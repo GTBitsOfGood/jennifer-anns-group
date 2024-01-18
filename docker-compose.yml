@@ -1,0 +1,28 @@
+services:
+  app:
+    build:
+      dockerfile: ./Dockerfile.dev
+    volumes:
+      - ./:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    # entrypoint: ./entrypoint.sh
+    environment:
+      DATABASE_URL: mongodb://mongo:27017/jenniferanns
+    networks:
+      - jennifer-anns-net
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    networks:
+      - jennifer-anns-net
+
+networks:
+  jennifer-anns-net:
+    driver: bridge
