@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { z } from "zod";
-import { gameSchema } from "../../utils/types";
+import { gameSchema } from "../../../utils/types";
 
 interface IGame extends z.infer<typeof gameSchema> {}
 

@@ -1,5 +1,5 @@
-import GameModel from "../../server/models/Games";
-import connectMongoDB from "../../server/mongodb";
+import GameModel from "../models/GameModel";
+import connectMongoDB from "../mongodb";
 
 export async function createGame(data: any) {
   await connectMongoDB();
