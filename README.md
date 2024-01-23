@@ -9,14 +9,14 @@ Jennifer Ann's Group is a nonprofit organization dedicated to preventing teen da
 - Install [Node.js](https://nodejs.org/en/download/)
 - Install [MongoDB Community Server](https://www.mongodb.com/docs/manual/administration/install-community/) to host a local instance of MongoDB. It may also be helpful to download [MongoDB Compass](https://www.mongodb.com/try/download/compass#compass) to view the state of your database.
 - Install and enable [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) in VSCode
-- Get a locally running MongoDB instance
+- Get a locally running MongoDB instance.
   You can use the command:
   ```sh
   docker run --name mongodb -d -p 27017:27017 mongo
   ```
 - Create a `.env` file in the root of the repository with the content:
   ```sh
-  DATABASE_URL=mongodb://localhost:27017/jenniferanns
+  MONGODB_URI=mongodb://localhost:27017/jennifer-anns
   ```
 - In the root directory of the project, run:
 
@@ -32,7 +32,7 @@ Jennifer Ann's Group is a nonprofit organization dedicated to preventing teen da
 
 - Navigate to http://localhost:3000/ to view the application.
 
-<!-- ## Run With Docker
+## Run With Docker
 
 1. Install [Docker](https://docs.docker.com/engine/install/)
 2. Start the application with Docker Compose: `docker compose up`
@@ -43,7 +43,7 @@ The Dockerized application will have live-reloading of changes made on the host 
 
 Note: On linux-based operating systems, if you come across an entrypoint permission error (i.e. `process: exec: "./entrypoint.sh": permission denied: unknown`), run `chmod +x ./entrypoint.sh` to make the shell file an executable.
 
-Windows Users: If you come across this error `exec ./entrypoint.sh: no such file or directory` when running the docker compose command, please follow this [Stackoverflow thread](https://stackoverflow.com/questions/40452508/docker-error-on-an-entrypoint-script-no-such-file-or-directory) to fix it. -->
+Windows Users: If you come across this error `exec ./entrypoint.sh: no such file or directory` when running the docker compose command, please follow this [Stackoverflow thread](https://stackoverflow.com/questions/40452508/docker-error-on-an-entrypoint-script-no-such-file-or-directory) to fix it.
 
 ## Major Technologies
 

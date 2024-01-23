@@ -1,13 +1,16 @@
-FROM node:16 AS deps
+FROM node:21 AS deps
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm install --legacy-peer-deps
+COPY package*.json ./
+RUN npm cache clean --force
+RUN npm install
 
-FROM node:16 as dev
+FROM node:21 as dev
 
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+RUN ls -la /app/node_modules
 
 CMD ["npm", "run", "dev"]
