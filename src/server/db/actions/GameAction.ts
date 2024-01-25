@@ -8,7 +8,6 @@ export async function createGame(data: any) {
     await game.save();
     return game._id;
   } catch (e) {
-    console.log(e);
     throw e;
   }
 }

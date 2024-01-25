@@ -19,6 +19,13 @@ export default async function handler(req: any, res: any) {
         });
       })
       .catch((error) => {
+        //MongoDB Error Code 11000 is for duplicate input
+        if (error.hasOwnProperty("code") && error.code == 11000) {
+          return res.status(400).send({
+            success: false,
+            message: error.message,
+          });
+        }
         return res.status(500).send({
           success: false,
           message: error.message,
