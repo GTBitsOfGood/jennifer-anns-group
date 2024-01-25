@@ -10,7 +10,6 @@ export default async function handler(req: any, res: any) {
         message: parsedData.error.format(),
       });
     }
-
     return createGame(parsedData.data)
       .then((id) => {
         return res.status(201).send({

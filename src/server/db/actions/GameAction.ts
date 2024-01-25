@@ -6,8 +6,9 @@ export async function createGame(data: any) {
   const game = new GameModel(data);
   try {
     await game.save();
+    return game._id;
   } catch (e) {
     console.log(e);
+    throw e;
   }
-  return game._id;
 }
