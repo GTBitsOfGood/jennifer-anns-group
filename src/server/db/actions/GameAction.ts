@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb";
 import GameModel from "../models/GameModel";
 import connectMongoDB from "../mongodb";
 
