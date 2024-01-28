@@ -11,5 +11,5 @@ export const userSchema = z.object({
   hashedPassword: z.string(),
   firstName: z.string(),
   lastName: z.string(),
-  label: z.string()
+  label: z.enum(["Educator", "Student", "Parent"])
 });
