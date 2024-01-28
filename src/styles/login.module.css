@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+
+.body {
+    display: flex;
+    flex-direction: row;
+    font-size: 20px;
+    justify-content: space-around;
+    align-items: center;
+    height: 100vh;
+}
+.leftContent {
+    display: flex;
+    flex-direction: column;
+    font-family: "Open Sans Condensed", sans-serif;
+    font-weight: 900;
+
+
+}
+
+.leftTitle {
+    font-size: bold;
+    font-size: 64px;
+}
+.leftDescription {
+    font-size: 54px;
+    font-style: italic;
+}
+.rightContent {
+    font-family: "Poppins", sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+.rightIntro {
+    font-size: 36px;
+    color: #2352A0;
+
+}
+.rightIntro h1 {
+    font-weight: bold;
+}
+
+.inputBox {
+    border-style: solid;
+    border: 1px solid #1a0606;
+    border-radius: 6px;
+    width: 456px;
+    height: 63px;
+    font-weight: normal;
+    padding-left: 10px;
+}
+.loginBox {
+    margin-top: 45px;
+    font-weight: 600;
+
+}
+
+.forgotPassword {
+    color: #2352A0;
+    margin-left: auto;
+    margin-top: 12px;
+    width: fit-content;
+    font-size: 16px;
+}
+.logIn {
+    color: #2352A0;
+    font-weight: bold;
+    font-size: 24px;
+    width: fit-content;
+    margin-left:auto;
+    margin-right: auto;
+    margin-top: 40px;
+    margin-bottom: auto;
+    padding: 10px;
+    padding-left: 30px;
+    padding-right: 30px;
+    border-radius: 10px;
+    border: 1px solid #2352A0;
+
+}
+
+.signup {
+    color: #2352A0;
+    text-decoration: underline;
+    
+}
+.signupBox {
+    margin-top: 20px;
+    font-size: 16px;
+    text-align: center;
+}
