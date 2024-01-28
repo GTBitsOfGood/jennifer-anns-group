@@ -16,4 +16,7 @@ export const gameSchema = z.object({
 export const userSchema = z.object({
   email: z.string().min(3).max(50),
   hashedPassword: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  label: z.enum(["Educator", "Student", "Parent"])
 });
