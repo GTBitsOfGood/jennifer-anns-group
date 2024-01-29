@@ -76,7 +76,12 @@
     padding-right: 30px;
     border-radius: 10px;
     border: 1px solid #2352A0;
-
+}
+.logIn:hover {
+    color: white;
+    background-color: #2352A0;
+    transition: color, .5s;
+    transition: background-color, .5s;
 }
 
 .signup {
@@ -88,4 +93,10 @@
     margin-top: 20px;
     font-size: 16px;
     text-align: center;
+}
+.logo {
+    filter: invert(100%);
+    display: inline;
+    padding-bottom: 5px;
+    margin-left: 5px;
 }

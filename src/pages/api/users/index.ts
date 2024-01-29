@@ -1,6 +1,5 @@
 import { createUser } from "../../../server/db/actions/UserAction";
 import { userSchema } from "../../../utils/types";
-
 export default async function handler(req: any, res: any) {
   if (req.method == "POST") {
     const parsedData = userSchema.safeParse(req.body);
