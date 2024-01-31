@@ -38,6 +38,20 @@ export const authOptions = {
         strategy: "jwt" as const,
     },
     secret: process.env.NEXTAUTH_SECRET,
+    callbacks: {
+        async signIn({user}) {
+            if (user?.error === "Email not found") {
+                throw new Error("Email Not Found");
+            }else if (user?.error === "Password Incorrect") {
+                throw new Error("Password Incorrect");
+            }else {
+                return true;
+            }
+
+
+        }
+
+    },
     providers: [
         CredentialsProvider({
             id: "credentials",
@@ -60,7 +74,11 @@ export const authOptions = {
                 if (response.status === 200) {
                     return response.message; //Make sure this message includes user._id.
                 }else {
-                    return null;
+                    if (response.status === 404) {
+                        return {error: "Email not found"}
+                    }else {
+                        return {error: "Password Incorrect"}
+                    }
                 }
 
             }

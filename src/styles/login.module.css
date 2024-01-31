@@ -43,6 +43,7 @@
 .inputBox {
     border-style: solid;
     border: 1px solid #1a0606;
+    border-color: black;
     border-radius: 6px;
     width: 456px;
     height: 63px;
@@ -83,7 +84,22 @@
     transition: color, .5s;
     transition: background-color, .5s;
 }
+.errorMessage {
+    display: flex;
+    align-items: center;
+    color:  #FF0000;
+    font-size: 14px;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
 
+
+}
+.errorImage {
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+
+}
 .signup {
     color: #2352A0;
     text-decoration: underline;
