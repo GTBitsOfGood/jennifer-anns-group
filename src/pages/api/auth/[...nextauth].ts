@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import {MongoDBAdapter} from "@next-auth/mongodb-adapter";
-
+import {IUser} from "@/server/db/models/UserModel";
 import UserModel from "@/server/db/models/UserModel";
 import {MongoClient, ObjectId} from "mongodb";
 import { verifyUser } from "@/server/db/actions/UserAction";
@@ -46,13 +46,17 @@ export const authOptions = {
                 email: {label: "Email", type: "text",placeholder:""},
                 password: {label: "Password",type: "password"}
             },
-            async authorize(credentials: any): Promise<any> { //What am I doing here.
-                const {email, password} = credentials as Credentials;
-
+            async authorize(credentials) { //What am I doing here.
+                if (credentials === undefined) {
+                    return null;
+                }
+                const {email, password} = credentials;
+                console.log("Verifying user!!");
                 if (!email || !password) {
                     return null;
                 }
                 const response = await verifyUser(email,password);
+                console.log(response);
                 if (response.status === 200) {
                     return response.message; //Make sure this message includes user._id.
                 }else {

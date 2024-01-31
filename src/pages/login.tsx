@@ -28,7 +28,7 @@ export default function login() {
                 <input className={styles.inputBox} type="password" id="password" value={password} onChange={(e) =>setPassword(e.target.value)}placeholder="Min 8 Characters"></input>
             </div>
                 <a className={styles.forgotPassword} href="https://www.google.com/">Forgot Password?</a>
-                <button className={styles.logIn} onClick={(e)=>{
+                <button className={styles.logIn} onClick={async (e)=>{
                     //Use document.getElementById("email")
                     e.preventDefault();
                     if (!email || !password) {
@@ -36,7 +36,8 @@ export default function login() {
                         return;
                     }
                     console.log(email,password);
-                    signIn("credentials",{email:email,password:password,redirect:false});
+                    const result = await signIn("credentials",{email:email,password:password,redirect:false});
+                    console.log(result);
                     router.push("/");
                     //Now use next-auth verification
                 }}>Log In</button>

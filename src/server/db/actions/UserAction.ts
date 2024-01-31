@@ -28,7 +28,8 @@ export async function verifyUser(email: string, hashedPassword: string) {
       }
     }
     //const match = await bcrypt.compare(password+email,user.hashedPassword); //Replace this line with a hashing algorithm when we get it.
-    const match = hashedPassword == user.hashedPassword; //Temp code, will remove once start working on bcrypt.
+    const match = hashedPassword === user.hashedPassword; //Temp code, will remove once start working on bcrypt.
+    console.log(hashedPassword,user.hashedPassword);
     if (match) {
       return {
         status: 200,
