@@ -12,6 +12,32 @@ export async function createGame(data: any) {
   }
 }
 
+export async function deleteGame(data: any) {
+  await connectMongoDB();
+  try {
+    const result = await GameModel.findByIdAndDelete(data);
+    if (!result) {
+      throw new ReferenceError("Game with given ID does not exist.");
+    }
+  } catch (e) {
+    throw e;
+  }
+}
+
+export async function editGame(data: any) {
+  await connectMongoDB();
+  try {
+    const result = await GameModel.findByIdAndUpdate(data.id, data.data, {
+      new: true,
+    });
+    if (!result) {
+      throw new ReferenceError("Game with given ID does not exist.");
+    }
+  } catch (e) {
+    throw e;
+  }
+}
+
 export async function getAllGames() {
   await connectMongoDB();
   try {
