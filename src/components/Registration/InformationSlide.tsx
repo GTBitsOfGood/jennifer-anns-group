@@ -15,12 +15,14 @@ enum Label {
   Student = "student",
   Parent = "parent",
   Educator = "educator",
+  Administrator = "administrator",
 }
 
 const ROLE_LABEL_MAP: Record<Label, string> = {
   [Label.Student]: "Student",
   [Label.Parent]: "Parent",
   [Label.Educator]: "Educator",
+  [Label.Administrator]: "Administrator",
 };
 
 enum YesNo {
@@ -106,6 +108,7 @@ function InformationSlide({ accountData }: Props) {
       className="grid gap-y-8 gap-x-4 w-[20em] grid-cols-2"
       onSubmit={handleInformationFormSubmit}
     >
+      {/* TODO: implement UnauthorizedAdmin error box */}
       <div className="relative">
         <label htmlFor={FIRST_NAME_FORM_KEY} className="text-xl">
           First Name*

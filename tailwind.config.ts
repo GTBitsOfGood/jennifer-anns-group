@@ -22,6 +22,7 @@ const config = {
         "blue-primary": "#2352A0",
         "input-bg": "#FAFBFC",
         "input-border": "#D9D9D9",
+        grey: "#666666",
         placeholder: "#A3AED0",
       },
       fontFamily: {

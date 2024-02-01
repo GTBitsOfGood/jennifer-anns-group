@@ -58,10 +58,6 @@ function Signup() {
               Sign in here
             </a>
           </p>
-          {/* TODO: Add href to administrator */}
-          <a className="underline text-blue-primary hover:cursor-pointer">
-            Administrator?
-          </a>
         </div>
       </div>
     </HeroImage>
