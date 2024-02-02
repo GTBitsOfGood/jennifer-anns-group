@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, {User} from "next-auth";
 import {MongoDBAdapter} from "@next-auth/mongodb-adapter";
 import {IUser} from "@/server/db/models/UserModel";
 import UserModel from "@/server/db/models/UserModel";
@@ -15,6 +15,12 @@ if (!URI) {
 }
 const client = new MongoClient(URI,options);
 
+declare module "next-auth" {
+    interface User {
+        error: string
+    }
+}
+
 const retrievePromise = () => {
     if (cachedPromise) {
         return cachedPromise;
@@ -28,6 +34,8 @@ interface Credentials {
     email: string;
     password: string;
 }
+
+
 /**
  *  @type {import("next-auth").NextAuthOptions}
  */
@@ -39,7 +47,7 @@ export const authOptions = {
     },
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
-        async signIn({user}) {
+        async signIn({user} : {user: User}) {
             if (user?.error === "Email not found") {
                 throw new Error("Email Not Found");
             }else if (user?.error === "Password Incorrect") {
@@ -60,7 +68,7 @@ export const authOptions = {
                 email: {label: "Email", type: "text",placeholder:""},
                 password: {label: "Password",type: "password"}
             },
-            async authorize(credentials) { //What am I doing here.
+            async authorize(credentials): Promise<any> { //What am I doing here.
                 if (credentials === undefined) {
                     return null;
                 }

@@ -1,6 +1,6 @@
 import UserModel from "../models/UserModel";
 import connectMongoDB from "../mongodb";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 const SALT_ROUNDS = 10;
 export async function createUser(data: any) {
   await connectMongoDB();
