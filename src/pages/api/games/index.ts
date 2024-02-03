@@ -1,4 +1,4 @@
-import { createGame } from "../../../server/db/actions/GameAction";
+import { createGame, getAllGames } from "../../../server/db/actions/GameAction";
 import { gameSchema } from "../../../utils/types";
 
 export default async function handler(req: any, res: any) {
@@ -10,7 +10,6 @@ export default async function handler(req: any, res: any) {
         message: parsedData.error.format(),
       });
     }
-
     return createGame(parsedData.data)
       .then((id) => {
         return res.status(201).send({
@@ -20,11 +19,33 @@ export default async function handler(req: any, res: any) {
         });
       })
       .catch((error) => {
+        //MongoDB Error Code 11000 is for duplicate input
+        if (error.hasOwnProperty("code") && error.code == 11000) {
+          return res.status(400).send({
+            success: false,
+            message: error.message,
+          });
+        }
         return res.status(500).send({
           success: false,
           message: error.message,
         });
       });
+  }
+  if (req.method == "GET") {
+    try {
+      const games = await getAllGames();
+      return res.status(200).send({
+        success: true,
+        message: "Games retrieved successfully",
+        data: games,
+      });
+    } catch (error: any) {
+      return res.status(500).send({
+        success: false,
+        message: error.message 
+      });
+    }
   }
   return res.status(405).send({
     success: false,

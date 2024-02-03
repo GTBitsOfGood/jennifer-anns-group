@@ -7,6 +7,9 @@ export interface IUser extends z.infer<typeof userSchema> {}
 const UserSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },
   hashedPassword: { type: String, required: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  label: { type: String, required: true },
 });
 
 const UserModel =

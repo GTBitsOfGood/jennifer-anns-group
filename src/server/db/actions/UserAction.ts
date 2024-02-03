@@ -7,6 +7,12 @@ export async function createUser(data: any) {
   await connectMongoDB();
   //Adding encryption here for making a new user.
   data.hashedPassword = await bcrypt.hash(data.hashedPassword, SALT_ROUNDS);
+
+  const existingUser = await UserModel.findOne({ email: data.email });
+  if (existingUser) {
+    throw new Error("User with this email already exists");
+  }
+
   const user = new UserModel(data);
   try {
     await user.save();

@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: "Open Sans Condensed";
+  src: url(../fonts/open-sans-condensed/OpenSans-CondLight.ttf)
+    format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Open Sans Condensed";
+  src: url(../fonts/open-sans-condensed/OpenSans-CondLightItalic.ttf)
+    format("truetype");
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Open Sans Condensed";
+  src: url(../fonts/open-sans-condensed/OpenSans-CondBold.ttf)
+    format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
