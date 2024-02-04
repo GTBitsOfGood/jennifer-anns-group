@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import { z } from "zod";
 import { userSchema } from "../../../utils/types";
 
-interface IUser extends z.infer<typeof userSchema> {}
+export interface IUser extends z.infer<typeof userSchema> {}
 
 const UserSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },
