@@ -1,10 +1,10 @@
 import { z } from "zod";
-
+import {ObjectId} from "mongodb";
 // Game
-export const gameSchema = z.object({
+export const gameSchema = z.object({ //Make sure to modify gameSchema endpoints, as well as editGameSchema I suppose.
   name: z.string().min(3).max(50),
-  theme: z.string().min(1).max(100),
-  tags: z.array(z.string()).optional(),
+  themes: z.array(z.instanceof(ObjectId)).optional(),
+  tags: z.array(z.instanceof(ObjectId)).optional(),
   multiClass: z.boolean(),
   description: z.string().optional(),
   game: z.string().url(),
@@ -15,8 +15,8 @@ export const gameSchema = z.object({
 // For editing game
 export const editGameSchema = z.object({
   name: z.string().min(3).max(50).optional(),
-  theme: z.string().min(1).max(100).optional(),
-  tags: z.array(z.string()).optional(),
+  themes: z.array(z.instanceof(ObjectId)).optional(),
+  tags: z.array(z.instanceof(ObjectId)).optional(),
   multiClass: z.boolean().optional(),
   description: z.string().optional(),
   game: z.string().url().optional(),
@@ -31,4 +31,17 @@ export const userSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   label: z.enum(["Educator", "Student", "Parent", "Administrator"]),
+});
+
+
+// Theme
+export const themeSchema = z.object({
+  name: z.string(),
+  games: z.array(z.instanceof(ObjectId)).optional()
+});
+
+// Tag
+export const tagSchema = z.object({
+  name: z.string(),
+  games: z.array(z.instanceof(ObjectId)).optional()
 });

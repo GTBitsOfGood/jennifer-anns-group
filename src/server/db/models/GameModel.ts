@@ -1,13 +1,13 @@
 import mongoose, { Schema } from "mongoose";
 import { z } from "zod";
 import { gameSchema } from "../../../utils/types";
-
+import { ObjectId } from "mongodb";
 interface IGame extends z.infer<typeof gameSchema> {}
 
 const GameSchema = new Schema<IGame>({
   name: { type: String, required: true, unique: true },
-  theme: { type: String, required: true },
-  tags: { type: [String], default: [] },
+  themes: { type: [ObjectId], required: false },
+  tags: { type: [ObjectId], default: [], required: false },
   multiClass: { type: Boolean, required: true },
   description: { type: String },
   game: { type: String, required: true },
