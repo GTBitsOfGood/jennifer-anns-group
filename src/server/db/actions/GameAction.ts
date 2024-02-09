@@ -91,7 +91,7 @@ export async function editGame(data: any) {
   try {
 
     const result = await GameModel.findByIdAndUpdate(data.id, data.data, {
-      new: true,
+      new: false,
     });
     if (!result) {
       throw new ReferenceError("Game with given ID does not exist.");
@@ -103,7 +103,6 @@ export async function editGame(data: any) {
     if (!result.tags) {
       result.tags = [];
     }
-    
     if (data.data.themes) {
       //Implies that themes was updated.
       //ADD new themes
@@ -123,19 +122,24 @@ export async function editGame(data: any) {
       }
     }
     //Removes old tags
-    if (data.data.tag) {
+    console.log("Previous Tags:",result.tags);
+    console.log("Next Tags:",data.data.tags);
+    if (data.data.tags) {
       //Implies that tags was updated.
       //ADD new tags
       for (const tag of data.data.tags) {
         //First ensure tag is'nt already in result (old one), to prevent excess database calls
         if (!(tag in result.tags)) {
           //Only adds if new tag.
-          await TagModel.findByIdAndUpdate(tag,{$addToSet: {games: data.id}});
+          console.log("Adding",data.id);
+          const result = await TagModel.findByIdAndUpdate(tag,{$addToSet: {games: data.id}});
+          console.log(result);
         }
       }
       for (const tag of result.tags) {
         //Remove old tag not in new tags
         if (!(tag.toString() in data.data.tags)) { //Becuase tag is ObjectID type, but data.data.tags has no tag
+          console.log("Removing",data.id);
           await TagModel.findByIdAndUpdate(tag,{$pull: {games: data.id}});
         }
       }
