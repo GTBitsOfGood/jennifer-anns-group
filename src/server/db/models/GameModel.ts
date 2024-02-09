@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import { z } from "zod";
 import { gameSchema } from "../../../utils/types";
 import { ObjectId } from "mongodb";
-interface IGame extends z.infer<typeof gameSchema> {}
+export interface IGame extends z.infer<typeof gameSchema> {}
 
 const GameSchema = new Schema<IGame>({
   name: { type: String, required: true, unique: true },

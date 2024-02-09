@@ -2,7 +2,7 @@ import mongoose, {Schema} from "mongoose";
 import {z} from "zod";
 import {themeSchema} from "../../../utils/types";
 import { ObjectId } from "mongodb";
-interface ITheme extends z.infer<typeof themeSchema> {}
+export interface ITheme extends z.infer<typeof themeSchema> {}
 
 const ThemeSchema = new Schema<ITheme>({
     name: {type: String, required: true, unique: true},

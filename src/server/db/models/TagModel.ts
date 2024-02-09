@@ -2,7 +2,7 @@ import mongoose, {Schema} from "mongoose";
 import {z} from "zod";
 import {tagSchema} from "../../../utils/types";
 import { ObjectId } from "mongodb";
-interface ITag extends z.infer<typeof tagSchema> {}
+export interface ITag extends z.infer<typeof tagSchema> {}
 
 const TagSchema = new Schema<ITag>({
     name: {type: String, required: true, unique: true},
