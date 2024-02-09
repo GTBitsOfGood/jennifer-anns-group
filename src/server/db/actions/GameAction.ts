@@ -6,7 +6,6 @@ import { gameSchema } from "@/utils/types";
 
 export async function createGame(data: any) {
   await connectMongoDB();
-  console.log(data);
   try {
       //Ensure every ObjectID actually represents a Document
       if (data && data.themes) {
@@ -54,10 +53,11 @@ export async function deleteGame(data: any) {
     if (!result.themes) return;
     if (!result.tags) return;
     for (const theme_id of result.themes) {
-      ThemeModel.findByIdAndUpdate(theme_id,{$pull: {games: data}})
+      console.log("Removing",theme_id)
+      await ThemeModel.findByIdAndUpdate(theme_id,{$pull: {games: data}});
     }
     for (const tag_id of result.tags) {
-      TagModel.findByIdAndUpdate(tag_id,{$pull: {games: data}})
+      await TagModel.findByIdAndUpdate(tag_id,{$pull: {games: data}});
     }
     
   } catch (e) {
@@ -103,6 +103,7 @@ export async function editGame(data: any) {
     if (!result.tags) {
       result.tags = [];
     }
+
     if (data.data.themes) {
       //Implies that themes was updated.
       //ADD new themes
@@ -122,8 +123,6 @@ export async function editGame(data: any) {
       }
     }
     //Removes old tags
-    console.log("Previous Tags:",result.tags);
-    console.log("Next Tags:",data.data.tags);
     if (data.data.tags) {
       //Implies that tags was updated.
       //ADD new tags
@@ -131,15 +130,12 @@ export async function editGame(data: any) {
         //First ensure tag is'nt already in result (old one), to prevent excess database calls
         if (!(tag in result.tags)) {
           //Only adds if new tag.
-          console.log("Adding",data.id);
           const result = await TagModel.findByIdAndUpdate(tag,{$addToSet: {games: data.id}});
-          console.log(result);
         }
       }
       for (const tag of result.tags) {
         //Remove old tag not in new tags
         if (!(tag.toString() in data.data.tags)) { //Becuase tag is ObjectID type, but data.data.tags has no tag
-          console.log("Removing",data.id);
           await TagModel.findByIdAndUpdate(tag,{$pull: {games: data.id}});
         }
       }
