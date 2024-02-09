@@ -8,12 +8,34 @@ import GameModel from "../models/GameModel";
 //Put more of the verification in the actual API endpoint
 //Themes and Tags are essentially identical
 export async function createTag(data: ITag) {
-       connectMongoDB();
+    connectMongoDB();
+    try {
+        //Ensure every ObjectID actually represents a game Document
+        if (data && data.games) {
+            for (const game of data.games) {
+                const result = await GameModel.findById(game);
+                if (!result) {
+                    throw ReferenceError(`ObjectID ${game} not present.`);
+                }
+            }
+        }
+    }catch(e) {
+        throw e;
+    }
+
    const tag = new TagModel(data);
+   //When I create a Tag or Theme make sure to add the tag id/theme id to the corresponding game.
+
    try {
        await tag.save();
    }catch (e) {
        throw e;
+   }
+   if (data.games) {
+    for (const game of data.games) {
+        //Game is an ObjectID or string
+        await GameModel.findByIdAndUpdate(game,{$addToSet: {tags: tag.id}})
+    }
    }
    return tag.id;
 }
@@ -25,34 +47,20 @@ export async function deleteTag(id: ObjectId) {
     //Review mongoose syntax. 
     connectMongoDB();
     try {
-        const deleted_tag: ITag & {id: ObjectId} | null = await TagModel.findByIdAndDelete(id);
+        console.log(id);
+        const deleted_tag: ITag & {id: ObjectId} | null = await TagModel.findByIdAndDelete(id.toString());//To fix error with BSON
+        console.log(deleted_tag);
         if (!deleted_tag) {
             //Object Id not present
             throw new ReferenceError("No Tag present with this ObjectID.");
         }
-        const games: ObjectId[] | undefined = deleted_tag.games; //How should I do typing here?
+        const games: (ObjectId | string)[] | undefined = deleted_tag.games; //How should I do typing here?
         //Go through every game and remove selected tag
         if (!games) {
             return;
         }
         for (const game of games) {
-            const gameDocument: IGame & {id: ObjectId} | null = await GameModel.findById(game);
-            //Is there a way to cast this type from promise to just ITheme with Objectid?
-            if (!gameDocument) {
-                continue; //Indicates that Game Object doesn't exist, weird but whatever.
-            }
-            if (!gameDocument.tags) {
-                continue; //Indicates Game Object doesn't have any themes, shouldn't occur, 
-                //but needed for typing purposes.
-            }
-            const newTags =  gameDocument.tags.filter((tag: ObjectId)=>{tag !== id});
-            const gameDoc = await GameModel.findByIdAndUpdate(game,{tag:newTags});
-            if (!gameDoc) {
-                //Failed to update model in this situation
-                //Document should already exist because it was there before, so this cant happen.
-                throw Error("Document doesn't appear to exist");
-            }
-
+            await GameModel.findByIdAndUpdate(game,{$pull: {tags: id}});
 
         }
 

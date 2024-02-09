@@ -9,7 +9,7 @@ const TagSchema = new Schema<ITag>({
     games: {type: [ObjectId], required: false},
 });
 
-const TagModel = (mongoose.models.Theme as mongoose.Model<ITag>) ??
+const TagModel = (mongoose.models.Tag as mongoose.Model<ITag>) ??
     mongoose.model("Tag",TagSchema);
 
 export default TagModel;

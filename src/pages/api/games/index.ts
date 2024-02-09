@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { createGame, getAllGames } from "../../../server/db/actions/GameAction";
 import { gameSchema } from "../../../utils/types";
-
+import { ObjectId } from "mongodb";
 export default async function handler(req: any, res: any) {
   switch (req.method) {
     case "GET":
@@ -19,13 +19,32 @@ export default async function handler(req: any, res: any) {
         });
       }
     case "POST":
+      console.log(req.body);
+      //How can I ensure that the values in req.body? are strings convertable to objects.
       const parsedData = gameSchema.safeParse(req.body);
+      console.log(parsedData);
       if (!parsedData.success) {
         return res.status(422).send({
           success: false,
           message: parsedData.error.format(),
         });
       }
+      if (parsedData.data.tags) {
+
+                
+        for (let i = 0; i < parsedData.data.tags.length; i++) {
+            parsedData.data.tags[i] = new ObjectId(parsedData.data.tags[i]);
+            
+        }
+    }
+    if (parsedData.data.themes) {
+
+                
+      for (let i = 0; i < parsedData.data.themes.length; i++) {
+          parsedData.data.themes[i] = new ObjectId(parsedData.data.themes[i]);
+          
+      }
+  }
       return createGame(parsedData.data)
         .then((id) => {
           return res.status(201).send({

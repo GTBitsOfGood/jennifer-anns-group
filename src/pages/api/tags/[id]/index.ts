@@ -19,26 +19,35 @@ export default async function handler(req: NextApiRequest,res: NextApiResponse) 
                     throw ReferenceError("ObjectId is invalid");
                 }
                 
-
+                return res.status(200).send({
+                    success: true,
+                    message: "Object successfully deleted"
+                })
 
             }catch(e: any) {
-                if (e instanceof ReferenceError || e instanceof ZodError) {
-                    res.status(400).send({
+                if (e instanceof ZodError) {
+                    return res.status(400).send({
+                        success: false,
+                        message: JSON.parse(e.message)
+                    })
+                }
+                else if(e instanceof ReferenceError) {
+                    return res.status(400).send({
                         success: false,
                         message: e.message
                     })
+
                 }
             else {
-                res.status(500).send({
+                return res.status(500).send({
                     success: false,
                     message: e.message
                 })
             }
         }
 
-
     }
-    res.status(405).send({
+    return res.status(405).send({
         success: false,
         message: `Method ${req.method} not allowed at this endpoint`
     });

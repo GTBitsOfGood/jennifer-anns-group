@@ -6,6 +6,28 @@ import { gameSchema } from "@/utils/types";
 
 export async function createGame(data: any) {
   await connectMongoDB();
+  console.log(data);
+  try {
+      //Ensure every ObjectID actually represents a Document
+      if (data && data.themes) {
+          for (const theme of data.themes) {
+              const result = await GameModel.findById(theme);
+              if (!result) {
+                  throw ReferenceError(`ObjectID ${theme} not present.`);
+              }
+          }
+      }
+      if (data && data.tags) {
+        for (const tag of data.tags) {
+            const result = await GameModel.findById(tag);
+            if (!result) {
+                throw ReferenceError(`ObjectID ${tag} not present.`);
+            }
+        }
+    }
+  }catch(e) {
+      throw e;
+  }
   const game = new GameModel(data);
   try {
     await game.save();
@@ -45,6 +67,27 @@ export async function deleteGame(data: any) {
 
 export async function editGame(data: any) {
   await connectMongoDB();
+  try {
+      //Ensure every ObjectID actually represents a Document
+      if (data && data.themes) {
+          for (const theme of data.themes) {
+              const result = await GameModel.findById(theme);
+              if (!result) {
+                  throw ReferenceError(`ObjectID ${theme} not present.`);
+              }
+          }
+      }
+      if (data && data.tags) {
+        for (const tag of data.tags) {
+            const result = await GameModel.findById(tag);
+            if (!result) {
+                throw ReferenceError(`ObjectID ${tag} not present.`);
+            }
+        }
+    }
+  }catch(e) {
+      throw e;
+  }
   try {
 
     const result = await GameModel.findByIdAndUpdate(data.id, data.data, {

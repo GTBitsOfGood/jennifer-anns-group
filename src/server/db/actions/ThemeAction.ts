@@ -9,12 +9,31 @@
 //Put more of the verification in the actual API endpoint
  export async function createTheme(data: ITheme) {
         connectMongoDB();
+    try {
+        //Ensure every ObjectID actually represents a game Document
+        if (data && data.games) {
+            for (const game of data.games) {
+                const result = await GameModel.findById(game);
+                if (!result) {
+                    throw ReferenceError(`ObjectID ${game} not present.`);
+                }
+            }
+        }
+    }catch(e) {
+        throw e;
+    }
     const theme = new ThemeModel(data);
     try {
         await theme.save();
     }catch (e) {
         throw e;
     }
+    if (data.games) {
+        for (const game of data.games) {
+            //Game is an ObjectID or string
+            await GameModel.findByIdAndUpdate(game,{$addToSet: {themes: theme.id}})
+        }
+       }
     return theme.id;
  }
 
@@ -26,35 +45,21 @@
     //Review mongoose syntax. 
     connectMongoDB();
     try {
-        const deleted_theme: ITheme & {id: ObjectId} | null = await ThemeModel.findByIdAndDelete(id);
+        console.log(id);
+        const deleted_theme: ITheme & {id: ObjectId} | null = await ThemeModel.findByIdAndDelete(id.toString());//To fix BSON Error?
+        console.log("After");
+
         if (!deleted_theme) {
             //Object Id not present
             throw new ReferenceError("No Theme present with this ObjectID.");
         }
-        const games: ObjectId[] | undefined = deleted_theme.games; //How should I do typing here?
+        const games: (ObjectId | string)[] | undefined = deleted_theme.games; //How should I do typing here?
         //Go through every game and remove selected theme
         if (!games) {
             return;
         }
         for (const game of games) {
-            const gameDocument: IGame & {id: ObjectId} | null = await GameModel.findById(game);
-            //Is there a way to cast this type from promise to just ITheme with Objectid?
-            if (!gameDocument) {
-                continue; //Indicates that Game Object doesn't exist, weird but whatever.
-            }
-            if (!gameDocument.themes) {
-                continue; //Indicates Game Object doesn't have any themes, shouldn't occur, 
-                //but needed for typing purposes.
-            }
-            const newThemes =  gameDocument.themes.filter((theme: ObjectId)=>{theme !== id});
-            const gameDoc = await GameModel.findByIdAndUpdate(game,{themes:newThemes});
-            if (!gameDoc) {
-                //Failed to update model in this situation
-                //Document should already exist because it was there before, so this cant happen.
-                throw Error("Document doesn't appear to exist");
-            }
-
-
+            await GameModel.findByIdAndUpdate(game,{$pull: {themes: id}});
         }
 
     }catch (e) {
