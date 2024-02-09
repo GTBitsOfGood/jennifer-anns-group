@@ -11,11 +11,11 @@
         connectMongoDB();
     const theme = new ThemeModel(data);
     try {
-        theme.save();
+        await theme.save();
     }catch (e) {
         throw e;
     }
-    return theme.id
+    return theme.id;
  }
 
 

@@ -11,7 +11,7 @@ export async function createTag(data: ITag) {
        connectMongoDB();
    const tag = new TagModel(data);
    try {
-       tag.save();
+       await tag.save();
    }catch (e) {
        throw e;
    }
