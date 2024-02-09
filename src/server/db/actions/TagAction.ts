@@ -47,9 +47,7 @@ export async function deleteTag(id: ObjectId) {
     //Review mongoose syntax. 
     connectMongoDB();
     try {
-        console.log(id);
         const deleted_tag: ITag & {id: ObjectId} | null = await TagModel.findByIdAndDelete(id.toString());//To fix error with BSON
-        console.log(deleted_tag);
         if (!deleted_tag) {
             //Object Id not present
             throw new ReferenceError("No Tag present with this ObjectID.");

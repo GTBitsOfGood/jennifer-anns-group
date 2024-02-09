@@ -53,7 +53,6 @@ export async function deleteGame(data: any) {
     if (!result.themes) return;
     if (!result.tags) return;
     for (const theme_id of result.themes) {
-      console.log("Removing",theme_id)
       await ThemeModel.findByIdAndUpdate(theme_id,{$pull: {games: data}});
     }
     for (const tag_id of result.tags) {

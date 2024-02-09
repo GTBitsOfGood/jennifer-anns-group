@@ -45,9 +45,7 @@
     //Review mongoose syntax. 
     connectMongoDB();
     try {
-        console.log(id);
         const deleted_theme: ITheme & {id: ObjectId} | null = await ThemeModel.findByIdAndDelete(id.toString());//To fix BSON Error?
-        console.log("After");
 
         if (!deleted_theme) {
             //Object Id not present
