@@ -21,7 +21,9 @@ const buttonVariants = cva(
           "hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-50",
         link: "text-slate-900 underline-offset-4 hover:underline dark:text-slate-50",
         mainblue:
-          "bg-blue-primary text-white hover:opacity-85 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
+          "border border-blue-primary border-[1px] bg-blue-primary text-white hover:opacity-75 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
+        outline2:
+          "border-2 border-[1px] border-blue-primary text-blue-primary bg-white hover:bg-gray-100 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
       },
       size: {
         default: "h-10 px-4 py-2",

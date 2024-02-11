@@ -51,4 +51,15 @@ export async function verifyUser(email: string, password: string) {
       message: "Invalid password",
     };
   }
+
+}
+
+export async function getUser(email: string) {
+  await connectMongoDB();
+  try {
+    const user = await UserModel.findOne({ email: email });
+    return user;
+  } catch (e) {
+    throw e;
+  }
 }
