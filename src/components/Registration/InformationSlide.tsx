@@ -9,7 +9,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { z } from "zod";
-import { accountSchema } from "@/pages/signup";
+import { AlertKeys, accountSchema } from "@/pages/signup";
+import { useRouter } from "next/router";
+import { signIn } from "next-auth/react";
 
 enum Label {
   Student = "student",
@@ -64,9 +66,17 @@ interface Props {
   accountData: Partial<
     Record<keyof z.infer<typeof accountSchema>, string | undefined>
   >;
+  setAlertType: React.Dispatch<React.SetStateAction<AlertKeys>>;
+  setIsAlertShowing: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function InformationSlide({ accountData }: Props) {
+function InformationSlide({
+  accountData,
+  setIsAlertShowing,
+  setAlertType,
+}: Props) {
+  const router = useRouter();
+
   const [validationErrors, setValidationErrors] = useState<
     Record<keyof z.infer<typeof informationSchema>, string | undefined>
   >({
@@ -76,7 +86,9 @@ function InformationSlide({ accountData }: Props) {
     age: undefined,
   });
 
-  function handleInformationFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleInformationFormSubmit(
+    e: React.FormEvent<HTMLFormElement>
+  ) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const input = {
@@ -86,13 +98,7 @@ function InformationSlide({ accountData }: Props) {
       age: formData.get(AGE_FORM_KEY),
     };
     const parse = informationSchema.safeParse(input);
-    if (parse.success) {
-      const { passwordConfirm, age, ...combinedAccountData } = {
-        ...accountData,
-        ...parse.data,
-      };
-      // TODO: Persist `combinedAccountData` to database
-    } else {
+    if (!parse.success) {
       const errors = parse.error.formErrors.fieldErrors;
       setValidationErrors({
         firstName: errors.firstName?.at(0),
@@ -100,7 +106,27 @@ function InformationSlide({ accountData }: Props) {
         label: errors.label?.at(0),
         age: errors.age?.at(0),
       });
+      return;
     }
+    const { passwordConfirm, age, ...combinedAccountData } = {
+      ...accountData,
+      ...parse.data,
+    };
+    const res = await fetch("/api/users", {
+      method: "POST",
+      body: JSON.stringify(combinedAccountData),
+    });
+    if (!res.ok) {
+      setIsAlertShowing(true);
+      setAlertType("generic");
+      return;
+    }
+    const creds = signIn("credentials", {
+      email: combinedAccountData.email,
+      password: combinedAccountData.password,
+      redirect: false,
+    });
+    router.replace("/");
   }
 
   return (
@@ -108,7 +134,6 @@ function InformationSlide({ accountData }: Props) {
       className="grid gap-y-8 gap-x-4 w-[20em] grid-cols-2"
       onSubmit={handleInformationFormSubmit}
     >
-      {/* TODO: implement UnauthorizedAdmin error box */}
       <div className="relative">
         <label htmlFor={FIRST_NAME_FORM_KEY} className="text-xl">
           First Name*
