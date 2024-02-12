@@ -24,7 +24,9 @@ const buttonVariants = cva(
           "border border-blue-primary border-[1px] bg-blue-primary text-white hover:opacity-75 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
         outline2:
           "border-2 border-[1px] border-blue-primary text-blue-primary bg-white hover:bg-gray-100 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
-      },
+        mainorange:
+          "border border-orange-primary transition-opacity border-[1px] bg-orange-primary text-white hover:opacity-80 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
+        },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-9 rounded-md px-3",

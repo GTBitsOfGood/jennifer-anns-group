@@ -3,7 +3,6 @@ import { userSchema } from "../../../utils/types";
 
 export default async function handler(req: any, res: any) {
   if (req.method == "POST") {
-    console.log("Post endpint hit w ", req.body);
     const parsedData = userSchema.safeParse(req.body);
     if (!parsedData.success) {
 
@@ -15,8 +14,6 @@ export default async function handler(req: any, res: any) {
 
     return createUser(parsedData.data)
       .then((id) => {
-     console.log("pleas ehlpe me here", parsedData);
-
         return res.status(201).send({
           success: true,
           message: "New user created!",
@@ -54,13 +51,11 @@ export default async function handler(req: any, res: any) {
   }
 
   if (req.method === "PUT") {
-    console.log("Put endpoint hit with data", typeof req.body);
     const { type } = req.query;
     if (type === "info") {
       // Editing user profile
       try {
         const result = await editUser(req.body);
-        console.log("JUst did editUser");
         return res.status(200).send({
           success: true,
           message: "User information updated successfully",

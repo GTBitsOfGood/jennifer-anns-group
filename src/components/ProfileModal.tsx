@@ -20,6 +20,7 @@ import {
 import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
+import { MoveLeft } from "lucide-react";
 
 export function ProfileModal() {
   const [profileState, setProfileState] = useState("view");
@@ -138,11 +139,9 @@ export function ProfileModal() {
     if (parse.success) {
       setInvalidPW("");
       setInvalidPWConfirm("");
-      console.log("editing user w this data", parse.data);
       editUser(parse.data, "password")
         .then((res) => {
           if (!res.success) {
-            console.log(res.message);
             setInvalidOldPW(res.message);
           } else {
             setProfileState("edit");
@@ -180,10 +179,14 @@ export function ProfileModal() {
     return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" onClick={(() => setProfileState("view"))}>Your profile</Button>
+        <Button variant="mainorange" onClick={(() => setProfileState("view"))}>Your profile</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] py-10 px-12  border-solid border-4 border-blue-primary">
         <DialogHeader>
+          {profileState=="changePw" && 
+            <MoveLeft onClick={()=>{setProfileState("edit")}}className="absolute left-4 top-4 rounded-sm h-6 w-6 text-blue-primary hover:cursor-pointer opacity-100 ring-offset-white transition-opacity focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:pointer-events-none" />
+          }
+        
           <DialogTitle className="text-lg text-blue-primary font-semibold -mb-2">
             {
             profileState == "view" && "Profile" ||
@@ -191,8 +194,10 @@ export function ProfileModal() {
             profileState == "changePw" && "Edit Password"
             }
             </DialogTitle>
+
+            
         </DialogHeader>
-        
+      
         {profileState != "changePw" &&
         <form onSubmit={handleProfileFormSubmit}>
         <div className="grid grid-cols-8 gap-3 py-4 -my-2">
