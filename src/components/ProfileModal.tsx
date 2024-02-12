@@ -1,144 +1,181 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-  } from "@/components/ui/select"
-import { profile } from "console"
-import { useState, useEffect } from "react"
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useState, useEffect } from "react";
 import { z } from "zod";
+import { useSession } from "next-auth/react";
 
 export function ProfileModal() {
+  const [profileState, setProfileState] = useState("view");
+  const [open, setOpen] = useState(false);
 
-    const [profileState, setProfileState] = useState("view");
+  interface UserData {
+    firstName: string;
+    lastName: string;
+    email: string;
+    label: string;
+    _id: any;
+    hashedPassword: any;
+  }
 
-    const [open, setOpen] = useState(false);
+  const { data: session } = useSession();
+  const currentUser = session?.user;
+  const [userData, setUserData] = useState<UserData | null>(null);
 
+  useEffect(() => {
+    if (currentUser) {
+      getUserData(currentUser.email);
+    }
+  }, [currentUser]);
 
-    const FNAME_FORM_KEY = "firstname";
-    const LNAME_FORM_KEY = "lastname";
-    const EMAIL_FORM_KEY = "email";
-    const ROLE_FORM_KEY = "role";
-    
-    const OLDPW_FORM_KEY = "oldpassword";
-    const PW_FORM_KEY = "password";
-    const PW_CONFIRM_FORM_KEY = "passwordConfirm";
+  // for testing, need to create user in Postman with email "abc@gmail.com" first
+  useEffect(() => {
+    getUserData("abc@gmail.com");
+  }, []);
 
-    const userSchema = z.object({
-        firstname: z.string(),
-        lastname: z.string(),
-        email: z.string().email("Not a valid email."),
-        role: z.enum(["Student", "Administrator", "Parent", "Educator"])
+  async function getUserData(email: any) {
+    try {
+      const response = await fetch(`/api/users?email=${encodeURIComponent(email)}`);
+      const data = await response.json();
+      setUserData(data.data);
+    } catch (error) {
+      console.error("Error getting user:", error);
+      throw error;
+    }
+  }
 
-    });
+  async function editUser(data: any, type: string) {
+    try {
+      const response = await fetch(`/api/users?type=${type}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      const responseData = await response.json();
+      return responseData;
+    } catch (error) {
+      console.error(`Error editing user ${type}:`, error);
+      throw error;
+    }
+  }
 
-    const pwSchema = z.object({
-        oldpassword: z.string(),
-        password: z.string().min(8, "Password must contain at least 8 characters."),
-        passwordConfirm: z.string(),
-    }).refine((data) => data.password === data.passwordConfirm, {
-        message: "Passwords do not match",
-        path: ["passwordConfirm"],
-    });
+  const FNAME_FORM_KEY = "firstName";
+  const LNAME_FORM_KEY = "lastName";
+  const EMAIL_FORM_KEY = "email";
+  const LABEL_FORM_KEY = "label";
+  const OLDPW_FORM_KEY = "oldpassword";
+  const PW_FORM_KEY = "password";
+  const PW_CONFIRM_FORM_KEY = "passwordConfirm";
 
-    function handleProfileFormSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const input = {
-            firstname: formData.get(FNAME_FORM_KEY),
-            lastname: formData.get(LNAME_FORM_KEY),
-            role: formData.get(ROLE_FORM_KEY),
-            email: formData.get(EMAIL_FORM_KEY),
-            // password: formData.get(PASSWORD_FORM_KEY),
-            // passwordConfirm: formData.get(PASSWORD_CONFIRM_FORM_KEY),
-        };
-        const parse = userSchema.safeParse(input);
-        if (parse.success) {
-            setInvalidEmail("");
-            setOpen(false);
-            setAccountData(parse.data);
-        } else {
-          const errors = parse.error.formErrors.fieldErrors;
-        //   TODO:show errors on frontend
-            if (errors.email) {
-                setInvalidEmail(errors.email[0]);
-            }
-            
-        }
+  const userSchema = z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.string().email("Not a valid email."),
+    label: z.enum(["Student", "Administrator", "Parent", "Educator"])
+  });
 
+  const pwSchema = z.object({
+    email: z.string().email(),
+    oldpassword: z.string(),
+    password: z.string().min(8, "Password must contain at least 8 characters."),
+    passwordConfirm: z.string(),
+  }).refine((data) => data.password === data.passwordConfirm, {
+    message: "Passwords do not match",
+    path: ["passwordConfirm"],
+  });
+
+  function handleProfileFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const input = {
+      firstName: formData.get(FNAME_FORM_KEY),
+      lastName: formData.get(LNAME_FORM_KEY),
+      label: formData.get(LABEL_FORM_KEY),
+      email: formData.get(EMAIL_FORM_KEY),
+    };
+    const parse = userSchema.safeParse(input);
+    if (parse.success) {
+      setInvalidEmail("");
+      setOpen(false);
+      setUserData({ ...parse.data, _id: userData?._id, hashedPassword: userData?.hashedPassword });
+      editUser({ ...parse.data, _id: userData?._id, hashedPassword: userData?.hashedPassword }, "info");
+    } else {
+      const errors = parse.error.formErrors.fieldErrors;
+      if (errors.email) {
+        setInvalidEmail(errors.email[0]);
       }
+    }
+  }
 
-      function setAccountData(data: Object) {
-        console.log(data);
-        // TODO: put request
-      }
-
-      function setPassword(data: string) {
-        console.log("New Password Set!: " + data);
-        // TODO: put request
-      }
-
-      function handlePasswordFormSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const input = {
-            oldpassword: formData.get(OLDPW_FORM_KEY),
-            password: formData.get(PW_FORM_KEY),
-            passwordConfirm: formData.get(PW_CONFIRM_FORM_KEY),
-        };
-        const parse = pwSchema.safeParse(input);
-        if (parse.success) {
+  function handlePasswordFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const input = {
+      email: userData?.email,
+      oldpassword: formData.get(OLDPW_FORM_KEY),
+      password: formData.get(PW_FORM_KEY),
+      passwordConfirm: formData.get(PW_CONFIRM_FORM_KEY),
+    };
+    const parse = pwSchema.safeParse(input);
+    if (parse.success) {
+      setInvalidPW("");
+      setInvalidPWConfirm("");
+      console.log("editing user w this data", parse.data);
+      editUser(parse.data, "password")
+        .then((res) => {
+          if (!res.success) {
+            console.log(res.message);
+            setInvalidOldPW(res.message);
+          } else {
             setProfileState("edit");
-            setInvalidPW("");
-            setInvalidPWConfirm("");
-            setPassword(parse.data.password);
-        } else {
-            const errors = parse.error.formErrors.fieldErrors;
-            if (errors.password) {
-                console.log(errors);
+            setInvalidOldPW("");
+          }
+        });
 
-                setInvalidPW(errors.password[0]);
-                console.log("pw1" + invalidPW);
-            } else {
-                setInvalidPW("");
-            }
-            if (errors.passwordConfirm) {
-                console.log(errors);
-
-                setInvalidPWConfirm(errors.passwordConfirm[0]);
-                console.log("pw2" + invalidPWConfirm);
-            } else {
-                setInvalidPWConfirm("");
-            }
-        }
-      }
-
-      const [invalidEmail, setInvalidEmail] = useState("");
-      const [invalidPW, setInvalidPW] = useState("");
-      const [invalidPWConfirm, setInvalidPWConfirm] = useState("");
-
-
-      useEffect (() => {
-        setInvalidEmail("");
+    } else {
+      const errors = parse.error.formErrors.fieldErrors;
+      if (errors.password) {
+        setInvalidPW(errors.password[0]);
+      } else {
         setInvalidPW("");
+      }
+      if (errors.passwordConfirm) {
+        setInvalidPWConfirm(errors.passwordConfirm[0]);
+      } else {
         setInvalidPWConfirm("");
+      }
+    }
+  }
 
-      }, [profileState])
+  const [invalidEmail, setInvalidEmail] = useState("");
+  const [invalidPW, setInvalidPW] = useState("");
+  const [invalidPWConfirm, setInvalidPWConfirm] = useState("");
+  const [invalidOldPW, setInvalidOldPW] = useState("");
+
+  useEffect(() => {
+    setInvalidEmail("");
+    setInvalidPW("");
+    setInvalidPWConfirm("");
+    setInvalidOldPW("");
+  }, [profileState]);
 
     return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -152,7 +189,6 @@ export function ProfileModal() {
             profileState == "view" && "Profile" ||
             profileState == "edit" && "Edit Profile" ||
             profileState == "changePw" && "Edit Password"
-                
             }
             </DialogTitle>
         </DialogHeader>
@@ -168,8 +204,8 @@ export function ProfileModal() {
                 profileState=="edit" &&            
                 <Input
                 name={FNAME_FORM_KEY}
-                id="firstname"
-                defaultValue="Pedro"
+                id="firstName"
+                defaultValue={userData?.firstName}
                 className="text-xs font-light text-black col-span-3"
                 />
             }
@@ -177,7 +213,7 @@ export function ProfileModal() {
             {
                 profileState=="view" &&
                 <p className="text-sm font-light text-blue-primary col-span-3 py-2">
-                Firstname
+                {userData?.firstName}
                 </p>
             }   
             
@@ -189,16 +225,16 @@ export function ProfileModal() {
             {
                 profileState=="edit" &&
                 <Input
-              id="lastname"
+              id="lastName"
               name={LNAME_FORM_KEY}
-              defaultValue="Duarte"
+              defaultValue={userData?.lastName}
               className="text-xs font-light text-black col-span-3"
               /> 
             }
             {
                 profileState=="view" &&
             <p className="text-sm font-light text-blue-primary col-span-3 py-2">
-                Lastname
+                {userData?.lastName}
             </p>
             }       
           </div>
@@ -207,45 +243,45 @@ export function ProfileModal() {
               Email
             </Label>
             {
-                profileState=="edit" && 
-                    <>           
-                    <Input
-                    name={EMAIL_FORM_KEY}
-                    id="email"
-                    defaultValue="abc@gmail.com"
-                    autoComplete="email"
-                    className={(invalidEmail=="" ? "" : "border-red-500 ") + ("text-xs font-light text-black col-span-8")} />
-                   
-                    <p className="text-xs text-red-500 mt-1">
-                        {invalidEmail}
-                    </p>
-                    </>
+              profileState=="edit" && 
+                <>           
+                  <Input
+                  name={EMAIL_FORM_KEY}
+                  id="email"
+                  defaultValue={userData?.email}
+                  autoComplete="email"
+                  className={(invalidEmail=="" ? "" : "border-red-500 ") + ("text-xs font-light text-black col-span-8")} />
+                  
+                  <p className="text-xs text-red-500 mt-1">
+                      {invalidEmail}
+                  </p>
+                </>
             }
             {
                 profileState=="view" &&
                 <p className="text-sm font-light text-blue-primary col-span-3 py-2">
-                example@gmail.com
+                {userData?.email}
                 </p>
             }   
           </div>
 
           <div className="items-center col-span-8">
-            <Label htmlFor={ROLE_FORM_KEY} className="text-right text-lg font-normal">
-              Role
+            <Label htmlFor={LABEL_FORM_KEY} className="text-right text-lg font-normal">
+              Label
             </Label>
             {profileState == "view" && 
                 <p className="text-sm font-light text-blue-primary col-span-3 py-2">
-                    Student
+                    {userData?.label}
                 </p>
             }
             
             {profileState == "edit" &&
                 <Select
-                name={ROLE_FORM_KEY}
-                defaultValue="Student"
+                name={LABEL_FORM_KEY}
+                defaultValue={userData?.label}
                 >
                 <SelectTrigger className="col-span-8">
-                    <SelectValue placeholder="Student" className="text-red-500"/>
+                    <SelectValue placeholder={userData?.label} className="text-red-500"/>
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
@@ -317,7 +353,11 @@ export function ProfileModal() {
                         type="password"
                         id={OLDPW_FORM_KEY}
                         defaultValue=""
-                        className="text-xs font-light text-black col-span-8" />
+                        className={(invalidOldPW=="" ? "" : "border-red-500 ") + ("text-xs font-light text-black col-span-8")} />
+
+                        <p className="text-xs text-red-500 mt-1">
+                            {invalidOldPW}
+                        </p>
                     </div>
                     <div className="items-center col-span-8">
                         <Label htmlFor={PW_FORM_KEY} className="text-right text-lg font-normal">
