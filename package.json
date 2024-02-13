@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "eslint --fix .",
-    "prettier-format": "prettier --config prettier.config.mjs \"src/**/*.{ts,tsx}\" --write",
+    "prettier-format": "prettier --config prettier.config.js \"src/**/*.{ts,tsx}\" --write",
     "format:check": "prettier --check ."
   },
   "dependencies": {
