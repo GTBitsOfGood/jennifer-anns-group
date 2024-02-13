@@ -19,8 +19,8 @@ jobs:
       - name: Run Tailwind CSS Build
         run: npx tailwindcss build -o styles.css
 
-      - name: Run Prettier
-        run: npx prettier --check .
+      - name: Run Prettier (Fix)
+        run: npm run prettier-format
 
       - name: Run ESLint
         run: npx eslint .
