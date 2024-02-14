@@ -24,7 +24,7 @@ export default function gamePage() {
 
     if (!gameData) {
         return (
-            <div>Hi</div>
+            <div></div>
         )
     }
 
@@ -33,11 +33,11 @@ export default function gamePage() {
             <ChakraProvider theme={theme}>
                 <h1 className={styles.name}>{gameData.name}</h1>
 
-                <Tabs className={styles.tabs}>
-                    <TabList className={styles.tabTitle}>
-                        <Tab color='brand.100' _selected={{color: 'brand.200'}}>Description</Tab>
-                        {gameData.parentingGuide ? <Tab color='brand.100' _selected={{color: 'brand.200'}}>Parenting Guide</Tab> : null}
-                        {gameData.lesson ? <Tab color='brand.100' _selected={{color: 'brand.200'}}>Lesson Plan</Tab> : null}
+                <Tabs colorScheme="brand" textColor="#667085" className={styles.tabs}>
+                    <TabList borderColor="brand.500" borderBottomWidth="4px" className={styles.tabTitle}>
+                        <Tab marginBottom="-4px" borderBottomWidth="4px">Description</Tab>
+                        {gameData.parentingGuide ? <Tab marginBottom="-4px" borderBottomWidth="4px">Parenting Guide</Tab> : null}
+                        {gameData.lesson ? <Tab marginBottom="-4px" borderBottomWidth="4px">Lesson Plan</Tab> : null}
                     </TabList>
                     <TabPanels className={styles.tabContent}>
                         <TabPanel>
@@ -53,12 +53,10 @@ export default function gamePage() {
                 </Tabs>
 
                 <div className={styles.tags}>
-                    <Tag>{gameData.theme}</Tag> 
-                    {/* {
-                        gameData.tags.forEach((element) => {
-                            return <Tag>{element}</Tag>
-                        })
-                    } */}
+                    <Tag px="18px" py="8px" borderRadius="full" bg="brand.400">{gameData.theme}</Tag> 
+                    {gameData.tags ? gameData.tags.map(tag => (
+                        <Tag ml="12px" px="18px" py="8px" borderRadius="full">{tag}</Tag>)
+                    ) : null}
                 </div>
             </ChakraProvider>
         </div>
