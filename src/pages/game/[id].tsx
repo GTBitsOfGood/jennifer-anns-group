@@ -40,22 +40,16 @@ export default function gamePage() {
                         {gameData.lesson ? <Tab marginBottom="-4px" borderBottomWidth="4px">Lesson Plan</Tab> : null}
                     </TabList>
                     <TabPanels className={styles.tabContent}>
-                        <TabPanel>
+                        <TabPanel p="0px">
                             <p>{gameData.description}</p>
-                        </TabPanel>
-                        <TabPanel>
-                            <p>two!</p>
-                        </TabPanel>
-                        <TabPanel>
-                            <p>{gameData.lesson}</p>
                         </TabPanel>
                     </TabPanels>
                 </Tabs>
 
                 <div className={styles.tags}>
-                    <Tag px="18px" py="8px" borderRadius="full" bg="brand.400">{gameData.theme}</Tag> 
+                    <Tag mr="12px" px="18px" py="8px" marginBottom="15px" borderRadius="full" bg="brand.400">{gameData.theme}</Tag> 
                     {gameData.tags ? gameData.tags.map(tag => (
-                        <Tag ml="12px" px="18px" py="8px" borderRadius="full">{tag}</Tag>)
+                        <Tag mr="12px" px="18px" py="8px" marginBottom="12px" borderRadius="full">{tag}</Tag>)
                     ) : null}
                 </div>
             </ChakraProvider>
