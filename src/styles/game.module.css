@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
 
 .name {
     font-family: "Poppins", sans-serif;
@@ -6,4 +7,32 @@
     font-weight: 600;
     text-align: center;
     margin-top: 124px;
+}
+
+.tabs {
+    width: 80vw;
+    margin: auto;
+}
+
+.tabTitle {
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: #98A2B3;
+}
+
+.tabContent {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: #667085;
+}
+
+.tags {
+    width: 80vw;
+    margin: auto;
+    padding: 0px 15px 0px 15px;
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: 14px;
 }
