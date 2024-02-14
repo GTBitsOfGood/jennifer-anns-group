@@ -1,33 +1,63 @@
+import { z } from "zod";
 import { createUser } from "../../../server/db/actions/UserAction";
 import { userSchema } from "../../../utils/types";
+import { NextApiRequest, NextApiResponse } from "next";
+import {
+  HTTP_BAD_REQUEST,
+  HTTP_CREATED,
+  HTTP_INTERNAL_SERVER_ERROR,
+  HTTP_METHOD_NOT_ALLOWED,
+} from "@/utils/consts";
+import {
+  GenericServerErrorException,
+  UserAlreadyExistsException,
+} from "@/utils/exceptions";
 
-export default async function handler(req: any, res: any) {
-  if (req.method == "POST") {
-    const parsedData = userSchema.safeParse(req.body);
-    if (!parsedData.success) {
-      return res.status(422).send({
-        success: false,
-        message: parsedData.error.format(),
-      });
-    }
+export const createUserSchema = userSchema
+  .omit({ hashedPassword: true })
+  .extend({
+    password: z.string(),
+  });
 
-    return createUser(parsedData.data)
-      .then((id) => {
-        return res.status(201).send({
-          success: true,
-          message: "New user created!",
-          data: { _id: id },
-        });
-      })
-      .catch((error) => {
-        return res.status(500).send({
-          success: false,
-          message: error.message,
-        });
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  switch (req.method) {
+    case "POST":
+      await createUserHandler(req, res);
+      break;
+    default:
+      res.status(HTTP_METHOD_NOT_ALLOWED).json({
+        error: `Request method ${req.method} is not allowed`,
       });
   }
-  return res.status(405).send({
-    success: false,
-    message: `Request method ${req.method} is not allowed`,
-  });
+  return;
+}
+
+async function createUserHandler(req: NextApiRequest, res: NextApiResponse) {
+  const parsedData = createUserSchema.safeParse(JSON.parse(req.body));
+  if (!parsedData.success) {
+    res.status(HTTP_BAD_REQUEST).json({
+      error: parsedData.error.format(),
+    });
+    return;
+  }
+
+  try {
+    const user = await createUser(parsedData.data);
+    res.status(HTTP_CREATED).json({
+      _id: user._id,
+    });
+    return;
+  } catch (e) {
+    let httpCode = HTTP_INTERNAL_SERVER_ERROR;
+
+    if (e instanceof UserAlreadyExistsException) httpCode = HTTP_BAD_REQUEST;
+
+    res.status(httpCode).json({
+      error: (e as Error).message,
+    });
+    return;
+  }
 }
