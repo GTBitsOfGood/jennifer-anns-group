@@ -1,4 +1,4 @@
-import styles from "@/styles/game.module.css";
+import styles from "@/styles/tags.module.css";
 import { ChakraProvider, Tag } from '@chakra-ui/react';
 import theme from './tagsTheme';
 import { gameSchema } from '@/utils/types';

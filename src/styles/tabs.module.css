@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+
+.tabs {
+    width: 80vw;
+    margin: auto;
+}
+
+.tabTitle {
+    font-family: "Poppins", sans-serif;
+    font-size: 16px;
+    color: #98A2B3;
+}
+
+.tabContent {
+    margin: 49px 0px 60px 0px;
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: #667085;
+}

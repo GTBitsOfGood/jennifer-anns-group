@@ -1,5 +1,5 @@
 import { ChakraProvider, Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
-import styles from "@/styles/game.module.css";
+import styles from "@/styles/tabs.module.css";
 import { gameSchema } from '@/utils/types';
 import { z } from "zod";
 import theme from "./tabsTheme";
