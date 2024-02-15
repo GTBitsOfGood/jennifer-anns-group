@@ -12,9 +12,9 @@ export default function TagsComponent({ gameData }: Props) {
     return (
         <ChakraProvider theme={theme}>
             <div className={styles.tags}>
-                <Tag mr="12px" px="18px" py="8px" mb="12px" borderRadius="full" bg="brand.400">{gameData.theme}</Tag> 
+                <Tag bg="brand.400">{gameData.theme}</Tag> 
                 {gameData.tags ? gameData.tags.map(tag => (
-                    <Tag mr="12px" px="18px" py="8px" mb="12px" borderRadius="full" bg="brand.500">{tag}</Tag>)
+                    <Tag bg="brand.500">{tag}</Tag>)
                 ) : null}
             </div>
         </ChakraProvider>

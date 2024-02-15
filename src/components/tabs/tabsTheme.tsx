@@ -1,12 +1,10 @@
-import { extendTheme } from '@chakra-ui/react'
+import { extendTheme } from '@chakra-ui/react';
+import { tabsTheme } from './tabsDefaultVariant';
 
-const tabsTheme = extendTheme({
-    colors: {
-        brand: {
-            500: "#EAECF0",
-            600: "#164C96",
-        }
-    }
+const theme = extendTheme({
+  components: {
+    Tabs: tabsTheme,
+  },
 });
 
-export default tabsTheme;
+export default theme;

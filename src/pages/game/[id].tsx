@@ -2,7 +2,7 @@ import styles from "@/styles/game.module.css";
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import TabsComponent from '../../components/tabs/TabsComponent';
-import TagsComponent from '../../components/tabs/TagsComponent';
+import TagsComponent from '../../components/tags/TagsComponent';
 import { gameSchema } from '@/utils/types';
 import { z } from "zod";
 
