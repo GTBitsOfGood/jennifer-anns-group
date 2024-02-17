@@ -1,22 +1,21 @@
 import { z } from "zod";
-import {ObjectId} from "mongodb";
+import { ObjectId } from "mongodb";
 
 const verifyObjectId = (value: string) => {
-  try {
-    new ObjectId(value);
+  //Instead of converting to an Object, verify that it can be converted into an ObjectId
+  const regex_string: RegExp = /[0-9A-Fa-f]{24}/g;
+  if (regex_string.test(value)) {
     return true;
-  }catch {
-    return false;
   }
-
-}
+  return false;
+};
 
 // Game
-export const gameSchema = z.object({ //Make sure to modify gameSchema endpoints, as well as editGameSchema I suppose.
+export const gameSchema = z.object({
+  //Make sure to modify gameSchema endpoints, as well as editGameSchema I suppose.
   name: z.string().min(3).max(50),
-  themes: z.array(z.union([z.string().refine(verifyObjectId),z.instanceof(ObjectId)])).optional(),//Ensures  that themes is
-  //either a list of 
-  tags: z.array(z.union([z.string().refine(verifyObjectId),z.instanceof(ObjectId)])).optional(),
+  themes: z.array(z.string().refine(verifyObjectId)).optional(),
+  tags: z.array(z.string().refine(verifyObjectId)).optional(),
   multiClass: z.boolean(),
   description: z.string().optional(),
   game: z.string().url(),
@@ -27,8 +26,8 @@ export const gameSchema = z.object({ //Make sure to modify gameSchema endpoints,
 // For editing game
 export const editGameSchema = z.object({
   name: z.string().min(3).max(50).optional(),
-  themes: z.array(z.union([z.string().refine(verifyObjectId),z.instanceof(ObjectId)])).optional(),
-  tags: z.array(z.union([z.string().refine(verifyObjectId),z.instanceof(ObjectId)])).optional(),
+  themes: z.array(z.string().refine(verifyObjectId)).optional(),
+  tags: z.array(z.string().refine(verifyObjectId)).optional(),
   multiClass: z.boolean().optional(),
   description: z.string().optional(),
   game: z.string().url().optional(),
@@ -45,15 +44,14 @@ export const userSchema = z.object({
   label: z.enum(["educator", "student", "parent", "administrator"]),
 });
 
-
 // Theme
 export const themeSchema = z.object({
   name: z.string(),
-  games: z.array(z.union([z.string().refine(verifyObjectId),z.instanceof(ObjectId)])).optional(),
 });
 
 // Tag
+const tag_types = ["Accessibility", "Custom"] as const; //
 export const tagSchema = z.object({
   name: z.string(),
-  games: z.array(z.union([z.string().refine(verifyObjectId),z.instanceof(ObjectId)])).optional(),
+  enum: z.enum(tag_types).optional(),
 });

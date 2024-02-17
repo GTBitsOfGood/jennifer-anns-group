@@ -36,7 +36,7 @@ export default async function handler(
 }
 
 async function createUserHandler(req: NextApiRequest, res: NextApiResponse) {
-  const parsedData = createUserSchema.safeParse(JSON.parse(req.body));
+  const parsedData = createUserSchema.safeParse(req.body);
   if (!parsedData.success) {
     res.status(HTTP_BAD_REQUEST).json({
       error: parsedData.error.format(),
