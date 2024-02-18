@@ -5,11 +5,11 @@ export interface ITag extends z.infer<typeof tagSchema> {}
 
 const TagSchema = new Schema<ITag>({
   name: { type: String, required: true, unique: true },
-  enum: {
+  type: {
     type: String,
-    enum: ["Accessibility", "Custom"],
-    default: "Custom",
-    required: false,
+    enum: ["accessibility", "custom"],
+    default: "custom",
+    required: true,
   },
 });
 
