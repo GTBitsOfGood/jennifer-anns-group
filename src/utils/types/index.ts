@@ -5,7 +5,7 @@ export const gameSchema = z.object({
   name: z.string().min(3).max(50),
   theme: z.string().min(1).max(100),
   tags: z.array(z.string()).optional(),
-  description: z.string().optional(),
+  description: z.string(),
   game: z.string().url(),
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
