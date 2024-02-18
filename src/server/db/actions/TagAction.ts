@@ -1,9 +1,7 @@
 import TagModel from "../models/TagModel";
 import connectMongoDB from "../mongodb";
 import { ObjectId } from "mongodb";
-import mongoose from "mongoose";
 import { ITag } from "../models/TagModel";
-import { IGame } from "../models/GameModel";
 import GameModel from "../models/GameModel";
 import { GenericUserErrorException } from "@/utils/exceptions";
 
@@ -32,7 +30,6 @@ export async function deleteTag(id: ObjectId) {
       { tags: { $in: [id] } },
       { $pull: { tags: id } }
     );
-    console.log(results);
   } catch (e) {
     throw e;
   }

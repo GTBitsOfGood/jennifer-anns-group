@@ -2,8 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { themeSchema } from "@/utils/types";
 import { ITheme } from "@/server/db/models/ThemeModel";
 import { createTheme } from "@/server/db/actions/ThemeAction";
-import { ZodError } from "zod";
-import { ObjectId } from "mongodb";
 import { customErrorHandler } from "@/utils/exceptions";
 export default async function handler(
   req: NextApiRequest,
@@ -17,7 +15,6 @@ export default async function handler(
         //This gives us runtime verification
         const safeBody: ITheme = themeSchema.parse(JSON.parse(req.body));
         result = await createTheme(safeBody);
-        console.log(result);
 
         return res.status(201).send({
           data: { _id: result },

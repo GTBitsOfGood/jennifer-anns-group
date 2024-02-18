@@ -1,10 +1,7 @@
-import mongoose from "mongoose";
 import { customErrorHandler } from "@/utils/exceptions";
 import { createGame, getAllGames } from "../../../server/db/actions/GameAction";
 import { gameSchema } from "../../../utils/types";
-import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
-import { MongoServerError } from "mongodb";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse

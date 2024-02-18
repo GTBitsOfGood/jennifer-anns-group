@@ -1,5 +1,4 @@
 import { NextApiResponse, NextApiRequest } from "next";
-import { ZodError, z } from "zod";
 import { deleteTheme } from "@/server/db/actions/ThemeAction";
 import { ObjectId } from "mongodb";
 import {

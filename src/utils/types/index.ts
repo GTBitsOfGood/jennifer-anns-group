@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { ObjectId } from "mongodb";
 
 const verifyObjectId = (value: string) => {
   //Instead of converting to an Object, verify that it can be converted into an ObjectId
@@ -50,8 +49,8 @@ export const themeSchema = z.object({
 });
 
 // Tag
-const tag_types = ["Accessibility", "Custom"] as const; //
+const tag_types = ["accessibility", "custom"] as const; //
 export const tagSchema = z.object({
   name: z.string(),
-  enum: z.enum(tag_types).optional(),
+  type: z.enum(tag_types),
 });

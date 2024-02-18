@@ -2,9 +2,7 @@ import ThemeModel from "../models/ThemeModel";
 import GameModel from "../models/GameModel";
 import connectMongoDB from "../mongodb";
 import { ObjectId } from "mongodb";
-import mongoose from "mongoose";
 import { ITheme } from "../models/ThemeModel";
-import { IGame } from "../models/GameModel";
 import { GenericUserErrorException } from "@/utils/exceptions";
 
 //Put more of the verification in the actual API endpoint

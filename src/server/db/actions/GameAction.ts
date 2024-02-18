@@ -2,7 +2,6 @@ import GameModel from "../models/GameModel";
 import ThemeModel from "../models/ThemeModel";
 import TagModel from "../models/TagModel";
 import connectMongoDB from "../mongodb";
-import { gameSchema } from "@/utils/types";
 import { z } from "zod";
 import { ObjectId } from "mongodb";
 import { editGameSchema } from "@/utils/types";

@@ -8,10 +8,7 @@ import {
   HTTP_INTERNAL_SERVER_ERROR,
   HTTP_METHOD_NOT_ALLOWED,
 } from "@/utils/consts";
-import {
-  GenericServerErrorException,
-  UserAlreadyExistsException,
-} from "@/utils/exceptions";
+import { UserAlreadyExistsException } from "@/utils/exceptions";
 
 export const createUserSchema = userSchema
   .omit({ hashedPassword: true })

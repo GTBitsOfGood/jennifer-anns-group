@@ -2,8 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { tagSchema } from "@/utils/types";
 import { ITag } from "@/server/db/models/TagModel";
 import { createTag } from "@/server/db/actions/TagAction";
-import { ObjectId } from "mongodb";
-import { ZodError } from "zod";
 import { customErrorHandler } from "@/utils/exceptions";
 export default async function handler(
   req: NextApiRequest,
