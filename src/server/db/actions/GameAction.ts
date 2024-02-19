@@ -127,7 +127,10 @@ export async function getAllGames() {
 export async function getGameById(id: string) {
   await connectMongoDB();
   try {
-    const game = await GameModel.findById(id);
+    const game = await GameModel.findById(id)
+      .populate("themes")
+      .populate("tags");
+    console.log(game);
     return game;
   } catch (e) {
     throw e;
