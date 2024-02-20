@@ -1,59 +1,61 @@
+import { z } from "zod";
 import UserModel from "../models/UserModel";
 import connectMongoDB from "../mongodb";
+import { createUserSchema } from "@/pages/api/users";
 import bcrypt from "bcrypt";
+import { userSchema } from "@/utils/types";
+// import { Error } from "mongoose";
+import {
+  GenericServerErrorException,
+  UserAlreadyExistsException,
+  UserCredentialsIncorrectException,
+  UserDoesNotExistException,
+} from "@/utils/exceptions";
+import { MongoError, MongoServerError } from "mongodb";
+import { MongooseError } from "mongoose";
+
 const SALT_ROUNDS = 10;
+const DUP_KEY_ERROR_CODE = 11000;
 
-export async function createUser(data: any) {
+export async function createUser(data: z.infer<typeof createUserSchema>) {
   await connectMongoDB();
-  //Adding encryption here for making a new user.
-  data.hashedPassword = await bcrypt.hash(data.hashedPassword, SALT_ROUNDS);
 
-  const existingUser = await UserModel.findOne({ email: data.email });
+  const hashedPassword = await bcrypt.hash(data.password, SALT_ROUNDS);
 
-  if (existingUser) {
-    throw new Error("User with this email already exists");
-  }
-
-  const user = new UserModel(data);
+  const userData: z.infer<typeof userSchema> = {
+    ...data,
+    hashedPassword,
+  };
 
   try {
-    await user.save();
-  } catch (e) {
-    console.log(e);
+    return await UserModel.create(userData);
+  } catch (e: unknown) {
+    let mongoErr = e as MongoError;
+    if (
+      mongoErr.name === "MongoServerError" &&
+      mongoErr.code === DUP_KEY_ERROR_CODE
+    ) {
+      throw new UserAlreadyExistsException();
+    }
+    throw new GenericServerErrorException();
   }
-  return user._id;
 }
 
 export async function verifyUser(email: string, password: string) {
-  //Data should be username and password.
-  try {
-    await connectMongoDB();
-  } catch (e) {
-    throw new Error("Unable to verify user.");
-  }
-  const user = await UserModel.findOne({ email: email });
+  await connectMongoDB();
 
-  if (!user) {
-    return {
-      status: 404,
-      message: "User does not exist.",
-    };
-  }
+  const user = await UserModel.findOne({ email: email }, { __v: 0 });
+  if (!user) throw new UserDoesNotExistException();
 
   const match = await bcrypt.compare(password, user.hashedPassword);
+  if (!match) throw new UserCredentialsIncorrectException();
 
-  if (match) {
-    return {
-      status: 200,
-      message: user,
-    };
-  } else {
-    return {
-      status: 400,
-      message: "Invalid password",
-    };
-  }
+  const { hashedPassword, ...nonSensitiveUser } = user.toObject();
 
+  return {
+    ...nonSensitiveUser,
+    _id: nonSensitiveUser._id.toString(),
+  };
 }
 
 export async function getUser(email: string) {

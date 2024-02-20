@@ -1,1 +1,1 @@
-export const ADMIN_CONTACT = "contact@jenniferanns.org";
+export const ADMIN_CONTACT = "contact@jenniferann.org";
