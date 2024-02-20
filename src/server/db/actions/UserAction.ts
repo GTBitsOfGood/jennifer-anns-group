@@ -3,13 +3,14 @@ import UserModel from "../models/UserModel";
 import connectMongoDB from "../mongodb";
 import { createUserSchema } from "@/pages/api/users";
 import bcrypt from "bcrypt";
-import { userSchema } from "@/utils/types";
+import { changePWSchema, userSchema } from "@/utils/types";
 // import { Error } from "mongoose";
 import {
   GenericServerErrorException,
   UserAlreadyExistsException,
   UserCredentialsIncorrectException,
   UserDoesNotExistException,
+  GenericUserErrorException
 } from "@/utils/exceptions";
 import { MongoError, MongoServerError } from "mongodb";
 import { MongooseError } from "mongoose";
@@ -58,75 +59,72 @@ export async function verifyUser(email: string, password: string) {
   };
 }
 
+/**
+ * Gets a user by their email address.
+ * @param {string} email Email address of the user to get.
+ * @throws If an error occurs while retrieving the user.
+ */
 export async function getUser(email: string) {
   await connectMongoDB();
-  try {
-    const user = await UserModel.findOne({ email: email });
-    return user;
-  } catch (e) {
-    throw e;
+  const user = await UserModel.findOne({ email: email });
+  if (!user) {
+    throw new UserDoesNotExistException();
   }
+  return user;
 }
 
-export async function editUser(data: any) {
+/**
+ * Edits a user.
+ * @param {z.infer<typeof userSchema> & { _id: string }} userInfo Info of the user to find/update.
+ * @throws If an error occurs while finding/updating the user.
+ */
+export async function editUser(userInfo: z.infer<typeof userSchema> & { _id: string }) {
   await connectMongoDB();
-  try {
-    const result = await UserModel.findByIdAndUpdate(data._id, data, {
-      new: true,
-    });
-    if (!result) {
-      throw new ReferenceError("User with given ID does not exist.");
-    }
-    const user = await UserModel.findById(data._id);
-  } catch (e) {
-    throw e;
+
+  const existingUser = await UserModel.findOne({ email: userInfo.email });
+  
+  if (existingUser && String(existingUser._id) != userInfo._id) {
+    throw new GenericUserErrorException();
   }
+  const result = await UserModel.findByIdAndUpdate(userInfo._id, userInfo, {
+    new: true,
+  });
+  if (!result) {
+    throw new UserDoesNotExistException();
+  }
+  return result;
 }
 
-export async function editPassword(data: any) {
+/**
+ * Edits user password.
+ * @param {z.infer<typeof changePWSchema>} passwordInfo Password info of user.
+ * @throws If an error occurs while changing user password.
+ */
+export async function editPassword(passwordInfo: z.infer<typeof changePWSchema>) {
   await connectMongoDB();
 
-  try {
-    const user = await UserModel.findOne({ email: data.email });
-    if (!user) {
-      return {
-        status: 404,
-        message: "User does not exist",
-      };
-    }
+  const user = await UserModel.findOne({ email: passwordInfo.email });
+  if (!user) {
+    throw new UserDoesNotExistException();
+  }
 
-    // Compare the old password provided by the user with the hashed password stored in the database
-    const oldPasswordMatch = await bcrypt.compare(data.oldpassword, user.hashedPassword);
-    if (!oldPasswordMatch) {
-      return {
-        status: 400,
-        message: "Old password is incorrect",
-      };
-    }
+  // Compare the old password provided by the user with the hashed password stored in the database
+  const oldPasswordMatch = await bcrypt.compare(passwordInfo.oldpassword, user.hashedPassword);
+  if (!oldPasswordMatch) {
+    throw new UserCredentialsIncorrectException();
+  }
 
-    const hashedPassword = await bcrypt.hash(data.password, SALT_ROUNDS);
+  const hashedPassword = await bcrypt.hash(passwordInfo.password, SALT_ROUNDS);
 
-    // Update the user's password
-    const updatedUser = await UserModel.findOneAndUpdate(
-      { email: data.email },
-      { $set: { hashedPassword } },
-      { new: true }
-    );
+  // Update the user's password
+  const updatedUser = await UserModel.findOneAndUpdate(
+    { email: passwordInfo.email },
+    { $set: { hashedPassword } },
+    { new: true }
+  );
 
-    // Check if user was able to be found/updated
-    if (!updatedUser) {
-      return {
-        status: 400,
-        message: "Failed to update password",
-      };
-    }
-
-    return {
-      status: 200,
-      message: "Password updated successfully",
-    };
-
-  } catch (e) {
-    throw e;
+  // Check if user was able to be found/updated
+  if (!updatedUser) {
+    throw new GenericServerErrorException();
   }
 }

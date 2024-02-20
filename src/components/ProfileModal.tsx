@@ -21,38 +21,41 @@ import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { MoveLeft } from "lucide-react";
+import { changePWSchema, userSchema } from "@/utils/types";
+import cn from 'classnames';
 
 export function ProfileModal() {
-  const [profileState, setProfileState] = useState("view");
+  const [profileState, setProfileState] = useState<"view" | "changePw" | "edit">("view");
   const [open, setOpen] = useState(false);
 
-  interface UserData {
-    firstName: string;
-    lastName: string;
-    email: string;
-    label: string;
-    _id: any;
-    hashedPassword: any;
-  }
+  const userDataSchema = userSchema
+  .extend({
+    _id: z.string().length(24),
+  });
 
   const { data: session } = useSession();
   const currentUser = session?.user;
-  const [userData, setUserData] = useState<UserData | null>(null);
+  const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
 
   useEffect(() => {
     if (currentUser) {
-      getUserData(currentUser.email);
+      getUserData(String(currentUser.email));
     }
   }, [currentUser]);
 
   // for testing, need to create user in Postman with email "abc@gmail.com" first
   useEffect(() => {
-    getUserData("abc@gmail.com");
+    try {
+      getUserData("abc@gmail.com");
+    } catch (error) {
+      console.error("Error getting user data:", error);
+    }
   }, []);
 
-  async function getUserData(email: any) {
+  async function getUserData(email: string) {
     try {
-      const response = await fetch(`/api/users?email=${encodeURIComponent(email)}`);
+      const params = new URLSearchParams({ email: email });
+      const response = await fetch(`/api/users?${params.toString()}`);
       const data = await response.json();
       setUserData(data.data);
     } catch (error) {
@@ -61,9 +64,11 @@ export function ProfileModal() {
     }
   }
 
-  async function editUser(data: any, type: string) {
+  async function editUser(data: z.infer<typeof userDataSchema> | z.infer<typeof changePWSchema>, type: "info" | "password") {
     try {
-      const response = await fetch(`/api/users?type=${type}`, {
+      const params = new URLSearchParams({ type: type });
+
+      const response = await fetch(`/api/users?${params.toString()}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +79,6 @@ export function ProfileModal() {
       return responseData;
     } catch (error) {
       console.error(`Error editing user ${type}:`, error);
-      throw error;
     }
   }
 
@@ -86,12 +90,31 @@ export function ProfileModal() {
   const PW_FORM_KEY = "password";
   const PW_CONFIRM_FORM_KEY = "passwordConfirm";
 
-  const userSchema = z.object({
-    firstName: z.string(),
-    lastName: z.string(),
-    email: z.string().email("Not a valid email."),
-    label: z.enum(["Student", "Administrator", "Parent", "Educator"])
+  const [invalidFields, setInvalidFields] = useState({
+    email: "",
+    password: "",
+    passwordConfirm: "",
+    oldPassword: "",
+    emailEdit: ""
   });
+
+  type FormKey = "email" | "password" | "passwordConfirm" | "oldPassword" | "emailEdit";
+
+  function resetErrorMessage(field: FormKey) {
+    setInvalidFields(prevInvalidFields => ({
+      ...prevInvalidFields,
+      [field]: ""
+    }));
+  }
+  function setErrorMessage(field: FormKey, data: string) {
+    setInvalidFields(prevInvalidFields => ({
+      ...prevInvalidFields,
+      [field]: data
+    }));
+  }
+
+  const formUserSchema = userSchema
+  .omit({ hashedPassword: true });
 
   const pwSchema = z.object({
     email: z.string().email(),
@@ -103,7 +126,7 @@ export function ProfileModal() {
     path: ["passwordConfirm"],
   });
 
-  function handleProfileFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleProfileFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const input = {
@@ -112,21 +135,32 @@ export function ProfileModal() {
       label: formData.get(LABEL_FORM_KEY),
       email: formData.get(EMAIL_FORM_KEY),
     };
-    const parse = userSchema.safeParse(input);
+    const parse = formUserSchema.safeParse(input);
     if (parse.success) {
-      setInvalidEmail("");
-      setOpen(false);
-      setUserData({ ...parse.data, _id: userData?._id, hashedPassword: userData?.hashedPassword });
-      editUser({ ...parse.data, _id: userData?._id, hashedPassword: userData?.hashedPassword }, "info");
+      setUserData({ ...parse.data, _id: userData?._id!, hashedPassword: userData?.hashedPassword! });
+      editUser({ ...parse.data, _id: userData?._id!, hashedPassword: userData?.hashedPassword! }, "info");
+      try {
+        const res = await editUser({ ...parse.data, _id: userData?._id!, hashedPassword: userData?.hashedPassword! }, "info");
+
+        if (res.error) {
+          setErrorMessage("email", res.error);
+        } else {
+          setOpen(false);
+          setErrorMessage("email", res.error);
+
+        }
+      } catch (error) {
+        console.error("Error editing user:", error);
+      }
     } else {
       const errors = parse.error.formErrors.fieldErrors;
       if (errors.email) {
-        setInvalidEmail(errors.email[0]);
+        setErrorMessage("email", String(errors.email.at(0)));
       }
     }
   }
 
-  function handlePasswordFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handlePasswordFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const input = {
@@ -137,44 +171,50 @@ export function ProfileModal() {
     };
     const parse = pwSchema.safeParse(input);
     if (parse.success) {
-      setInvalidPW("");
-      setInvalidPWConfirm("");
-      editUser(parse.data, "password")
-        .then((res) => {
-          if (!res.success) {
-            setInvalidOldPW(res.message);
-          } else {
-            setProfileState("edit");
-            setInvalidOldPW("");
-          }
-        });
-
+      resetErrorMessage("password");
+      resetErrorMessage("passwordConfirm");
+      try {
+        const res = await editUser(parse.data, "password");
+        if (res.error) {
+          console.log("Old password incorrect", res);
+          setErrorMessage("oldPassword", res.error);
+        } else {
+          setProfileState("edit");
+          resetErrorMessage("oldPassword");
+        }
+      } catch (error) {
+        console.error("Error editing user:", error);
+      }
     } else {
       const errors = parse.error.formErrors.fieldErrors;
       if (errors.password) {
-        setInvalidPW(errors.password[0]);
+        setErrorMessage("password", errors.password[0]);
       } else {
-        setInvalidPW("");
+        resetErrorMessage("password");
       }
       if (errors.passwordConfirm) {
-        setInvalidPWConfirm(errors.passwordConfirm[0]);
+        setErrorMessage("passwordConfirm", errors.passwordConfirm[0]);
       } else {
-        setInvalidPWConfirm("");
+        resetErrorMessage("passwordConfirm");
       }
     }
   }
 
-  const [invalidEmail, setInvalidEmail] = useState("");
-  const [invalidPW, setInvalidPW] = useState("");
-  const [invalidPWConfirm, setInvalidPWConfirm] = useState("");
-  const [invalidOldPW, setInvalidOldPW] = useState("");
-
   useEffect(() => {
-    setInvalidEmail("");
-    setInvalidPW("");
-    setInvalidPWConfirm("");
-    setInvalidOldPW("");
+    setInvalidFields({
+      email: "",
+      password: "",
+      passwordConfirm: "",
+      oldPassword: "",
+      emailEdit: ""
+    });
   }, [profileState]);
+
+  const profileStateLabels = {
+    view: "Profile",
+    edit: "Edit Profile",
+    changePw: "Edit Password"
+  };
 
     return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -188,12 +228,8 @@ export function ProfileModal() {
           }
         
           <DialogTitle className="text-lg text-blue-primary font-semibold -mb-2">
-            {
-            profileState == "view" && "Profile" ||
-            profileState == "edit" && "Edit Profile" ||
-            profileState == "changePw" && "Edit Password"
-            }
-            </DialogTitle>
+            {profileStateLabels[profileState]}
+          </DialogTitle>
 
             
         </DialogHeader>
@@ -255,10 +291,13 @@ export function ProfileModal() {
                   id="email"
                   defaultValue={userData?.email}
                   autoComplete="email"
-                  className={(invalidEmail=="" ? "" : "border-red-500 ") + ("text-xs font-light text-black col-span-8")} />
-                  
+                  className={cn("text-xs font-light text-black col-span-8", {
+                    "border-red-500": invalidFields.email !== ""
+                  })}
+
+                  />
                   <p className="text-xs text-red-500 mt-1">
-                      {invalidEmail}
+                      {invalidFields.email}
                   </p>
                 </>
             }
@@ -276,7 +315,7 @@ export function ProfileModal() {
             </Label>
             {profileState == "view" && 
                 <p className="text-sm font-light text-blue-primary col-span-3 py-2">
-                    {userData?.label}
+                    {userData?.label ? userData?.label.charAt(0).toUpperCase() + userData?.label.slice(1) : ""}
                 </p>
             }
             
@@ -285,15 +324,15 @@ export function ProfileModal() {
                 name={LABEL_FORM_KEY}
                 defaultValue={userData?.label}
                 >
-                <SelectTrigger className="col-span-8">
+                <SelectTrigger className="col-span-8 text-xs font-light">
                     <SelectValue placeholder={userData?.label} className="text-red-500"/>
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
-                    <SelectItem value="Student">Student</SelectItem>
-                    <SelectItem value="Parent">Parent</SelectItem>
-                    <SelectItem value="Educator">Educator</SelectItem>
-                    <SelectItem value="Administrator">Administrator</SelectItem>
+                    <SelectItem value="student">Student</SelectItem>
+                    <SelectItem value="parent">Parent</SelectItem>
+                    <SelectItem value="educator">Educator</SelectItem>
+                    <SelectItem value="administrator">Administrator</SelectItem>
                     </SelectGroup>
                 </SelectContent>
                 </Select>
@@ -321,7 +360,7 @@ export function ProfileModal() {
                 id="password"
                 defaultValue="********"
                 disabled
-            className="text-sm font-light text-blue-primary col-span-8 disabled:border-none disabled:hover:cursor-default disabled:pl-0 disabled:bg-transparent"
+            className="text-sm font-light text-blue-primary col-span-8 disabled:border-none disabled:hover:cursor-default disabled:pl-0 disabled:bg-transparent disabled:opacity-100"
             />
             </>
             }
@@ -358,10 +397,13 @@ export function ProfileModal() {
                         type="password"
                         id={OLDPW_FORM_KEY}
                         defaultValue=""
-                        className={(invalidOldPW=="" ? "" : "border-red-500 ") + ("text-xs font-light text-black col-span-8")} />
+                        className={cn("text-xs font-light text-black col-span-8", {
+                          "border-red-500": invalidFields.oldPassword !== ""
+                        })}
+                        />
 
                         <p className="text-xs text-red-500 mt-1">
-                            {invalidOldPW}
+                            {invalidFields.oldPassword}
                         </p>
                     </div>
                     <div className="items-center col-span-8">
@@ -375,10 +417,12 @@ export function ProfileModal() {
                         placeholder="Min. 8 characters"
                         id={PW_FORM_KEY}
                         defaultValue=""
-                        className={(invalidPW=="" ? "" : "border-red-500 ") + ("text-xs font-light text-black col-span-8")} />
-                   
+                        className={cn("text-xs font-light text-black col-span-8", {
+                          "border-red-500": invalidFields.password !== ""
+                        })}
+                        />
                         <p className="text-xs text-red-500 mt-1">
-                            {invalidPW}
+                            {invalidFields.password}
                         </p>
                     </div>
                     <div className="items-center col-span-8">
@@ -392,10 +436,12 @@ export function ProfileModal() {
                         defaultValue=""
                         type="password"
                         placeholder="Min. 8 characters"
-                        className={(invalidPWConfirm=="" ? "" : "border-red-500 ") + ("text-xs font-light text-black col-span-8")} />
-                   
+                        className={cn("text-xs font-light text-black col-span-8", {
+                          "border-red-500": invalidFields.passwordConfirm !== ""
+                        })}
+                        />
                         <p className="text-xs text-red-500 mt-1">
-                            {invalidPWConfirm}
+                            {invalidFields.passwordConfirm}
                         </p>
                     </div>
                 </div>

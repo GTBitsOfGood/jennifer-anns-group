@@ -53,3 +53,12 @@ export const userSchema = z.object({
   lastName: z.string(),
   label: z.enum(["educator", "student", "parent", "administrator"]),
 });
+
+// For changing password
+export const changePWSchema = z.object({
+  email: z.string().email(),
+  oldpassword: z.string(),
+  password: z.string(),
+  passwordConfirm: z.string()
+});
+

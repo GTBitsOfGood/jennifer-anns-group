@@ -7,8 +7,10 @@ import {
   HTTP_CREATED,
   HTTP_INTERNAL_SERVER_ERROR,
   HTTP_METHOD_NOT_ALLOWED,
+  HTTP_NOT_FOUND,
+  HTTP_UNAUTHORIZED
 } from "@/utils/consts";
-import { UserAlreadyExistsException } from "@/utils/exceptions";
+import { GenericUserErrorException, UserAlreadyExistsException, UserCredentialsIncorrectException, UserDoesNotExistException } from "@/utils/exceptions";
 
 export const createUserSchema = userSchema
   .omit({ hashedPassword: true })
@@ -24,77 +26,37 @@ export default async function handler(
     case "POST":
       await createUserHandler(req, res);
       break;
+
+    case "GET":
+      const email = String(req.query.email);
+      try {
+        const user = await getUser(email); 
+        res.status(200).send({
+          data: user,
+        });
+        return;
+      } catch (e: unknown) {
+        if (e instanceof UserDoesNotExistException) {
+          res.status(HTTP_NOT_FOUND).json({
+            error: (e as Error).message,
+          });
+          return;
+        }
+        res.status(HTTP_INTERNAL_SERVER_ERROR).json({
+          error: (e as Error).message,
+        });
+        return;
+      }
+
+    case "PUT":
+      await editUserHandler(req, res);
+      break;      
+
     default:
       res.status(HTTP_METHOD_NOT_ALLOWED).json({
         error: `Request method ${req.method} is not allowed`,
       });
   }
-  if (req.method === "GET") {
-    const email = String(req.query.email);
-    try {
-      const user = await getUser(email); 
-      if (!user) {
-        return res.status(404).send({
-          success: false,
-          message: `Could not find user with email ${email}`,
-        });
-      }
-      return res.status(200).send({
-        success: true,
-        message: "User retrieved successfully",
-        data: user,
-      });
-    } catch (error: any) {
-      return res.status(500).send({
-        success: false,
-        message: error.message,
-      });
-    }
-  }
-
-  if (req.method === "PUT") {
-    const { type } = req.query;
-    if (type === "info") {
-      // Editing user profile
-      try {
-        const result = await editUser(req.body);
-        return res.status(200).send({
-          success: true,
-          message: "User information updated successfully",
-          data: result,
-        });
-      } catch (error: any) {
-        return res.status(500).send({
-          success: false,
-          message: error.message,
-        });
-      }
-    } else if (type === "password") {
-      // Editing user password
-      try {
-        const result = await editPassword(req.body);
-        return res.status(result.status).send({
-          success: result.status === 200,
-          message: result.message,
-        });
-      } catch (error: any) {
-        return res.status(500).send({
-          success: false,
-          message: error.message,
-        });
-      }
-    } else {
-      return res.status(400).send({
-        success: false,
-        message: "Invalid request type",
-      });
-    }
-  }
-  
-  return res.status(405).send({
-    success: false,
-    message: `Request method ${req.method} is not allowed`,
-  });
   return;
 }
 
@@ -123,4 +85,63 @@ async function createUserHandler(req: NextApiRequest, res: NextApiResponse) {
     });
     return;
   }
+}
+
+async function editUserHandler(req: NextApiRequest, res: NextApiResponse) {
+  const { type } = req.query;
+    if (type === "info") {
+      // Editing user profile
+      try {
+        const result = await editUser(req.body);
+        res.status(200).send({
+          data: result,
+        });
+        return;
+      } catch (e: unknown) {
+        if (e instanceof GenericUserErrorException) {
+          res.status(HTTP_BAD_REQUEST).json({
+            error: "User with email already exists"
+          });
+          return;
+        }
+        if (e instanceof UserDoesNotExistException) {
+          res.status(HTTP_NOT_FOUND).json({
+            error: (e as Error).message,
+          });
+          return;
+        }
+        res.status(HTTP_INTERNAL_SERVER_ERROR).json({
+          error: (e as Error).message,
+        });
+        return;
+      } 
+    }
+
+    else if (type === "password") {
+      // Editing user password
+      try {
+        const result = await editPassword(req.body);
+        res.status(200).send({
+          data: result,
+        });
+        return;
+      } catch (e: unknown) {
+        if (e instanceof UserDoesNotExistException) {
+          res.status(HTTP_NOT_FOUND).json({
+            error: (e as Error).message,
+          });
+          return;
+        }
+        if (e instanceof UserCredentialsIncorrectException) {
+          res.status(HTTP_UNAUTHORIZED).json({
+            error: "Old password is incorrect",
+          });
+          return;
+        }
+        res.status(HTTP_INTERNAL_SERVER_ERROR).json({
+          error: (e as Error).message,
+        });
+        return;
+      } 
+    }
 }
