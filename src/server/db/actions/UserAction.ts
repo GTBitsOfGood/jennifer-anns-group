@@ -62,7 +62,7 @@ export async function verifyUser(email: string, password: string) {
 /**
  * Gets a user by their email address.
  * @param {string} email Email address of the user to get.
- * @throws If an error occurs while retrieving the user.
+ * @throws {UserDoesNotExistException} If unable to find user
  */
 export async function getUser(email: string) {
   await connectMongoDB();
@@ -76,7 +76,9 @@ export async function getUser(email: string) {
 /**
  * Edits a user.
  * @param {z.infer<typeof userSchema> & { _id: string }} userInfo Info of the user to find/update.
- * @throws If an error occurs while finding/updating the user.
+ * @throws {GenericUserErrorException} If changing email to an email that corresponds to a pre-existing account
+ * @throws {UserDoesNotExistException} If unable to find user
+ * 
  */
 export async function editUser(userInfo: z.infer<typeof userSchema> & { _id: string }) {
   await connectMongoDB();
@@ -98,7 +100,9 @@ export async function editUser(userInfo: z.infer<typeof userSchema> & { _id: str
 /**
  * Edits user password.
  * @param {z.infer<typeof changePWSchema>} passwordInfo Password info of user.
- * @throws If an error occurs while changing user password.
+ * @throws {UserDoesNotExistException} If unable to find user
+ * @throws {UserCredentialsIncorrectException} If old password doesn't match user's current password
+ * @throws {GenericServerErrorException} If unable to update user
  */
 export async function editPassword(passwordInfo: z.infer<typeof changePWSchema>) {
   await connectMongoDB();
