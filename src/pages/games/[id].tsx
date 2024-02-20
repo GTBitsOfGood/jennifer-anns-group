@@ -24,7 +24,7 @@ const GamePage = () => {
     } catch (error: any) {
       setError(error.message);
     }
-  }
+  };
 
   if (gameID && loading) {
     getGame();
@@ -49,6 +49,6 @@ const GamePage = () => {
       <TagsComponent gameData={gameData} />
     </div>
   );
-}
+};
 
 export default GamePage;

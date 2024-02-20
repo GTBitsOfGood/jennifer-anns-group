@@ -11,8 +11,7 @@ import {
   UserCredentialsIncorrectException,
   UserDoesNotExistException,
 } from "@/utils/exceptions";
-import { MongoError, MongoServerError } from "mongodb";
-import { MongooseError } from "mongoose";
+import { MongoError } from "mongodb";
 
 const SALT_ROUNDS = 10;
 const DUP_KEY_ERROR_CODE = 11000;

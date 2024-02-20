@@ -60,8 +60,8 @@ function LoginForm() {
   }
 
   return (
-    <form className="flex flex-col gap-8 w-[20em]" onSubmit={handleLoginSubmit}>
-      <div className="flex flex-col relative">
+    <form className="flex w-[20em] flex-col gap-8" onSubmit={handleLoginSubmit}>
+      <div className="relative flex flex-col">
         <label htmlFor={EMAIL_FORM_KEY} className="text-xl">
           Email*
         </label>
@@ -78,7 +78,7 @@ function LoginForm() {
           {validationErrors.email}
         </p>
       </div>
-      <div className="flex flex-col relative">
+      <div className="relative flex flex-col">
         <label htmlFor={PASSWORD_FORM_KEY} className="text-xl">
           Password*
         </label>
@@ -97,7 +97,7 @@ function LoginForm() {
         </p>
       </div>
       <div className="flex flex-row justify-end">
-        <a className="text-blue-primary hover:cursor-pointer text-sm font-light">
+        <a className="text-sm font-light text-blue-primary hover:cursor-pointer">
           Forgot Password?
         </a>
       </div>

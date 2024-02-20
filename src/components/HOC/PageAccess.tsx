@@ -26,10 +26,10 @@ const pageAccessHOC = <P extends object>(Component: React.FC<P>) => {
 
     if (status === "loading") {
       return (
-        <div className="w-dvw h-dvh flex flex-col items-center justify-center">
+        <div className="flex h-dvh w-dvw flex-col items-center justify-center">
           <svg
             aria-hidden="true"
-            className="w-12 h-12 text-gray-200 animate-spin dark:text-gray-600 fill-blue-primary"
+            className="h-12 w-12 animate-spin fill-blue-primary text-gray-200 dark:text-gray-600"
             viewBox="0 0 100 101"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"

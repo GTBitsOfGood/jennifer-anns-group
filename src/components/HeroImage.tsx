@@ -8,16 +8,20 @@ interface Props {
 function HeroImage(props: PropsWithChildren<Props>) {
   return (
     <div className="flex h-dvh w-dvw flex-row bg-gradient-to-b from-[#fdd299] to-[#fc9000]">
-      <div className="flex h-full w-[45%] max-w-[45%] justify-center flex-col p-5 items-center">
+      <div className="flex h-full w-[45%] max-w-[45%] flex-col items-center justify-center p-5">
         <div>
-          <h1 className="font-open-sans-cond uppercase font-extrabold text-6xl text-white mb-6 w-[6em]">
+          <h1 className="mb-6 w-[6em] font-open-sans-cond text-6xl font-extrabold uppercase text-white">
             Jennifer Ann&apos;s Group
           </h1>
-          <div className="flex flex-row h-[3rem]">
-            <h3 className="font-open-sans-cond uppercase font-extralight text-5xl text-white italic pr-4">
+          <div className="flex h-[3rem] flex-row">
+            <h3 className="pr-4 font-open-sans-cond text-5xl font-extralight uppercase italic text-white">
               Life. Love.
             </h3>
-            <Image src="/logo.png" className="max-w-full max-h-full" alt="Logo" />
+            <Image
+              src="/logo.png"
+              className="max-h-full max-w-full"
+              alt="Logo"
+            />
           </div>
         </div>
       </div>
@@ -26,7 +30,7 @@ function HeroImage(props: PropsWithChildren<Props>) {
           borderTopLeftRadius: "35% 100%",
           borderBottomLeftRadius: "35% 100%",
         }}
-        className={`h-full max-w-[55%] w-[55%] bg-white ${
+        className={`h-full w-[55%] max-w-[55%] bg-white ${
           props.containerClassName ?? ""
         }`}
       >

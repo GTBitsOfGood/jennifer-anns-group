@@ -8,8 +8,8 @@ function Login() {
     <HeroImage containerClassName="flex flex-col items-center justify-center">
       <div className="flex flex-col content-start gap-6">
         <div>
-          <h2 className="text-blue-primary text-3xl font-light">Welcome to</h2>
-          <h2 className="text-blue-primary text-3xl font-bold">
+          <h2 className="text-3xl font-light text-blue-primary">Welcome to</h2>
+          <h2 className="text-3xl font-bold text-blue-primary">
             Jennifer Ann&apos;s Group
           </h2>
         </div>
@@ -19,7 +19,7 @@ function Login() {
             Don&apos;t have an account?{" "}
             <Link
               href="/signup"
-              className="underline text-blue-primary hover:cursor-pointer"
+              className="text-blue-primary underline hover:cursor-pointer"
             >
               Sign up now
             </Link>

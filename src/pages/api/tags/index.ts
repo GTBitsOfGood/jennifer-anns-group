@@ -5,7 +5,7 @@ import { createTag } from "@/server/db/actions/TagAction";
 import { customErrorHandler } from "@/utils/exceptions";
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   try {
     switch (req.method) {

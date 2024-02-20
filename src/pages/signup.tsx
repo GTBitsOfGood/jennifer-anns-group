@@ -8,7 +8,7 @@ import InformationSlide, {
 } from "@/components/Registration/InformationSlide";
 import RegistrationAlert from "@/components/Registration/RegistrationAlert";
 import { ADMIN_CONTACT } from "@/utils/adminConsts";
-import Link from 'next/link';
+import Link from "next/link";
 
 import React, { useState } from "react";
 import { z } from "zod";
@@ -84,7 +84,7 @@ function Signup() {
 
   return (
     <HeroImage containerClassName="flex flex-col items-center justify-center">
-      <div className="flex flex-col content-start gap-6 relative">
+      <div className="relative flex flex-col content-start gap-6">
         {alertType !== undefined && isAlertShowing ? (
           <div className="absolute top-[-8em]">
             <RegistrationAlert
@@ -96,7 +96,7 @@ function Signup() {
           </div>
         ) : null}
         <div>
-          <h2 className="text-blue-primary text-3xl font-bold">Registration</h2>
+          <h2 className="text-3xl font-bold text-blue-primary">Registration</h2>
         </div>
         <div>{formSlideComponentMap[formSlide]}</div>
         <div className="flex flex-col items-center gap-2">
@@ -104,7 +104,7 @@ function Signup() {
             Have an account?{" "}
             <Link
               href="/login"
-              className="underline text-blue-primary hover:cursor-pointer"
+              className="text-blue-primary underline hover:cursor-pointer"
             >
               Sign in here
             </Link>
