@@ -1,6 +1,7 @@
 import pageAccessHOC from "@/components/HOC/PageAccess";
 import HeroImage from "@/components/HeroImage";
 import LoginForm from "@/components/Login/LoginForm";
+import Link from "next/link";
 
 function Login() {
   return (
@@ -16,12 +17,12 @@ function Login() {
         <div className="flex flex-col items-center gap-2">
           <p>
             Don&apos;t have an account?{" "}
-            <a
+            <Link
               href="/signup"
               className="underline text-blue-primary hover:cursor-pointer"
             >
               Sign up now
-            </a>
+            </Link>
           </p>
         </div>
       </div>

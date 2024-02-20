@@ -8,6 +8,7 @@ import InformationSlide, {
 } from "@/components/Registration/InformationSlide";
 import RegistrationAlert from "@/components/Registration/RegistrationAlert";
 import { ADMIN_CONTACT } from "@/utils/adminConsts";
+import Link from 'next/link';
 
 import React, { useState } from "react";
 import { z } from "zod";
@@ -101,12 +102,12 @@ function Signup() {
         <div className="flex flex-col items-center gap-2">
           <p>
             Have an account?{" "}
-            <a
+            <Link
               href="/login"
               className="underline text-blue-primary hover:cursor-pointer"
             >
               Sign in here
-            </a>
+            </Link>
           </p>
         </div>
       </div>

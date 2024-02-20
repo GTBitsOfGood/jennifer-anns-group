@@ -1,4 +1,5 @@
 import React, { PropsWithChildren } from "react";
+import { Image } from "@chakra-ui/react";
 
 interface Props {
   containerClassName?: string;
@@ -16,7 +17,7 @@ function HeroImage(props: PropsWithChildren<Props>) {
             <h3 className="font-open-sans-cond uppercase font-extralight text-5xl text-white italic pr-4">
               Life. Love.
             </h3>
-            <img src="/logo.png" className="max-w-full max-h-full" alt="Logo" />
+            <Image src="/logo.png" className="max-w-full max-h-full" alt="Logo" />
           </div>
         </div>
       </div>

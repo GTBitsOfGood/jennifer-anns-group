@@ -9,17 +9,33 @@ import { z } from "zod";
 const GamePage = () => {
   const gameID = useRouter().query.id;
   const [gameData, setGameData] = useState<z.infer<typeof gameSchema>>();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (gameID) {
-      getGame();
+  const getGame = async () => {
+    try {
+      const response = await fetch(`/api/games/${gameID}`);
+      if (!response.ok) {
+        setError("Failed to fetch game");
+      }
+      const data = await response.json();
+      setGameData(data.data);
+      setLoading(false);
+    } catch (error: any) {
+      setError(error.message);
     }
-  }, [gameID, getGame]);
+  }
 
-  async function getGame() {
-    const response = await fetch(`/api/games/${gameID}`);
-    const data = await response.json();
-    setGameData(data.data);
+  if (gameID && loading) {
+    getGame();
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
   if (!gameData) {
