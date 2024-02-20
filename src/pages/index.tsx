@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { signOut, useSession } from "next-auth/react";
 import React from "react";
 
-const index = () => {
+const Home = () => {
   const { data, status } = useSession();
   return (
     <div>
@@ -14,4 +14,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Home;

@@ -6,7 +6,7 @@ import TagsComponent from "../../components/Tags/TagsComponent";
 import { gameSchema } from "@/utils/types";
 import { z } from "zod";
 
-export default function gamePage() {
+const GamePage = () => {
   const gameID = useRouter().query.id;
   const [gameData, setGameData] = useState<z.infer<typeof gameSchema>>();
 
@@ -14,7 +14,7 @@ export default function gamePage() {
     if (gameID) {
       getGame();
     }
-  }, [gameID]);
+  }, [gameID, getGame]);
 
   async function getGame() {
     const response = await fetch(`/api/games/${gameID}`);
@@ -34,3 +34,5 @@ export default function gamePage() {
     </div>
   );
 }
+
+export default GamePage;

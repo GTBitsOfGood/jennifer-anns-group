@@ -10,7 +10,7 @@ function HeroImage(props: PropsWithChildren<Props>) {
       <div className="flex h-full w-[45%] max-w-[45%] justify-center flex-col p-5 items-center">
         <div>
           <h1 className="font-open-sans-cond uppercase font-extrabold text-6xl text-white mb-6 w-[6em]">
-            Jennifer Ann's Group
+            Jennifer Ann&apos;s Group
           </h1>
           <div className="flex flex-row h-[3rem]">
             <h3 className="font-open-sans-cond uppercase font-extralight text-5xl text-white italic pr-4">

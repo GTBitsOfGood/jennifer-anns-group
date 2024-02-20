@@ -9,13 +9,13 @@ function Login() {
         <div>
           <h2 className="text-blue-primary text-3xl font-light">Welcome to</h2>
           <h2 className="text-blue-primary text-3xl font-bold">
-            Jennifer Ann's Group
+            Jennifer Ann&apos;s Group
           </h2>
         </div>
         <LoginForm />
         <div className="flex flex-col items-center gap-2">
           <p>
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <a
               href="/signup"
               className="underline text-blue-primary hover:cursor-pointer"
