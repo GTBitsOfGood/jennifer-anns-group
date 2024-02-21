@@ -13,7 +13,6 @@ import {
 
 import { userSchema } from "@/utils/types";
 import cn from "classnames";
-import { z } from "zod";
 import { useState, useEffect } from "react";
 
 type EditProps = {
