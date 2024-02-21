@@ -1,7 +1,5 @@
 import { z } from "zod";
-import {
-  createUser
-} from "../../../server/db/actions/UserAction";
+import { createUser } from "../../../server/db/actions/UserAction";
 import { userSchema } from "../../../utils/types";
 import { NextApiRequest, NextApiResponse } from "next";
 import {
@@ -9,11 +7,8 @@ import {
   HTTP_CREATED,
   HTTP_INTERNAL_SERVER_ERROR,
   HTTP_METHOD_NOT_ALLOWED,
-
 } from "@/utils/consts";
-import {
-  UserAlreadyExistsException
-} from "@/utils/exceptions";
+import { UserAlreadyExistsException } from "@/utils/exceptions";
 
 export const createUserSchema = userSchema
   .omit({ hashedPassword: true })

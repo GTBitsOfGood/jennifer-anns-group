@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { HTTP_UNAUTHORIZED } from "@/utils/consts";
 
 import { userSchema } from "@/utils/types";
 import cn from "classnames";
@@ -44,22 +45,15 @@ type EditProps = {
   >;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   editUser: (
-    data:
-      | {
-          email: string;
-          password: string;
-          oldpassword: string;
-          passwordConfirm: string;
-        }
-      | {
-          email: string;
-          hashedPassword: string;
-          firstName: string;
-          lastName: string;
-          label: "educator" | "student" | "parent" | "administrator";
-          _id: string;
-        },
-    type: "info" | "password"
+    data: {
+      email: string;
+      hashedPassword: string;
+      firstName: string;
+      lastName: string;
+      label: "educator" | "student" | "parent" | "administrator";
+      _id: string;
+    },
+    type: "info" | "password",
   ) => Promise<any>;
 };
 
@@ -95,10 +89,14 @@ function EditProfileModal(props: EditProps) {
             _id: props.userData?._id!,
             hashedPassword: props.userData?.hashedPassword!,
           },
-          "info"
+          "info",
         );
         if (res.error) {
-          setInvalidEmail(res.error);
+          if (res.status == HTTP_UNAUTHORIZED) {
+            setInvalidEmail(res.error);
+          } else {
+            console.error("Error editing user:", res.error);
+          }
         } else {
           props.setOpen(false);
           props.setUserData({
@@ -121,8 +119,8 @@ function EditProfileModal(props: EditProps) {
 
   return (
     <form onSubmit={handleProfileFormSubmit}>
-      <div className="grid grid-cols-8 gap-3 py-4 -my-2">
-        <div className="items-center col-span-4">
+      <div className="-my-2 grid grid-cols-8 gap-3 py-4">
+        <div className="col-span-4 items-center">
           <Label
             htmlFor={FNAME_FORM_KEY}
             className="text-right text-lg font-normal"
@@ -133,10 +131,10 @@ function EditProfileModal(props: EditProps) {
             name={FNAME_FORM_KEY}
             id="firstName"
             defaultValue={props.userData?.firstName}
-            className="text-xs font-light text-black col-span-3"
+            className="col-span-3 text-xs font-light text-black"
           />
         </div>
-        <div className="items-center col-span-4">
+        <div className="col-span-4 items-center">
           <Label
             htmlFor={LNAME_FORM_KEY}
             className="text-right text-lg font-normal"
@@ -147,10 +145,10 @@ function EditProfileModal(props: EditProps) {
             id="lastName"
             name={LNAME_FORM_KEY}
             defaultValue={props.userData?.lastName}
-            className="text-xs font-light text-black col-span-3"
+            className="col-span-3 text-xs font-light text-black"
           />
         </div>
-        <div className="items-center col-span-8">
+        <div className="col-span-8 items-center">
           <Label
             htmlFor={EMAIL_FORM_KEY}
             className="text-right text-lg font-normal"
@@ -162,14 +160,14 @@ function EditProfileModal(props: EditProps) {
             id="email"
             defaultValue={props.userData?.email}
             autoComplete="email"
-            className={cn("text-xs font-light text-black col-span-8", {
+            className={cn("col-span-8 text-xs font-light text-black", {
               "border-red-500": invalidEmail !== "",
             })}
           />
-          <p className="text-xs text-red-500 mt-1">{invalidEmail}</p>
+          <p className="mt-1 text-xs text-red-500">{invalidEmail}</p>
         </div>
 
-        <div className="items-center col-span-8">
+        <div className="col-span-8 items-center">
           <Label
             htmlFor={LABEL_FORM_KEY}
             className="text-right text-lg font-normal"
@@ -194,20 +192,20 @@ function EditProfileModal(props: EditProps) {
             </SelectContent>
           </Select>
         </div>
-        <div className="items-center col-span-8">
+        <div className="col-span-8 items-center">
           <p
             onClick={() => props.setProfileState("changePw")}
-            className="text-lg text-blue-primary font-semibold mt-2 mb-6 hover:cursor-pointer"
+            className="mb-6 mt-2 text-lg font-semibold text-blue-primary hover:cursor-pointer"
           >
             Change Password
           </p>
         </div>
       </div>
       <DialogFooter>
-        <div className="relative w-full mt-10">
+        <div className="relative mt-10 w-full">
           <Button
             variant="outline2"
-            className="absolute bottom-0 left-0 text-lg px-4"
+            className="absolute bottom-0 left-0 px-4 text-lg"
             onClick={() => props.setProfileState("view")}
           >
             Cancel
@@ -216,7 +214,7 @@ function EditProfileModal(props: EditProps) {
           <Button
             type="submit"
             variant="mainblue"
-            className="absolute bottom-0 right-0 text-lg px-4"
+            className="absolute bottom-0 right-0 px-4 text-lg"
             onClick={() => props.setProfileState("edit")}
           >
             Save Changes

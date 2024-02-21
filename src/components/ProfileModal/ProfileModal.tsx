@@ -48,18 +48,21 @@ export function ProfileModal() {
 
   async function editUser(
     data: z.infer<typeof userDataSchema> | z.infer<typeof changePWSchema>,
-    type: "info" | "password"
+    type: "info" | "password",
   ) {
     try {
       const params = new URLSearchParams({ type: type });
 
-      const response = await fetch(`/api/users/${currentUser?._id}/?${params.toString()}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `/api/users/${currentUser?._id}/?${params.toString()}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
         },
-        body: JSON.stringify(data),
-      });
+      );
       const responseData = await response.json();
       return responseData;
     } catch (error) {
@@ -82,7 +85,7 @@ export function ProfileModal() {
           </Button>
         </DialogTrigger>
 
-        <DialogContent className="sm:max-w-[425px] py-10 px-12  border-solid border-4 border-blue-primary">
+        <DialogContent className="border-4 border-solid border-blue-primary  px-12 py-10 sm:max-w-[425px]">
           <DialogHeader>
             {profileState == "changePw" && (
               <div className="absolute left-4 top-4 rounded-sm opacity-100 ring-offset-white transition-opacity hover:cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-slate-100 data-[state=open]:text-slate-500 dark:ring-offset-slate-950 dark:focus:ring-slate-300 dark:data-[state=open]:bg-slate-800 dark:data-[state=open]:text-slate-400">
@@ -94,7 +97,7 @@ export function ProfileModal() {
                 />
               </div>
             )}
-            <DialogTitle className="text-lg text-blue-primary font-semibold -mb-2">
+            <DialogTitle className="-mb-2 text-lg font-semibold text-blue-primary">
               {profileStateLabels[profileState]}
             </DialogTitle>
           </DialogHeader>
@@ -117,7 +120,6 @@ export function ProfileModal() {
           {profileState == "changePw" && (
             <ChangePasswordModal
               setProfileState={setProfileState}
-              userData={userData}
               editUser={editUser}
             />
           )}

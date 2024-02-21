@@ -3,43 +3,23 @@ import { DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { z } from "zod";
 import cn from "classnames";
 
 import React from "react";
 import { useState, useEffect } from "react";
+import { changePWSchema } from "@/utils/types";
 
 type ChangePWProps = {
   setProfileState: React.Dispatch<
     React.SetStateAction<"view" | "edit" | "changePw">
   >;
-  userData:
-    | {
-        email: string;
-        hashedPassword: string;
-        firstName: string;
-        lastName: string;
-        label: "educator" | "student" | "parent" | "administrator";
-        _id: string;
-      }
-    | undefined;
   editUser: (
-    data:
-      | {
-          email: string;
-          password: string;
-          oldpassword: string;
-          passwordConfirm: string;
-        }
-      | {
-          email: string;
-          hashedPassword: string;
-          firstName: string;
-          lastName: string;
-          label: "educator" | "student" | "parent" | "administrator";
-          _id: string;
-        },
-    type: "info" | "password"
+    data: {
+      password: string;
+      oldpassword: string;
+      passwordConfirm: string;
+    },
+    type: "info" | "password",
   ) => Promise<any>;
 };
 
@@ -48,28 +28,21 @@ function ChangePasswordModal(props: ChangePWProps) {
   const PW_FORM_KEY = "password";
   const PW_CONFIRM_FORM_KEY = "passwordConfirm";
 
-  const pwSchema = z
-    .object({
-      email: z.string().email(),
-      oldpassword: z.string(),
-      password: z
-        .string()
-        .min(8, "Password must contain at least 8 characters."),
-      passwordConfirm: z.string(),
-    })
-    .refine((data) => data.password === data.passwordConfirm, {
+  const pwSchema = changePWSchema.refine(
+    (data) => data.password === data.passwordConfirm,
+    {
       message: "Passwords do not match",
       path: ["passwordConfirm"],
-    });
+    },
+  );
 
   const [invalidFields, setInvalidFields] = useState({
-    email: "",
     password: "",
     passwordConfirm: "",
     oldPassword: "",
   });
 
-  type FormKey = "email" | "password" | "passwordConfirm" | "oldPassword";
+  type FormKey = "password" | "passwordConfirm" | "oldPassword";
 
   function resetErrorMessage(field: FormKey) {
     setInvalidFields((prevInvalidFields) => ({
@@ -86,7 +59,6 @@ function ChangePasswordModal(props: ChangePWProps) {
 
   useEffect(() => {
     setInvalidFields({
-      email: "",
       password: "",
       passwordConfirm: "",
       oldPassword: "",
@@ -97,7 +69,6 @@ function ChangePasswordModal(props: ChangePWProps) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const input = {
-      email: props.userData?.email,
       oldpassword: formData.get(OLDPW_FORM_KEY),
       password: formData.get(PW_FORM_KEY),
       passwordConfirm: formData.get(PW_CONFIRM_FORM_KEY),
@@ -131,10 +102,11 @@ function ChangePasswordModal(props: ChangePWProps) {
       }
     }
   }
+
   return (
     <form onSubmit={handlePasswordFormSubmit}>
-      <div className="grid grid-cols-8 gap-6 py-4 -my-2">
-        <div className="items-center col-span-8">
+      <div className="-my-2 grid grid-cols-8 gap-6 py-4">
+        <div className="col-span-8 items-center">
           <Label
             htmlFor={OLDPW_FORM_KEY}
             className="text-right text-lg font-normal"
@@ -147,16 +119,16 @@ function ChangePasswordModal(props: ChangePWProps) {
             type="password"
             id={OLDPW_FORM_KEY}
             defaultValue=""
-            className={cn("text-xs font-light text-black col-span-8", {
+            className={cn("col-span-8 text-xs font-light text-black", {
               "border-red-500": invalidFields.oldPassword !== "",
             })}
           />
 
-          <p className="text-xs text-red-500 mt-1">
+          <p className="mt-1 text-xs text-red-500">
             {invalidFields.oldPassword}
           </p>
         </div>
-        <div className="items-center col-span-8">
+        <div className="col-span-8 items-center">
           <Label
             htmlFor={PW_FORM_KEY}
             className="text-right text-lg font-normal"
@@ -170,13 +142,13 @@ function ChangePasswordModal(props: ChangePWProps) {
             placeholder="Min. 8 characters"
             id={PW_FORM_KEY}
             defaultValue=""
-            className={cn("text-xs font-light text-black col-span-8", {
+            className={cn("col-span-8 text-xs font-light text-black", {
               "border-red-500": invalidFields.password !== "",
             })}
           />
-          <p className="text-xs text-red-500 mt-1">{invalidFields.password}</p>
+          <p className="mt-1 text-xs text-red-500">{invalidFields.password}</p>
         </div>
-        <div className="items-center col-span-8">
+        <div className="col-span-8 items-center">
           <Label
             htmlFor={PW_CONFIRM_FORM_KEY}
             className="text-right text-lg font-normal"
@@ -190,22 +162,22 @@ function ChangePasswordModal(props: ChangePWProps) {
             defaultValue=""
             type="password"
             placeholder="Min. 8 characters"
-            className={cn("text-xs font-light text-black col-span-8", {
+            className={cn("col-span-8 text-xs font-light text-black", {
               "border-red-500": invalidFields.passwordConfirm !== "",
             })}
           />
-          <p className="text-xs text-red-500 mt-1">
+          <p className="mt-1 text-xs text-red-500">
             {invalidFields.passwordConfirm}
           </p>
         </div>
       </div>
 
       <DialogFooter>
-        <div className="w-full relative mt-16">
+        <div className="relative mt-16 w-full">
           <Button
             type="submit"
             variant="mainblue"
-            className="absolute right-0 bottom-0 text-lg px-4"
+            className="absolute bottom-0 right-0 px-4 text-lg"
           >
             Save Password
           </Button>

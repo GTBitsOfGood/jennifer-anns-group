@@ -56,9 +56,7 @@ export const userSchema = z.object({
 
 // For changing password
 export const changePWSchema = z.object({
-  email: z.string().email(),
   oldpassword: z.string(),
-  password: z.string(),
-  passwordConfirm: z.string()
+  password: z.string().min(8, "Password must contain at least 8 characters."),
+  passwordConfirm: z.string(),
 });
-

@@ -10,7 +10,7 @@ import {
   UserAlreadyExistsException,
   UserCredentialsIncorrectException,
   UserDoesNotExistException,
-  GenericUserErrorException
+  GenericUserErrorException,
 } from "@/utils/exceptions";
 import { MongoError } from "mongodb";
 
@@ -77,13 +77,15 @@ export async function getUser(id: string) {
  * @param {z.infer<typeof userSchema> & { _id: string }} userInfo Info of the user to find/update.
  * @throws {GenericUserErrorException} If changing email to an email that corresponds to a pre-existing account
  * @throws {UserDoesNotExistException} If unable to find user
- * 
+ *
  */
-export async function editUser(userInfo: z.infer<typeof userSchema> & { _id: string }) {
+export async function editUser(
+  userInfo: z.infer<typeof userSchema> & { _id: string },
+) {
   await connectMongoDB();
 
   const existingUser = await UserModel.findOne({ email: userInfo.email });
-  
+
   if (existingUser && String(existingUser._id) != userInfo._id) {
     throw new UserAlreadyExistsException();
   }
@@ -99,20 +101,27 @@ export async function editUser(userInfo: z.infer<typeof userSchema> & { _id: str
 /**
  * Edits user password.
  * @param {z.infer<typeof changePWSchema>} passwordInfo Password info of user.
+ * @param {string} id ID of the user.
  * @throws {UserDoesNotExistException} If unable to find user
  * @throws {UserCredentialsIncorrectException} If old password doesn't match user's current password
  * @throws {GenericServerErrorException} If unable to update user
  */
-export async function editPassword(passwordInfo: z.infer<typeof changePWSchema>) {
+export async function editPassword(
+  passwordInfo: z.infer<typeof changePWSchema>,
+  id: string,
+) {
   await connectMongoDB();
-
-  const user = await UserModel.findOne({ email: passwordInfo.email });
+  console.log(id);
+  const user = await UserModel.findById(id);
   if (!user) {
     throw new UserDoesNotExistException();
   }
 
   // Compare the old password provided by the user with the hashed password stored in the database
-  const oldPasswordMatch = await bcrypt.compare(passwordInfo.oldpassword, user.hashedPassword);
+  const oldPasswordMatch = await bcrypt.compare(
+    passwordInfo.oldpassword,
+    user.hashedPassword,
+  );
   if (!oldPasswordMatch) {
     throw new UserCredentialsIncorrectException();
   }
@@ -120,10 +129,10 @@ export async function editPassword(passwordInfo: z.infer<typeof changePWSchema>)
   const hashedPassword = await bcrypt.hash(passwordInfo.password, SALT_ROUNDS);
 
   // Update the user's password
-  const updatedUser = await UserModel.findOneAndUpdate(
-    { email: passwordInfo.email },
+  const updatedUser = await UserModel.findByIdAndUpdate(
+    id,
     { $set: { hashedPassword } },
-    { new: true }
+    { new: true },
   );
 
   // Check if user was able to be found/updated

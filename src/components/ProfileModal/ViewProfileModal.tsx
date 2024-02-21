@@ -23,42 +23,42 @@ type ViewProps = {
 function ViewProfileModal(props: ViewProps) {
   return (
     <>
-      <div className="grid grid-cols-8 gap-3 py-4 -my-2">
-        <div className="items-center col-span-4">
+      <div className="-my-2 grid grid-cols-8 gap-3 py-4">
+        <div className="col-span-4 items-center">
           <Label className="text-right text-lg font-normal">First Name</Label>
 
-          <p className="text-sm font-light text-blue-primary col-span-3 py-2">
+          <p className="col-span-3 py-2 text-sm font-light text-blue-primary">
             {props.userData?.firstName}
           </p>
         </div>
-        <div className="items-center col-span-4">
+        <div className="col-span-4 items-center">
           <Label className="text-right text-lg font-normal">Last Name</Label>
 
-          <p className="text-sm font-light text-blue-primary col-span-3 py-2">
+          <p className="col-span-3 py-2 text-sm font-light text-blue-primary">
             {props.userData?.lastName}
           </p>
         </div>
-        <div className="items-center col-span-8">
+        <div className="col-span-8 items-center">
           <Label className="text-right text-lg font-normal">Email</Label>
 
-          <p className="text-sm font-light text-blue-primary col-span-3 py-2">
+          <p className="col-span-3 py-2 text-sm font-light text-blue-primary">
             {props.userData?.email}
           </p>
         </div>
 
-        <div className="items-center col-span-8">
+        <div className="col-span-8 items-center">
           <Label className="text-right text-lg font-normal">Label</Label>
 
-          <p className="text-sm font-light text-blue-primary col-span-3 py-2">
+          <p className="col-span-3 py-2 text-sm font-light text-blue-primary">
             {props.userData?.label
               ? props.userData?.label.charAt(0).toUpperCase() +
                 props.userData?.label.slice(1)
               : ""}
           </p>
         </div>
-        <div className="items-center col-span-8">
+        <div className="col-span-8 items-center">
           <Label className="text-right text-lg font-normal">Password</Label>
-          <p className="text-sm font-light text-blue-primary col-span-3 py-2">
+          <p className="col-span-3 py-2 text-sm font-light text-blue-primary">
             ********
           </p>
         </div>
@@ -66,7 +66,7 @@ function ViewProfileModal(props: ViewProps) {
       <DialogFooter>
         <Button
           variant="mainblue"
-          className="text-lg px-6"
+          className="px-6 text-lg"
           onClick={() => props.setProfileState("edit")}
         >
           Edit

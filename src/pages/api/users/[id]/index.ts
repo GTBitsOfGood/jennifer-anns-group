@@ -18,8 +18,8 @@ import {
 } from "@/utils/exceptions";
 
 export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse,
+  req: NextApiRequest,
+  res: NextApiResponse,
 ) {
   switch (req.method) {
     case "GET":
@@ -42,11 +42,11 @@ export default async function handler(
         });
         return;
       }
-    
+
     case "PUT":
       await editUserHandler(req, res);
       break;
-  
+
     default:
       res.status(HTTP_METHOD_NOT_ALLOWED).json({
         error: `Request method ${req.method} is not allowed`,
@@ -54,9 +54,10 @@ export default async function handler(
   }
   return;
 }
-      
+
 async function editUserHandler(req: NextApiRequest, res: NextApiResponse) {
-  const { type } = req.query;
+  const { type, id } = req.query;
+
   if (type === "info") {
     // Editing user profile
     try {
@@ -86,7 +87,7 @@ async function editUserHandler(req: NextApiRequest, res: NextApiResponse) {
   } else if (type === "password") {
     // Editing user password
     try {
-      const result = await editPassword(req.body);
+      const result = await editPassword(req.body, String(id));
       res.status(200).send({
         data: result,
       });
