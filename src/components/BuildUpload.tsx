@@ -1,7 +1,7 @@
 import { uploadBuildFiles } from "@/utils/file";
 import { useState } from "react";
 
-export default function Upload() {
+export default function BuildUpload() {
   const [loaderFile, setLoaderFile] = useState<null | File>(null);
   const [dataFile, setDataFile] = useState<null | File>(null);
   const [codeFile, setCodeFile] = useState<null | File>(null);
@@ -57,6 +57,7 @@ export default function Upload() {
   return (
     <>
       <form onSubmit={handleSubmit}>
+        <h1 className="font-bold">Upload Build (id=1)</h1>
         <h1>Loader</h1>
         <input type="file" name="loader" onChange={handleFileChange} />
         <h1>Data</h1>

@@ -1,17 +1,21 @@
 import { getBuildFileUrl } from "@/utils/file";
 import { Unity, useUnityContext } from "react-unity-webgl";
 
-export default function EmbeddedGame() {
+interface EmbeddedGameProps {
+  gameId: string;
+}
+
+export default function EmbeddedGame({ gameId }: EmbeddedGameProps) {
   const { unityProvider } = useUnityContext({
-    loaderUrl: getBuildFileUrl("1", "loader"),
-    dataUrl: getBuildFileUrl("1", "data"),
-    frameworkUrl: getBuildFileUrl("1", "framework"),
-    codeUrl: getBuildFileUrl("1", "code"),
+    loaderUrl: getBuildFileUrl(gameId, "loader"),
+    dataUrl: getBuildFileUrl(gameId, "data"),
+    frameworkUrl: getBuildFileUrl(gameId, "framework"),
+    codeUrl: getBuildFileUrl(gameId, "code"),
   });
 
   return (
     <>
-      <Unity unityProvider={unityProvider} />
+      <Unity unityProvider={unityProvider} className="w-full" />
     </>
   );
 }

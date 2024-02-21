@@ -21,7 +21,7 @@ export async function uploadBuildFiles(
     }
   }
 
-  // atomic uploads?
+  // atomic uploads? retry on error?
   try {
     await Promise.all(
       Array.from(files.entries()).map(async ([type, file]) => {
@@ -50,6 +50,10 @@ export async function uploadBuildFiles(
     console.error("Failed to upload files:", error);
     throw error;
   }
+
+  await axios.put(`/api/games/${gameId}`, {
+    webGLBuild: true,
+  });
 }
 
 const CLOUDFLARE_URL = "https://cloudflare-b2.nathangong.workers.dev";
