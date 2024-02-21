@@ -1,0 +1,9 @@
+[
+  {
+    "corsRuleName": "uploadFromAnyOrigin",
+    "allowedOrigins": ["http://localhost:3000"],
+    "allowedHeaders": ["*"],
+    "allowedOperations": ["b2_upload_file"],
+    "maxAgeSeconds": 3600
+  }
+]
