@@ -59,13 +59,13 @@ export async function verifyUser(email: string, password: string) {
 }
 
 /**
- * Gets a user by their email address.
- * @param {string} email Email address of the user to get.
+ * Gets a user by their ID.
+ * @param {string} id ID of the user to get.
  * @throws {UserDoesNotExistException} If unable to find user
  */
-export async function getUser(email: string) {
+export async function getUser(id: string) {
   await connectMongoDB();
-  const user = await UserModel.findOne({ email: email });
+  const user = await UserModel.findById(id);
   if (!user) {
     throw new UserDoesNotExistException();
   }
@@ -85,7 +85,7 @@ export async function editUser(userInfo: z.infer<typeof userSchema> & { _id: str
   const existingUser = await UserModel.findOne({ email: userInfo.email });
   
   if (existingUser && String(existingUser._id) != userInfo._id) {
-    throw new GenericUserErrorException();
+    throw new UserAlreadyExistsException();
   }
   const result = await UserModel.findByIdAndUpdate(userInfo._id, userInfo, {
     new: true,
