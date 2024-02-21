@@ -28,7 +28,7 @@ export async function deleteTag(id: ObjectId) {
     }
     const results = await GameModel.updateMany(
       { tags: { $in: [id] } },
-      { $pull: { tags: id } }
+      { $pull: { tags: id } },
     );
   } catch (e) {
     throw e;

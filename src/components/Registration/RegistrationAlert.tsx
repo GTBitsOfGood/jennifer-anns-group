@@ -7,9 +7,9 @@ interface Props {
 
 const RegistrationAlert = (props: PropsWithChildren<Props>) => {
   return (
-    <div className="relative bg-white border border-red-500 rounded-md p-3 mb-4 w-[20em]">
+    <div className="relative mb-4 w-[20em] rounded-md border border-red-500 bg-white p-3">
       <button
-        className="absolute top-1 right-2 text-red-500 cursor-pointer text-xs"
+        className="absolute right-2 top-1 cursor-pointer text-xs text-red-500"
         onClick={() => props.setIsAlertShowing(false)}
       >
         <svg
@@ -26,8 +26,8 @@ const RegistrationAlert = (props: PropsWithChildren<Props>) => {
           />
         </svg>
       </button>
-      <p className="text-red-500 text-xs mb-2">{props.title}</p>
-      <p className="text-grey text-xs">{props.children}</p>
+      <p className="mb-2 text-xs text-red-500">{props.title}</p>
+      <p className="text-xs text-grey">{props.children}</p>
     </div>
   );
 };

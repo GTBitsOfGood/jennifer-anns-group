@@ -14,11 +14,17 @@ export default function TagsComponent({ gameData }: Props) {
       <div className={styles.tags}>
         {gameData.themes
           ? gameData.themes.map((theme) => (
-              <Tag bg="brand.400">{theme.name}</Tag>
+              <Tag key={theme.name} bg="brand.400">
+                {theme.name}
+              </Tag>
             ))
           : null}
         {gameData.tags
-          ? gameData.tags.map((tag) => <Tag bg="brand.500">{tag.name}</Tag>)
+          ? gameData.tags.map((tag) => (
+              <Tag key={tag.name} bg="brand.500">
+                {tag.name}
+              </Tag>
+            ))
           : null}
       </div>
     </ChakraProvider>

@@ -25,13 +25,13 @@ export async function deleteTheme(id: ObjectId) {
 
     if (!deleted_theme) {
       throw new GenericUserErrorException(
-        "No Theme present with this ObjectID."
+        "No Theme present with this ObjectID.",
       );
     }
 
     const results = await GameModel.updateMany(
       { themes: { $in: [id] } },
-      { $pull: { themes: id } }
+      { $pull: { themes: id } },
     );
   } catch (e) {
     throw e;
