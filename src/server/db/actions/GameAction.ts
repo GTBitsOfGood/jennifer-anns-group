@@ -16,6 +16,8 @@ export async function deleteGame(data: any) {
   await connectMongoDB();
   try {
     const result = await GameModel.findByIdAndDelete(data);
+
+    // todo: delete build files from B2
     if (!result) {
       throw new ReferenceError("Game with given ID does not exist.");
     }

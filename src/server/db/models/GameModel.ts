@@ -1,8 +1,16 @@
 import mongoose, { Schema } from "mongoose";
 import { z } from "zod";
-import { gameSchema } from "../../../utils/types";
+import { buildSchema, gameSchema, AppType } from "../../../utils/types";
+import { ObjectId } from "mongodb";
 
+interface IBuild extends z.infer<typeof buildSchema> {}
 interface IGame extends z.infer<typeof gameSchema> {}
+
+const BuildSchema = new Schema<IBuild>({
+  type: { type: String, enum: Object.values(AppType), required: true },
+  link: { type: String, required: true },
+  instructions: { type: String },
+});
 
 const GameSchema = new Schema<IGame>({
   name: { type: String, required: true, unique: true },
@@ -10,7 +18,8 @@ const GameSchema = new Schema<IGame>({
   tags: { type: [String], default: [] },
   multiClass: { type: Boolean, required: true },
   description: { type: String },
-  game: { type: String, required: true },
+  webGLBuild: { type: Boolean, default: false },
+  builds: { type: [BuildSchema], default: [] },
   lesson: { type: String },
   parentingGuide: { type: String },
 });
