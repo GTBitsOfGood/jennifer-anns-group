@@ -1,11 +1,5 @@
-import mongoose from "mongoose";
-import {
-  createGame,
-  getAllGames,
-  uploadBuildFiles,
-} from "../../../server/db/actions/GameAction";
+import { createGame, getAllGames } from "../../../server/db/actions/GameAction";
 import { gameSchema } from "../../../utils/types";
-import formidable from "formidable";
 
 export default async function handler(req: any, res: any) {
   switch (req.method) {

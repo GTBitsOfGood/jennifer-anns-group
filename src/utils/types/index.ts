@@ -1,4 +1,21 @@
+import { ObjectId } from "mongodb";
 import { z } from "zod";
+
+// Build
+export enum AppType {
+  AmazonApp = "Amazon App",
+  AndroidApp = "Android App",
+  AppStore = "App Store",
+  LinuxDownload = "Linux Download",
+  MacDownload = "Mac Download",
+  WindowsDownload = "Windows Download",
+}
+
+export const buildSchema = z.object({
+  type: z.nativeEnum(AppType),
+  link: z.string().url(),
+  instructions: z.string().optional(),
+});
 
 // Game
 export const gameSchema = z.object({
@@ -7,7 +24,8 @@ export const gameSchema = z.object({
   tags: z.array(z.string()).optional(),
   multiClass: z.boolean(),
   description: z.string().optional(),
-  game: z.string().url(),
+  webGLBuild: z.boolean(),
+  builds: z.array(buildSchema).optional(),
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
 });
