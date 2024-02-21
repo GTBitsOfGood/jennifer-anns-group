@@ -2,7 +2,7 @@ import {
   deleteBuild,
   getBuildUploadUrl,
 } from "@/server/db/actions/BuildAction";
-import { getGameById } from "@/server/db/actions/GameAction";
+import { editGame, getGameById } from "@/server/db/actions/GameAction";
 import { NextApiResponse } from "next";
 
 export default async function handler(req: any, res: NextApiResponse) {
@@ -26,10 +26,11 @@ export default async function handler(req: any, res: NextApiResponse) {
       });
     case "DELETE":
       await deleteBuild(gameId);
+      await editGame({ id: gameId, data: { webGLBuild: false } });
 
       return res.status(200).send({
         success: true,
-        message: "Builds successfully deleted!",
+        message: "Build successfully deleted!",
       });
   }
 
