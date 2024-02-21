@@ -1,14 +1,13 @@
-import { ProfileModal } from '@/components/ProfileModal'
-import React from 'react'
+import { ProfileModal } from "@/components/ProfileModal/ProfileModal";
+import React from "react";
 import { SessionProvider } from "next-auth/react";
 
 function index() {
   return (
     <SessionProvider>
-    <ProfileModal />
+      <ProfileModal />
     </SessionProvider>
-
-  )
+  );
 }
 
-export default index
+export default index;
