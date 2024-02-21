@@ -14,13 +14,13 @@ export async function createGame(data: IGame) {
 
     if (data && data.themes) {
       const themePromises = data.themes.map((theme) =>
-        ThemeModel.findById(theme)
+        ThemeModel.findById(theme),
       );
       const themeResults = await Promise.all(themePromises);
       themeResults.forEach((result, index) => {
         if (!result) {
           throw new GenericUserErrorException(
-            `ObjectID ${data.themes![index]} not a present theme.`
+            `ObjectID ${data.themes![index]} not a present theme.`,
           ); //Using non-null assertion, as if condition should ensure data.tags is non-null
         }
       });
@@ -31,7 +31,7 @@ export async function createGame(data: IGame) {
       tagResults.forEach((result, index) => {
         if (!result) {
           throw new GenericUserErrorException(
-            `ObjectID ${data.tags![index]} is not a  present tag.`
+            `ObjectID ${data.tags![index]} is not a  present tag.`,
           ); //Using non-null assertion, as if condition should ensure data.tags is non-null
         }
       });
@@ -73,13 +73,13 @@ export async function editGame(allData: nextEditGame) {
     //Ah yes
     if (data && data.themes) {
       const themePromises = data.themes.map((theme) =>
-        ThemeModel.findById(theme)
+        ThemeModel.findById(theme),
       );
       const themeResults = await Promise.all(themePromises);
       themeResults.forEach((result, index) => {
         if (!result) {
           throw new GenericUserErrorException(
-            `ObjectID ${data.themes![index]} not a present theme.`
+            `ObjectID ${data.themes![index]} not a present theme.`,
           ); //Using non-null assertion, as if condition should ensure data.tags is non-null
         }
       });
@@ -90,7 +90,7 @@ export async function editGame(allData: nextEditGame) {
       tagResults.forEach((result, index) => {
         if (!result) {
           throw new GenericUserErrorException(
-            `ObjectID ${data.tags![index]} is not a  present tag.`
+            `ObjectID ${data.tags![index]} is not a  present tag.`,
           ); //Using non-null assertion, as if condition should ensure data.tags is non-null
         }
       });

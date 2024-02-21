@@ -1,8 +1,9 @@
-import { extendTheme } from '@chakra-ui/react';
+import { extendTheme } from "@chakra-ui/react";
 import { tabsAnatomy } from "@chakra-ui/anatomy";
 import { createMultiStyleConfigHelpers } from "@chakra-ui/react";
 
-const { definePartsStyle, defineMultiStyleConfig } = createMultiStyleConfigHelpers(tabsAnatomy.keys);
+const { definePartsStyle, defineMultiStyleConfig } =
+  createMultiStyleConfigHelpers(tabsAnatomy.keys);
 
 // define custom variants
 const tabVariant = definePartsStyle({
@@ -31,10 +32,9 @@ const tabsTheme = defineMultiStyleConfig({
     defaultTab: tabVariant,
   },
   defaultProps: {
-    variant: 'defaultTab',
-  }
+    variant: "defaultTab",
+  },
 });
-
 
 const theme = extendTheme({
   components: {

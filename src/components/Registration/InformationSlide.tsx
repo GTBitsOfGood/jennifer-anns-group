@@ -87,7 +87,7 @@ function InformationSlide({
   });
 
   async function handleInformationFormSubmit(
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -131,7 +131,7 @@ function InformationSlide({
 
   return (
     <form
-      className="grid gap-y-8 gap-x-4 w-[20em] grid-cols-2"
+      className="grid w-[20em] grid-cols-2 gap-x-4 gap-y-8"
       onSubmit={handleInformationFormSubmit}
     >
       <div className="relative">
@@ -168,7 +168,7 @@ function InformationSlide({
           {validationErrors.lastName}
         </p>
       </div>
-      <div className="col-span-2 w-full relative">
+      <div className="relative col-span-2 w-full">
         <label htmlFor={LABEL_FORM_KEY} className="text-xl">
           I am a*
         </label>
@@ -194,7 +194,7 @@ function InformationSlide({
           {validationErrors.label}
         </p>
       </div>
-      <div className="col-span-2 w-full relative">
+      <div className="relative col-span-2 w-full">
         <label htmlFor={AGE_FORM_KEY} className="text-xl">
           Are you at least 13 years old?*
         </label>
@@ -220,7 +220,7 @@ function InformationSlide({
           {validationErrors.age}
         </p>
       </div>
-      <div className="flex flex-row justify-center col-span-2">
+      <div className="col-span-2 flex flex-row justify-center">
         <Button type="submit" variant="outline" size="lg" className="w-fit">
           Register
         </Button>
