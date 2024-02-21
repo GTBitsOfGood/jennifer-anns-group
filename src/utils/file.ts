@@ -1,5 +1,9 @@
 import axios from "axios";
 
+const CLOUDFLARE_URL = process.env.CLOUDFLARE_URL;
+
+// there's probably a better place to put these
+type BuildFileType = "data" | "framework" | "loader" | "code";
 const buildFileTypes = Object.freeze({
   data: "build.data",
   framework: "build.framework.js",
@@ -56,9 +60,7 @@ export async function uploadBuildFiles(
   });
 }
 
-const CLOUDFLARE_URL = "https://cloudflare-b2.nathangong.workers.dev";
-
-export function getBuildFileUrl(gameId: string, type: string) {
+export function getBuildFileUrl(gameId: string, type: BuildFileType) {
   const fileName = `${gameId}/${
     buildFileTypes[type as keyof typeof buildFileTypes]
   }`;
