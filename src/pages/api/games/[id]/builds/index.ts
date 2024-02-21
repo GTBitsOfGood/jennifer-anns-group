@@ -1,5 +1,8 @@
+import {
+  deleteBuild,
+  getBuildUploadUrl,
+} from "@/server/db/actions/BuildAction";
 import { getGameById } from "@/server/db/actions/GameAction";
-import connectB2 from "@/server/db/b2";
 import { NextApiResponse } from "next";
 
 export default async function handler(req: any, res: NextApiResponse) {
@@ -14,17 +17,19 @@ export default async function handler(req: any, res: NextApiResponse) {
 
   switch (req.method) {
     case "POST":
-      const b2 = await connectB2();
-
-      const bucketId = process.env.B2_BUCKET_ID;
-      const response = await b2.getUploadUrl({ bucketId });
-      const uploadUrl = response.data.uploadUrl;
-      const uploadAuthToken = response.data.authorizationToken;
+      const { uploadUrl, uploadAuthToken } = await getBuildUploadUrl();
 
       return res.status(200).send({
         success: true,
         message: "URL and auth token generated successfully",
         data: { uploadUrl, uploadAuthToken },
+      });
+    case "DELETE":
+      await deleteBuild(gameId);
+
+      return res.status(200).send({
+        success: true,
+        message: "Builds successfully deleted!",
       });
   }
 
