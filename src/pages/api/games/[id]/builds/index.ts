@@ -2,13 +2,6 @@ import { getGameById } from "@/server/db/actions/GameAction";
 import connectB2 from "@/server/db/b2";
 import { NextApiResponse } from "next";
 
-// needed for formidable to work
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 export default async function handler(req: any, res: NextApiResponse) {
   const gameId = req.query.id;
   const game = await getGameById(req.query.id);
