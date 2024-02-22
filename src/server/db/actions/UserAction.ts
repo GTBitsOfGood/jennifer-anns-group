@@ -10,12 +10,12 @@ import {
   UserAlreadyExistsException,
   UserCredentialsIncorrectException,
   UserDoesNotExistException,
-  GenericUserErrorException,
 } from "@/utils/exceptions";
 import { MongoError } from "mongodb";
 
 const SALT_ROUNDS = 10;
 const DUP_KEY_ERROR_CODE = 11000;
+const idSchema = z.string().length(24);
 
 export async function createUser(data: z.infer<typeof createUserSchema>) {
   await connectMongoDB();
@@ -60,12 +60,12 @@ export async function verifyUser(email: string, password: string) {
 
 /**
  * Gets a user by their ID.
- * @param {string} id ID of the user to get.
+ * @param {z.infer<typeof idSchema>} id ID of the user to get.
  * @throws {UserDoesNotExistException} If unable to find user
  */
-export async function getUser(id: string) {
+export async function getUser(id: z.infer<typeof idSchema>) {
   await connectMongoDB();
-  const user = await UserModel.findById(id);
+  const user = await UserModel.findById(id).select("-hashedPassword");
   if (!user) {
     throw new UserDoesNotExistException();
   }
@@ -74,24 +74,26 @@ export async function getUser(id: string) {
 
 /**
  * Edits a user.
- * @param {z.infer<typeof userSchema> & { _id: string }} userInfo Info of the user to find/update.
+ * @param {z.infer<typeof userSchema> & { _id: z.infer<typeof idSchema> }} userInfo Info of the user to find/update.
  * @throws {GenericUserErrorException} If changing email to an email that corresponds to a pre-existing account
  * @throws {UserDoesNotExistException} If unable to find user
  *
  */
 export async function editUser(
-  userInfo: z.infer<typeof userSchema> & { _id: string },
+  userInfo: z.infer<typeof userSchema> & { _id: z.infer<typeof idSchema> },
 ) {
   await connectMongoDB();
 
   const existingUser = await UserModel.findOne({ email: userInfo.email });
 
-  if (existingUser && String(existingUser._id) != userInfo._id) {
+  if (existingUser && existingUser.toObject()._id.toString() != userInfo._id) {
     throw new UserAlreadyExistsException();
   }
+
   const result = await UserModel.findByIdAndUpdate(userInfo._id, userInfo, {
     new: true,
-  });
+  }).select("-hashedPassword");
+
   if (!result) {
     throw new UserDoesNotExistException();
   }
@@ -111,7 +113,6 @@ export async function editPassword(
   id: string,
 ) {
   await connectMongoDB();
-  console.log(id);
   const user = await UserModel.findById(id);
   if (!user) {
     throw new UserDoesNotExistException();

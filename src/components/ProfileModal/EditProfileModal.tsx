@@ -10,51 +10,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { HTTP_UNAUTHORIZED } from "@/utils/consts";
 
 import { userSchema } from "@/utils/types";
 import cn from "classnames";
-import { useState, useEffect } from "react";
+import { z } from "zod";
+
+import { useState } from "react";
+import {
+  ProfileState,
+  userDataSchema,
+  EditUserParams,
+  EditUserReturnValue,
+} from "./ProfileModal";
+
+const formUserSchema = userSchema.omit({ hashedPassword: true });
 
 type EditProps = {
-  setProfileState: React.Dispatch<
-    React.SetStateAction<"view" | "edit" | "changePw">
-  >;
-  userData:
-    | {
-        email: string;
-        hashedPassword: string;
-        firstName: string;
-        lastName: string;
-        label: "educator" | "student" | "parent" | "administrator";
-        _id: string;
-      }
-    | undefined;
+  setProfileState: React.Dispatch<React.SetStateAction<ProfileState>>;
+  userData: z.infer<typeof userDataSchema> | undefined;
   setUserData: React.Dispatch<
-    React.SetStateAction<
-      | {
-          email: string;
-          hashedPassword: string;
-          firstName: string;
-          lastName: string;
-          label: "educator" | "student" | "parent" | "administrator";
-          _id: string;
-        }
-      | undefined
-    >
+    React.SetStateAction<z.infer<typeof userDataSchema> | undefined>
   >;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  editUser: (
-    data: {
-      email: string;
-      hashedPassword: string;
-      firstName: string;
-      lastName: string;
-      label: "educator" | "student" | "parent" | "administrator";
-      _id: string;
-    },
-    type: "info" | "password",
-  ) => Promise<any>;
+  editUser: (...args: EditUserParams) => EditUserReturnValue;
 };
 
 function EditProfileModal(props: EditProps) {
@@ -63,13 +41,7 @@ function EditProfileModal(props: EditProps) {
   const EMAIL_FORM_KEY = "email";
   const LABEL_FORM_KEY = "label";
 
-  const formUserSchema = userSchema.omit({ hashedPassword: true });
-
   const [invalidEmail, setInvalidEmail] = useState("");
-
-  useEffect(() => {
-    setInvalidEmail("");
-  }, []);
 
   async function handleProfileFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -87,22 +59,17 @@ function EditProfileModal(props: EditProps) {
           {
             ...parse.data,
             _id: props.userData?._id!,
-            hashedPassword: props.userData?.hashedPassword!,
           },
           "info",
+          props.userData?._id!,
         );
         if (res.error) {
-          if (res.status == HTTP_UNAUTHORIZED) {
-            setInvalidEmail(res.error);
-          } else {
-            console.error("Error editing user:", res.error);
-          }
+          setInvalidEmail(res.error);
         } else {
           props.setOpen(false);
           props.setUserData({
             ...parse.data,
             _id: props.userData?._id!,
-            hashedPassword: props.userData?.hashedPassword!,
           });
           setInvalidEmail("");
         }

@@ -4,23 +4,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import cn from "classnames";
+import { z } from "zod";
 
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { changePWSchema } from "@/utils/types";
 
+import {
+  ProfileState,
+  userDataSchema,
+  EditUserParams,
+  EditUserReturnValue,
+} from "./ProfileModal";
+
 type ChangePWProps = {
-  setProfileState: React.Dispatch<
-    React.SetStateAction<"view" | "edit" | "changePw">
-  >;
-  editUser: (
-    data: {
-      password: string;
-      oldpassword: string;
-      passwordConfirm: string;
-    },
-    type: "info" | "password",
-  ) => Promise<any>;
+  setProfileState: React.Dispatch<React.SetStateAction<ProfileState>>;
+  userData: z.infer<typeof userDataSchema> | undefined;
+  editUser: (...args: EditUserParams) => EditUserReturnValue;
 };
 
 function ChangePasswordModal(props: ChangePWProps) {
@@ -57,14 +57,6 @@ function ChangePasswordModal(props: ChangePWProps) {
     }));
   }
 
-  useEffect(() => {
-    setInvalidFields({
-      password: "",
-      passwordConfirm: "",
-      oldPassword: "",
-    });
-  }, []);
-
   async function handlePasswordFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -78,7 +70,11 @@ function ChangePasswordModal(props: ChangePWProps) {
       resetErrorMessage("password");
       resetErrorMessage("passwordConfirm");
       try {
-        const res = await props.editUser(parse.data, "password");
+        const res = await props.editUser(
+          parse.data,
+          "password",
+          props.userData?._id!,
+        );
         if (res.error) {
           setErrorMessage("oldPassword", res.error);
         } else {

@@ -1,23 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { userDataSchema, ProfileState } from "./ProfileModal";
+import { z } from "zod";
 
 import React from "react";
 
 type ViewProps = {
-  setProfileState: React.Dispatch<
-    React.SetStateAction<"view" | "edit" | "changePw">
-  >;
-  userData:
-    | {
-        email: string;
-        hashedPassword: string;
-        firstName: string;
-        lastName: string;
-        label: "educator" | "student" | "parent" | "administrator";
-        _id: string;
-      }
-    | undefined;
+  setProfileState: React.Dispatch<React.SetStateAction<ProfileState>>;
+  userData: z.infer<typeof userDataSchema> | undefined;
 };
 
 function ViewProfileModal(props: ViewProps) {
