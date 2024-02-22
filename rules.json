@@ -1,6 +1,6 @@
 [
   {
-    "corsRuleName": "uploadFromAnyOrigin",
+    "corsRuleName": "uploadFromLocalhost",
     "allowedOrigins": ["http://localhost:3000"],
     "allowedHeaders": ["*"],
     "allowedOperations": ["b2_upload_file"],
