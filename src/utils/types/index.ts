@@ -36,7 +36,8 @@ export const editGameSchema = z.object({
   tags: z.array(z.string()).optional(),
   multiClass: z.boolean().optional(),
   description: z.string().optional(),
-  game: z.string().url().optional(),
+  webGLBuild: z.boolean().optional(),
+  builds: z.array(buildSchema).optional(),
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
 });
