@@ -24,6 +24,7 @@ export default async function handler(
     case "POST":
       await createUserHandler(req, res);
       break;
+
     default:
       res.status(HTTP_METHOD_NOT_ALLOWED).json({
         error: `Request method ${req.method} is not allowed`,

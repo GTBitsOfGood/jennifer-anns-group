@@ -47,9 +47,16 @@ export const editGameSchema = z.object({
 
 // User
 export const userSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email("Not a valid email"),
   hashedPassword: z.string(),
   firstName: z.string(),
   lastName: z.string(),
   label: z.enum(["educator", "student", "parent", "administrator"]),
+});
+
+// For changing password
+export const changePWSchema = z.object({
+  oldpassword: z.string(),
+  password: z.string().min(8, "Password must contain at least 8 characters."),
+  passwordConfirm: z.string(),
 });
