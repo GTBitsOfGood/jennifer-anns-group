@@ -31,6 +31,8 @@ export const gameSchema = z.object({
   game: z.string().url(),
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
+  answerKey: z.string().url().optional(),
+  videoTrailer: z.string().url().optional(),
 });
 
 // For editing game
@@ -43,6 +45,8 @@ export const editGameSchema = z.object({
   game: z.string().url().optional(),
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
+  answerKey: z.string().url().optional(),
+  videoTrailer: z.string().url().optional(),
 });
 
 // User

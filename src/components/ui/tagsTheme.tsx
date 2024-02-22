@@ -29,6 +29,7 @@ const tagsTheme = defineMultiStyleConfig({
 const theme = extendTheme({
   colors: {
     brand: {
+      300: "#FDD299",
       400: "#A9CBEB",
       500: "#F2F2F2",
     },
