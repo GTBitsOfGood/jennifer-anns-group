@@ -59,7 +59,7 @@ export async function uploadBuildFiles(
 }
 
 export function getBuildFileUrl(gameId: string, type: BuildFileType) {
-  const CLOUDFLARE_URL = "https://cloudflare-b2.nathangong.workers.dev";
+  const CLOUDFLARE_URL = "https://cloudflare-b2.bogjenniferanns.workers.dev";
 
   const fileName = `${gameId}/${
     buildFileTypes[type as keyof typeof buildFileTypes]
