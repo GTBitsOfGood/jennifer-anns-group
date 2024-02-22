@@ -6,6 +6,7 @@ export default function BuildUpload() {
   const [dataFile, setDataFile] = useState<null | File>(null);
   const [codeFile, setCodeFile] = useState<null | File>(null);
   const [frameworkFile, setFrameworkFile] = useState<null | File>(null);
+  const [gameId, setGameId] = useState("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files === null || event.target.files.length === 0) return;
@@ -51,13 +52,28 @@ export default function BuildUpload() {
       ["framework", frameworkFile],
     ]);
 
-    await uploadBuildFiles("1", files);
+    try {
+      await uploadBuildFiles(gameId, files);
+      alert("Files uploaded successfully");
+    } catch (e) {
+      console.error(e);
+      alert("Failed to upload files");
+    }
   };
 
   return (
     <>
       <form onSubmit={handleSubmit}>
-        <h1 className="font-bold">Upload Build (id=1)</h1>
+        <h1 className="font-bold">Upload Build</h1>
+        <h1>Game ID</h1>
+        <input
+          type="text"
+          name="gameId"
+          className="border-2 border-black"
+          onChange={(e) => {
+            setGameId(e.target.value);
+          }}
+        />
         <h1>Loader</h1>
         <input type="file" name="loader" onChange={handleFileChange} />
         <h1>Data</h1>

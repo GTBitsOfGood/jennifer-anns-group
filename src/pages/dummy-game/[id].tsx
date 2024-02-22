@@ -1,4 +1,3 @@
-import BuildUpload from "@/components/BuildUpload";
 import EmbeddedGame from "@/components/EmbeddedGame";
 import { useRouter } from "next/router";
 
@@ -14,7 +13,6 @@ export default function Game({}) {
     <div>
       <h1>Game</h1>
       <EmbeddedGame gameId={id as string} />
-      <BuildUpload />
     </div>
   );
 }
