@@ -23,7 +23,7 @@ export const gameSchema = z.object({
   tags: z.array(z.string()).optional(),
   multiClass: z.boolean(),
   description: z.string().optional(),
-  webGLBuild: z.boolean(),
+  webGLBuild: z.boolean().optional(),
   builds: z.array(buildSchema).optional(),
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
