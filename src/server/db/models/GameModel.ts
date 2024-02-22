@@ -20,6 +20,8 @@ const GameSchema = new Schema<IGame>({
   game: { type: String, required: true },
   lesson: { type: String },
   parentingGuide: { type: String },
+  answerKey: { type: String },
+  videoTrailer: { type: String },
 });
 
 const GameModel =
