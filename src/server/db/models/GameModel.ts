@@ -4,7 +4,7 @@ import { buildSchema, gameSchema, AppType } from "../../../utils/types";
 import { ObjectId } from "mongodb";
 
 interface IBuild extends z.infer<typeof buildSchema> {}
-interface IGame extends z.infer<typeof gameSchema> {}
+export interface IGame extends z.infer<typeof gameSchema> {}
 
 const BuildSchema = new Schema<IBuild>({
   type: { type: String, enum: Object.values(AppType), required: true },

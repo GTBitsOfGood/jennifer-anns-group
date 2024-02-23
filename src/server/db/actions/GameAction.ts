@@ -13,7 +13,6 @@ export async function createGame(data: IGame) {
   await connectMongoDB();
   try {
     //Ensure every ObjectID actually represents a Document
-
     if (data && data.themes) {
       const themePromises = data.themes.map((theme) =>
         ThemeModel.findById(theme),
@@ -55,7 +54,7 @@ export async function deleteGame(data: ObjectId) {
   try {
     const result = await GameModel.findByIdAndDelete(data.toString());
     if (result?.get("webGLBuild")) {
-      await deleteBuild(data);
+      await deleteBuild(data.toString());
     }
     if (!result) {
       throw new GenericUserErrorException("Game with given ID does not exist.");
