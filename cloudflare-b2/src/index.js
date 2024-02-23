@@ -30,8 +30,8 @@ function filterHeaders(headers, env) {
 			(pair) =>
 				!UNSIGNABLE_HEADERS.includes(pair[0]) &&
 				!pair[0].startsWith('cf-') &&
-				!('ALLOWED_HEADERS' in env && !env.ALLOWED_HEADERS.includes(pair[0]))
-		)
+				!('ALLOWED_HEADERS' in env && !env.ALLOWED_HEADERS.includes(pair[0])),
+		),
 	);
 }
 
@@ -137,7 +137,7 @@ export default {
 				} else if (response.ok) {
 					attempts -= 1;
 					console.error(
-						`Range header in request for ${signedRequest.url} but no content-range header in response. Will retry ${attempts} more times`
+						`Range header in request for ${signedRequest.url} but no content-range header in response. Will retry ${attempts} more times`,
 					);
 					// Do not abort on the last attempt, as we want to return the response
 					if (attempts > 0) {
