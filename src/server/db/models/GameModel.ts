@@ -14,14 +14,25 @@ const BuildSchema = new Schema<IBuild>({
 
 const GameSchema = new Schema<IGame>({
   name: { type: String, required: true, unique: true },
-  theme: { type: String, required: true },
-  tags: { type: [String], default: [] },
-  multiClass: { type: Boolean, required: true },
-  description: { type: String },
+  themes: {
+    type: [Schema.Types.ObjectId],
+    ref: "Theme",
+    required: false,
+  },
+  tags: {
+    type: [Schema.Types.ObjectId],
+    ref: "Tag",
+    default: [],
+    required: false,
+  },
+  description: { type: String, required: true },
   webGLBuild: { type: Boolean, default: false },
   builds: { type: [BuildSchema], default: [] },
+  game: { type: String, required: true },
   lesson: { type: String },
   parentingGuide: { type: String },
+  answerKey: { type: String },
+  videoTrailer: { type: String },
 });
 
 const GameModel =

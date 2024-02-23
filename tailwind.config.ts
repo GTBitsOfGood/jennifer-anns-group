@@ -20,6 +20,7 @@ const config = {
     extend: {
       colors: {
         "blue-primary": "#2352A0",
+        "orange-primary": "#FC9300",
         "input-bg": "#FAFBFC",
         "input-border": "#D9D9D9",
         grey: "#666666",
