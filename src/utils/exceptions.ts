@@ -41,7 +41,8 @@ export function customErrorHandler(res: NextApiResponse, error: unknown) {
       });
     } else if (error instanceof SyntaxError) {
       return res.status(400).send({
-        message: "SyntaxError: Ensure you are sending text, not a JSON.",
+        message:
+          "SyntaxError: You may potentially be sending JSON, instead of text.",
       });
     } else if (
       error.hasOwnProperty("code") && //Tried to use instanceof MongoServerError, but that fails to catch MongoServerError

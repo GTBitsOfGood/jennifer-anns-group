@@ -1,7 +1,12 @@
 import { customErrorHandler } from "@/utils/exceptions";
-import { createGame, getAllGames } from "../../../server/db/actions/GameAction";
-import { gameSchema } from "../../../utils/types";
+import {
+  createGame,
+  getSelectedGames,
+} from "../../../server/db/actions/GameAction";
+import { gameSchema, gameSchemaAPI } from "../../../utils/types";
 import { NextApiRequest, NextApiResponse } from "next";
+import z from "zod";
+import { GetGameQuerySchema } from "../../../utils/types";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -9,16 +14,18 @@ export default async function handler(
   try {
     switch (req.method) {
       case "GET":
-        const games = await getAllGames();
+        //Validate req.query
+        const query = GetGameQuerySchema.parse(req.query); //JSON.parse not necessary
+
+        const games = await getSelectedGames(query);
         return res.status(200).send({
-          message: "Games retrieved successfully",
           data: games,
         });
 
       case "POST":
         //How can I ensure that the values in req.body? are strings convertable to objects.
 
-        const parsedData = gameSchema.safeParse(JSON.parse(req.body));
+        const parsedData = gameSchemaAPI.safeParse(JSON.parse(req.body));
         if (!parsedData.success) {
           return res.status(422).send({
             error: parsedData.error.format(),

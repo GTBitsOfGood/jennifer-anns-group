@@ -1,7 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 import { z } from "zod";
-import { gameSchema } from "../../../utils/types";
+import { gameSchema, gameSchemaAPI } from "../../../utils/types";
 export interface IGame extends z.infer<typeof gameSchema> {}
+export interface IGameAPI extends z.infer<typeof gameSchemaAPI> {}
 //You must use mongoose.Schema.Types.ObjectId when defining Schemas that contain an ObjectId.
 const GameSchema = new Schema<IGame>({
   name: { type: String, required: true, unique: true },
