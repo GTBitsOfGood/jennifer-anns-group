@@ -23,12 +23,14 @@ const config = {
         "orange-primary": "#FC9300",
         "input-bg": "#FAFBFC",
         "input-border": "#D9D9D9",
+        "delete-red": "#8B0000",
         grey: "#666666",
         placeholder: "#A3AED0",
       },
       fontFamily: {
         sans: ["Poppins", "sans-serif"], // Default `Poppins` font family to sans
         "open-sans-cond": ['"Open Sans Condensed"', "sans-serif"],
+        inter: ['Inter', 'sans-serif'],
       },
       keyframes: {
         "accordion-down": {
