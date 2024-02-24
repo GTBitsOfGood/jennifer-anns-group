@@ -161,17 +161,19 @@ export async function getSelectedGames(
     filters.name = { $regex: reg_string };
   }
   //Match by gameContent
-  if (query.gameContent && "answerKey" in query.gameContent) {
-    filters.answerKey = { $exists: true };
-  }
-  if (query.gameContent && "parentingGuide" in query.gameContent) {
-    filters.parentingGuide = { $exists: true };
-  }
-  if (query.gameContent && "lessonPlan" in query.gameContent) {
-    filters.lessonPlan = { $exists: true };
-  }
-  if (query.gameContent && "videoTrailer" in query.gameContent) {
-    filters.videoTrailer = { $exists: true };
+  if (query.gameContent) {
+    if (query.gameContent.includes("answerKey")) {
+      filters.answerKey = { $exists: true };
+    }
+    if (query.gameContent.includes("parentingGuide")) {
+      filters.parentingGuide = { $exists: true };
+    }
+    if (query.gameContent.includes("lessonPlan")) {
+      filters.lessonPlan = { $exists: true };
+    }
+    if (query.gameContent.includes("videoTrailer")) {
+      filters.videoTrailer = { $exists: true };
+    }
   }
   let games;
   if (query.page) {
