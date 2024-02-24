@@ -11,7 +11,7 @@ const buildFileTypes = Object.freeze({
 
 export async function uploadBuildFiles(
   gameId: string,
-  files: Map<string, File>
+  files: Map<string, File>,
 ) {
   if (files.size !== 4) {
     throw new Error("Invalid build files");
@@ -42,20 +42,25 @@ export async function uploadBuildFiles(
             Authorization: uploadAuthToken,
             "X-Bz-File-Name": fileName,
             "Content-Type": file.type,
-            "Content-Length": file.size.toString(),
             "X-Bz-Content-Sha1": "do_not_verify",
           },
         });
-      })
+      }),
     );
   } catch (error) {
     console.error("Failed to upload files:", error);
     throw error;
   }
 
-  await axios.put(`/api/games/${gameId}`, {
-    webGLBuild: true,
-  });
+  await axios.put(
+    `/api/games/${gameId}`,
+    JSON.stringify({ webGLBuild: true }),
+    {
+      headers: {
+        "Content-Type": "text",
+      },
+    },
+  );
 }
 
 export function getBuildFileUrl(gameId: string, type: BuildFileType) {
