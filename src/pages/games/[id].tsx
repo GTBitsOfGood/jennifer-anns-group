@@ -79,9 +79,11 @@ const GamePage = () => {
       <h1 className={styles.name}>{gameData.name}</h1>
       {(userData && userData.label === "administrator")
         ? <Link href={`/games/${gameID}/edit`}>
-            <button>
-              Edit
-            </button> 
+            <div className="flex justify-end w-[80vw] mx-auto">
+              <button className="bg-input-border font-sans font-medium text-blue-primary px-4 py-2 text-base rounded-full">
+                Edit
+              </button> 
+            </div>
           </Link>: null}
       <TabsComponent gameData={gameData} />
       <TagsComponent gameData={gameData} />

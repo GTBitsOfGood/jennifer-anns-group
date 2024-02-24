@@ -48,7 +48,7 @@ const EditGamePage = () => {
         <div>
             <h1 className="font-sans font-semibold text-[56px] text-center mt-[126px]">{gameData.name}</h1>
             <div className="flex justify-end w-[80vw] mx-auto">
-                <DeleteGameComponent gameData={gameData}/>
+                <DeleteGameComponent gameName={gameData.name} />
             </div>
             <TabsComponent gameData={gameData} />
             <TagsComponent gameData={gameData} />
