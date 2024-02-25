@@ -169,6 +169,18 @@ export async function getSelectedGames(
       return acc;
     }, filters);
   }
+
+  //Filtering based on game build (filtering should be add)
+  if (query.gameBuilds) {
+    if (query.gameBuilds.includes("webgl")) {
+      //WebGl requires a different type of filter, as it is seperate from the other builds
+      filters.webGLBuild = true;
+      //Remove webGL for further filtering based on other normal games.
+      query.gameBuilds = query.gameBuilds.filter((item) => item !== "webgl");
+    }
+    filters.builds = { $all: query.gameBuilds };
+  }
+
   let games = await GameModel.find(filters)
     .skip((query.page - 1) * RESULTS_PER_PAGE)
     .limit(RESULTS_PER_PAGE);
