@@ -16,6 +16,7 @@ services:
       - jennifer-anns-net
     depends_on:
       - mongo
+    entrypoint: ./entrypoint.sh
 
   mongo:
     image: mongo
