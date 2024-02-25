@@ -2,16 +2,17 @@ import GameModel from "../models/GameModel";
 import ThemeModel from "../models/ThemeModel";
 import TagModel from "../models/TagModel";
 import connectMongoDB from "../mongodb";
+import { deleteBuild } from "./BuildAction";
 import { z } from "zod";
 import { ObjectId } from "mongodb";
 import { editGameSchema } from "@/utils/types";
 import { IGame } from "../models/GameModel";
 import { GenericUserErrorException } from "@/utils/exceptions";
+
 export async function createGame(data: IGame) {
   await connectMongoDB();
   try {
     //Ensure every ObjectID actually represents a Document
-
     if (data && data.themes) {
       const themePromises = data.themes.map((theme) =>
         ThemeModel.findById(theme),
@@ -52,6 +53,9 @@ export async function deleteGame(data: ObjectId) {
   await connectMongoDB();
   try {
     const result = await GameModel.findByIdAndDelete(data.toString());
+    if (result?.get("webGLBuild")) {
+      await deleteBuild(data.toString());
+    }
     if (!result) {
       throw new GenericUserErrorException("Game with given ID does not exist.");
     }
