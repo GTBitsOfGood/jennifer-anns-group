@@ -1,5 +1,10 @@
 import styles from "@/styles/tags.module.css";
-import { ChakraProvider, Tag, TagCloseButton, TagRightIcon } from "@chakra-ui/react";
+import {
+  ChakraProvider,
+  Tag,
+  TagCloseButton,
+  TagRightIcon,
+} from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import theme from "../ui/tagsTheme";
 import { gameSchema, tagSchema, themeSchema } from "@/utils/types";
@@ -26,7 +31,13 @@ const sortByTagType = (
   return 0;
 };
 
-export default function TagsComponent({ mode, themes, setThemes, tags, setTags }: Props) {
+export default function TagsComponent({
+  mode,
+  themes,
+  setThemes,
+  tags,
+  setTags,
+}: Props) {
   const [search, setSearch] = useState(false);
 
   return (
@@ -47,24 +58,30 @@ export default function TagsComponent({ mode, themes, setThemes, tags, setTags }
                   bg={tag.type === "accessibility" ? "brand.300" : "brand.500"}
                 >
                   {tag.name}
-                  {
-                    mode === "edit" ? <TagCloseButton /> : null
-                  }
+                  {mode === "edit" ? <TagCloseButton /> : null}
                 </Tag>
               ))
             : null}
-          {mode === "edit" && !search
-            ? <Tag className="cursor-pointer" bg="brand.600" color="white" onClick={() => {setSearch(true)}}>
+          {mode === "edit" && !search ? (
+            <Tag
+              className="cursor-pointer"
+              bg="brand.600"
+              color="white"
+              onClick={() => {
+                setSearch(true);
+              }}
+            >
               Add
-              <TagRightIcon color="white" boxSize='12px' as={AddIcon} />
+              <TagRightIcon color="white" boxSize="12px" as={AddIcon} />
             </Tag>
-            : null}  
+          ) : null}
         </div>
       </ChakraProvider>
-      {mode === "edit" && search
-        ? <p className="bg-grey w-[560px] ml-[10vw] mt-7">search bar</p>
-        : null
-      }
+      {mode === "edit" && search ? (
+        <div className="ml-[10vw] mt-7 w-[560px] bg-grey">
+          <p>search bar</p>
+        </div>
+      ) : null}
     </div>
   );
 }

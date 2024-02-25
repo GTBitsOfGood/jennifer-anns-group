@@ -16,12 +16,12 @@ const GamePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const idSchema = z.string().length(24);
-  
+
   const userDataSchema = userSchema
-  .extend({
-    _id: idSchema,
-  })
-  .omit({ hashedPassword: true });
+    .extend({
+      _id: idSchema,
+    })
+    .omit({ hashedPassword: true });
 
   const { data: session } = useSession();
   const currentUser = session?.user;
@@ -77,16 +77,21 @@ const GamePage = () => {
   return (
     <div>
       <h1 className={styles.name}>{gameData.name}</h1>
-      {(userData && userData.label === "administrator")
-        ? <Link href={`/games/${gameID}/edit`}>
-            <div className="flex justify-end w-[80vw] mx-auto">
-              <button className="bg-input-border font-sans font-medium text-blue-primary px-4 py-2 text-base rounded-full">
-                Edit
-              </button> 
-            </div>
-          </Link>: null}
+      {userData && userData.label === "administrator" ? (
+        <Link href={`/games/${gameID}/edit`}>
+          <div className="mx-auto flex w-[80vw] justify-end">
+            <button className="rounded-full bg-input-border px-4 py-2 font-sans text-base font-medium text-blue-primary">
+              Edit
+            </button>
+          </div>
+        </Link>
+      ) : null}
       <TabsComponent mode="view" gameData={gameData} />
-      <TagsComponent mode="view" themes={gameData.themes} tags={gameData.tags} />
+      <TagsComponent
+        mode="view"
+        themes={gameData.themes}
+        tags={gameData.tags}
+      />
     </div>
   );
 };
