@@ -1,5 +1,4 @@
-jest.config.js 
-jest-mongodb-config.js
+
 prettier.config.js
 next.config.js
 postcss.config.js

@@ -23,6 +23,11 @@ export class GenericUserErrorException extends Error {
     super(message);
   }
 }
+export class GenericGameErrorException extends Error {
+  constructor(message = "User mistake in game endpoint") {
+    super(message);
+  }
+}
 export class GenericServerErrorException extends Error {
   constructor(message = "Internal Server Error") {
     super(message);
@@ -35,7 +40,10 @@ export function customErrorHandler(res: NextApiResponse, error: unknown) {
       return res.status(400).send({
         error: JSON.parse(error.message),
       });
-    } else if (error instanceof GenericUserErrorException) {
+    } else if (
+      error instanceof GenericUserErrorException ||
+      error instanceof GenericGameErrorException
+    ) {
       return res.status(400).send({
         error: error.message,
       });

@@ -1,19 +1,22 @@
 import mongoose, { Schema } from "mongoose";
 import { z } from "zod";
-import { gameSchema, gameSchemaAPI } from "../../../utils/types";
+import { gameSchema } from "../../../utils/types";
+import { ITheme } from "./ThemeModel";
+import { ITag } from "./TagModel";
 export interface IGame extends z.infer<typeof gameSchema> {}
-export interface IGameAPI extends z.infer<typeof gameSchemaAPI> {}
+export type populatedGame = Omit<IGame, "tags" | "themes"> & {
+  tags: ITag[];
+} & { themes: ITheme[] };
 //You must use mongoose.Schema.Types.ObjectId when defining Schemas that contain an ObjectId.
 const GameSchema = new Schema<IGame>({
   name: { type: String, required: true, unique: true },
   themes: {
     type: [Schema.Types.ObjectId],
-    ref: "Theme",
+    default: [],
     required: false,
   },
   tags: {
     type: [Schema.Types.ObjectId],
-    ref: "Tag",
     default: [],
     required: false,
   },

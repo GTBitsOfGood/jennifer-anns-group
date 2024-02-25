@@ -44,7 +44,7 @@ export default async function handler(
         });
       case "PUT":
         //If no ID in query or not valid
-        if (!gameId || !mongoose.Types.ObjectId.isValid(gameId)) {
+        if (!gameId || !ObjectId.isValid(gameId)) {
           return res.status(422).send({
             error: "Invalid game ID has been specified for deletion.",
           });

@@ -7,12 +7,12 @@ import {
   TabPanel,
 } from "@chakra-ui/react";
 import styles from "@/styles/tabs.module.css";
-import { gameSchema } from "@/utils/types";
+import { populatedGame } from "@/server/db/models/GameModel";
 import { z } from "zod";
 import theme from "../ui/tabsTheme";
 
 interface Props {
-  gameData: z.infer<typeof gameSchema>;
+  gameData: populatedGame;
 }
 
 export default function TabsComponent({ gameData }: Props) {
