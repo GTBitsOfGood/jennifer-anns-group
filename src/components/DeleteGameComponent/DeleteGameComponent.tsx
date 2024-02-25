@@ -32,7 +32,7 @@ export default function DeleteGameDialog({ gameName }: Props) {
     
     return (
         <ChakraProvider>
-            <button onClick={onOpen} className="font-sans font-semibold bg-delete-red rounded-md text-white px-[17px] py-2 text-xl">
+            <button onClick={onOpen} className="mt-1 font-sans font-semibold bg-delete-red rounded-md text-white px-[17px] py-2 text-xl">
                 Delete Page
             </button>
             <AlertDialog
@@ -44,8 +44,10 @@ export default function DeleteGameDialog({ gameName }: Props) {
             >
                 <AlertDialogOverlay />
 
-                <AlertDialogContent height="450" maxWidth="585">
-                    <AlertDialogCloseButton />
+                <AlertDialogContent border="2px" height="450" maxWidth="585">
+                    <div >
+                        <AlertDialogCloseButton mr="60px" mt="60px" height="25px" width="25px" />
+                    </div>
                     <AlertDialogHeader>
                         <div className="text-blue-primary text-[26px] font-bold mt-[114px] mx-[118px] text-center">
                             Are you sure you want to delete {gameName}?
@@ -60,8 +62,11 @@ export default function DeleteGameDialog({ gameName }: Props) {
                         <button onClick={deleteGame} className="text-white font-sans font-semibold bg-delete-red w-[198px] h-[47px] rounded-[10px] mr-[22px] mb-24">
                         Yes, delete page
                         </button>
-                        <button ref={cancelRef} onClick={onClose} className="font-sans font-semibold w-[198px] h-[47px] rounded-[10px] border-solid border-black border-[1px] ml-[22px] mb-24">
-                        No, return
+                        <button ref={cancelRef} 
+                            onClick={onClose} 
+                            className="font-sans font-semibold w-[198px] h-[47px] rounded-[10px] border-solid border-black border-[1px] ml-[22px] mb-24"
+                        >
+                            No, return
                         </button>
                     </AlertDialogFooter>
                 </AlertDialogContent>

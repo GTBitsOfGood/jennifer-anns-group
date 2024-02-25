@@ -85,8 +85,8 @@ const GamePage = () => {
               </button> 
             </div>
           </Link>: null}
-      <TabsComponent gameData={gameData} />
-      <TagsComponent gameData={gameData} />
+      <TabsComponent mode="view" gameData={gameData} />
+      <TagsComponent mode="view" themes={gameData.themes} tags={gameData.tags} />
     </div>
   );
 };
