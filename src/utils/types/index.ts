@@ -10,13 +10,29 @@ const verifyObjectId = (value: string) => {
   return false;
 };
 
+// Build
+export enum AppType {
+  AmazonApp = "Amazon App",
+  AndroidApp = "Android App",
+  AppStore = "App Store",
+  LinuxDownload = "Linux Download",
+  MacDownload = "Mac Download",
+  WindowsDownload = "Windows Download",
+}
+
+export const buildSchema = z.object({
+  type: z.nativeEnum(AppType),
+  link: z.string().url(),
+  instructions: z.string().optional(),
+});
+
 // Theme
 export const themeSchema = z.object({
   name: z.string(),
 });
 
 // Tag
-const tag_types = ["accessibility", "custom"] as const; //
+const tag_types = ["accessibility", "custom"] as const;
 export const tagSchema = z.object({
   name: z.string(),
   type: z.enum(tag_types),
@@ -30,6 +46,8 @@ export const gameSchema = z.object({
   name: z.string().min(3).max(50),
   themes: z.array(z.string().refine(verifyObjectId)).optional(),
   tags: z.array(z.string().refine(verifyObjectId)).optional(),
+  webGLBuild: z.boolean().optional(),
+  builds: z.array(buildSchema).optional(),
   description: z.string(),
   game: z.string().url(),
   lesson: z.string().url().optional(),
@@ -49,7 +67,8 @@ export const editGameSchema = z.object({
   tags: z.array(z.string().refine(verifyObjectId)).optional(),
   multiClass: z.boolean().optional(),
   description: z.string().optional(),
-  game: z.string().url().optional(),
+  webGLBuild: z.boolean().optional(),
+  builds: z.array(buildSchema).optional(),
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
   answerKey: z.string().url().optional(),

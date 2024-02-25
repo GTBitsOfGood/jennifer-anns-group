@@ -2,10 +2,13 @@ import GameModel, { IGame } from "../models/GameModel";
 import ThemeModel, { ITheme } from "../models/ThemeModel";
 import TagModel from "../models/TagModel";
 import connectMongoDB from "../mongodb";
+import { deleteBuild } from "./BuildAction";
 import { FilterQuery } from "mongoose";
+
 import { z } from "zod";
 import { ObjectId } from "mongodb";
 import { editGameSchema } from "@/utils/types";
+import { IGame } from "../models/GameModel";
 import { GenericGameErrorException } from "@/utils/exceptions";
 import { GetGameQuerySchema } from "@/pages/api/games";
 import { theme } from "@chakra-ui/react";
@@ -13,7 +16,6 @@ import mongoose, { Query } from "mongoose";
 import { Accessibility } from "lucide-react";
 
 const RESULTS_PER_PAGE = 6;
-
 export async function createGame(data: IGame) {
   await connectMongoDB();
   //Ensure every ObjectID actually represents a Document
@@ -50,9 +52,16 @@ export async function createGame(data: IGame) {
 
 export async function deleteGame(data: ObjectId) {
   await connectMongoDB();
-  const result = await GameModel.findByIdAndDelete(data.toString());
-  if (!result) {
-    throw new GenericGameErrorException("Game with given ID does not exist.");
+  try {
+    const result = await GameModel.findByIdAndDelete(data.toString());
+    if (result?.get("webGLBuild")) {
+      await deleteBuild(data.toString());
+    }
+    if (!result) {
+      throw new GenericGameErrorException("Game with given ID does not exist.");
+    }
+  } catch (e) {
+    throw e;
   }
 }
 interface IEditGame extends z.infer<typeof editGameSchema> {}
