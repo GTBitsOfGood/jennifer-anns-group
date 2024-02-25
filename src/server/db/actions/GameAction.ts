@@ -8,7 +8,6 @@ import { FilterQuery } from "mongoose";
 import { z } from "zod";
 import { ObjectId } from "mongodb";
 import { editGameSchema } from "@/utils/types";
-import { IGame } from "../models/GameModel";
 import { GenericGameErrorException } from "@/utils/exceptions";
 import { GetGameQuerySchema } from "@/pages/api/games";
 import { theme } from "@chakra-ui/react";
