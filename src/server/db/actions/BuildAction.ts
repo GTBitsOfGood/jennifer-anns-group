@@ -12,12 +12,14 @@ export async function deleteBuild(id: string) {
     maxFileCount: 1000,
   });
 
-  for (const file of response.data.files) {
-    await b2.deleteFileVersion({
-      fileId: file.fileId,
-      fileName: file.fileName,
-    });
-  }
+  const deletePromises = response.data.files.map(
+    async (file: { fileId: string; fileName: string }) =>
+      b2.deleteFileVersion({
+        fileId: file.fileId,
+        fileName: file.fileName,
+      }),
+  );
+  await Promise.all(deletePromises);
 }
 
 export async function getBuildUploadUrl() {
