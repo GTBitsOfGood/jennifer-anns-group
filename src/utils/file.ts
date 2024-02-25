@@ -23,34 +23,44 @@ export async function uploadBuildFiles(
     }
   }
 
-  // atomic uploads? retry on error?
-  try {
-    await Promise.all(
-      Array.from(files.entries()).map(async ([type, file]) => {
-        const { data } = await axios.post(`/api/games/${gameId}/builds`, {
-          gameId,
-        });
-        const uploadUrl = data.data.uploadUrl;
-        const uploadAuthToken = data.data.uploadAuthToken;
+  // atomic uploads?
+  await Promise.all(
+    Array.from(files.entries()).map(async ([type, file]) => {
+      let retryCount = 0;
+      let success = false;
 
-        const fileName = `${gameId}/${
-          buildFileTypes[type as keyof typeof buildFileTypes]
-        }`;
+      while (retryCount < 4 && !success) {
+        try {
+          const { data } = await axios.post(`/api/games/${gameId}/builds`, {
+            gameId,
+          });
+          const uploadUrl = data.data.uploadUrl;
+          const uploadAuthToken = data.data.uploadAuthToken;
 
-        await axios.post(uploadUrl, file, {
-          headers: {
-            Authorization: uploadAuthToken,
-            "X-Bz-File-Name": fileName,
-            "Content-Type": file.type,
-            "X-Bz-Content-Sha1": "do_not_verify",
-          },
-        });
-      }),
-    );
-  } catch (error) {
-    console.error("Failed to upload files:", error);
-    throw error;
-  }
+          const fileName = `${gameId}/${
+            buildFileTypes[type as keyof typeof buildFileTypes]
+          }`;
+
+          await axios.post(uploadUrl, file, {
+            headers: {
+              Authorization: uploadAuthToken,
+              "X-Bz-File-Name": fileName,
+              "Content-Type": file.type,
+              "X-Bz-Content-Sha1": "do_not_verify",
+            },
+          });
+
+          success = true;
+        } catch (error) {
+          retryCount++;
+        }
+      }
+
+      if (!success) {
+        throw new Error("Failed to upload file after 4 retries");
+      }
+    }),
+  );
 
   await axios.put(
     `/api/games/${gameId}`,
