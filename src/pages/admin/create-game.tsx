@@ -31,15 +31,12 @@ function CreateGame() {
   });
 
   async function createGame(data: z.infer<typeof createGameSchema>) {
-    console.log("created game");
-
     try {
       const response = await fetch(`/api/games`, {
         method: "POST",
         body: JSON.stringify(data),
       });
       const responseData = await response.json();
-      console.log(responseData);
       return responseData;
     } catch (error) {
       console.error(`Error creating game:`, error);
@@ -64,6 +61,7 @@ function CreateGame() {
           videoTrailer: undefined,
           description: undefined,
         });
+        console.log(res);
         // router.replace("/games");
       } catch (error) {
         console.error("Error creating game:", error);
@@ -76,10 +74,6 @@ function CreateGame() {
         description: errors.description?.at(0),
       });
     }
-    // if (!res?.ok) {
-    //   // do something
-    //   return;
-    // }
   }
 
   return (
