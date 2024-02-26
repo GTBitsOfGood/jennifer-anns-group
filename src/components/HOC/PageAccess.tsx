@@ -17,6 +17,7 @@ const pageRequiredAuthentication: Record<
   [Pages.HOME]: undefined,
   [Pages.LOGIN]: "unauthenticated",
   [Pages.SIGNUP]: "unauthenticated",
+  [Pages.CREATEGAME]: "unauthenticated",
 };
 
 const pageAccessHOC = <P extends object>(Component: React.FC<P>) => {

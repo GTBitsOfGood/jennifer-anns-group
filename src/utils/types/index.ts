@@ -50,7 +50,7 @@ export const gameSchema = z.object({
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
   answerKey: z.string().url().optional(),
-  videoTrailer: z.string().url().optional(),
+  videoTrailer: z.string().url("Not a valid URL").or(z.literal("")),
 });
 
 // For editing game

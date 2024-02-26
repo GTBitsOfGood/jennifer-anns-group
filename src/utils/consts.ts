@@ -11,4 +11,5 @@ export enum Pages {
   HOME = "/",
   LOGIN = "/login",
   SIGNUP = "/signup",
+  CREATEGAME = "/admin/create-game",
 }
