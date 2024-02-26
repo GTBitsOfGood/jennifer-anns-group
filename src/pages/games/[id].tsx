@@ -1,20 +1,21 @@
 import styles from "@/styles/game.module.css";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import TabsComponent from "../../components/Tabs/TabsComponent";
 import TagsComponent from "../../components/Tags/TagsComponent";
 import { gameSchema } from "@/utils/types";
 import { z } from "zod";
+import EmbeddedGame from "@/components/EmbeddedGame";
 
 const GamePage = () => {
-  const gameID = useRouter().query.id;
+  const gameId = useRouter().query.id;
   const [gameData, setGameData] = useState<z.infer<typeof gameSchema>>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const getGame = async () => {
     try {
-      const response = await fetch(`/api/games/${gameID}`);
+      const response = await fetch(`/api/games/${gameId}`);
       if (!response.ok) {
         setError("Failed to fetch game");
       }
@@ -26,7 +27,7 @@ const GamePage = () => {
     }
   };
 
-  if (gameID && loading) {
+  if (gameId && loading) {
     getGame();
   }
 
@@ -45,6 +46,7 @@ const GamePage = () => {
   return (
     <div>
       <h1 className={styles.name}>{gameData.name}</h1>
+      <EmbeddedGame gameId={gameId as string} />
       <TabsComponent gameData={gameData} />
       <TagsComponent gameData={gameData} />
     </div>
