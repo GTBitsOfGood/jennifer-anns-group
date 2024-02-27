@@ -36,7 +36,7 @@ const GamePage = () => {
   }
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <></>;
   }
 
   if (!gameData) {
