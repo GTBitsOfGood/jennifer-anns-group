@@ -46,7 +46,6 @@ export const gameSchema = z.object({
   webGLBuild: z.boolean().optional(),
   builds: z.array(buildSchema).optional(),
   description: z.string(),
-  game: z.string().url(),
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
   answerKey: z.string().url().optional(),

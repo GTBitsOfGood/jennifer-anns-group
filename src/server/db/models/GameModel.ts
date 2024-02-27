@@ -28,7 +28,6 @@ const GameSchema = new Schema<IGame>({
   description: { type: String, required: true },
   webGLBuild: { type: Boolean, default: false },
   builds: { type: [BuildSchema], default: [] },
-  game: { type: String, required: true },
   lesson: { type: String },
   parentingGuide: { type: String },
   answerKey: { type: String },
