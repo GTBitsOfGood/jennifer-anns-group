@@ -102,7 +102,6 @@ export async function editGame(allData: nextEditGame) {
     const result = await GameModel.findByIdAndUpdate(allData.id, allData.data, {
       new: false,
     });
-    const joe = result?.toObject();
     if (!result) {
       throw new GenericUserErrorException("Game with given ID does not exist.");
     }
