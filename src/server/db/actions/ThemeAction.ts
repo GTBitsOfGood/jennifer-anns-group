@@ -1,26 +1,42 @@
 import ThemeModel from "../models/ThemeModel";
 import GameModel from "../models/GameModel";
 import connectMongoDB from "../mongodb";
-import { ObjectId } from "mongodb";
 import { ITheme } from "../models/ThemeModel";
 import { GenericUserErrorException } from "@/utils/exceptions";
+import { CreateThemeInput } from "@/pages/api/themes";
+import { Types } from "mongoose";
 
-//Put more of the verification in the actual API endpoint
-export async function createTheme(data: ITheme) {
-  connectMongoDB();
-  const theme = new ThemeModel(data);
+export async function createTheme(data: CreateThemeInput) {
+  await connectMongoDB();
+  const session = await ThemeModel.startSession();
+  session.startTransaction();
   try {
-    await theme.save();
+    const theme = (await ThemeModel.create([data], { session }))[0];
+    await GameModel.updateMany(
+      {
+        _id: {
+          $in: data.games,
+        },
+      },
+      {
+        $push: {
+          themes: theme._id,
+        },
+      }
+    );
+    await session.commitTransaction();
+    return theme.toObject();
   } catch (e) {
+    await session.abortTransaction();
+    console.log(e);
     throw e;
   }
-  return theme.id;
 }
 
-export async function deleteTheme(id: ObjectId) {
-  connectMongoDB();
+export async function deleteTheme(id: string) {
+  await connectMongoDB();
   try {
-    const deleted_theme: (ITheme & { id: ObjectId }) | null =
+    const deleted_theme: (ITheme & { _id: Types.ObjectId }) | null =
       await ThemeModel.findByIdAndDelete(id.toString()); //To fix BSON Error
 
     if (!deleted_theme) {
@@ -36,4 +52,13 @@ export async function deleteTheme(id: ObjectId) {
   } catch (e) {
     throw e;
   }
+}
+
+export async function getThemes() {
+  await connectMongoDB();
+  const themes = await ThemeModel.find({});
+  return themes.map((theme) => ({
+    ...theme.toObject(),
+    _id: theme._id.toString(),
+  }));
 }

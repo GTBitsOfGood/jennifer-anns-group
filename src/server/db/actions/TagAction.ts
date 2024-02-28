@@ -34,3 +34,12 @@ export async function deleteTag(id: ObjectId) {
     throw e;
   }
 }
+
+export async function getTagsByType() {
+  await connectMongoDB();
+  const tags = await TagModel.find({});
+  return {
+    accessibility: tags.filter((tag) => tag.type === "accessibility"),
+    custom: tags.filter((tag) => tag.type === "custom"),
+  };
+}
