@@ -57,7 +57,7 @@ const EditGamePage = () => {
       <div className="flex justify-center">
         <span
           contentEditable="true"
-          className="mt-[126px] max-w-[80vw] rounded-[20px] border border-solid border-grey bg-input-bg px-8 py-2.5 text-center font-sans text-[56px] font-semibold !outline-none"
+          className="mt-[126px] max-w-[50vw] rounded-[20px] border border-solid border-grey bg-input-bg px-8 py-2.5 text-center font-sans text-[56px] font-semibold !outline-none"
           onChange={(e) => setName(e.target.value)}
         >
           {" "}

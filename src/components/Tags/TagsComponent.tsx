@@ -7,12 +7,14 @@ import {
 } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import theme from "../ui/tagsTheme";
-import { gameSchema, tagSchema, themeSchema } from "@/utils/types";
+import { tagSchema, themeSchema } from "@/utils/types";
 import { z } from "zod";
 import { Dispatch, useState } from "react";
 import * as React from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import searchTheme from "../ui/searchTagsTheme";
+import { ThemeProvider } from "@mui/material/styles";
 
 interface Props {
   mode: string;
@@ -48,6 +50,12 @@ export default function TagsComponent({
     { label: "Gatekeep", year: 1993 },
     { label: "Glass Onion", year: 1994 },
   ];
+
+  const handleSelection = (event, newValue: string | null) => {
+    if (newValue) {
+      console.log(newValue.label);
+    }
+  };
 
   return (
     <div>
@@ -88,18 +96,21 @@ export default function TagsComponent({
       </ChakraProvider>
       {mode === "edit" && search ? (
         <div className="mb-32 ml-[10vw] mt-7 font-sans">
-          <Autocomplete
-            disablePortal
-            id="combo-box-demo"
-            options={top100Films}
-            className="sans-serif"
-            sx={{
-              width: 560,
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Search themes/tags" />
-            )}
-          />
+          <ThemeProvider theme={searchTheme}>
+            <Autocomplete
+              disablePortal
+              id="combo-box-demo"
+              options={top100Films}
+              className="sans-serif"
+              onChange={handleSelection}
+              sx={{
+                width: 560,
+              }}
+              renderInput={(params) => (
+                <TextField {...params} placeholder="Search themes/tags" />
+              )}
+            />
+          </ThemeProvider>
         </div>
       ) : null}
     </div>
