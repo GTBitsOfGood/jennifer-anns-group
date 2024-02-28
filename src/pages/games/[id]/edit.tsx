@@ -55,12 +55,14 @@ const EditGamePage = () => {
   return (
     <div>
       <div className="flex justify-center">
-        <input
-          className="mt-[126px] rounded-[20px] border border-solid border-grey bg-input-bg py-2.5 text-center font-sans text-[56px] font-semibold !outline-none"
-          type="text"
-          value={name}
+        <span
+          contentEditable="true"
+          className="mt-[126px] max-w-[80vw] rounded-[20px] border border-solid border-grey bg-input-bg px-8 py-2.5 text-center font-sans text-[56px] font-semibold !outline-none"
           onChange={(e) => setName(e.target.value)}
-        />
+        >
+          {" "}
+          {name}{" "}
+        </span>
       </div>
       <div className="mx-auto flex w-[80vw] justify-end">
         <DeleteGameComponent gameName={gameData.name} />

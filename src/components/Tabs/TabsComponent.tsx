@@ -19,7 +19,12 @@ interface Props {
   gameData: z.infer<typeof gameSchema>;
 }
 
-export default function TabsComponent({ mode, description, setDescription, gameData }: Props) {
+export default function TabsComponent({
+  mode,
+  description,
+  setDescription,
+  gameData,
+}: Props) {
   return (
     <ChakraProvider theme={theme}>
       <Tabs colorScheme="brand" className={styles.tabs}>
@@ -30,12 +35,17 @@ export default function TabsComponent({ mode, description, setDescription, gameD
         </TabList>
         <TabPanels className={styles.tabContent}>
           <TabPanel p="0px">
-            { mode === "edit"
-              ? <textarea className="!resize-none h-40 px-5 py-5 rounded-[20px] border-solid border bg-input-bg !outline-none border-grey font-sans w-full" 
-                value={description} 
-                onChange={(e) => setDescription(e.target.value)} />
-              : <p>{gameData.description}</p>
-            }
+            {mode === "edit" ? (
+              <div className="rounded-[20px] border border-solid border-grey bg-input-bg">
+                <textarea
+                  className="h-52 w-full !resize-none rounded-[20px] border border-[20px] border-solid border-transparent bg-input-bg font-sans !outline-none"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </div>
+            ) : (
+              <p>{gameData.description}</p>
+            )}
           </TabPanel>
         </TabPanels>
       </Tabs>

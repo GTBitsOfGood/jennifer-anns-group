@@ -10,6 +10,9 @@ import theme from "../ui/tagsTheme";
 import { gameSchema, tagSchema, themeSchema } from "@/utils/types";
 import { z } from "zod";
 import { Dispatch, useState } from "react";
+import * as React from "react";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
 
 interface Props {
   mode: string;
@@ -39,6 +42,12 @@ export default function TagsComponent({
   setTags,
 }: Props) {
   const [search, setSearch] = useState(false);
+  const top100Films = [
+    { label: "Gaslighting", year: 2008 },
+    { label: "Girlboss", year: 1957 },
+    { label: "Gatekeep", year: 1993 },
+    { label: "Glass Onion", year: 1994 },
+  ];
 
   return (
     <div>
@@ -78,8 +87,19 @@ export default function TagsComponent({
         </div>
       </ChakraProvider>
       {mode === "edit" && search ? (
-        <div className="ml-[10vw] mt-7 w-[560px] bg-grey">
-          <p>search bar</p>
+        <div className="mb-32 ml-[10vw] mt-7 font-sans">
+          <Autocomplete
+            disablePortal
+            id="combo-box-demo"
+            options={top100Films}
+            className="sans-serif"
+            sx={{
+              width: 560,
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Search themes/tags" />
+            )}
+          />
         </div>
       ) : null}
     </div>
