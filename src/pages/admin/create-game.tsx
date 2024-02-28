@@ -61,8 +61,14 @@ function CreateGame() {
           videoTrailer: undefined,
           description: undefined,
         });
-        console.log(res);
-        // router.replace("/games");
+        if (res?.message?.includes("duplicate")) {
+          setValidationErrors({
+            ...validationErrors,
+            name: "Game with this title already exists",
+          });
+        } else {
+          router.replace("/games");
+        }
       } catch (error) {
         console.error("Error creating game:", error);
       }
@@ -150,7 +156,7 @@ function CreateGame() {
             variant="mainblue"
             className="px-6 py-6 text-2xl font-semibold"
           >
-            Preview
+            Publish
           </Button>
         </div>
       </form>
