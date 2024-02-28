@@ -23,11 +23,30 @@ export class GenericUserErrorException extends Error {
     super(message);
   }
 }
-export class GenericGameErrorException extends Error {
+export class AbstractGameErrorException extends Error {
   constructor(message = "User mistake in game endpoint") {
+    super(message);
+    if (this.constructor === AbstractGameErrorException) {
+      throw new TypeError("Abstract class cannot be instantiated"); //Ensures constructor gets overrided.
+    }
+  }
+}
+export class InvalidIdGameErrorException extends Error {
+  constructor(message = "Invalid ObjectID in game endpoint") {
     super(message);
   }
 }
+export class InvalidThemeErrorException extends Error {
+  constructor(message = "Invalid Theme name in game endpoint") {
+    super(message);
+  }
+}
+export class InvalidTagErrorException extends Error {
+  constructor(message = "Invalid Tag name in game endpoint") {
+    super(message);
+  }
+}
+
 export class GenericServerErrorException extends Error {
   constructor(message = "Internal Server Error") {
     super(message);
@@ -42,7 +61,7 @@ export function customErrorHandler(res: NextApiResponse, error: unknown) {
       });
     } else if (
       error instanceof GenericUserErrorException ||
-      error instanceof GenericGameErrorException
+      error instanceof AbstractGameErrorException
     ) {
       return res.status(400).send({
         error: error.message,

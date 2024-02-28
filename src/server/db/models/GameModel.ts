@@ -21,11 +21,13 @@ const GameSchema = new Schema<IGame>({
   name: { type: String, required: true, unique: true },
   themes: {
     type: [Schema.Types.ObjectId],
+    ref: "Theme",
     default: [],
     required: false,
   },
   tags: {
     type: [Schema.Types.ObjectId],
+    ref: "Tag",
     default: [],
     required: false,
   },

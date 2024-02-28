@@ -8,23 +8,23 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { z, RefinementCtx } from "zod";
 //Ensure its an integer
 // GameContentEnum
-const GameContentEnum = {
-  answerKey: "answerKey",
-  parentingGuide: "parentingGuide",
-  lessonPlan: "lesson",
-  videoTrailer: "videoTrailer",
-};
 
-// GameBuildsEnum
-const GameBuildsEnum = {
-  amazon: "amazon",
-  android: "android",
-  appstore: "appstore",
-  linux: "linux",
-  mac: "mac",
-  webgl: "webgl",
-  windows: "windows",
-};
+export enum GameContentEnum {
+  answerKey = "answerKey",
+  parentingGuide = "parentingGuide",
+  lesson = "lesson",
+  videoTrailer = "videoTrailer",
+}
+
+export enum GameBuildsEnum {
+  amazon = "amazon",
+  android = "android",
+  appstore = "appstore",
+  linux = "linux",
+  mac = "max",
+  webgl = "webgl",
+  windows = "windows",
+}
 
 const convertINT = (val: string, ctx: RefinementCtx) => {
   const result = parseInt(val);
@@ -73,9 +73,13 @@ export default async function handler(
       case "GET":
         //Validate req.query
         console.log(req.query);
-        const query = GetGameQuerySchema.parse(req.query); //JSON.parse not necessary
-
-        const games = await getSelectedGames(query);
+        const parsedQuery = GetGameQuerySchema.safeParse(req.query); //JSON.parse not necessary
+        if (!parsedQuery.success) {
+          return res.status(422).send({
+            error: parsedQuery.error.format(),
+          });
+        }
+        const games = await getSelectedGames(parsedQuery.data);
         return res.status(200).send({
           data: games,
         });

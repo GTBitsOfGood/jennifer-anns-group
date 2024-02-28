@@ -37,14 +37,16 @@ export default async function handler(
 
       case "DELETE":
         //If no ID in query or not valid
-        return await deleteGame(new ObjectId(gameId)).then(() => {
-          return res.status(200).send({
-            message: "Game successfully deleted!",
-          });
-        });
+        return await deleteGame(new mongoose.Types.ObjectId(gameId)).then(
+          () => {
+            return res.status(200).send({
+              message: "Game successfully deleted!",
+            });
+          },
+        );
       case "PUT":
         //If no ID in query or not valid
-        if (!gameId || !ObjectId.isValid(gameId)) {
+        if (!gameId || !mongoose.isValidObjectId(gameId)) {
           return res.status(422).send({
             error: "Invalid game ID has been specified for deletion.",
           });
