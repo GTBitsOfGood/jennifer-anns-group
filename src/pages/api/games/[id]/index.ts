@@ -1,9 +1,6 @@
 import mongoose from "mongoose";
 import { ObjectId } from "mongodb";
-import {
-  customErrorHandler,
-  GenericUserErrorException,
-} from "@/utils/exceptions";
+import { customErrorHandler } from "@/utils/exceptions";
 
 import {
   getGameById,
@@ -12,6 +9,7 @@ import {
 } from "@/server/db/actions/GameAction";
 import { editGameSchema } from "@/utils/types";
 import { NextApiRequest, NextApiResponse } from "next";
+import { GenericUserErrorException } from "@/utils/exceptions/user";
 
 export default async function handler(
   req: NextApiRequest,

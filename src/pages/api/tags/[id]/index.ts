@@ -1,10 +1,8 @@
 import { NextApiResponse, NextApiRequest } from "next";
 import { deleteTag } from "@/server/db/actions/TagAction";
 import { ObjectId } from "mongodb";
-import {
-  GenericUserErrorException,
-  customErrorHandler,
-} from "@/utils/exceptions";
+import { customErrorHandler } from "@/utils/exceptions";
+import { GenericUserErrorException } from "@/utils/exceptions/user";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -19,7 +17,7 @@ export default async function handler(
         }
         const id: string = potential_id;
         if (ObjectId.isValid(id)) {
-          await deleteTag(new ObjectId(id));
+          await deleteTag(id);
         } else {
           throw new GenericUserErrorException("ObjectId is invalid");
         }

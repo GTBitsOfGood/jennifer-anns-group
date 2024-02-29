@@ -5,14 +5,14 @@ import { createUserSchema } from "@/pages/api/users";
 import bcrypt from "bcrypt";
 import { userSchema } from "@/utils/types";
 // import { Error } from "mongoose";
-import {
-  GenericServerErrorException,
-  UserAlreadyExistsException,
-  UserCredentialsIncorrectException,
-  UserDoesNotExistException,
-} from "@/utils/exceptions";
+import { GenericServerErrorException } from "@/utils/exceptions";
 import { MongoError, MongoServerError } from "mongodb";
 import { MongooseError } from "mongoose";
+import {
+  UserAlreadyExistsException,
+  UserDoesNotExistException,
+  UserCredentialsIncorrectException,
+} from "@/utils/exceptions/user";
 
 const SALT_ROUNDS = 10;
 const DUP_KEY_ERROR_CODE = 11000;
