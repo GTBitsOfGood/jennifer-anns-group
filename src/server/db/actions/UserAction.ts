@@ -4,10 +4,7 @@ import connectMongoDB from "../mongodb";
 import { createUserSchema } from "@/pages/api/users";
 import bcrypt from "bcrypt";
 import { userSchema } from "@/utils/types";
-// import { Error } from "mongoose";
-import { GenericServerErrorException } from "@/utils/exceptions";
-import { MongoError, MongoServerError } from "mongodb";
-import { MongooseError } from "mongoose";
+import { MongoError } from "mongodb";
 import {
   UserAlreadyExistsException,
   UserDoesNotExistException,
@@ -37,7 +34,7 @@ export async function createUser(data: z.infer<typeof createUserSchema>) {
     ) {
       throw new UserAlreadyExistsException();
     }
-    throw new GenericServerErrorException();
+    throw e;
   }
 }
 

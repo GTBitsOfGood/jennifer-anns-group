@@ -40,8 +40,6 @@ function DeleteModal({ open, setOpen, subject, subjectType }: Props) {
     },
   });
 
-  console.log(status);
-
   const { mutate: deleteTag } = useMutation({
     mutationFn: (tag: DeleteTagInput) =>
       fetch("/api/tags", {

@@ -7,7 +7,7 @@ import InformationSlide, {
   informationSchema,
 } from "@/components/Registration/InformationSlide";
 import RegistrationAlert from "@/components/Registration/RegistrationAlert";
-import { ADMIN_CONTACT } from "@/utils/adminConsts";
+import { ADMIN_CONTACT } from "@/utils/consts";
 
 import React, { useState } from "react";
 import { z } from "zod";

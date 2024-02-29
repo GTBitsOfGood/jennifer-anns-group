@@ -19,7 +19,7 @@ export default function gamePage() {
   async function getGame() {
     const response = await fetch(`/api/games/${gameID}`);
     const data = await response.json();
-    setGameData(data.data);
+    setGameData(data);
   }
 
   if (!gameData) {

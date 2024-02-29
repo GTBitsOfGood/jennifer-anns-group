@@ -6,56 +6,66 @@ import { z } from "zod";
 import { ObjectId } from "mongodb";
 import { editGameSchema } from "@/utils/types";
 import { IGame } from "../models/GameModel";
-import { GenericUserErrorException } from "@/utils/exceptions/user";
+import { GameNotFoundException } from "@/utils/exceptions/game";
+import { ThemeNotFoundException } from "@/utils/exceptions/theme";
+import { TagNotFoundException } from "@/utils/exceptions/tag";
+
 export async function createGame(data: IGame) {
   await connectMongoDB();
-  try {
-    //Ensure every ObjectID actually represents a Document
+  const session = await TagModel.startSession();
+  session.startTransaction();
 
+  // add theme and tag IDs to the game
+  try {
     if (data && data.themes) {
       const themePromises = data.themes.map((theme) =>
         ThemeModel.findById(theme)
       );
       const themeResults = await Promise.all(themePromises);
-      themeResults.forEach((result, index) => {
+      themeResults.forEach((result) => {
         if (!result) {
-          throw new GenericUserErrorException(
-            `ObjectID ${data.themes![index]} not a present theme.`
-          ); //Using non-null assertion, as if condition should ensure data.tags is non-null
+          throw new ThemeNotFoundException();
         }
       });
     }
     if (data && data.tags) {
       const tagPromises = data.tags.map((tag) => TagModel.findById(tag));
       const tagResults = await Promise.all(tagPromises);
-      tagResults.forEach((result, index) => {
+      tagResults.forEach((result) => {
         if (!result) {
-          throw new GenericUserErrorException(
-            `ObjectID ${data.tags![index]} is not a  present tag.`
-          ); //Using non-null assertion, as if condition should ensure data.tags is non-null
+          throw new TagNotFoundException();
         }
       });
     }
   } catch (e) {
+    await session.abortTransaction();
     throw e;
   }
-  const game = new GameModel(data);
+
+  // create the game
   try {
-    await game.save();
-    return game._id;
+    const game = await GameModel.create(data);
+    await session.commitTransaction();
+    return game.toObject();
   } catch (e) {
+    await session.abortTransaction();
     throw e;
   }
 }
 
 export async function deleteGame(data: ObjectId) {
   await connectMongoDB();
+  const session = await GameModel.startSession();
+  session.startTransaction();
   try {
-    const result = await GameModel.findByIdAndDelete(data.toString());
-    if (!result) {
-      throw new GenericUserErrorException("Game with given ID does not exist.");
+    const deletedGame = await GameModel.findByIdAndDelete(data.toString());
+    if (!deletedGame) {
+      throw new GameNotFoundException();
     }
+    await session.commitTransaction();
+    return deletedGame.toObject();
   } catch (e) {
+    await session.abortTransaction();
     throw e;
   }
 }
@@ -65,12 +75,9 @@ interface nextEditGame {
   id: string;
 }
 export async function editGame(allData: nextEditGame) {
-  //Don't modify until sure of how data is used in the API
   await connectMongoDB();
   const data: IEditGame = allData.data;
   try {
-    //Ensure every ObjectID actually represents a Document
-    //Ah yes
     if (data && data.themes) {
       const themePromises = data.themes.map((theme) =>
         ThemeModel.findById(theme)
@@ -78,9 +85,7 @@ export async function editGame(allData: nextEditGame) {
       const themeResults = await Promise.all(themePromises);
       themeResults.forEach((result, index) => {
         if (!result) {
-          throw new GenericUserErrorException(
-            `ObjectID ${data.themes![index]} not a present theme.`
-          ); //Using non-null assertion, as if condition should ensure data.tags is non-null
+          throw new ThemeNotFoundException();
         }
       });
     }
@@ -89,9 +94,7 @@ export async function editGame(allData: nextEditGame) {
       const tagResults = await Promise.all(tagPromises);
       tagResults.forEach((result, index) => {
         if (!result) {
-          throw new GenericUserErrorException(
-            `ObjectID ${data.tags![index]} is not a  present tag.`
-          ); //Using non-null assertion, as if condition should ensure data.tags is non-null
+          throw new TagNotFoundException();
         }
       });
     }
@@ -99,13 +102,13 @@ export async function editGame(allData: nextEditGame) {
     throw e;
   }
   try {
-    const result = await GameModel.findByIdAndUpdate(allData.id, allData.data, {
-      new: false,
+    const newGame = await GameModel.findByIdAndUpdate(allData.id, allData.data, {
+      new: true,
     });
-    if (!result) {
-      throw new GenericUserErrorException("Game with given ID does not exist.");
+    if (!newGame) {
+      throw new GameNotFoundException();
     }
-    return result;
+    return newGame;
   } catch (e) {
     throw e;
   }
