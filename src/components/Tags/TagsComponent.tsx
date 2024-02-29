@@ -10,11 +10,7 @@ import theme from "../ui/tagsTheme";
 import { tagSchema, themeSchema } from "@/utils/types";
 import { z } from "zod";
 import { Dispatch, useState } from "react";
-import * as React from "react";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
-import searchTheme from "../ui/searchTagsTheme";
-import { ThemeProvider } from "@mui/material/styles";
+import SearchTagsComponent from "./SearchTagsComponent";
 
 interface Props {
   mode: string;
@@ -44,18 +40,35 @@ export default function TagsComponent({
   setTags,
 }: Props) {
   const [search, setSearch] = useState(false);
-  const top100Films = [
-    { label: "Gaslighting", year: 2008 },
-    { label: "Girlboss", year: 1957 },
-    { label: "Gatekeep", year: 1993 },
-    { label: "Glass Onion", year: 1994 },
-  ];
 
-  const handleSelection = (event, newValue: string | null) => {
-    if (newValue) {
-      console.log(newValue.label);
-    }
-  };
+  // async function deleteTag(tag: z.infer<typeof tagSchema>) {
+  //   const tagID = tag._id;
+  //   const response = await fetch(`/api/tags/${tagID}`, {
+  //     method: "DELETE",
+  //   });
+  // }
+
+  // async function deleteTheme(theme: z.infer<typeof tagSchema>) {
+  //   const themeID = theme._id;
+  //   const response = await fetch(`/api/themes/${themeID}`, {
+  //     method: "DELETE",
+  //   });
+  // }
+
+  function deleteTag(tag: z.infer<typeof tagSchema>) {
+    const newList = tags.filter((t) => {
+      t.name !== tag.name;
+    });
+    console.log(newList);
+    setTags(newList);
+  }
+
+  function deleteTheme(theme: z.infer<typeof themeSchema>) {
+    const newList = themes.filter((t) => {
+      t.name !== theme.name;
+    });
+    setThemes(newList);
+  }
 
   return (
     <div>
@@ -65,6 +78,9 @@ export default function TagsComponent({
             ? themes.map((theme) => (
                 <Tag key={theme.name} bg="brand.400">
                   {theme.name}
+                  {mode === "edit" ? (
+                    <TagCloseButton onClick={() => deleteTheme(theme)} />
+                  ) : null}
                 </Tag>
               ))
             : null}
@@ -75,7 +91,11 @@ export default function TagsComponent({
                   bg={tag.type === "accessibility" ? "brand.300" : "brand.500"}
                 >
                   {tag.name}
-                  {mode === "edit" ? <TagCloseButton /> : null}
+                  {mode === "edit" &&
+                  tag.name !== "Parenting Guide" &&
+                  tag.name !== "Lesson Plan" ? (
+                    <TagCloseButton onClick={() => deleteTag(tag)} />
+                  ) : null}
                 </Tag>
               ))
             : null}
@@ -96,21 +116,7 @@ export default function TagsComponent({
       </ChakraProvider>
       {mode === "edit" && search ? (
         <div className="mb-32 ml-[10vw] mt-7 font-sans">
-          <ThemeProvider theme={searchTheme}>
-            <Autocomplete
-              disablePortal
-              id="combo-box-demo"
-              options={top100Films}
-              className="sans-serif"
-              onChange={handleSelection}
-              sx={{
-                width: 560,
-              }}
-              renderInput={(params) => (
-                <TextField {...params} placeholder="Search themes/tags" />
-              )}
-            />
-          </ThemeProvider>
+          <SearchTagsComponent />
         </div>
       ) : null}
     </div>

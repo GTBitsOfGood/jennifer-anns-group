@@ -18,7 +18,7 @@ export default async function handler(
   // try {
   switch (req.method) {
     case "GET":
-      getTagsByTypeHandler(req, res);
+      return getTagsByTypeHandler(req, res);
     case "POST":
       let result;
       //First ensure that req.body is of the proper type, via zod.
