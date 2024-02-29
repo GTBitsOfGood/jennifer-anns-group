@@ -3,13 +3,26 @@ import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import searchTheme from "../ui/searchTagsTheme";
 import { ThemeProvider } from "@mui/material/styles";
-import { useState, useEffect } from "react";
+import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import { z } from "zod";
 import { tagSchema, themeSchema } from "@/utils/types";
 
-export default function SearchTagsComponent() {
+interface Tags {
+  accessibility: z.infer<typeof tagSchema>[];
+  custom: z.infer<typeof tagSchema>[];
+}
+
+interface Props {
+  setSearch: Dispatch<SetStateAction<boolean>>;
+}
+
+export default function SearchTagsComponent({ setSearch }: Props) {
   const [themes, setThemes] = useState<z.infer<typeof themeSchema>[]>();
-  const [tags, setTags] = useState([]);
+  const tagsVar: Tags = {
+    accessibility: [],
+    custom: [],
+  };
+  const [tags, setTags] = useState<Tags>(tagsVar);
   const [options, setOptions] = useState([]);
 
   useEffect(() => {
@@ -17,16 +30,18 @@ export default function SearchTagsComponent() {
     getTags();
   }, []);
 
-  //   useEffect(() => {
-  //     setOptions((options) => [...options, ...themes]);
-  //   }, [themes]);
+  //     useEffect(() => {
+  //         if (themes) {
 
-  useEffect(() => {
-    if (tags.length > 0) {
-      console.log(options);
-      setOptions((options) => [...options, ...tags]);
-    }
-  }, [tags]);
+  //         }
+  //     }, [themes]);
+
+  //   useEffect(() => {
+  //     console.log("alskdjflkajsdf");
+  //     if (tags) {
+  //       setOptions((options) => [...options, ...tags]);
+  //     }
+  //   }, [tags]);
 
   async function getThemes() {
     const response = await fetch("/api/themes");
@@ -47,12 +62,16 @@ export default function SearchTagsComponent() {
     { label: "Glass Onion", year: 1994 },
   ];
 
-  const handleSelection = (event, newValue: string | null) => {
+  const handleSelection = (
+    event,
+    newValue: { label: string; year: string },
+  ) => {
     if (newValue) {
       console.log(newValue.label);
     }
     console.log(themes);
     console.log(tags);
+    setSearch(false);
   };
 
   return (

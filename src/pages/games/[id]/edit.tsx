@@ -36,6 +36,8 @@ const EditGamePage = () => {
     }
   };
 
+  const saveChanges = async () => {};
+
   if (gameID && loading) {
     getGame();
   }
@@ -87,7 +89,10 @@ const EditGamePage = () => {
             Discard changes
           </button>
         </Link>
-        <button className="ml-8 rounded-xl bg-blue-primary px-6 py-3 font-sans text-2xl font-medium text-white">
+        <button
+          onClick={saveChanges}
+          className="ml-8 rounded-xl bg-blue-primary px-6 py-3 font-sans text-2xl font-medium text-white"
+        >
           Save changes
         </button>
       </div>

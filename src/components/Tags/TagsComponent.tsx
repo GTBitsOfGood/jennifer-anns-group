@@ -9,15 +9,15 @@ import { AddIcon } from "@chakra-ui/icons";
 import theme from "../ui/tagsTheme";
 import { tagSchema, themeSchema } from "@/utils/types";
 import { z } from "zod";
-import { Dispatch, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import SearchTagsComponent from "./SearchTagsComponent";
 
 interface Props {
   mode: string;
   themes: z.infer<typeof themeSchema>[];
-  setThemes: Dispatch<z.infer<typeof themeSchema>[]>;
+  setThemes: Dispatch<SetStateAction<z.infer<typeof themeSchema>>[]>;
   tags: z.infer<typeof tagSchema>[];
-  setTags: Dispatch<z.infer<typeof tagSchema>[]>;
+  setTags: Dispatch<SetStateAction<z.infer<typeof tagSchema>>[]>;
 }
 
 const sortByTagType = (
@@ -55,17 +55,16 @@ export default function TagsComponent({
   //   });
   // }
 
-  function deleteTag(tag: z.infer<typeof tagSchema>) {
+  function removeTag(tag: z.infer<typeof tagSchema>) {
     const newList = tags.filter((t) => {
-      t.name !== tag.name;
+      return t.name !== tag.name;
     });
-    console.log(newList);
     setTags(newList);
   }
 
-  function deleteTheme(theme: z.infer<typeof themeSchema>) {
+  function removeTheme(theme: z.infer<typeof themeSchema>) {
     const newList = themes.filter((t) => {
-      t.name !== theme.name;
+      return t.name !== theme.name;
     });
     setThemes(newList);
   }
@@ -79,7 +78,7 @@ export default function TagsComponent({
                 <Tag key={theme.name} bg="brand.400">
                   {theme.name}
                   {mode === "edit" ? (
-                    <TagCloseButton onClick={() => deleteTheme(theme)} />
+                    <TagCloseButton onClick={() => removeTheme(theme)} />
                   ) : null}
                 </Tag>
               ))
@@ -94,7 +93,7 @@ export default function TagsComponent({
                   {mode === "edit" &&
                   tag.name !== "Parenting Guide" &&
                   tag.name !== "Lesson Plan" ? (
-                    <TagCloseButton onClick={() => deleteTag(tag)} />
+                    <TagCloseButton onClick={() => removeTag(tag)} />
                   ) : null}
                 </Tag>
               ))
@@ -116,7 +115,7 @@ export default function TagsComponent({
       </ChakraProvider>
       {mode === "edit" && search ? (
         <div className="mb-32 ml-[10vw] mt-7 font-sans">
-          <SearchTagsComponent />
+          <SearchTagsComponent setSearch={setSearch} />
         </div>
       ) : null}
     </div>
