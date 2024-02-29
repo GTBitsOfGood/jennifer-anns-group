@@ -53,3 +53,5 @@ export const userSchema = z.object({
   lastName: z.string(),
   label: z.enum(["educator", "student", "parent", "administrator"]),
 });
+
+export type ExtendId<T extends any> = T & { _id: string };

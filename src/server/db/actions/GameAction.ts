@@ -6,7 +6,7 @@ import { z } from "zod";
 import { ObjectId } from "mongodb";
 import { editGameSchema } from "@/utils/types";
 import { IGame } from "../models/GameModel";
-import { GenericUserErrorException } from "@/utils/exceptions";
+import { GenericUserErrorException } from "@/utils/exceptions/user";
 export async function createGame(data: IGame) {
   await connectMongoDB();
   try {

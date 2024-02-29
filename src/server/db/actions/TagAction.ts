@@ -1,36 +1,53 @@
 import TagModel from "../models/TagModel";
 import connectMongoDB from "../mongodb";
-import { ObjectId } from "mongodb";
-import { ITag } from "../models/TagModel";
 import GameModel from "../models/GameModel";
-import { GenericUserErrorException } from "@/utils/exceptions";
+import { TagNotFoundException } from "@/utils/exceptions/tag";
+import { CreateTagInput } from "@/pages/api/tags";
 
-export async function createTag(data: ITag) {
-  connectMongoDB();
-
-  const tag = new TagModel(data);
-
+export async function createTag(data: CreateTagInput) {
+  await connectMongoDB();
+  const session = await TagModel.startSession();
+  session.startTransaction();
   try {
-    await tag.save();
+    const tag = (await TagModel.create([data], { session }))[0];
+    await GameModel.updateMany(
+      {
+        _id: {
+          $in: data.games,
+        },
+      },
+      {
+        $push: {
+          tags: tag._id,
+        },
+      }
+    );
+
+    await session.commitTransaction();
+    return tag.toObject();
   } catch (e) {
+    await session.abortTransaction();
     throw e;
   }
-  return tag.id;
 }
 
-export async function deleteTag(id: ObjectId) {
-  connectMongoDB();
+export async function deleteTag(id: string) {
+  await connectMongoDB();
+  const session = await TagModel.startSession();
+  session.startTransaction();
   try {
-    const deleted_tag: (ITag & { id: ObjectId }) | null =
-      await TagModel.findByIdAndDelete(id.toString()); //To fix error with BSON
-    if (!deleted_tag) {
-      throw new GenericUserErrorException("No Tag present with this ObjectID.");
+    const deletedTag = await TagModel.findByIdAndDelete(id.toString()); //To fix error with BSON
+    if (!deletedTag) {
+      throw new TagNotFoundException();
     }
     const results = await GameModel.updateMany(
       { tags: { $in: [id] } },
       { $pull: { tags: id } }
     );
+    await session.commitTransaction();
+    return deletedTag.toObject();
   } catch (e) {
+    await session.abortTransaction();
     throw e;
   }
 }
