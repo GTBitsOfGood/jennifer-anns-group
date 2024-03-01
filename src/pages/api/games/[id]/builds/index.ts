@@ -3,44 +3,73 @@ import {
   getBuildUploadUrl,
 } from "@/server/db/actions/BuildAction";
 import { editGame, getGameById } from "@/server/db/actions/GameAction";
-import { customErrorHandler } from "@/utils/exceptions";
+import {
+  GameNotFoundException,
+  BuildUploadException,
+  GameException,
+  GameInvalidInputException,
+  BuildNotFoundException,
+} from "@/utils/exceptions/game";
 import { NextApiResponse } from "next";
+import { HTTP_STATUS_CODE } from "@/utils/consts";
 
 export default async function handler(req: any, res: NextApiResponse) {
+  switch (req.method) {
+    case "POST":
+      return createBuildHandler(req, res);
+    case "DELETE":
+      return deleteBuildHandler(req, res);
+    default:
+      return res.status(HTTP_STATUS_CODE.METHOD_NOT_ALLOWED).send({
+        error: `Request method ${req.method} is not allowed`,
+      });
+  }
+}
+
+async function createBuildHandler(req: any, res: NextApiResponse) {
+  try {
+    const game = await getGameById(req.query.id);
+    if (!game) {
+      throw new GameNotFoundException();
+    }
+
+    const { uploadUrl, uploadAuthToken } = await getBuildUploadUrl();
+    if (!uploadUrl || !uploadAuthToken) {
+      throw new BuildUploadException();
+    }
+    return { uploadUrl, uploadAuthToken };
+  } catch (e) {
+    if (e instanceof GameException) {
+      return res.status(e.code).send(e.message);
+    }
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+  }
+}
+
+async function deleteBuildHandler(req: any, res: NextApiResponse) {
   try {
     const gameId = req.query.id;
-    const game = await getGameById(req.query.id);
-    if (game == null) {
-      return res.status(404).send({
-        success: false,
-        error: `Could not find game with id: ${gameId}`,
-      });
+    if (!gameId || Array.isArray(gameId)) {
+      throw new GameInvalidInputException();
     }
 
-    switch (req.method) {
-      case "POST":
-        const { uploadUrl, uploadAuthToken } = await getBuildUploadUrl();
-
-        return res.status(200).send({
-          success: true,
-          message: "URL and auth token generated successfully",
-          data: { uploadUrl, uploadAuthToken },
-        });
-      case "DELETE":
-        await deleteBuild(gameId);
-        await editGame({ id: gameId, data: { webGLBuild: false } });
-
-        return res.status(200).send({
-          success: true,
-          message: "Build successfully deleted!",
-        });
+    const deletedBuild = await deleteBuild(gameId);
+    if (!deletedBuild) {
+      throw new BuildNotFoundException();
     }
-
-    return res.status(405).send({
-      success: false,
-      message: `Request method ${req.method} is not allowed`,
+    const editedGame = await editGame({
+      id: gameId,
+      data: { webGLBuild: false },
     });
-  } catch (error) {
-    return customErrorHandler(res, error);
+    if (!editedGame) {
+      throw new GameNotFoundException();
+    }
+
+    return res.status(HTTP_STATUS_CODE.OK).send(deletedBuild);
+  } catch (e) {
+    if (e instanceof GameException) {
+      return res.status(e.code).send(e.message);
+    }
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
   }
 }

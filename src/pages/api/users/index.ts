@@ -3,7 +3,10 @@ import { createUser } from "../../../server/db/actions/UserAction";
 import { userSchema } from "../../../utils/types";
 import { NextApiRequest, NextApiResponse } from "next";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
-import { UserInvalidInputException, UserException } from "@/utils/exceptions/user";
+import {
+  UserInvalidInputException,
+  UserException,
+} from "@/utils/exceptions/user";
 
 export const createUserSchema = userSchema
   .omit({ hashedPassword: true })

@@ -1,22 +1,20 @@
-import GameModel from "../models/GameModel";
-import ThemeModel from "../models/ThemeModel";
-import TagModel from "../models/TagModel";
+import GameModel, { IGame } from "../models/GameModel";
+import ThemeModel, { ITheme } from "../models/ThemeModel";
+import TagModel, { ITag } from "../models/TagModel";
 import connectMongoDB from "../mongodb";
 import { deleteBuild } from "./BuildAction";
 import { z } from "zod";
 import { ObjectId } from "mongodb";
 import { editGameSchema } from "@/utils/types";
-import { IGame } from "../models/GameModel";
-import { GameNotFoundException } from "@/utils/exceptions/game";
+import {
+  GameNotFoundException,
+  InvalidIdGameErrorException,
+} from "@/utils/exceptions/game";
 import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
 
-const RESULTS_PER_PAGE = 6;
-
 export async function createGame(data: IGame) {
   await connectMongoDB();
-  const session = await TagModel.startSession();
-  session.startTransaction();
 
   // add theme and tag IDs to the game
   try {
@@ -41,17 +39,17 @@ export async function createGame(data: IGame) {
       });
     }
   } catch (e) {
-    await session.abortTransaction();
     throw e;
   }
 
+  console.log("DATA", data);
+
   // create the game
   try {
-    const game = (await GameModel.create([data], { session }))[0];
-    await session.commitTransaction();
-    return game.toObject();
+    const game = await GameModel.create(data);
+    console.log("GAME", game);
+    return game;
   } catch (e) {
-    await session.abortTransaction();
     throw e;
   }
 }
@@ -81,32 +79,32 @@ export async function editGame(allData: nextEditGame) {
   const data: IEditGame = allData.data;
   try {
     if (data && data.themes) {
-      const themePromises = data.themes.map((theme) =>
-        ThemeModel.findById(theme),
-      );
-      const themeResults = await Promise.all(themePromises);
-      themeResults.forEach((result, index) => {
-        if (!result) {
-          throw new ThemeNotFoundException();
-        }
-      });
+      const themeResults = await ThemeModel.find({ id: { $in: data.themes } });
+      if (themeResults.length !== data.themes.length) {
+        throw new InvalidIdGameErrorException(
+          "One of the given themes does not exist.",
+        ); //Using non-null assertion, as if condition should ensure data.tags is non-null
+      }
     }
     if (data && data.tags) {
-      const tagPromises = data.tags.map((tag) => TagModel.findById(tag));
-      const tagResults = await Promise.all(tagPromises);
-      tagResults.forEach((result, index) => {
-        if (!result) {
-          throw new TagNotFoundException();
-        }
-      });
+      const tagResults = await TagModel.find({ id: { $in: data.tags } });
+      if (tagResults.length !== data.tags.length) {
+        throw new InvalidIdGameErrorException(
+          "One of the given tags does not exist.",
+        ); //Using non-null assertion, as if condition should ensure data.tags is non-null
+      }
     }
   } catch (e) {
     throw e;
   }
   try {
-    const newGame = await GameModel.findByIdAndUpdate(allData.id, allData.data, {
-      new: true,
-    });
+    const newGame = await GameModel.findByIdAndUpdate(
+      allData.id,
+      allData.data,
+      {
+        new: true,
+      },
+    );
     if (!newGame) {
       throw new GameNotFoundException();
     }
@@ -133,8 +131,8 @@ export async function getGameById(id: string) {
   await connectMongoDB();
   try {
     const game = await GameModel.findById(id)
-      .populate("themes")
-      .populate("tags");
+      .populate<ITheme>("themes")
+      .populate<ITag>("tags");
     return game;
   } catch (e) {
     throw e;

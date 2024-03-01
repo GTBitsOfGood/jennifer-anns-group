@@ -1,7 +1,11 @@
 import { NextApiResponse, NextApiRequest } from "next";
 import { deleteTheme } from "@/server/db/actions/ThemeAction";
 import { ObjectId } from "mongodb";
-import { ThemeInvalidInputException, ThemeNotFoundException, ThemeException } from "@/utils/exceptions/theme";
+import {
+  ThemeInvalidInputException,
+  ThemeNotFoundException,
+  ThemeException,
+} from "@/utils/exceptions/theme";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 
 export default async function handler(
@@ -24,7 +28,7 @@ async function deleteThemeHandler(req: NextApiRequest, res: NextApiResponse) {
     if (!potential_id || Array.isArray(potential_id)) {
       throw new ThemeInvalidInputException();
     }
-  
+
     const id: string = potential_id;
     if (!ObjectId.isValid(id)) {
       throw new ThemeNotFoundException();

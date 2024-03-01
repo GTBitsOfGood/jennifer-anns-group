@@ -53,14 +53,14 @@ function Themes() {
   });
 
   return (
-    <div className="flex pt-8 px-[10em] flex-col items-center gap-10">
-      <h1 className="font-semibold text-4xl">Themes and Tags</h1>
+    <div className="flex flex-col items-center gap-10 px-[10em] pt-8">
+      <h1 className="text-4xl font-semibold">Themes and Tags</h1>
       <div className="w-full">
         <div className="flex flex-row justify-between">
-          <h3 className="font-semibold text-xl">Themes</h3>
+          <h3 className="text-xl font-semibold">Themes</h3>
           <Button
             variant="primary"
-            className="text-xs rounded-full gap-1 py-2 px-3 h-fit cursor-pointer"
+            className="h-fit cursor-pointer gap-1 rounded-full px-3 py-2 text-xs"
             onClick={() => {
               setSelectedAddSubject("theme");
               setAddModalDisclosure(true);
@@ -73,10 +73,11 @@ function Themes() {
             </div>
           </Button>
         </div>
-        <div className="flex flex-row gap-2 flex-wrap">
+        <div className="flex flex-row flex-wrap gap-2">
           {themes?.map((theme) => {
             return (
               <Tag
+                key={theme._id}
                 variant="theme"
                 className="group hover:cursor-pointer"
                 onClick={() => {
@@ -100,10 +101,10 @@ function Themes() {
       </div>
       <div className="w-full">
         <div className="flex flex-row justify-between">
-          <h3 className="font-semibold text-xl">Accessibility</h3>
+          <h3 className="text-xl font-semibold">Accessibility</h3>
           <Button
             variant="primary"
-            className="text-xs rounded-full gap-1 py-2 px-3 h-fit cursor-pointer"
+            className="h-fit cursor-pointer gap-1 rounded-full px-3 py-2 text-xs"
             onClick={() => {
               setSelectedAddSubject("accessibility");
               setAddModalDisclosure(true);
@@ -116,10 +117,11 @@ function Themes() {
             </div>
           </Button>
         </div>
-        <div className="flex flex-row gap-2 flex-wrap">
+        <div className="flex flex-row flex-wrap gap-2">
           {tags?.accessibility.map((tag) => {
             return (
               <Tag
+                key={tag._id}
                 variant="accessibility"
                 className="group hover:cursor-pointer"
                 onClick={() => {
@@ -142,11 +144,11 @@ function Themes() {
         </div>
       </div>
       <div className="w-full">
-        <div className="flex flex-row justify-between flex-wrap">
-          <h3 className="font-semibold text-xl">Tags</h3>
+        <div className="flex flex-row flex-wrap justify-between">
+          <h3 className="text-xl font-semibold">Tags</h3>
           <Button
             variant="primary"
-            className="text-xs rounded-full gap-1 py-2 px-3 h-fit cursor-pointer"
+            className="h-fit cursor-pointer gap-1 rounded-full px-3 py-2 text-xs"
             onClick={() => {
               setSelectedAddSubject("tag");
               setAddModalDisclosure(true);
@@ -163,6 +165,7 @@ function Themes() {
           {tags?.custom.map((tag) => {
             return (
               <Tag
+                key={tag._id}
                 variant="custom"
                 className="group hover:cursor-pointer"
                 onClick={() => {

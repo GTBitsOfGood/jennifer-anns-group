@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { tagSchema } from "@/utils/types";
-import { ITag } from "@/server/db/models/TagModel";
 import {
   createTag,
   deleteTag,

@@ -20,7 +20,7 @@ export async function createTag(data: CreateTagInput) {
         $push: {
           tags: tag._id,
         },
-      }
+      },
     );
 
     await session.commitTransaction();

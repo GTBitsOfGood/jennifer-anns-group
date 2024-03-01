@@ -20,7 +20,7 @@ export async function createTheme(data: CreateThemeInput) {
         $push: {
           themes: theme._id,
         },
-      }
+      },
     );
     await session.commitTransaction();
     return theme.toObject();

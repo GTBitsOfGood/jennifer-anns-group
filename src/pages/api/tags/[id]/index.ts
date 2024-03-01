@@ -1,7 +1,11 @@
 import { NextApiResponse, NextApiRequest } from "next";
 import { deleteTag } from "@/server/db/actions/TagAction";
 import { ObjectId } from "mongodb";
-import { TagInvalidInputException, TagNotFoundException, TagException } from "@/utils/exceptions/tag";
+import {
+  TagInvalidInputException,
+  TagNotFoundException,
+  TagException,
+} from "@/utils/exceptions/tag";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 
 export default async function handler(
@@ -39,4 +43,3 @@ async function deleteTagHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
   }
 }
-

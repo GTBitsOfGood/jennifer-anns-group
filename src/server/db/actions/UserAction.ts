@@ -5,7 +5,6 @@ import { createUserSchema } from "@/pages/api/users";
 import bcrypt from "bcrypt";
 import { MongoError } from "mongodb";
 import { changePWSchema, userSchema } from "@/utils/types";
-// import { Error } from "mongoose";
 import {
   UserAlreadyExistsException,
   UserDoesNotExistException,
@@ -137,6 +136,6 @@ export async function editPassword(
 
   // Check if user was able to be found/updated
   if (!updatedUser) {
-    throw new GenericServerErrorException();
+    throw new UserDoesNotExistException();
   }
 }
