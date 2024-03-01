@@ -60,7 +60,7 @@ const EditGamePage = () => {
         <span
           contentEditable="true"
           className="mt-[126px] max-w-[50vw] rounded-[20px] border border-solid border-grey bg-input-bg px-8 py-2.5 text-center font-sans text-[56px] font-semibold !outline-none"
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => setName(e.currentTarget.textContent || "")}
         >
           {" "}
           {name}{" "}
@@ -75,13 +75,15 @@ const EditGamePage = () => {
         setDescription={setDescription}
         gameData={gameData}
       />
-      <TagsComponent
-        mode="edit"
-        themes={themes}
-        setThemes={setThemes}
-        tags={tags}
-        setTags={setTags}
-      />
+      {tags && themes ? (
+        <TagsComponent
+          mode="edit"
+          themes={themes}
+          setThemes={setThemes}
+          tags={tags}
+          setTags={setTags}
+        />
+      ) : null}
       {/* <div className="absolute"> */}
       <div className="mx-auto my-24 flex w-[80vw] justify-end">
         <Link href={`/games/${gameID}`}>

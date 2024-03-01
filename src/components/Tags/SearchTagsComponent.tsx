@@ -14,34 +14,66 @@ interface Tags {
 
 interface Props {
   setSearch: Dispatch<SetStateAction<boolean>>;
+  currThemes: z.infer<typeof themeSchema>[];
+  setCurrThemes: Dispatch<SetStateAction<z.infer<typeof themeSchema>>[]>;
+  currTags: z.infer<typeof tagSchema>[];
+  setCurrTags: Dispatch<SetStateAction<z.infer<typeof tagSchema>>[]>;
 }
 
-export default function SearchTagsComponent({ setSearch }: Props) {
+export default function SearchTagsComponent({
+  setSearch,
+  currThemes,
+  setCurrThemes,
+  currTags,
+  setCurrTags,
+}: Props) {
   const [themes, setThemes] = useState<z.infer<typeof themeSchema>[]>();
   const tagsVar: Tags = {
     accessibility: [],
     custom: [],
   };
+  type TagOrTheme = z.infer<typeof tagSchema> | z.infer<typeof themeSchema>;
   const [tags, setTags] = useState<Tags>(tagsVar);
-  const [options, setOptions] = useState([]);
+  const [options, setOptions] = useState<TagOrTheme[]>([]);
 
   useEffect(() => {
     getThemes();
     getTags();
   }, []);
 
-  //     useEffect(() => {
-  //         if (themes) {
+  useEffect(() => {
+    if (themes) {
+      themes.map((theme) => {
+        if (
+          !currThemes.some((curr) => curr.name === theme.name) &&
+          !options.some((option) => option.name === theme.name)
+        ) {
+          setOptions((options) => [...options, theme]);
+        }
+      });
+    }
+  }, [themes]);
 
-  //         }
-  //     }, [themes]);
-
-  //   useEffect(() => {
-  //     console.log("alskdjflkajsdf");
-  //     if (tags) {
-  //       setOptions((options) => [...options, ...tags]);
-  //     }
-  //   }, [tags]);
+  useEffect(() => {
+    if (tags) {
+      tags.accessibility.map((tag) => {
+        if (
+          !currTags.some((curr) => curr.name === tag.name) &&
+          !options.some((option) => option.name === tag.name)
+        ) {
+          setOptions((options) => [...options, tag]);
+        }
+      });
+      tags.custom.map((tag) => {
+        if (
+          !currTags.some((curr) => curr.name === tag.name) &&
+          !options.some((option) => option.name === tag.name)
+        ) {
+          setOptions((options) => [...options, tag]);
+        }
+      });
+    }
+  }, [tags]);
 
   async function getThemes() {
     const response = await fetch("/api/themes");
@@ -64,13 +96,16 @@ export default function SearchTagsComponent({ setSearch }: Props) {
 
   const handleSelection = (
     event,
-    newValue: { label: string; year: string },
+    newValue: z.infer<typeof tagSchema> | z.infer<typeof themeSchema>,
   ) => {
     if (newValue) {
-      console.log(newValue.label);
+      console.log(newValue);
+      if (tagSchema.safeParse(newValue)) {
+        setCurrTags((currTags) => [...currTags, newValue]);
+      } else {
+        setCurrThemes((currThemes) => [...currThemes, newValue]);
+      }
     }
-    console.log(themes);
-    console.log(tags);
     setSearch(false);
   };
 
@@ -79,8 +114,8 @@ export default function SearchTagsComponent({ setSearch }: Props) {
       <Autocomplete
         disablePortal
         id="combo-box-demo"
-        options={top100Films}
-        // getOptionLabel={(t) => t.name}
+        options={options}
+        getOptionLabel={(t) => t.name}
         className="sans-serif"
         onChange={handleSelection}
         isOptionEqualToValue={(option, value) => option.label === value.label}

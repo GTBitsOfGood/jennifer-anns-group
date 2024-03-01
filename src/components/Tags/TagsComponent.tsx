@@ -15,9 +15,9 @@ import SearchTagsComponent from "./SearchTagsComponent";
 interface Props {
   mode: string;
   themes: z.infer<typeof themeSchema>[];
-  setThemes: Dispatch<SetStateAction<z.infer<typeof themeSchema>>[]>;
+  setThemes: Dispatch<z.infer<typeof themeSchema>[]>;
   tags: z.infer<typeof tagSchema>[];
-  setTags: Dispatch<SetStateAction<z.infer<typeof tagSchema>>[]>;
+  setTags: Dispatch<z.infer<typeof tagSchema>[]>;
 }
 
 const sortByTagType = (
@@ -115,7 +115,13 @@ export default function TagsComponent({
       </ChakraProvider>
       {mode === "edit" && search ? (
         <div className="mb-32 ml-[10vw] mt-7 font-sans">
-          <SearchTagsComponent setSearch={setSearch} />
+          <SearchTagsComponent
+            setSearch={setSearch}
+            currThemes={themes}
+            setCurrThemes={setThemes}
+            currTags={tags}
+            setCurrTags={setTags}
+          />
         </div>
       ) : null}
     </div>
