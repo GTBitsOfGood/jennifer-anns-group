@@ -3,15 +3,13 @@ import UserModel from "../models/UserModel";
 import connectMongoDB from "../mongodb";
 import { createUserSchema } from "@/pages/api/users";
 import bcrypt from "bcrypt";
-import { changePWSchema, userSchema } from "@/utils/types";
-// import { Error } from "mongoose";
-import {
-  GenericServerErrorException,
-  UserAlreadyExistsException,
-  UserCredentialsIncorrectException,
-  UserDoesNotExistException,
-} from "@/utils/exceptions";
 import { MongoError } from "mongodb";
+import { changePWSchema, userSchema } from "@/utils/types";
+import {
+  UserAlreadyExistsException,
+  UserDoesNotExistException,
+  UserCredentialsIncorrectException,
+} from "@/utils/exceptions/user";
 
 const SALT_ROUNDS = 10;
 const DUP_KEY_ERROR_CODE = 11000;
@@ -37,7 +35,7 @@ export async function createUser(data: z.infer<typeof createUserSchema>) {
     ) {
       throw new UserAlreadyExistsException();
     }
-    throw new GenericServerErrorException();
+    throw e;
   }
 }
 
@@ -138,6 +136,6 @@ export async function editPassword(
 
   // Check if user was able to be found/updated
   if (!updatedUser) {
-    throw new GenericServerErrorException();
+    throw new UserDoesNotExistException();
   }
 }

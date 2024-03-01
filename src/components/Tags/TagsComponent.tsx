@@ -1,11 +1,12 @@
 import styles from "@/styles/tags.module.css";
 import { ChakraProvider, Tag } from "@chakra-ui/react";
 import theme from "../ui/tagsTheme";
-import { gameSchema, tagSchema } from "@/utils/types";
+import { tagSchema } from "@/utils/types";
+import { populatedGame } from "@/server/db/models/GameModel";
 import { z } from "zod";
 
 interface Props {
-  gameData: z.infer<typeof gameSchema>;
+  gameData: populatedGame;
 }
 
 const sortByTagType = (
