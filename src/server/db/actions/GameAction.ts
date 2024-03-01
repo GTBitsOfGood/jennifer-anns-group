@@ -2,6 +2,7 @@ import GameModel from "../models/GameModel";
 import ThemeModel from "../models/ThemeModel";
 import TagModel from "../models/TagModel";
 import connectMongoDB from "../mongodb";
+import { deleteBuild } from "./BuildAction";
 import { z } from "zod";
 import { ObjectId } from "mongodb";
 import { editGameSchema } from "@/utils/types";
@@ -21,7 +22,7 @@ export async function createGame(data: IGame) {
   try {
     if (data && data.themes) {
       const themePromises = data.themes.map((theme) =>
-        ThemeModel.findById(theme)
+        ThemeModel.findById(theme),
       );
       const themeResults = await Promise.all(themePromises);
       themeResults.forEach((result) => {
@@ -62,6 +63,9 @@ export async function deleteGame(data: ObjectId) {
     if (!deletedGame) {
       throw new GameNotFoundException();
     }
+    if (deletedGame?.webGLBuild) {
+      await deleteBuild(data.toString());
+    }
     return deletedGame.toObject();
   } catch (e) {
     throw e;
@@ -78,7 +82,7 @@ export async function editGame(allData: nextEditGame) {
   try {
     if (data && data.themes) {
       const themePromises = data.themes.map((theme) =>
-        ThemeModel.findById(theme)
+        ThemeModel.findById(theme),
       );
       const themeResults = await Promise.all(themePromises);
       themeResults.forEach((result, index) => {

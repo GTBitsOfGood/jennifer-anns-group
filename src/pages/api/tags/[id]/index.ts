@@ -6,7 +6,7 @@ import { HTTP_STATUS_CODE } from "@/utils/consts";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   switch (req.method) {
     case "DELETE":

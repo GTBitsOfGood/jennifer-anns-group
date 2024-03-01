@@ -1,8 +1,17 @@
 import mongoose, { Schema } from "mongoose";
 import { z } from "zod";
-import { gameSchema } from "../../../utils/types";
+import { buildSchema, gameSchema, AppType } from "../../../utils/types";
+import { ObjectId } from "mongodb";
+
+interface IBuild extends z.infer<typeof buildSchema> {}
 export interface IGame extends z.infer<typeof gameSchema> {}
-//You must use mongoose.Schema.Types.ObjectId when defining Schemas that contain an ObjectId.
+
+const BuildSchema = new Schema<IBuild>({
+  type: { type: String, enum: Object.values(AppType), required: true },
+  link: { type: String, required: true },
+  instructions: { type: String },
+});
+
 const GameSchema = new Schema<IGame>({
   name: { type: String, required: true, unique: true },
   themes: {
@@ -17,9 +26,13 @@ const GameSchema = new Schema<IGame>({
     required: false,
   },
   description: { type: String, required: true },
+  webGLBuild: { type: Boolean, default: false },
+  builds: { type: [BuildSchema], default: [] },
   game: { type: String, required: true },
   lesson: { type: String },
   parentingGuide: { type: String },
+  answerKey: { type: String },
+  videoTrailer: { type: String },
 });
 
 const GameModel =

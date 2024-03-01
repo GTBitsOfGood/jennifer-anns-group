@@ -44,7 +44,7 @@ export async function deleteTheme(id: string) {
 
     const results = await GameModel.updateMany(
       { themes: { $in: [id] } },
-      { $pull: { themes: id } }
+      { $pull: { themes: id } },
     );
     await session.commitTransaction();
     return deletedTheme;

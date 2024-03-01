@@ -64,10 +64,10 @@ function CredentialSlide({ setFormSlide, setAccountData }: Props) {
 
   return (
     <form
-      className="flex flex-col gap-8 w-[20em]"
+      className="flex w-[20em] flex-col gap-8"
       onSubmit={handleCredentialFormSubmit}
     >
-      <div className="flex flex-col relative">
+      <div className="relative flex flex-col">
         <label htmlFor={EMAIL_FORM_KEY} className="text-xl">
           Email*
         </label>
@@ -84,7 +84,7 @@ function CredentialSlide({ setFormSlide, setAccountData }: Props) {
           {validationErrors.email}
         </p>
       </div>
-      <div className="flex flex-col relative">
+      <div className="relative flex flex-col">
         <label htmlFor={PASSWORD_FORM_KEY} className="text-xl">
           Password*
         </label>
@@ -102,7 +102,7 @@ function CredentialSlide({ setFormSlide, setAccountData }: Props) {
           {validationErrors.password}
         </p>
       </div>
-      <div className="flex flex-col relative">
+      <div className="relative flex flex-col">
         <label htmlFor={PASSWORD_CONFIRM_FORM_KEY} className="text-xl">
           Confirm Password*
         </label>
