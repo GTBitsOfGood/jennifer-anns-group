@@ -14,3 +14,5 @@ export enum Pages {
   LOGIN = "/login",
   SIGNUP = "/signup",
 }
+
+export const ADMIN_CONTACT = "contact@jenniferann.org";

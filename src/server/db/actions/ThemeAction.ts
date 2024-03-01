@@ -1,17 +1,16 @@
 import ThemeModel from "../models/ThemeModel";
 import GameModel from "../models/GameModel";
 import connectMongoDB from "../mongodb";
-import { ITheme } from "../models/ThemeModel";
-import { GenericUserErrorException } from "@/utils/exceptions";
 import { CreateThemeInput } from "@/pages/api/themes";
-import { Types } from "mongoose";
+import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 
 export async function createTheme(data: CreateThemeInput) {
   await connectMongoDB();
   const session = await ThemeModel.startSession();
-  session.startTransaction();
+  // session.startTransaction();
   try {
-    const theme = (await ThemeModel.create([data], { session }))[0];
+    // const theme = (await ThemeModel.create([data], { session }))[0];
+    const theme = await ThemeModel.create(data);
     await GameModel.updateMany(
       {
         _id: {
@@ -22,12 +21,12 @@ export async function createTheme(data: CreateThemeInput) {
         $push: {
           themes: theme._id,
         },
-      }
+      },
     );
-    await session.commitTransaction();
+    // await session.commitTransaction();
     return theme.toObject();
   } catch (e) {
-    await session.abortTransaction();
+    // await session.abortTransaction();
     console.log(e);
     throw e;
   }
@@ -35,21 +34,23 @@ export async function createTheme(data: CreateThemeInput) {
 
 export async function deleteTheme(id: string) {
   await connectMongoDB();
+  // const session = await ThemeModel.startSession();
+  // session.startTransaction();
   try {
-    const deleted_theme: (ITheme & { _id: Types.ObjectId }) | null =
-      await ThemeModel.findByIdAndDelete(id.toString()); //To fix BSON Error
+    const deletedTheme = await ThemeModel.findByIdAndDelete(id.toString()); //To fix BSON Error
 
-    if (!deleted_theme) {
-      throw new GenericUserErrorException(
-        "No Theme present with this ObjectID.",
-      );
+    if (!deletedTheme) {
+      throw new ThemeNotFoundException();
     }
 
     const results = await GameModel.updateMany(
       { themes: { $in: [id] } },
       { $pull: { themes: id } },
     );
+    // await session.commitTransaction();
+    return deletedTheme;
   } catch (e) {
+    // await session.abortTransaction();
     throw e;
   }
 }

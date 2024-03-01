@@ -2,13 +2,11 @@ import { z } from "zod";
 import { createUser } from "../../../server/db/actions/UserAction";
 import { userSchema } from "../../../utils/types";
 import { NextApiRequest, NextApiResponse } from "next";
+import { HTTP_STATUS_CODE } from "@/utils/consts";
 import {
-  HTTP_BAD_REQUEST,
-  HTTP_CREATED,
-  HTTP_INTERNAL_SERVER_ERROR,
-  HTTP_METHOD_NOT_ALLOWED,
-} from "@/utils/consts";
-import { UserAlreadyExistsException } from "@/utils/exceptions";
+  UserInvalidInputException,
+  UserException,
+} from "@/utils/exceptions/user";
 
 export const createUserSchema = userSchema
   .omit({ hashedPassword: true })
@@ -22,40 +20,29 @@ export default async function handler(
 ) {
   switch (req.method) {
     case "POST":
-      await createUserHandler(req, res);
-      break;
-
+      return createUserHandler(req, res);
     default:
-      res.status(HTTP_METHOD_NOT_ALLOWED).json({
+      return res.status(HTTP_STATUS_CODE.METHOD_NOT_ALLOWED).json({
         error: `Request method ${req.method} is not allowed`,
       });
   }
-  return;
 }
 
 async function createUserHandler(req: NextApiRequest, res: NextApiResponse) {
-  const parsedData = createUserSchema.safeParse(JSON.parse(req.body));
-  if (!parsedData.success) {
-    res.status(HTTP_BAD_REQUEST).json({
-      error: parsedData.error.format(),
-    });
-    return;
-  }
-
   try {
-    const user = await createUser(parsedData.data);
-    res.status(HTTP_CREATED).json({
-      _id: user._id,
-    });
-    return;
-  } catch (e) {
-    let httpCode = HTTP_INTERNAL_SERVER_ERROR;
+    const parsedData = createUserSchema.safeParse(JSON.parse(req.body));
+    if (!parsedData.success) {
+      throw new UserInvalidInputException();
+    }
 
-    if (e instanceof UserAlreadyExistsException) httpCode = HTTP_BAD_REQUEST;
-
-    res.status(httpCode).json({
-      error: (e as Error).message,
+    const newUser = await createUser(parsedData.data);
+    return res.status(HTTP_STATUS_CODE.CREATED).send({
+      _id: newUser._id,
     });
-    return;
+  } catch (e: any) {
+    if (e instanceof UserException) {
+      return res.status(e.code).send(e.message);
+    }
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }

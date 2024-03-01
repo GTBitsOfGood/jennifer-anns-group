@@ -4,18 +4,11 @@ import {
   editPassword,
 } from "../../../../server/db/actions/UserAction";
 import { NextApiRequest, NextApiResponse } from "next";
+import { HTTP_STATUS_CODE } from "@/utils/consts";
 import {
-  HTTP_BAD_REQUEST,
-  HTTP_INTERNAL_SERVER_ERROR,
-  HTTP_METHOD_NOT_ALLOWED,
-  HTTP_NOT_FOUND,
-  HTTP_UNAUTHORIZED,
-} from "@/utils/consts";
-import {
-  UserAlreadyExistsException,
-  UserCredentialsIncorrectException,
   UserDoesNotExistException,
-} from "@/utils/exceptions";
+  UserException,
+} from "@/utils/exceptions/user";
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,73 +16,53 @@ export default async function handler(
 ) {
   switch (req.method) {
     case "GET":
-      const id = String(req.query.id);
-      try {
-        const user = await getUser(id);
-        res.status(200).send({
-          data: user,
-        });
-        return;
-      } catch (e: unknown) {
-        if (e instanceof UserDoesNotExistException) {
-          res.status(HTTP_NOT_FOUND).json({
-            error: (e as Error).message,
-          });
-          return;
-        }
-        res.status(HTTP_INTERNAL_SERVER_ERROR).json({
-          error: (e as Error).message,
-        });
-        return;
-      }
-
+      return getUserHandler(req, res);
     case "PUT":
-      await editUserHandler(req, res);
-      break;
-
+      return editUserHandler(req, res);
     default:
-      res.status(HTTP_METHOD_NOT_ALLOWED).json({
+      return res.status(HTTP_STATUS_CODE.METHOD_NOT_ALLOWED).send({
         error: `Request method ${req.method} is not allowed`,
       });
   }
-  return;
+}
+
+async function getUserHandler(req: NextApiRequest, res: NextApiResponse) {
+  const id = String(req.query.id);
+  try {
+    const user = await getUser(id);
+    if (!user) throw new UserDoesNotExistException();
+    res.status(HTTP_STATUS_CODE.OK).send(user);
+  } catch (e: any) {
+    if (e instanceof UserException) {
+      return res.status(e.code).send(e.message);
+    }
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+  }
 }
 
 async function editUserHandler(req: NextApiRequest, res: NextApiResponse) {
   const type = req.query.type;
 
   if (type === "info") {
-    editProfileHandler(req, res);
+    return editProfileHandler(req, res);
   } else if (type === "password") {
-    editPasswordHandler(req, res);
+    return editPasswordHandler(req, res);
+  } else {
+    return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
+      error: `Request type PUT: ${type} is not allowed`,
+    });
   }
 }
 
 async function editProfileHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const result = await editUser(req.body);
-    res.status(200).send({
-      data: result,
-    });
-    return;
+    return res.status(HTTP_STATUS_CODE.OK).send({ result });
   } catch (e: any) {
-    switch (e.constructor) {
-      case UserAlreadyExistsException:
-        res.status(HTTP_BAD_REQUEST).json({
-          error: "User with email already exists",
-        });
-        return;
-      case UserDoesNotExistException:
-        res.status(HTTP_NOT_FOUND).json({
-          error: (e as Error).message,
-        });
-        return;
-      default:
-        res.status(HTTP_INTERNAL_SERVER_ERROR).json({
-          error: (e as Error).message,
-        });
-        return;
+    if (e instanceof UserException) {
+      return res.status(e.code).send(e.message);
     }
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }
 
@@ -97,27 +70,11 @@ async function editPasswordHandler(req: NextApiRequest, res: NextApiResponse) {
   const id = req.query.id;
   try {
     const result = await editPassword(req.body, String(id));
-    res.status(200).send({
-      data: result,
-    });
-    return;
+    return res.status(HTTP_STATUS_CODE.OK).send({ result });
   } catch (e: any) {
-    switch (e.constructor) {
-      case UserDoesNotExistException:
-        res.status(HTTP_NOT_FOUND).json({
-          error: (e as Error).message,
-        });
-        return;
-      case UserCredentialsIncorrectException:
-        res.status(HTTP_UNAUTHORIZED).json({
-          error: "Old password is incorrect",
-        });
-        return;
-      default:
-        res.status(HTTP_INTERNAL_SERVER_ERROR).json({
-          error: (e as Error).message,
-        });
-        return;
+    if (e instanceof UserException) {
+      return res.status(e.code).send(e.message);
     }
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }

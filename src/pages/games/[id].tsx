@@ -1,6 +1,6 @@
 import styles from "@/styles/game.module.css";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import TabsComponent from "../../components/Tabs/TabsComponent";
 import TagsComponent from "../../components/Tags/TagsComponent";
 import { gameSchema } from "@/utils/types";
@@ -9,10 +9,11 @@ import { useSession } from "next-auth/react";
 import { userSchema } from "@/utils/types";
 import editIcon from "@/images/editIcon.png";
 import Link from "next/link";
+import { populatedGame } from "@/server/db/models/GameModel";
 
 const GamePage = () => {
   const gameID = useRouter().query.id;
-  const [gameData, setGameData] = useState<z.infer<typeof gameSchema>>();
+  const [gameData, setGameData] = useState<populatedGame>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const idSchema = z.string().length(24);
@@ -51,7 +52,7 @@ const GamePage = () => {
         setError("Failed to fetch game");
       }
       const data = await response.json();
-      setGameData(data.data);
+      setGameData(data);
       setLoading(false);
     } catch (error: any) {
       setError(error.message);

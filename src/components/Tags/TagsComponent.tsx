@@ -8,8 +8,9 @@ import {
 import { AddIcon } from "@chakra-ui/icons";
 import theme from "../ui/tagsTheme";
 import { tagSchema, themeSchema } from "@/utils/types";
+import { populatedGame } from "@/server/db/models/GameModel";
 import { z } from "zod";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, useState } from "react";
 import SearchTagsComponent from "./SearchTagsComponent";
 
 interface Props {
@@ -18,6 +19,7 @@ interface Props {
   setThemes: Dispatch<z.infer<typeof themeSchema>[]>;
   tags: z.infer<typeof tagSchema>[];
   setTags: Dispatch<z.infer<typeof tagSchema>[]>;
+  gameData: populatedGame;
 }
 
 const sortByTagType = (
