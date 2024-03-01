@@ -36,10 +36,10 @@ async function deleteThemeHandler(req: NextApiRequest, res: NextApiResponse) {
 
     const deletedTheme = await deleteTheme(id);
     return res.status(HTTP_STATUS_CODE.OK).send(deletedTheme);
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof ThemeException) {
       return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }

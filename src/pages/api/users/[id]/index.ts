@@ -32,11 +32,11 @@ async function getUserHandler(req: NextApiRequest, res: NextApiResponse) {
     const user = await getUser(id);
     if (!user) throw new UserDoesNotExistException();
     res.status(HTTP_STATUS_CODE.OK).send(user);
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof UserException) {
       return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }
 
@@ -44,9 +44,13 @@ async function editUserHandler(req: NextApiRequest, res: NextApiResponse) {
   const type = req.query.type;
 
   if (type === "info") {
-    editProfileHandler(req, res);
+    return editProfileHandler(req, res);
   } else if (type === "password") {
-    editPasswordHandler(req, res);
+    return editPasswordHandler(req, res);
+  } else {
+    return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
+      error: `Request type PUT: ${type} is not allowed`,
+    });
   }
 }
 
@@ -54,11 +58,11 @@ async function editProfileHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const result = await editUser(req.body);
     return res.status(HTTP_STATUS_CODE.OK).send({ result });
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof UserException) {
       return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }
 
@@ -67,10 +71,10 @@ async function editPasswordHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const result = await editPassword(req.body, String(id));
     return res.status(HTTP_STATUS_CODE.OK).send({ result });
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof UserException) {
       return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }

@@ -39,10 +39,10 @@ async function createUserHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(HTTP_STATUS_CODE.CREATED).send({
       _id: newUser._id,
     });
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof UserException) {
       return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }

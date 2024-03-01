@@ -9,12 +9,17 @@ import { editGameSchema } from "@/utils/types";
 import {
   GameNotFoundException,
   InvalidIdGameErrorException,
+  GameAlreadyExistsException,
 } from "@/utils/exceptions/game";
 import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
 
 export async function createGame(data: IGame) {
   await connectMongoDB();
+
+  const existingGame = await GameModel.findOne({ name: data.name });
+
+  if (existingGame) throw new GameAlreadyExistsException();
 
   // add theme and tag IDs to the game
   try {
@@ -42,13 +47,10 @@ export async function createGame(data: IGame) {
     throw e;
   }
 
-  console.log("DATA", data);
-
   // create the game
   try {
     const game = await GameModel.create(data);
-    console.log("GAME", game);
-    return game;
+    return game.toObject();
   } catch (e) {
     throw e;
   }

@@ -24,10 +24,11 @@ export default async function handler(
       return deleteGameHandler(req, res);
     case "PUT":
       return editGameHandler(req, res);
+    default:
+      return res.status(HTTP_STATUS_CODE.METHOD_NOT_ALLOWED).send({
+        error: `Request method ${req.method} is not allowed`,
+      });
   }
-  return res.status(HTTP_STATUS_CODE.METHOD_NOT_ALLOWED).send({
-    error: `Request method ${req.method} is not allowed`,
-  });
 }
 
 async function getGameByIdHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -42,11 +43,11 @@ async function getGameByIdHandler(req: NextApiRequest, res: NextApiResponse) {
       throw new GameNotFoundException();
     }
     return res.status(HTTP_STATUS_CODE.OK).send(game);
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof GameException) {
       return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }
 
@@ -62,11 +63,11 @@ async function deleteGameHandler(req: NextApiRequest, res: NextApiResponse) {
       throw new GameNotFoundException();
     }
     return res.status(HTTP_STATUS_CODE.OK).send(deletedGame);
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof GameException) {
       return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }
 
@@ -81,13 +82,14 @@ async function editGameHandler(req: NextApiRequest, res: NextApiResponse) {
     if (!updateData.success) {
       throw new GameInvalidInputException();
     }
+    console.log("EDIT GAME", updateData.data);
 
     const editedGame = await editGame({ id: gameId, data: updateData.data });
     return res.status(HTTP_STATUS_CODE.OK).send(editedGame);
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof GameException) {
       return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }

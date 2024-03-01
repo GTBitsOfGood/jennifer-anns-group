@@ -34,15 +34,18 @@ async function createBuildHandler(req: any, res: NextApiResponse) {
     }
 
     const { uploadUrl, uploadAuthToken } = await getBuildUploadUrl();
+    console.log(uploadUrl, uploadAuthToken);
     if (!uploadUrl || !uploadAuthToken) {
       throw new BuildUploadException();
     }
-    return { uploadUrl, uploadAuthToken };
-  } catch (e) {
+    return res
+      .status(HTTP_STATUS_CODE.CREATED)
+      .send({ uploadUrl, uploadAuthToken });
+  } catch (e: any) {
     if (e instanceof GameException) {
       return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }
 
@@ -66,10 +69,10 @@ async function deleteBuildHandler(req: any, res: NextApiResponse) {
     }
 
     return res.status(HTTP_STATUS_CODE.OK).send(deletedBuild);
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof GameException) {
       return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }

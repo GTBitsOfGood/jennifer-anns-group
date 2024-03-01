@@ -36,10 +36,10 @@ async function deleteTagHandler(req: NextApiRequest, res: NextApiResponse) {
 
     const deletedTag = await deleteTag(id);
     return res.status(HTTP_STATUS_CODE.OK).send(deletedTag);
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof TagException) {
       return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }

@@ -32,6 +32,12 @@ export class InvalidIdGameErrorException extends GameException {
   }
 }
 
+export class GameAlreadyExistsException extends GameException {
+  constructor(message = "Game already exists") {
+    super(message, HTTP_STATUS_CODE.BAD_REQUEST);
+  }
+}
+
 export class BuildUploadException extends GameException {
   constructor(message = "Failed to generate build URL and auth token") {
     super(message, HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
