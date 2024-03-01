@@ -1,6 +1,6 @@
 import { customErrorHandler } from "@/utils/exceptions";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
-
+import { z, RefinementCtx } from "zod";
 import {
   createGame,
   getSelectedGames,
@@ -28,9 +28,73 @@ export default async function handler(
   }
 }
 
+export enum GameContentEnum {
+  answerKey = "answerKey",
+  parentingGuide = "parentingGuide",
+  lesson = "lesson",
+  videoTrailer = "videoTrailer",
+}
+
+export enum GameBuildsEnum {
+  amazon = "amazon",
+  android = "android",
+  appstore = "appstore",
+  linux = "linux",
+  mac = "max",
+  webgl = "webgl",
+  windows = "windows",
+}
+
+const convertINT = (val: string, ctx: RefinementCtx) => {
+  const result = parseInt(val);
+  if (isNaN(result)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Not a valid integer",
+    });
+    return z.NEVER;
+  } else {
+    return result;
+  }
+};
+const putSingleStringInArray = (val: string) => {
+  return [val];
+};
+
+//Query parameters can pass in a single value but need to be an array, so moddifying it to expect that.
+export const GetGameQuerySchema = z.object({
+  name: z.string().min(3).max(50).optional(),
+  theme: z.string().optional(),
+  tags: z
+    .array(z.string())
+    .or(z.string().transform(putSingleStringInArray))
+    .optional(),
+  accessibility: z
+    .array(z.string())
+    .or(z.string().transform(putSingleStringInArray))
+    .optional(),
+  gameBuilds: z
+    .array(z.nativeEnum(GameBuildsEnum))
+    .or(z.nativeEnum(GameBuildsEnum).transform(putSingleStringInArray))
+    .optional(),
+  gameContent: z
+    .array(z.nativeEnum(GameContentEnum))
+    .or(z.nativeEnum(GameContentEnum).transform(putSingleStringInArray)) //In this case where only thing is passed into gameContent.
+    .optional(),
+  page: z.string().transform(convertINT).pipe(z.number().gte(1)),
+});
+
 async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const games = await getAllGames();
+    //TODO: Putback parsing
+    const parsedQuery = GetGameQuerySchema.safeParse(req.query); //JSON.parse not necessary
+    if (!parsedQuery.success) {
+      //Convert to current format.
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .send(parsedQuery.error.format());
+    }
+    const games = await getSelectedGames(parsedQuery.data);
     return res.status(HTTP_STATUS_CODE.OK).send(games);
   } catch (e: any) {
     return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);

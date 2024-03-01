@@ -4,18 +4,23 @@ import TagModel, { ITag } from "../models/TagModel";
 import connectMongoDB from "../mongodb";
 import { deleteBuild } from "./BuildAction";
 import { FilterQuery } from "mongoose";
-import { ITag } from "../models/TagModel";
 import { z } from "zod";
-import { GameBuildsEnum } from "@/pages/api/games";
-import { ObjectId } from "mongodb";
 import { editGameSchema } from "@/utils/types";
+import mongoose from "mongoose";
+import { GetGameQuerySchema, GameBuildsEnum } from "@/pages/api/games";
 import {
   GameNotFoundException,
   InvalidIdGameErrorException,
   GameAlreadyExistsException,
 } from "@/utils/exceptions/game";
+import {
+  InvalidTagErrorException,
+  InvalidThemeErrorException,
+} from "@/utils/exceptions";
 import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
+
+const RESULTS_PER_PAGE = 6;
 
 export async function createGame(data: IGame) {
   await connectMongoDB();
@@ -82,39 +87,30 @@ interface nextEditGame {
 export async function editGame(allData: nextEditGame) {
   await connectMongoDB();
   const data: IEditGame = allData.data;
-  try {
-    if (data && data.themes) {
-      const themeResults = await ThemeModel.find({ id: { $in: data.themes } });
-      if (themeResults.length !== data.themes.length) {
-        throw new InvalidIdGameErrorException(
-          "One of the given themes does not exist.",
-        ); //Using non-null assertion, as if condition should ensure data.tags is non-null
-      }
-    }
-    if (data && data.tags) {
-      const tagResults = await TagModel.find({ id: { $in: data.tags } });
-      if (tagResults.length !== data.tags.length) {
-        throw new InvalidIdGameErrorException(
-          "One of the given tags does not exist.",
-        ); //Using non-null assertion, as if condition should ensure data.tags is non-null
-      }
+  if (data && data.themes) {
+    const themeResults = await ThemeModel.find({ id: { $in: data.themes } });
+    if (themeResults.length !== data.themes.length) {
+      throw new InvalidIdGameErrorException(
+        "One of the given themes does not exist.",
+      ); //Using non-null assertion, as if condition should ensure data.tags is non-null
     }
   }
-  try {
-    const newGame = await GameModel.findByIdAndUpdate(
-      allData.id,
-      allData.data,
-      {
-        new: true,
-      },
-    );
-    if (!newGame) {
-      throw new GameNotFoundException();
+  if (data && data.tags) {
+    const tagResults = await TagModel.find({ id: { $in: data.tags } });
+    if (tagResults.length !== data.tags.length) {
+      throw new InvalidIdGameErrorException(
+        "One of the given tags does not exist.",
+      ); //Using non-null assertion, as if condition should ensure data.tags is non-null
     }
-    return newGame;
-  } catch (e) {
-    throw e;
   }
+
+  const newGame = await GameModel.findByIdAndUpdate(allData.id, allData.data, {
+    new: true,
+  });
+  if (!newGame) {
+    throw new GameNotFoundException();
+  }
+  return newGame;
 }
 export async function getSelectedGames(
   query: z.infer<typeof GetGameQuerySchema>,
