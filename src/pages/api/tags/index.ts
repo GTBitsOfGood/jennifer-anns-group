@@ -55,7 +55,7 @@ async function postTagHandler(req: NextApiRequest, res: NextApiResponse) {
     if (e instanceof TagException) {
       return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send("");
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
   }
 }
 
@@ -76,6 +76,6 @@ async function deleteTagHandler(req: NextApiRequest, res: NextApiResponse) {
     if (e instanceof TagException) {
       return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send("");
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
   }
 }

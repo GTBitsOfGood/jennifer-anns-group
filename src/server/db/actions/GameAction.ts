@@ -10,6 +10,8 @@ import { GameNotFoundException } from "@/utils/exceptions/game";
 import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
 
+const RESULTS_PER_PAGE = 6;
+
 export async function createGame(data: IGame) {
   await connectMongoDB();
   const session = await TagModel.startSession();
@@ -44,7 +46,7 @@ export async function createGame(data: IGame) {
 
   // create the game
   try {
-    const game = await GameModel.create(data);
+    const game = (await GameModel.create([data], { session }))[0];
     await session.commitTransaction();
     return game.toObject();
   } catch (e) {
@@ -55,17 +57,13 @@ export async function createGame(data: IGame) {
 
 export async function deleteGame(data: ObjectId) {
   await connectMongoDB();
-  const session = await GameModel.startSession();
-  session.startTransaction();
   try {
     const deletedGame = await GameModel.findByIdAndDelete(data.toString());
     if (!deletedGame) {
       throw new GameNotFoundException();
     }
-    await session.commitTransaction();
     return deletedGame.toObject();
   } catch (e) {
-    await session.abortTransaction();
     throw e;
   }
 }

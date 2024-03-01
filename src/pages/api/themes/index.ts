@@ -80,7 +80,7 @@ async function deleteThemeHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(HTTP_STATUS_CODE.OK).send(deletedTheme);
   } catch (e) {
     if (e instanceof ThemeException) {
-      return res.status(e.code).send("");
+      return res.status(e.code).send(e.message);
     }
     return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
   }
