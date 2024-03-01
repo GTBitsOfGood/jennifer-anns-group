@@ -15,9 +15,9 @@ interface Tags {
 interface Props {
   setSearch: Dispatch<SetStateAction<boolean>>;
   currThemes: z.infer<typeof themeSchema>[];
-  setCurrThemes: Dispatch<SetStateAction<z.infer<typeof themeSchema>>[]>;
+  setCurrThemes: Dispatch<z.infer<typeof themeSchema>[]>;
   currTags: z.infer<typeof tagSchema>[];
-  setCurrTags: Dispatch<SetStateAction<z.infer<typeof tagSchema>>[]>;
+  setCurrTags: Dispatch<z.infer<typeof tagSchema>[]>;
 }
 
 export default function SearchTagsComponent({
@@ -87,20 +87,12 @@ export default function SearchTagsComponent({
     setTags(data);
   }
 
-  const top100Films = [
-    { label: "Gaslighting", year: 2008 },
-    { label: "Girlboss", year: 1957 },
-    { label: "Gatekeep", year: 1993 },
-    { label: "Glass Onion", year: 1994 },
-  ];
-
   const handleSelection = (
     event,
     newValue: z.infer<typeof tagSchema> | z.infer<typeof themeSchema>,
   ) => {
     if (newValue) {
-      console.log(newValue);
-      if (tagSchema.safeParse(newValue)) {
+      if (tagSchema.safeParse(newValue).success) {
         setCurrTags((currTags) => [...currTags, newValue]);
       } else {
         setCurrThemes((currThemes) => [...currThemes, newValue]);
@@ -118,7 +110,6 @@ export default function SearchTagsComponent({
         getOptionLabel={(t) => t.name}
         className="sans-serif"
         onChange={handleSelection}
-        isOptionEqualToValue={(option, value) => option.label === value.label}
         sx={{
           width: 560,
         }}

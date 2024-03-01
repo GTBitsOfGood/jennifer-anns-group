@@ -9,7 +9,8 @@ import React from "react";
 import DeleteGameComponent from "@/components/GameComponent/DeleteGameComponent";
 
 const EditGamePage = () => {
-  const gameID = useRouter().query.id;
+  const router = useRouter();
+  const gameID = router.query.id;
   const [gameData, setGameData] = useState<z.infer<typeof gameSchema>>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -36,7 +37,27 @@ const EditGamePage = () => {
     }
   };
 
-  const saveChanges = async () => {};
+  const saveChanges = async () => {
+    const themeIds = themes?.map((theme) => {
+      return theme._id;
+    });
+    const tagIds = tags?.map((tag) => {
+      return tag._id;
+    });
+
+    const changes = {
+      name: name,
+      description: description,
+      themes: themeIds,
+      tags: tagIds,
+    };
+    const result = fetch(`/api/games/${gameID}`, {
+      method: "PUT",
+      body: JSON.stringify(changes),
+    });
+
+    router.push(`/games/${gameID}`);
+  };
 
   if (gameID && loading) {
     getGame();
@@ -57,14 +78,12 @@ const EditGamePage = () => {
   return (
     <div>
       <div className="flex justify-center">
-        <span
-          contentEditable="true"
-          className="mt-[126px] max-w-[50vw] rounded-[20px] border border-solid border-grey bg-input-bg px-8 py-2.5 text-center font-sans text-[56px] font-semibold !outline-none"
-          onChange={(e) => setName(e.currentTarget.textContent || "")}
-        >
-          {" "}
-          {name}{" "}
-        </span>
+        <input
+          className="mt-[126px] rounded-[20px] border border-solid border-grey bg-input-bg py-2.5 text-center font-sans text-[56px] font-semibold !outline-none"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
       </div>
       <div className="mx-auto flex w-[80vw] justify-end">
         <DeleteGameComponent gameName={gameData.name} />
