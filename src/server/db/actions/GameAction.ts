@@ -1,6 +1,6 @@
 import GameModel, { IGame } from "../models/GameModel";
 import ThemeModel, { ITheme } from "../models/ThemeModel";
-import TagModel from "../models/TagModel";
+import TagModel, { ITag } from "../models/TagModel";
 import connectMongoDB from "../mongodb";
 import { deleteBuild } from "./BuildAction";
 import { FilterQuery } from "mongoose";
@@ -10,63 +10,66 @@ import { GameBuildsEnum } from "@/pages/api/games";
 import { ObjectId } from "mongodb";
 import { editGameSchema } from "@/utils/types";
 import {
+  GameNotFoundException,
   InvalidIdGameErrorException,
-  InvalidThemeErrorException,
-  InvalidTagErrorException,
-} from "@/utils/exceptions";
-import { GetGameQuerySchema } from "@/pages/api/games";
-import { theme } from "@chakra-ui/react";
-import mongoose, { Query } from "mongoose";
-import { Accessibility } from "lucide-react";
-import { escape } from "querystring";
+  GameAlreadyExistsException,
+} from "@/utils/exceptions/game";
+import { ThemeNotFoundException } from "@/utils/exceptions/theme";
+import { TagNotFoundException } from "@/utils/exceptions/tag";
 
-const RESULTS_PER_PAGE = 6;
 export async function createGame(data: IGame) {
   await connectMongoDB();
-  //Ensure every ObjectID actually represents a Document
 
-  if (data && data.themes) {
-    const themePromises = data.themes.map((theme) =>
-      ThemeModel.findById(theme),
-    );
-    const themeResults = await Promise.all(themePromises);
-    themeResults.forEach((result, index) => {
-      if (!result) {
-        throw new InvalidIdGameErrorException(
-          `ObjectID ${data.themes![index]} not a present theme.`,
-        ); //Using non-null assertion, as if condition should ensure data.tags is non-null
-      }
-    });
-  }
-  if (data && data.tags) {
-    const tagPromises = data.tags.map((tag) => TagModel.findById(tag));
-    const tagResults = await Promise.all(tagPromises);
-    tagResults.forEach((result, index) => {
-      if (!result) {
-        throw new InvalidIdGameErrorException(
-          `ObjectID ${data.tags![index]} is not a  present tag.`,
-        ); //Using non-null assertion, as if condition should ensure data.tags is non-null
-      }
-    });
+  const existingGame = await GameModel.findOne({ name: data.name });
+
+  if (existingGame) throw new GameAlreadyExistsException();
+
+  // add theme and tag IDs to the game
+  try {
+    if (data && data.themes) {
+      const themePromises = data.themes.map((theme) =>
+        ThemeModel.findById(theme),
+      );
+      const themeResults = await Promise.all(themePromises);
+      themeResults.forEach((result) => {
+        if (!result) {
+          throw new ThemeNotFoundException();
+        }
+      });
+    }
+    if (data && data.tags) {
+      const tagPromises = data.tags.map((tag) => TagModel.findById(tag));
+      const tagResults = await Promise.all(tagPromises);
+      tagResults.forEach((result) => {
+        if (!result) {
+          throw new TagNotFoundException();
+        }
+      });
+    }
+  } catch (e) {
+    throw e;
   }
 
-  const game = new GameModel(data);
-  await game.save();
-  return game._id;
+  // create the game
+  try {
+    const game = await GameModel.create(data);
+    return game.toObject();
+  } catch (e) {
+    throw e;
+  }
 }
 
 export async function deleteGame(data: mongoose.Types.ObjectId) {
   await connectMongoDB();
   try {
-    const result = await GameModel.findByIdAndDelete(data.toString());
-    if (result?.get("webGLBuild")) {
+    const deletedGame = await GameModel.findByIdAndDelete(data.toString());
+    if (!deletedGame) {
+      throw new GameNotFoundException();
+    }
+    if (deletedGame?.webGLBuild) {
       await deleteBuild(data.toString());
     }
-    if (!result) {
-      throw new InvalidIdGameErrorException(
-        "Game with given ID does not exist.",
-      );
-    }
+    return deletedGame.toObject();
   } catch (e) {
     throw e;
   }
@@ -77,35 +80,41 @@ interface nextEditGame {
   id: string;
 }
 export async function editGame(allData: nextEditGame) {
-  //Don't modify until sure of how data is used in the API
   await connectMongoDB();
   const data: IEditGame = allData.data;
-  //Ensure every ObjectID actually represents a Document
-  //Ah yes
-  if (data && data.themes) {
-    const themeResults = await ThemeModel.find({ id: { $in: data.themes } });
-    if (themeResults.length !== data.themes.length) {
-      throw new InvalidIdGameErrorException(
-        "One of the given themes does not exist.",
-      ); //Using non-null assertion, as if condition should ensure data.tags is non-null
+  try {
+    if (data && data.themes) {
+      const themeResults = await ThemeModel.find({ id: { $in: data.themes } });
+      if (themeResults.length !== data.themes.length) {
+        throw new InvalidIdGameErrorException(
+          "One of the given themes does not exist.",
+        ); //Using non-null assertion, as if condition should ensure data.tags is non-null
+      }
+    }
+    if (data && data.tags) {
+      const tagResults = await TagModel.find({ id: { $in: data.tags } });
+      if (tagResults.length !== data.tags.length) {
+        throw new InvalidIdGameErrorException(
+          "One of the given tags does not exist.",
+        ); //Using non-null assertion, as if condition should ensure data.tags is non-null
+      }
     }
   }
-  if (data && data.tags) {
-    const tagResults = await TagModel.find({ id: { $in: data.tags } });
-    if (tagResults.length !== data.tags.length) {
-      throw new InvalidIdGameErrorException(
-        "One of the given tags does not exist.",
-      ); //Using non-null assertion, as if condition should ensure data.tags is non-null
+  try {
+    const newGame = await GameModel.findByIdAndUpdate(
+      allData.id,
+      allData.data,
+      {
+        new: true,
+      },
+    );
+    if (!newGame) {
+      throw new GameNotFoundException();
     }
+    return newGame;
+  } catch (e) {
+    throw e;
   }
-
-  const result = await GameModel.findByIdAndUpdate(allData.id, allData.data, {
-    new: false,
-  });
-  if (!result) {
-    throw new InvalidIdGameErrorException("Game with given ID does not exist.");
-  }
-  return result;
 }
 export async function getSelectedGames(
   query: z.infer<typeof GetGameQuerySchema>,
@@ -198,8 +207,12 @@ export async function getSelectedGames(
 
 export async function getGameById(id: string) {
   await connectMongoDB();
-  const game = await GameModel.findById(id)
-    .populate<ITheme>("themes")
-    .populate<ITag>("tags");
-  return game;
+  try {
+    const game = await GameModel.findById(id)
+      .populate<ITheme>("themes")
+      .populate<ITag>("tags");
+    return game;
+  } catch (e) {
+    throw e;
+  }
 }

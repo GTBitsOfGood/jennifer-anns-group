@@ -69,7 +69,7 @@ export function ProfileModal() {
     try {
       const response = await fetch(`/api/users/${currentUser?._id}`);
       const data = await response.json();
-      setUserData(data.data);
+      setUserData(data);
     } catch (error) {
       console.error("Error getting user:", error);
     }

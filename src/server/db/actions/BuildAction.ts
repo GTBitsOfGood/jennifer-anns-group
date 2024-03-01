@@ -20,6 +20,7 @@ export async function deleteBuild(id: string) {
       }),
   );
   await Promise.all(deletePromises);
+  return response.data.files;
 }
 
 export async function getBuildUploadUrl() {

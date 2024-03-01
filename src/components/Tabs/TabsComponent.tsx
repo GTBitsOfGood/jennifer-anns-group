@@ -8,7 +8,6 @@ import {
 } from "@chakra-ui/react";
 import styles from "@/styles/tabs.module.css";
 import { populatedGame } from "@/server/db/models/GameModel";
-import { z } from "zod";
 import theme from "../ui/tabsTheme";
 
 interface Props {
