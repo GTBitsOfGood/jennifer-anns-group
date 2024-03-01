@@ -78,7 +78,7 @@ function AddModal({ subject, open, setOpen }: Props) {
     Subject,
     (
       input: { name: string; games: string[] },
-      callback: { onSuccess: () => void }
+      callback: { onSuccess: () => void },
     ) => void
   > = {
     theme: (input, callback) => mutateTheme(input, callback),
@@ -112,10 +112,10 @@ function AddModal({ subject, open, setOpen }: Props) {
           onSuccess: () => {
             setOpen(false);
           },
-        }
+        },
       );
     },
-    [subject]
+    [subject],
   );
 
   const [nameError, setNameError] = useState<string | undefined>(undefined);
@@ -158,7 +158,7 @@ function AddModal({ subject, open, setOpen }: Props) {
             </div>
             <div className="flex flex-col gap-2">
               <Label className="text-lg font-normal">Select games</Label>
-              <div className="flex flex-row gap-2">
+              <div className="flex flex-row gap-x-2 gap-y-4 flex-wrap">
                 {games?.map((game) => {
                   return (
                     <div key={game._id}>

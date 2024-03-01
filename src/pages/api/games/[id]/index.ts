@@ -13,7 +13,7 @@ import { GenericUserErrorException } from "@/utils/exceptions/user";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   try {
     const gameId = req.query.id;
@@ -59,7 +59,7 @@ export default async function handler(
             return res.status(200).send({
               message: "Game successfully edited!",
             });
-          }
+          },
         );
     }
     return res.status(405).send({
