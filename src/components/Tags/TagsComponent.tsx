@@ -15,9 +15,9 @@ import { themeDataSchema, tagDataSchema } from "@/pages/games/[id]/edit";
 interface Props {
   mode: string;
   themes: z.infer<typeof themeDataSchema>[];
-  setThemes: Dispatch<z.infer<typeof themeDataSchema>[]>;
+  setThemes?: Dispatch<z.infer<typeof themeDataSchema>[]>;
   tags: z.infer<typeof tagDataSchema>[];
-  setTags: Dispatch<z.infer<typeof tagDataSchema>[]>;
+  setTags?: Dispatch<z.infer<typeof tagDataSchema>[]>;
 }
 
 const sortByTagType = (
@@ -42,17 +42,21 @@ export default function TagsComponent({
   const [search, setSearch] = useState(false);
 
   function removeTag(tag: z.infer<typeof tagDataSchema>) {
-    const newList = tags.filter((t) => {
-      return t.name !== tag.name;
-    });
-    setTags(newList);
+    if (setTags) {
+      const newList = tags.filter((t) => {
+        return t.name !== tag.name;
+      });
+      setTags(newList);
+    }
   }
 
   function removeTheme(theme: z.infer<typeof themeDataSchema>) {
-    const newList = themes.filter((t) => {
-      return t.name !== theme.name;
-    });
-    setThemes(newList);
+    if (setThemes) {
+      const newList = themes.filter((t) => {
+        return t.name !== theme.name;
+      });
+      setThemes(newList);
+    }
   }
 
   return (
@@ -99,7 +103,7 @@ export default function TagsComponent({
           ) : null}
         </div>
       </ChakraProvider>
-      {mode === "edit" && search ? (
+      {mode === "edit" && search && setThemes && setTags ? (
         <div className="mb-32 ml-[10vw] mt-7 font-sans">
           <SearchTagsComponent
             setSearch={setSearch}
