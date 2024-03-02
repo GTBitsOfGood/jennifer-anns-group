@@ -1,22 +1,30 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { gameSchema, tagSchema, themeSchema } from "@/utils/types";
+import { tagSchema, themeSchema } from "@/utils/types";
 import { z } from "zod";
 import TagsComponent from "@/components/Tags/TagsComponent";
 import TabsComponent from "@/components/Tabs/TabsComponent";
-import Link from "next/link";
 import React from "react";
 import DeleteGameComponent from "@/components/GameComponent/DeleteGameComponent";
+import { populatedGame } from "@/server/db/models/GameModel";
+
+export const themeDataSchema = themeSchema.extend({
+  _id: z.string().length(24),
+});
+
+export const tagDataSchema = tagSchema.extend({
+  _id: z.string().length(24),
+});
 
 const EditGamePage = () => {
   const router = useRouter();
   const gameID = router.query.id;
-  const [gameData, setGameData] = useState<z.infer<typeof gameSchema>>();
+  const [gameData, setGameData] = useState<populatedGame>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [name, setName] = useState("");
-  const [themes, setThemes] = useState<z.infer<typeof themeSchema>[]>();
-  const [tags, setTags] = useState<z.infer<typeof tagSchema>[]>();
+  const [themes, setThemes] = useState<z.infer<typeof themeDataSchema>[]>();
+  const [tags, setTags] = useState<z.infer<typeof tagDataSchema>[]>();
   const [description, setDescription] = useState("");
 
   const getGame = async () => {
@@ -26,15 +34,19 @@ const EditGamePage = () => {
         setError("Failed to fetch game");
       }
       const data = await response.json();
-      setGameData(data.data);
-      setName(data.data.name);
-      setThemes(data.data.themes);
-      setTags(data.data.tags);
-      setDescription(data.data.description);
+      setGameData(data);
+      setName(data.name);
+      setThemes(data.themes);
+      setTags(data.tags);
+      setDescription(data.description);
       setLoading(false);
     } catch (error: any) {
       setError(error.message);
     }
+  };
+
+  const discardChanges = async () => {
+    router.push(`/games/${gameID}`);
   };
 
   const saveChanges = async () => {
@@ -51,7 +63,8 @@ const EditGamePage = () => {
       themes: themeIds,
       tags: tagIds,
     };
-    const result = fetch(`/api/games/${gameID}`, {
+
+    await fetch(`/api/games/${gameID}`, {
       method: "PUT",
       body: JSON.stringify(changes),
     });
@@ -105,11 +118,12 @@ const EditGamePage = () => {
       ) : null}
       {/* <div className="absolute"> */}
       <div className="mx-auto my-24 flex w-[80vw] justify-end">
-        <Link href={`/games/${gameID}`}>
-          <button className="rounded-xl bg-input-border px-6 py-3 font-sans text-2xl font-medium text-blue-primary">
-            Discard changes
-          </button>
-        </Link>
+        <button
+          onClick={discardChanges}
+          className="rounded-xl bg-input-border px-6 py-3 font-sans text-2xl font-medium text-blue-primary"
+        >
+          Discard changes
+        </button>
         <button
           onClick={saveChanges}
           className="ml-8 rounded-xl bg-blue-primary px-6 py-3 font-sans text-2xl font-medium text-white"

@@ -7,24 +7,22 @@ import {
 } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import theme from "../ui/tagsTheme";
-import { tagSchema, themeSchema } from "@/utils/types";
-import { populatedGame } from "@/server/db/models/GameModel";
 import { z } from "zod";
 import { Dispatch, useState } from "react";
 import SearchTagsComponent from "./SearchTagsComponent";
+import { themeDataSchema, tagDataSchema } from "@/pages/games/[id]/edit";
 
 interface Props {
   mode: string;
-  themes: z.infer<typeof themeSchema>[];
-  setThemes: Dispatch<z.infer<typeof themeSchema>[]>;
-  tags: z.infer<typeof tagSchema>[];
-  setTags: Dispatch<z.infer<typeof tagSchema>[]>;
-  gameData: populatedGame;
+  themes: z.infer<typeof themeDataSchema>[];
+  setThemes: Dispatch<z.infer<typeof themeDataSchema>[]>;
+  tags: z.infer<typeof tagDataSchema>[];
+  setTags: Dispatch<z.infer<typeof tagDataSchema>[]>;
 }
 
 const sortByTagType = (
-  tagA: z.infer<typeof tagSchema>,
-  tagB: z.infer<typeof tagSchema>,
+  tagA: z.infer<typeof tagDataSchema>,
+  tagB: z.infer<typeof tagDataSchema>,
 ) => {
   if (tagA.type === "accessibility" && tagB.type !== "accessibility") {
     return -1;
@@ -43,28 +41,14 @@ export default function TagsComponent({
 }: Props) {
   const [search, setSearch] = useState(false);
 
-  // async function deleteTag(tag: z.infer<typeof tagSchema>) {
-  //   const tagID = tag._id;
-  //   const response = await fetch(`/api/tags/${tagID}`, {
-  //     method: "DELETE",
-  //   });
-  // }
-
-  // async function deleteTheme(theme: z.infer<typeof tagSchema>) {
-  //   const themeID = theme._id;
-  //   const response = await fetch(`/api/themes/${themeID}`, {
-  //     method: "DELETE",
-  //   });
-  // }
-
-  function removeTag(tag: z.infer<typeof tagSchema>) {
+  function removeTag(tag: z.infer<typeof tagDataSchema>) {
     const newList = tags.filter((t) => {
       return t.name !== tag.name;
     });
     setTags(newList);
   }
 
-  function removeTheme(theme: z.infer<typeof themeSchema>) {
+  function removeTheme(theme: z.infer<typeof themeDataSchema>) {
     const newList = themes.filter((t) => {
       return t.name !== theme.name;
     });

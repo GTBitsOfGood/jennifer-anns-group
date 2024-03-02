@@ -3,21 +3,22 @@ import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import searchTheme from "../ui/searchTagsTheme";
 import { ThemeProvider } from "@mui/material/styles";
+import Paper from "@mui/material/Paper";
 import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import { z } from "zod";
-import { tagSchema, themeSchema } from "@/utils/types";
+import { themeDataSchema, tagDataSchema } from "@/pages/games/[id]/edit";
 
 interface Tags {
-  accessibility: z.infer<typeof tagSchema>[];
-  custom: z.infer<typeof tagSchema>[];
+  accessibility: z.infer<typeof tagDataSchema>[];
+  custom: z.infer<typeof tagDataSchema>[];
 }
 
 interface Props {
   setSearch: Dispatch<SetStateAction<boolean>>;
-  currThemes: z.infer<typeof themeSchema>[];
-  setCurrThemes: Dispatch<z.infer<typeof themeSchema>[]>;
-  currTags: z.infer<typeof tagSchema>[];
-  setCurrTags: Dispatch<z.infer<typeof tagSchema>[]>;
+  currThemes: z.infer<typeof themeDataSchema>[];
+  setCurrThemes: Dispatch<z.infer<typeof themeDataSchema>[]>;
+  currTags: z.infer<typeof tagDataSchema>[];
+  setCurrTags: Dispatch<z.infer<typeof tagDataSchema>[]>;
 }
 
 export default function SearchTagsComponent({
@@ -27,12 +28,14 @@ export default function SearchTagsComponent({
   currTags,
   setCurrTags,
 }: Props) {
-  const [themes, setThemes] = useState<z.infer<typeof themeSchema>[]>();
+  const [themes, setThemes] = useState<z.infer<typeof themeDataSchema>[]>();
   const tagsVar: Tags = {
     accessibility: [],
     custom: [],
   };
-  type TagOrTheme = z.infer<typeof tagSchema> | z.infer<typeof themeSchema>;
+  type TagOrTheme =
+    | z.infer<typeof tagDataSchema>
+    | z.infer<typeof themeDataSchema>;
   const [tags, setTags] = useState<Tags>(tagsVar);
   const [options, setOptions] = useState<TagOrTheme[]>([]);
 
@@ -89,16 +92,26 @@ export default function SearchTagsComponent({
 
   const handleSelection = (
     event,
-    newValue: z.infer<typeof tagSchema> | z.infer<typeof themeSchema>,
+    newValue: z.infer<typeof tagDataSchema> | z.infer<typeof themeDataSchema>,
   ) => {
     if (newValue) {
-      if (tagSchema.safeParse(newValue).success) {
+      if (tagDataSchema.safeParse(newValue).success) {
         setCurrTags((currTags) => [...currTags, newValue]);
       } else {
         setCurrThemes((currThemes) => [...currThemes, newValue]);
       }
     }
     setSearch(false);
+  };
+
+  const CustomPaper = (props: React.JSX.Element) => {
+    return (
+      <Paper
+        sx={{ border: "1px solid black", borderRadius: "10px" }}
+        elevation={0}
+        {...props}
+      />
+    );
   };
 
   return (
@@ -110,7 +123,12 @@ export default function SearchTagsComponent({
         getOptionLabel={(t) => t.name}
         className="sans-serif"
         onChange={handleSelection}
+        PaperComponent={CustomPaper}
         sx={{
+          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+            {
+              border: "1px solid black",
+            },
           width: 560,
         }}
         renderInput={(params) => (

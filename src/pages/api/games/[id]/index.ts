@@ -85,6 +85,7 @@ async function editGameHandler(req: NextApiRequest, res: NextApiResponse) {
     console.log("EDIT GAME", updateData.data);
 
     const editedGame = await editGame({ id: gameId, data: updateData.data });
+    console.log(editedGame);
     return res.status(HTTP_STATUS_CODE.OK).send(editedGame);
   } catch (e: any) {
     if (e instanceof GameException) {
