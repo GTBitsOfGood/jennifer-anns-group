@@ -105,13 +105,15 @@ export default function TagsComponent({
       </ChakraProvider>
       {mode === "edit" && search && setThemes && setTags ? (
         <div className="mb-32 ml-[10vw] mt-7 font-sans">
-          <SearchTagsComponent
-            setSearch={setSearch}
-            currThemes={themes}
-            setCurrThemes={setThemes}
-            currTags={tags}
-            setCurrTags={setTags}
-          />
+          <div className="absolute">
+            <SearchTagsComponent
+              setSearch={setSearch}
+              currThemes={themes}
+              setCurrThemes={setThemes}
+              currTags={tags}
+              setCurrTags={setTags}
+            />
+          </div>
         </div>
       ) : null}
     </div>

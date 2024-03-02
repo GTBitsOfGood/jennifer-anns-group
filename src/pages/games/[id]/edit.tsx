@@ -40,24 +40,23 @@ const EditGamePage = () => {
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
 
-  useEffect(() => {
-    if (!session) {
-      router.push("/");
-    }
-  }, [session]);
+  // useEffect(() => {
+  //   if (!session) {
+  //     router.push("/");
+  //   }
+  // }, [session]);
 
   useEffect(() => {
-    console.log(currentUser);
     if (currentUser) {
       getUserData();
     }
   }, [currentUser]);
 
-  useEffect(() => {
-    if (userData && userData.label !== "administrator") {
-      router.push("/");
-    }
-  }, [userData]);
+  // useEffect(() => {
+  //   if (userData && userData.label !== "administrator") {
+  //     router.push("/");
+  //   }
+  // }, [userData]);
 
   async function getUserData() {
     try {
@@ -158,22 +157,22 @@ const EditGamePage = () => {
           setTags={setTags}
         />
       ) : null}
-      {/* <div className="absolute"> */}
-      <div className="mx-auto my-24 flex w-[80vw] justify-end">
-        <button
-          onClick={discardChanges}
-          className="rounded-xl bg-input-border px-6 py-3 font-sans text-2xl font-medium text-blue-primary"
-        >
-          Discard changes
-        </button>
-        <button
-          onClick={saveChanges}
-          className="ml-8 rounded-xl bg-blue-primary px-6 py-3 font-sans text-2xl font-medium text-white"
-        >
-          Save changes
-        </button>
+      <div className="mx-auto mb-40 mt-24 flex w-[80vw] justify-end">
+        <div className="absolute">
+          <button
+            onClick={discardChanges}
+            className="rounded-xl bg-input-border px-6 py-3 font-sans text-2xl font-medium text-blue-primary"
+          >
+            Discard changes
+          </button>
+          <button
+            onClick={saveChanges}
+            className="ml-8 rounded-xl bg-blue-primary px-6 py-3 font-sans text-2xl font-medium text-white"
+          >
+            Save changes
+          </button>
+        </div>
       </div>
-      {/* </div> */}
     </div>
   );
 };

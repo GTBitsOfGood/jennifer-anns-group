@@ -10,7 +10,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import React from "react";
+import { useRef } from "react";
 import theme from "../ui/deleteDialogTheme";
 
 interface Props {
@@ -21,7 +21,7 @@ export default function DeleteGameDialog({ gameName }: Props) {
   const router = useRouter();
   const gameID = router.query.id;
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const cancelRef = React.useRef();
+  const cancelRef = useRef<HTMLButtonElement | null>(null);
 
   async function deleteGame() {
     fetch(`/api/games/${gameID}`, {
