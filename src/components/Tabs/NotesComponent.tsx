@@ -161,9 +161,7 @@ export default function NotesComponent({
                       </div>
                       <CheckIcon
                         className="ml-6 inline-block shrink-0 cursor-pointer self-center"
-                        onClick={() => {
-                          handleEditNote();
-                        }}
+                        onClick={() => handleEditNote()}
                       />
                       <TrashIcon
                         className="ml-4 inline-block shrink-0 cursor-pointer self-center"
