@@ -2,6 +2,7 @@ FROM node:21 AS deps
 WORKDIR /app
 
 COPY package*.json ./
+COPY entrypoint.sh ./
 RUN npm cache clean --force
 RUN npm install
 
