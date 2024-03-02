@@ -49,6 +49,7 @@ export default function NotesComponent({
       const data = await response.json();
       return data;
     },
+    retry: 3,
   });
 
   async function handleAddNote() {
