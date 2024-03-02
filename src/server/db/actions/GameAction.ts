@@ -191,7 +191,7 @@ export async function getSelectedGames(
       //Remove webGL for further filtering based on other normal games.
       query.gameBuilds = query.gameBuilds.filter((item) => item !== "webgl");
     }
-    filters.builds = { $all: query.gameBuilds };
+    filters.builds = { "builds.type": { $all: query.gameBuilds } };
   }
 
   let games = await GameModel.find(filters)
