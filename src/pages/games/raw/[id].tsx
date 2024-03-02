@@ -5,10 +5,6 @@ import RawEmbeddedGame from "@/components/RawEmbeddedGame";
 const GamePage = () => {
   const gameId = useRouter().query.id;
 
-  if (!gameId || typeof window === "undefined") {
-    return <></>;
-  }
-
   useEffect(() => {
     const body = document.querySelector("body");
     if (body === null) {
@@ -17,6 +13,10 @@ const GamePage = () => {
 
     body.classList.add("overflow-hidden");
   }, []);
+
+  if (!gameId || typeof window === "undefined") {
+    return <></>;
+  }
 
   return <RawEmbeddedGame gameId={gameId as string} />;
 };
