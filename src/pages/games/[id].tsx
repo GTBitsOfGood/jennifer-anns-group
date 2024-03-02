@@ -3,15 +3,14 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import TabsComponent from "../../components/Tabs/TabsComponent";
 import TagsComponent from "../../components/Tags/TagsComponent";
-import { gameSchema } from "@/utils/types";
-import { z } from "zod";
 import EmbeddedGame from "@/components/EmbeddedGame";
 import NotesComponent from "@/components/Tabs/NotesComponent";
 import { useSession } from "next-auth/react";
+import { IGame } from "@/server/db/models/GameModel";
 
 const GamePage = () => {
   const gameId = useRouter().query.id;
-  const [gameData, setGameData] = useState<z.infer<typeof gameSchema>>();
+  const [gameData, setGameData] = useState<IGame & { _id: string }>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { data: session } = useSession();
