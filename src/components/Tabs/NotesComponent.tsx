@@ -24,21 +24,20 @@ function formatDate(date: Date) {
   return month + " - " + day + " - " + year;
 }
 
-interface Props {
+interface NotesComponentProps {
   userId: string;
   gameData: IGame & { _id: string };
 }
 
-export default function NotesComponent({ gameData, userId }: Props) {
+export default function NotesComponent({
+  gameData,
+  userId,
+}: NotesComponentProps) {
   const [newNote, setNewNote] = useState("");
   const [editNoteId, setEditNoteId] = useState("");
   const [editNote, setEditNote] = useState("");
 
-  const {
-    error,
-    data: notes,
-    refetch,
-  } = useQuery({
+  const { data: notes, refetch } = useQuery({
     queryKey: ["notes"],
     queryFn: async () => {
       const response = await fetch(
@@ -68,7 +67,7 @@ export default function NotesComponent({ gameData, userId }: Props) {
     );
 
     setNewNote("");
-    refetch();
+    await refetch();
   }
 
   async function handleDeleteNote(noteId: string) {
@@ -78,7 +77,7 @@ export default function NotesComponent({ gameData, userId }: Props) {
       },
     });
 
-    refetch();
+    await refetch();
   }
 
   async function handleEditNote() {
@@ -154,7 +153,7 @@ export default function NotesComponent({ gameData, userId }: Props) {
                       <div className="w-full">
                         <TextArea
                           defaultValue={note.description}
-                          className="h-24"
+                          className="h-24 text-base"
                           onChange={(e) => {
                             setEditNote(e.target.value);
                           }}
