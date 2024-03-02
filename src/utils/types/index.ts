@@ -49,13 +49,20 @@ export const editGameSchema = z.object({
   videoTrailer: z.string().url().optional(),
 });
 
+export enum UserLabel {
+  Educator = "educator",
+  Student = "student",
+  Parent = "parent",
+  Administrator = "administrator",
+}
+
 // User
 export const userSchema = z.object({
   email: z.string().email("Not a valid email"),
   hashedPassword: z.string(),
   firstName: z.string(),
   lastName: z.string(),
-  label: z.enum(["educator", "student", "parent", "administrator"]),
+  label: z.nativeEnum(UserLabel),
 });
 
 // For changing password

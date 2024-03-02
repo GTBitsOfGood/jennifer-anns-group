@@ -72,6 +72,7 @@ function EditProfileModal(props: EditProps) {
             _id: props.userData?._id!,
           });
           setInvalidEmail("");
+          window.location.reload();
         }
       } catch (error) {
         console.error("Error editing user:", error);

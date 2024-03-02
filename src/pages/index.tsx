@@ -1,16 +1,39 @@
-import { Footer } from "@/components/Header/Footer";
-import Header from "@/components/Header/Header";
-import { UserType } from "@/utils/types/userTypes";
-import React from "react";
+import { Footer } from "@/components/Navigation/Footer";
+import Header from "@/components/Navigation/Header";
+import { SessionProvider } from "next-auth/react";
+import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { userDataSchema } from "@/components/ProfileModal/ProfileModal";
+import { z } from "zod";
 
 const Home = () => {
+  const { data: session } = useSession();
+  const currentUser = session?.user;
+  const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
+
+  useEffect(() => {
+    if (currentUser) {
+      getUserData();
+    }
+  }, [currentUser]);
+
+  async function getUserData() {
+    try {
+      const response = await fetch(`/api/users/${currentUser?._id}`);
+      const data = await response.json();
+      setUserData(data.data);
+    } catch (error) {
+      console.error("Error getting user:", error);
+    }
+  }
+
   return (
     <div>
-      <Header user={UserType.Public} />
-      <Header user={UserType.AccountHolder} />
-      <Header user={UserType.Admin} />
-      <br></br>
-      <Footer />
+      <SessionProvider>
+        <Header label={userData?.label} />
+        <br></br>
+        <Footer />
+      </SessionProvider>
     </div>
   );
 };

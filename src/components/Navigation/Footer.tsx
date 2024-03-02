@@ -1,11 +1,11 @@
 export const Footer = () => {
-  // replace with social links when nonprofit gets back
+  // replace with actual social links when nonprofit gets back
   const socialLinks = {
-    Facebook: ["www.facebook.com", "11", "19"],
-    Twitter: ["www.x.com", "19", "15"],
-    Instagram: ["www.instagram.com", "19", "19"],
-    LinkedIn: ["www.linkedin.com", "19", "18"],
-    YouTube: ["www.youtube.com", "21", "15"],
+    Facebook: ["https://www.facebook.com", "11", "19"],
+    Twitter: ["https://www.x.com", "19", "15"],
+    Instagram: ["https://www.instagram.com", "19", "19"],
+    LinkedIn: ["https://www.linkedin.com", "19", "18"],
+    YouTube: ["https://www.youtube.com", "21", "15"],
   };
 
   return (
@@ -36,6 +36,7 @@ export const Footer = () => {
           <div
             className="inline-flex items-center justify-start gap-[22px]"
             style={{ marginTop: "3.125vh" }}
+            aria-label="Social Links"
           >
             {Object.entries(socialLinks).map(
               ([name, [link, width, height]]) => (
@@ -43,6 +44,7 @@ export const Footer = () => {
                   <img
                     src={`/social/${name}.svg`}
                     className={`w-[${width}px] h-[${height}px]`}
+                    alt={name}
                   />
                 </a>
               ),
@@ -80,24 +82,7 @@ export const Footer = () => {
           >
             Contact us
           </div>
-          <div className="flex gap-[6px]" style={{ paddingBottom: "22px" }}>
-            <img src="/contact/globe.svg"></img>
-            <div className="font-['DM Sans'] text-lg font-normal leading-tight text-slate-500">
-              JenniferAnn.org
-            </div>
-          </div>
-          <div className="flex gap-[6px]" style={{ paddingBottom: "22px" }}>
-            <img src="/contact/Email.svg"></img>
-            <div className="font-['DM Sans'] text-lg font-normal leading-tight text-slate-500">
-              contact@JenniferAnn.org
-            </div>
-          </div>
-          <div className="flex gap-[6px]" style={{ paddingBottom: "22px" }}>
-            <img src="/contact/phone.svg"></img>
-            <div className="font-['DM Sans'] text-lg font-normal leading-tight text-slate-500">
-              877-786-7838 (877 STOP TDV)
-            </div>
-          </div>
+          <img src="/contact.svg"></img>
         </div>
       </div>
       <div style={{ marginBottom: "79px" }}>
