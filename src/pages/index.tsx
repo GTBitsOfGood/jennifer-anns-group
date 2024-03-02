@@ -1,15 +1,16 @@
-import { Button } from "@/components/ui/button";
-import { signOut, useSession } from "next-auth/react";
+import { Footer } from "@/components/Header/Footer";
+import Header from "@/components/Header/Header";
+import { UserType } from "@/utils/types/userTypes";
 import React from "react";
 
 const Home = () => {
-  const { data, status } = useSession();
   return (
     <div>
-      <h1 className="ml-10 mt-10 text-4xl text-orange-500">Hello World</h1>
-      {status === "authenticated" ? (
-        <Button onClick={() => signOut()}>Log out</Button>
-      ) : null}
+      <Header user={UserType.Public} />
+      <Header user={UserType.AccountHolder} />
+      <Header user={UserType.Admin} />
+      <br></br>
+      <Footer />
     </div>
   );
 };
