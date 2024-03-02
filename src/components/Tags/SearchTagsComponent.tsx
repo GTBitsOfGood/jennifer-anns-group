@@ -3,7 +3,7 @@ import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import searchTheme from "../ui/searchTagsTheme";
 import { ThemeProvider } from "@mui/material/styles";
-import Paper from "@mui/material/Paper";
+import Paper, { PaperProps } from "@mui/material/Paper";
 import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import { z } from "zod";
 import { themeDataSchema, tagDataSchema } from "@/pages/games/[id]/edit";
@@ -90,21 +90,19 @@ export default function SearchTagsComponent({
     setTags(data);
   }
 
-  const handleSelection = (
-    event,
-    newValue: z.infer<typeof tagDataSchema> | z.infer<typeof themeDataSchema>,
-  ) => {
+  const handleSelection = (event: React.SyntheticEvent, newValue: any) => {
+    console.log(event);
     if (newValue) {
       if (tagDataSchema.safeParse(newValue).success) {
-        setCurrTags((currTags) => [...currTags, newValue]);
+        setCurrTags([...currTags, newValue]);
       } else {
-        setCurrThemes((currThemes) => [...currThemes, newValue]);
+        setCurrThemes([...currThemes, newValue]);
       }
     }
     setSearch(false);
   };
 
-  const CustomPaper = (props: React.JSX.Element) => {
+  const CustomPaper: React.FC<PaperProps> = (props) => {
     return (
       <Paper
         sx={{ border: "1px solid black", borderRadius: "10px" }}

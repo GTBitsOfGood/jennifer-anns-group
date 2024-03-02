@@ -91,7 +91,11 @@ const GamePage = () => {
           </div>
         </Link>
       ) : null}
-      <TabsComponent mode="view" gameData={gameData} />
+      <TabsComponent
+        mode="view"
+        description={gameData.description}
+        gameData={gameData}
+      />
       <TagsComponent
         mode="view"
         themes={gameData.themes}

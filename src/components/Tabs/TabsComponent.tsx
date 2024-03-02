@@ -14,7 +14,7 @@ import { Dispatch, SetStateAction } from "react";
 interface Props {
   mode: string;
   description: string;
-  setDescription: Dispatch<SetStateAction<string>>;
+  setDescription?: Dispatch<SetStateAction<string>>;
   gameData: populatedGame;
 }
 
@@ -39,7 +39,11 @@ export default function TabsComponent({
                 <textarea
                   className="h-52 w-full !resize-none rounded-[20px] border border-[20px] border-solid border-transparent bg-input-bg font-sans !outline-none"
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={(e) => {
+                    if (setDescription) {
+                      setDescription(e.target.value);
+                    }
+                  }}
                 />
               </div>
             ) : (

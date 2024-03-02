@@ -1,12 +1,13 @@
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { tagSchema, themeSchema } from "@/utils/types";
+import { useEffect, useState } from "react";
+import { tagSchema, themeSchema, userSchema } from "@/utils/types";
 import { z } from "zod";
 import TagsComponent from "@/components/Tags/TagsComponent";
 import TabsComponent from "@/components/Tabs/TabsComponent";
 import React from "react";
 import DeleteGameComponent from "@/components/GameComponent/DeleteGameComponent";
 import { populatedGame } from "@/server/db/models/GameModel";
+import { useSession } from "next-auth/react";
 
 export const themeDataSchema = themeSchema.extend({
   _id: z.string().length(24),
@@ -26,6 +27,47 @@ const EditGamePage = () => {
   const [themes, setThemes] = useState<z.infer<typeof themeDataSchema>[]>();
   const [tags, setTags] = useState<z.infer<typeof tagDataSchema>[]>();
   const [description, setDescription] = useState("");
+
+  const idSchema = z.string().length(24);
+
+  const userDataSchema = userSchema
+    .extend({
+      _id: idSchema,
+    })
+    .omit({ hashedPassword: true });
+
+  const { data: session } = useSession();
+  const currentUser = session?.user;
+  const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
+
+  useEffect(() => {
+    if (!session) {
+      router.push("/");
+    }
+  }, [session]);
+
+  useEffect(() => {
+    console.log(currentUser);
+    if (currentUser) {
+      getUserData();
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (userData && userData.label !== "administrator") {
+      router.push("/");
+    }
+  }, [userData]);
+
+  async function getUserData() {
+    try {
+      const response = await fetch(`/api/users/${currentUser?._id}`);
+      const data = await response.json();
+      setUserData(data);
+    } catch (error) {
+      console.error("Error getting user:", error);
+    }
+  }
 
   const getGame = async () => {
     try {
