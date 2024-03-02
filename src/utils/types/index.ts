@@ -62,7 +62,7 @@ export const editGameSchema = z.object({
   multiClass: z.boolean().optional(),
   description: z.string().optional(),
   webGLBuild: z.boolean().optional(),
-  builds: z.array(buildSchema),
+  builds: z.array(buildSchema).optional(),
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
   answerKey: z.string().url().optional(),
