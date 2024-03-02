@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { z } from "zod";
 
 const verifyObjectId = (value: string) => {
@@ -61,11 +62,18 @@ export const editGameSchema = z.object({
   multiClass: z.boolean().optional(),
   description: z.string().optional(),
   webGLBuild: z.boolean().optional(),
-  builds: z.array(buildSchema).optional(),
+  builds: z.array(buildSchema),
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
   answerKey: z.string().url().optional(),
   videoTrailer: z.string().url().optional(),
+});
+
+// Notes
+export const noteSchema = z.object({
+  date: z.string().pipe(z.coerce.date()),
+  description: z.string(),
+  gameId: z.string().refine(verifyObjectId).optional(),
 });
 
 // User
@@ -75,6 +83,7 @@ export const userSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   label: z.enum(["educator", "student", "parent", "administrator"]),
+  notes: z.array(noteSchema),
 });
 
 // For changing password

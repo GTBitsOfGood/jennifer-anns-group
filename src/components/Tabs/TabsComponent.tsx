@@ -6,7 +6,6 @@ import {
   Tab,
   TabPanel,
 } from "@chakra-ui/react";
-import styles from "@/styles/tabs.module.css";
 import { gameSchema } from "@/utils/types";
 import { z } from "zod";
 import theme from "../ui/tabsTheme";
@@ -18,13 +17,13 @@ interface Props {
 export default function TabsComponent({ gameData }: Props) {
   return (
     <ChakraProvider theme={theme}>
-      <Tabs colorScheme="brand" className={styles.tabs}>
-        <TabList className={styles.tabTitle}>
+      <Tabs colorScheme="brand" className="m-auto w-5/6 font-sans">
+        <TabList>
           <Tab>Description</Tab>
           {gameData.parentingGuide ? <Tab>Parenting Guide</Tab> : null}
           {gameData.lesson ? <Tab>Lesson Plan</Tab> : null}
         </TabList>
-        <TabPanels className={styles.tabContent}>
+        <TabPanels className="mb-12 mt-8 text-gray-500">
           <TabPanel p="0px">
             <p>{gameData.description}</p>
           </TabPanel>

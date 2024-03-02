@@ -24,6 +24,7 @@ const config = {
         "input-bg": "#FAFBFC",
         "input-border": "#D9D9D9",
         grey: "#666666",
+        "gray-500": "#667085",
         placeholder: "#A3AED0",
       },
       fontFamily: {

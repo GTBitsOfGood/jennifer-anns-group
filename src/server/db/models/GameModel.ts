@@ -1,7 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { z } from "zod";
 import { buildSchema, gameSchema, AppType } from "../../../utils/types";
-import { ObjectId } from "mongodb";
 
 interface IBuild extends z.infer<typeof buildSchema> {}
 export interface IGame extends z.infer<typeof gameSchema> {}

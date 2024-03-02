@@ -11,7 +11,7 @@ import {
 import { UserAlreadyExistsException } from "@/utils/exceptions";
 
 export const createUserSchema = userSchema
-  .omit({ hashedPassword: true })
+  .omit({ hashedPassword: true, notes: true })
   .extend({
     password: z.string(),
   });
