@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import NoteModel, { INote } from "../models/NoteModel";
+import { INote } from "../models/NoteModel";
 import UserModel, { IUser } from "../models/UserModel";
 import connectMongoDB from "../mongodb";
 import { Document } from "mongoose";
@@ -27,6 +27,27 @@ export async function createNote(
   try {
     await user.save();
     return user.notes[0];
+  } catch (e) {
+    throw e;
+  }
+}
+
+export async function updateNote(userId: string, noteId: string, data: INote) {
+  await connectMongoDB();
+
+  try {
+    const res = await UserModel.findOneAndUpdate(
+      { _id: userId, "notes._id": noteId },
+      {
+        $set: {
+          "notes.$.date": data.date,
+          "notes.$.description": data.description,
+          "notes.$.gameId": data.gameId,
+        },
+      },
+      { new: true },
+    );
+    return res;
   } catch (e) {
     throw e;
   }

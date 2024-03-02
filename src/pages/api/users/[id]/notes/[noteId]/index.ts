@@ -1,10 +1,12 @@
-import { deleteNote } from "@/server/db/actions/NoteAction";
+import { deleteNote, updateNote } from "@/server/db/actions/NoteAction";
 import {
   HTTP_INTERNAL_SERVER_ERROR,
   HTTP_METHOD_NOT_ALLOWED,
   HTTP_NOT_FOUND,
 } from "@/utils/consts";
 import { UserDoesNotExistException } from "@/utils/exceptions";
+import { noteSchema } from "@/utils/types";
+import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -15,6 +17,18 @@ export default async function handler(
   const noteId = req.query.noteId as string;
 
   switch (req.method) {
+    case "PUT":
+      const updateData = noteSchema.safeParse(JSON.parse(req.body));
+      if (!updateData.success) {
+        return res.status(422).send({
+          error: updateData.error.format(),
+        });
+      }
+      return await updateNote(id, noteId, updateData.data).then(() => {
+        return res.status(200).send({
+          message: "Note successfully edited!",
+        });
+      });
     case "DELETE":
       try {
         const result = await deleteNote(id, noteId);
