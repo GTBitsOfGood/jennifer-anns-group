@@ -1,32 +1,21 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { tagSchema, themeSchema, userSchema } from "@/utils/types";
 import { z } from "zod";
 import TagsComponent from "@/components/Tags/TagsComponent";
 import TabsComponent from "@/components/Tabs/TabsComponent";
 import React from "react";
 import DeleteGameComponent from "@/components/GameComponent/DeleteGameComponent";
-import { populatedGame } from "@/server/db/models/GameModel";
+import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { useSession } from "next-auth/react";
-
-export const themeDataSchema = themeSchema.extend({
-  _id: z.string().length(24),
-});
-
-export const tagDataSchema = tagSchema.extend({
-  _id: z.string().length(24),
-});
 
 const EditGamePage = () => {
   const router = useRouter();
   const gameID = router.query.id;
-  const [gameData, setGameData] = useState<populatedGame>();
+  const [gameData, setGameData] = useState<populatedGameWithId>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [name, setName] = useState("");
-  const [themes, setThemes] = useState<z.infer<typeof themeDataSchema>[]>();
-  const [tags, setTags] = useState<z.infer<typeof tagDataSchema>[]>();
-  const [description, setDescription] = useState("");
 
   const idSchema = z.string().length(24);
 
@@ -77,12 +66,20 @@ const EditGamePage = () => {
       const data = await response.json();
       setGameData(data);
       setName(data.name);
-      setThemes(data.themes);
-      setTags(data.tags);
-      setDescription(data.description);
       setLoading(false);
     } catch (error: any) {
       setError(error.message);
+    }
+  };
+
+  const changeName = (e: ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setName(newValue);
+    if (gameData) {
+      setGameData({
+        ...gameData,
+        name: name,
+      });
     }
   };
 
@@ -91,23 +88,23 @@ const EditGamePage = () => {
   };
 
   const saveChanges = async () => {
-    const themeIds = themes?.map((theme) => {
+    const themeIds = gameData?.themes.map((theme) => {
       return theme._id;
     });
-    const tagIds = tags?.map((tag) => {
+    const tagIds = gameData?.tags.map((tag) => {
       return tag._id;
     });
 
-    const changes = {
-      name: name,
-      description: description,
-      themes: themeIds,
+    const putData = {
       tags: tagIds,
+      themes: themeIds,
+      description: gameData?.description,
+      name: name,
     };
 
     await fetch(`/api/games/${gameID}`, {
       method: "PUT",
-      body: JSON.stringify(changes),
+      body: JSON.stringify(putData),
     });
 
     router.push(`/games/${gameID}`);
@@ -136,7 +133,7 @@ const EditGamePage = () => {
           className="mt-[126px] rounded-[20px] border border-solid border-grey bg-input-bg py-2.5 text-center font-sans text-[56px] font-semibold !outline-none"
           type="text"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={changeName}
         />
       </div>
       <div className="mx-auto flex w-[80vw] justify-end">
@@ -144,17 +141,14 @@ const EditGamePage = () => {
       </div>
       <TabsComponent
         mode="edit"
-        description={description}
-        setDescription={setDescription}
         gameData={gameData}
+        setGameData={setGameData}
       />
-      {tags && themes ? (
+      {gameData.tags && gameData.themes ? (
         <TagsComponent
           mode="edit"
-          themes={themes}
-          setThemes={setThemes}
-          tags={tags}
-          setTags={setTags}
+          gameData={gameData}
+          setGameData={setGameData}
         />
       ) : null}
       <div className="mx-auto mb-40 mt-24 flex w-[80vw] justify-end">

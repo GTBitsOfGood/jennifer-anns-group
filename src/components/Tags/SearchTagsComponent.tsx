@@ -1,12 +1,18 @@
 import * as React from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-import searchTheme from "../ui/searchTagsTheme";
-import { ThemeProvider } from "@mui/material/styles";
 import Paper, { PaperProps } from "@mui/material/Paper";
 import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import { z } from "zod";
-import { themeDataSchema, tagDataSchema } from "@/pages/games/[id]/edit";
+import { themeSchema, tagSchema } from "@/utils/types";
+
+const themeDataSchema = themeSchema.extend({
+  _id: z.string().length(24),
+});
+
+const tagDataSchema = tagSchema.extend({
+  _id: z.string().length(24),
+});
 
 interface Tags {
   accessibility: z.infer<typeof tagDataSchema>[];
@@ -91,7 +97,6 @@ export default function SearchTagsComponent({
   }
 
   const handleSelection = (event: React.SyntheticEvent, newValue: any) => {
-    console.log(event);
     if (newValue) {
       if (tagDataSchema.safeParse(newValue).success) {
         setCurrTags([...currTags, newValue]);
@@ -113,7 +118,7 @@ export default function SearchTagsComponent({
   };
 
   return (
-    <ThemeProvider theme={searchTheme}>
+    <div>
       <Autocomplete
         disablePortal
         id="combo-box-demo"
@@ -133,6 +138,6 @@ export default function SearchTagsComponent({
           <TextField {...params} placeholder="Search themes/tags" />
         )}
       />
-    </ThemeProvider>
+    </div>
   );
 }

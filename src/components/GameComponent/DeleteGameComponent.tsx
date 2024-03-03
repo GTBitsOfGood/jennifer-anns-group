@@ -1,5 +1,4 @@
 import {
-  ChakraProvider,
   AlertDialog,
   AlertDialogBody,
   AlertDialogFooter,
@@ -11,7 +10,6 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useRef } from "react";
-import theme from "../ui/deleteDialogTheme";
 
 interface Props {
   gameName: string;
@@ -31,7 +29,7 @@ export default function DeleteGameDialog({ gameName }: Props) {
   }
 
   return (
-    <ChakraProvider theme={theme}>
+    <div>
       <button
         onClick={onOpen}
         className="mt-1 rounded-md bg-delete-red px-[17px] py-2 font-sans text-xl font-semibold text-white"
@@ -83,6 +81,6 @@ export default function DeleteGameDialog({ gameName }: Props) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </ChakraProvider>
+    </div>
   );
 }

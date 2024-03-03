@@ -1,31 +1,30 @@
-import {
-  ChakraProvider,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
-} from "@chakra-ui/react";
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import styles from "@/styles/tabs.module.css";
-import { populatedGame } from "@/server/db/models/GameModel";
-import theme from "../ui/tabsTheme";
-import { Dispatch, SetStateAction } from "react";
+import { populatedGameWithId } from "@/server/db/models/GameModel";
+import { ChangeEvent, Dispatch, useState } from "react";
 
 interface Props {
   mode: string;
-  description: string;
-  setDescription?: Dispatch<SetStateAction<string>>;
-  gameData: populatedGame;
+  gameData: populatedGameWithId;
+  setGameData?: Dispatch<populatedGameWithId>;
 }
 
-export default function TabsComponent({
-  mode,
-  description,
-  setDescription,
-  gameData,
-}: Props) {
+export default function TabsComponent({ mode, gameData, setGameData }: Props) {
+  const [description, setDescription] = useState(gameData.description);
+
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    setDescription(newValue);
+    if (setGameData) {
+      setGameData({
+        ...gameData,
+        description: newValue,
+      });
+    }
+  };
+
   return (
-    <ChakraProvider theme={theme}>
+    <div>
       <Tabs colorScheme="brand" className={styles.tabs}>
         <TabList className={styles.tabTitle}>
           <Tab>Description</Tab>
@@ -39,11 +38,7 @@ export default function TabsComponent({
                 <textarea
                   className="h-52 w-full !resize-none rounded-[20px] border border-[20px] border-solid border-transparent bg-input-bg font-sans !outline-none"
                   value={description}
-                  onChange={(e) => {
-                    if (setDescription) {
-                      setDescription(e.target.value);
-                    }
-                  }}
+                  onChange={handleChange}
                 />
               </div>
             ) : (
@@ -52,6 +47,6 @@ export default function TabsComponent({
           </TabPanel>
         </TabPanels>
       </Tabs>
-    </ChakraProvider>
+    </div>
   );
 }

@@ -9,14 +9,11 @@ import { userSchema } from "@/utils/types";
 import Image from "next/image";
 import editIcon from "@/images/editIcon.png";
 import Link from "next/link";
-import { populatedGame } from "@/server/db/models/GameModel";
-import { tagDataSchema, themeDataSchema } from "./[id]/edit";
+import { populatedGameWithId } from "@/server/db/models/GameModel";
 
 const GamePage = () => {
   const gameID = useRouter().query.id;
-  const [gameData, setGameData] = useState<populatedGame>();
-  const [themes, setThemes] = useState<z.infer<typeof themeDataSchema>[]>();
-  const [tags, setTags] = useState<z.infer<typeof tagDataSchema>[]>();
+  const [gameData, setGameData] = useState<populatedGameWithId>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const idSchema = z.string().length(24);
@@ -56,8 +53,6 @@ const GamePage = () => {
       const data = await response.json();
       setGameData(data);
       setLoading(false);
-      setThemes(data.themes);
-      setTags(data.tags);
     } catch (error: any) {
       setError(error.message);
     }
@@ -96,14 +91,8 @@ const GamePage = () => {
           </div>
         </Link>
       ) : null}
-      <TabsComponent
-        mode="view"
-        description={gameData.description}
-        gameData={gameData}
-      />
-      {tags && themes ? (
-        <TagsComponent mode="view" themes={themes} tags={tags} />
-      ) : null}
+      <TabsComponent mode="view" gameData={gameData} />
+      <TagsComponent mode="view" gameData={gameData} />
     </div>
   );
 };

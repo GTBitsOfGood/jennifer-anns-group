@@ -7,6 +7,10 @@ export interface IGame extends z.infer<typeof gameSchema> {}
 export type populatedGame = Omit<IGame, "tags" | "themes"> & {
   tags: ITag[];
 } & { themes: ITheme[] };
+export type populatedGameWithId = Omit<IGame, "tags" | "themes"> & {
+  tags: (ITag & { _id: string })[];
+  themes: (ITheme & { _id: string })[];
+};
 
 interface IBuild extends z.infer<typeof buildSchema> {}
 

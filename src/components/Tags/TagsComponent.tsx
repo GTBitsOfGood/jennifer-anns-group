@@ -1,23 +1,24 @@
 import styles from "@/styles/tags.module.css";
-import {
-  ChakraProvider,
-  Tag,
-  TagCloseButton,
-  TagRightIcon,
-} from "@chakra-ui/react";
+import { Tag, TagCloseButton, TagRightIcon } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
-import theme from "../ui/tagsTheme";
 import { z } from "zod";
-import { Dispatch, useState } from "react";
+import { Dispatch, useEffect, useState } from "react";
 import SearchTagsComponent from "./SearchTagsComponent";
-import { themeDataSchema, tagDataSchema } from "@/pages/games/[id]/edit";
+import { populatedGameWithId } from "@/server/db/models/GameModel";
+import { tagSchema, themeSchema } from "@/utils/types";
+
+const themeDataSchema = themeSchema.extend({
+  _id: z.string().length(24),
+});
+
+const tagDataSchema = tagSchema.extend({
+  _id: z.string().length(24),
+});
 
 interface Props {
   mode: string;
-  themes: z.infer<typeof themeDataSchema>[];
-  setThemes?: Dispatch<z.infer<typeof themeDataSchema>[]>;
-  tags: z.infer<typeof tagDataSchema>[];
-  setTags?: Dispatch<z.infer<typeof tagDataSchema>[]>;
+  gameData: populatedGameWithId;
+  setGameData?: Dispatch<populatedGameWithId>;
 }
 
 const sortByTagType = (
@@ -32,17 +33,35 @@ const sortByTagType = (
   return 0;
 };
 
-export default function TagsComponent({
-  mode,
-  themes,
-  setThemes,
-  tags,
-  setTags,
-}: Props) {
+export default function TagsComponent({ mode, gameData, setGameData }: Props) {
   const [search, setSearch] = useState(false);
+  const [themes, setThemes] = useState<z.infer<typeof themeDataSchema>[]>(
+    gameData.themes,
+  );
+  const [tags, setTags] = useState<z.infer<typeof tagDataSchema>[]>(
+    gameData.tags,
+  );
+
+  useEffect(() => {
+    if (setGameData && tags) {
+      setGameData({
+        ...gameData,
+        tags: tags,
+      });
+    }
+  }, [tags]);
+
+  useEffect(() => {
+    if (setGameData && themes) {
+      setGameData({
+        ...gameData,
+        themes: themes,
+      });
+    }
+  }, [themes]);
 
   function removeTag(tag: z.infer<typeof tagDataSchema>) {
-    if (setTags) {
+    if (tags) {
       const newList = tags.filter((t) => {
         return t.name !== tag.name;
       });
@@ -51,7 +70,7 @@ export default function TagsComponent({
   }
 
   function removeTheme(theme: z.infer<typeof themeDataSchema>) {
-    if (setThemes) {
+    if (themes) {
       const newList = themes.filter((t) => {
         return t.name !== theme.name;
       });
@@ -61,49 +80,47 @@ export default function TagsComponent({
 
   return (
     <div>
-      <ChakraProvider theme={theme}>
-        <div className={styles.tags}>
-          {themes
-            ? themes.map((theme) => (
-                <Tag key={theme.name} bg="brand.400">
-                  {theme.name}
-                  {mode === "edit" ? (
-                    <TagCloseButton onClick={() => removeTheme(theme)} />
-                  ) : null}
-                </Tag>
-              ))
-            : null}
-          {tags
-            ? tags.sort(sortByTagType).map((tag) => (
-                <Tag
-                  key={tag.name}
-                  bg={tag.type === "accessibility" ? "brand.300" : "brand.500"}
-                >
-                  {tag.name}
-                  {mode === "edit" &&
-                  tag.name !== "Parenting Guide" &&
-                  tag.name !== "Lesson Plan" ? (
-                    <TagCloseButton onClick={() => removeTag(tag)} />
-                  ) : null}
-                </Tag>
-              ))
-            : null}
-          {mode === "edit" && !search ? (
-            <Tag
-              className="cursor-pointer"
-              bg="brand.600"
-              color="white"
-              onClick={() => {
-                setSearch(true);
-              }}
-            >
-              Add
-              <TagRightIcon color="white" boxSize="12px" as={AddIcon} />
-            </Tag>
-          ) : null}
-        </div>
-      </ChakraProvider>
-      {mode === "edit" && search && setThemes && setTags ? (
+      <div className={styles.tags}>
+        {themes
+          ? themes.map((theme) => (
+              <Tag key={theme.name} bg="brand.400">
+                {theme.name}
+                {mode === "edit" ? (
+                  <TagCloseButton onClick={() => removeTheme(theme)} />
+                ) : null}
+              </Tag>
+            ))
+          : null}
+        {tags
+          ? tags.sort(sortByTagType).map((tag) => (
+              <Tag
+                key={tag.name}
+                bg={tag.type === "accessibility" ? "brand.300" : "brand.500"}
+              >
+                {tag.name}
+                {mode === "edit" &&
+                tag.name !== "Parenting Guide" &&
+                tag.name !== "Lesson Plan" ? (
+                  <TagCloseButton onClick={() => removeTag(tag)} />
+                ) : null}
+              </Tag>
+            ))
+          : null}
+        {mode === "edit" && !search ? (
+          <Tag
+            className="cursor-pointer"
+            bg="brand.600"
+            color="white"
+            onClick={() => {
+              setSearch(true);
+            }}
+          >
+            Add
+            <TagRightIcon color="white" boxSize="12px" as={AddIcon} />
+          </Tag>
+        ) : null}
+      </div>
+      {mode === "edit" && search && themes && tags ? (
         <div className="mb-32 ml-[10vw] mt-7 font-sans">
           <div className="absolute">
             <SearchTagsComponent
