@@ -1,4 +1,3 @@
-import { customErrorHandler } from "@/utils/exceptions";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { z, RefinementCtx } from "zod";
 import {
@@ -40,7 +39,7 @@ export enum GameBuildsEnum {
   android = "android",
   appstore = "appstore",
   linux = "linux",
-  mac = "max",
+  mac = "mac",
   webgl = "webgl",
   windows = "windows",
 }

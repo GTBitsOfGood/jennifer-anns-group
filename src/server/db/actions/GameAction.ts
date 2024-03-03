@@ -13,10 +13,6 @@ import {
   InvalidIdGameErrorException,
   GameAlreadyExistsException,
 } from "@/utils/exceptions/game";
-import {
-  InvalidTagErrorException,
-  InvalidThemeErrorException,
-} from "@/utils/exceptions";
 import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
 
@@ -88,7 +84,7 @@ export async function editGame(allData: nextEditGame) {
   await connectMongoDB();
   const data: IEditGame = allData.data;
   if (data && data.themes) {
-    const themeResults = await ThemeModel.find({ id: { $in: data.themes } });
+    const themeResults = await ThemeModel.find({ _id: { $in: data.themes } });
     if (themeResults.length !== data.themes.length) {
       throw new InvalidIdGameErrorException(
         "One of the given themes does not exist.",
@@ -96,7 +92,7 @@ export async function editGame(allData: nextEditGame) {
     }
   }
   if (data && data.tags) {
-    const tagResults = await TagModel.find({ id: { $in: data.tags } });
+    const tagResults = await TagModel.find({ _id: { $in: data.tags } });
     if (tagResults.length !== data.tags.length) {
       throw new InvalidIdGameErrorException(
         "One of the given tags does not exist.",
@@ -119,6 +115,7 @@ export async function getSelectedGames(
   //Want to be able to filter by specific tags,game_builds, etc.
   //Find the corresponding id to the Theme tag.
   let filters: FilterQuery<IGame> = {};
+  const aggregate = GameModel.aggregate([]);
   if (query.theme) {
     //Find corresponding themeObject in mongodb
     const foundTheme = await ThemeModel.findOne({
@@ -126,7 +123,7 @@ export async function getSelectedGames(
     });
     if (!foundTheme) {
       //No theme was found
-      throw new InvalidThemeErrorException(
+      throw new ThemeNotFoundException(
         `No theme with the name ${query.theme} exists.`,
       );
     }
@@ -151,7 +148,7 @@ export async function getSelectedGames(
         type: curr.type,
       });
       if (currTags.length !== curr.tags.length) {
-        throw new InvalidTagErrorException(
+        throw new TagNotFoundException(
           `One or more of the ${curr.type} tags do not exist.`,
         );
       }
@@ -191,13 +188,39 @@ export async function getSelectedGames(
       //Remove webGL for further filtering based on other normal games.
       query.gameBuilds = query.gameBuilds.filter((item) => item !== "webgl");
     }
-    filters.builds = { "builds.type": { $all: query.gameBuilds } };
+    //Right now picks where at least one type is included, not all types.
+    //Add directly to aggregate pipeline. Transform it then unwind it back.
+    //Converts AppType to field used in filter.
+    const buildConverter: { [key: string]: string } = {
+      amazon: "Amazon App",
+      android: "Android App",
+      appstore: "App Store",
+      linux: "Linux Download",
+      mac: "Mac Download",
+      windows: "windows",
+    };
+    const filterableBuilds = query.gameBuilds.map(
+      (build: string) => buildConverter[build],
+    );
+    aggregate.addFields({
+      types: {
+        $map: {
+          input: "$builds",
+          as: "buildGame",
+          in: "$$buildGame.type",
+        },
+      },
+    });
+    aggregate.match({ types: { $all: filterableBuilds } });
+    aggregate.project({ types: 0 });
+    //aggregate.match({ types: { $all: query.gameBuilds } });
+    //I need builds to contain several builds, all of which have types which should be in query.gameBuilds.
   }
-
-  let games = await GameModel.find(filters)
-    .skip((query.page - 1) * RESULTS_PER_PAGE)
-    .limit(RESULTS_PER_PAGE);
-
+  //Need to add extra filtering outside of GameModel.find for
+  aggregate.match(filters);
+  aggregate.skip((query.page - 1) * RESULTS_PER_PAGE);
+  aggregate.limit(RESULTS_PER_PAGE);
+  const games = await aggregate.exec();
   return games;
 }
 
