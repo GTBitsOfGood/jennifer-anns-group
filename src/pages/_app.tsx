@@ -14,14 +14,12 @@ export default function App({
   pageProps: { session, ...pageProps },
 }: AppProps) {
   return (
-    <SessionProvider session={session}>
-      <QueryClientProvider client={queryClient}>
-        <ChakraProvider theme={chakraTheme}>
-          <ThemeProvider theme={muiTheme}>
-            <Component {...pageProps} />
-          </ThemeProvider>
-        </ChakraProvider>
-      </QueryClientProvider>
-    </SessionProvider>
+    <ChakraProvider theme={chakraTheme}>
+      <SessionProvider session={session}>
+        <QueryClientProvider client={queryClient}>
+          <Component {...pageProps} />
+        </QueryClientProvider>
+      </SessionProvider>
+    </ChakraProvider>
   );
 }
