@@ -1,10 +1,14 @@
 import mongoose, { Schema } from "mongoose";
 import { z } from "zod";
 import { buildSchema, gameSchema, AppType } from "../../../utils/types";
-import { ObjectId } from "mongodb";
+import { ITheme } from "./ThemeModel";
+import { ITag } from "./TagModel";
+export interface IGame extends z.infer<typeof gameSchema> {}
+export type populatedGame = Omit<IGame, "tags" | "themes"> & {
+  tags: ITag[];
+} & { themes: ITheme[] };
 
 interface IBuild extends z.infer<typeof buildSchema> {}
-export interface IGame extends z.infer<typeof gameSchema> {}
 
 const BuildSchema = new Schema<IBuild>({
   type: { type: String, enum: Object.values(AppType), required: true },
@@ -17,6 +21,7 @@ const GameSchema = new Schema<IGame>({
   themes: {
     type: [Schema.Types.ObjectId],
     ref: "Theme",
+    default: [],
     required: false,
   },
   tags: {
