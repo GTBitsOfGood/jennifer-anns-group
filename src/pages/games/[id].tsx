@@ -7,7 +7,6 @@ import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { userSchema } from "@/utils/types";
 import Image from "next/image";
-import editIcon from "@/images/editIcon.png";
 import Link from "next/link";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 
@@ -82,7 +81,12 @@ const GamePage = () => {
           <div className="mx-auto flex w-[80vw] justify-end">
             <button className="rounded-full bg-input-border">
               <div className="flex flex-row py-2 pl-3.5 pr-4">
-                <Image width={24} height={24} src={editIcon} alt="edit-icon" />
+                <Image
+                  width={24}
+                  height={24}
+                  src={`/editIcon.png`}
+                  alt="edit-icon"
+                />
                 <p className="ml-1 font-sans text-base font-medium text-blue-primary">
                   Edit
                 </p>
