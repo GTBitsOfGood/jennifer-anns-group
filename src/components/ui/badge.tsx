@@ -18,8 +18,10 @@ const badgeVariants = cva(
           "text-blue-primary border-blue-primary font-light bg-white hover:cursor-pointer",
         theme:
           "font-normal border-transparent bg-[#aacbea] text-slate-50 text-black",
-        accessibility: "font-normal border-transparent bg-[#FFE5C6] text-slate-50 text-black",
-        custom: "font-normal border-transparent bg-[#f2f2f2] text-slate-50 text-black",
+        accessibility:
+          "font-normal border-transparent bg-[#FFE5C6] text-slate-50 text-black",
+        custom:
+          "font-normal border-transparent bg-[#f2f2f2] text-slate-50 text-black",
       },
     },
     defaultVariants: {
