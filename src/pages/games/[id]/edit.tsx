@@ -78,7 +78,7 @@ const EditGamePage = () => {
     if (gameData) {
       setGameData({
         ...gameData,
-        name: name,
+        name: newValue,
       });
     }
   };
@@ -99,7 +99,7 @@ const EditGamePage = () => {
       tags: tagIds,
       themes: themeIds,
       description: gameData?.description,
-      name: name,
+      name: gameData?.name,
     };
 
     await fetch(`/api/games/${gameID}`, {
