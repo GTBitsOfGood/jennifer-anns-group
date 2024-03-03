@@ -8,14 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MoveLeft } from "lucide-react";
 
-import {
-  Tag,
-  TagLabel,
-  TagLeftIcon,
-  TagRightIcon,
-  TagCloseButton,
-  ChakraProvider,
-} from "@chakra-ui/react";
+import { tagSchema, themeSchema, gameSchema } from "@/utils/types";
 
 const NAME_FORM_KEY = "name";
 const TRAILER_FORM_KEY = "videoTrailer";
@@ -23,6 +16,7 @@ const DESCR_FORM_KEY = "description";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import ThemeSelect from "@/components/Themes/ThemeSelect";
+import TagSelect from "@/components/Tags/TagSelect";
 
 export const createGameSchema = z.object({
   name: z.string().min(3, "Title must be at least 3 characters"),
@@ -33,58 +27,53 @@ export const createGameSchema = z.object({
 function CreateGame() {
   const router = useRouter();
 
-  const [themes, setThemes] = useState<string[]>([
-    "Gaslighting",
-    "Critical Thinking",
-    "Fake News",
-    "Social Media Addiction",
-    "Cyberbullying",
-    "Body Image",
-    "Environmental Awareness",
-    "Gender Equality",
-    "Mental Health",
-    "Diversity and Inclusion",
-    "Racism",
-    "Bullying",
-    "Discrimination",
-    "Consent",
-    "Self-Esteem",
-    "Healthy Relationships",
-    "Peer Pressure",
-    "Stress Management",
-    "Empathy",
-    "Social Justice",
-    "Human Rights",
-    "Media Literacy",
-    "Political Awareness",
-    "Digital Privacy",
-    "Educational Equity",
-    "Community Engagement",
-    "Cultural Understanding",
-    "Inclusivity",
-    "Ethical Responsibility",
-    "Global Citizenship",
-  ]);
+  const [themes, setThemes] = useState<z.infer<typeof themeSchema>[]>([]);
+  const [selectedThemes, setSelectedThemes] = useState<
+    z.infer<typeof themeSchema>[]
+  >([]);
 
-  // useEffect(() => {
-  //   console.log("Tryna fetch");
-  //   const fetchData = async () => {
-  //     try {
-  //       console.log("TRYING TO fetch");
+  const [accessibilityTags, setAccessibilityTags] = useState<
+    z.infer<typeof tagSchema>[]
+  >([]);
+  const [selectedAccessibilityTags, setSelectedAccessibilityTags] = useState<
+    z.infer<typeof tagSchema>[]
+  >([]);
 
-  //       const res = await fetch("/api/themes/", { method: "GET" });
-  //       const data = await res.json();
-  //       console.log("data", data);
+  const [customTags, setCustomTags] = useState<z.infer<typeof tagSchema>[]>([]);
+  const [selectedCustomTags, setSelectedCustomTags] = useState<
+    z.infer<typeof tagSchema>[]
+  >([]);
 
-  //       setThemes(data);
-  //     } catch (error) {
-  //       console.error("Error fetching themes:", error);
-  //     }
-  //   };
+  // const [tags, setTags] = useState<z.infer<typeof tagSchema>[]>([]);
+  const [selectedTags, setSelectedTags] = useState<z.infer<typeof tagSchema>[]>(
+    [],
+  );
 
-  //   fetchData();
-  //   setThemes(["Consent", "Gaslighting", "IDK"]);
-  // }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/themes/", { method: "GET" });
+        const data = await res.json();
+
+        setThemes(data);
+      } catch (error) {
+        console.error("Error fetching themes:", error);
+      }
+
+      try {
+        const res = await fetch("/api/tags/", { method: "GET" });
+        const data = await res.json();
+        console.log(data);
+
+        setAccessibilityTags(data.accessibility);
+        setCustomTags(data.custom);
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const [validationErrors, setValidationErrors] = useState<
     Record<keyof z.input<typeof createGameSchema>, string | undefined>
@@ -94,13 +83,18 @@ function CreateGame() {
     description: undefined,
   });
 
-  async function createGame(data: z.infer<typeof createGameSchema>) {
+  async function createGame(data: z.infer<typeof gameSchema>) {
+    console.log("ab to create");
     try {
       const response = await fetch(`/api/games`, {
         method: "POST",
         body: JSON.stringify(data),
       });
+      console.log("j created");
+
       const responseData = await response.json();
+      console.log(responseData.error);
+
       return responseData;
     } catch (error) {
       console.error(`Error creating game:`, error);
@@ -114,8 +108,10 @@ function CreateGame() {
       name: formData.get(NAME_FORM_KEY),
       videoTrailer: formData.get(TRAILER_FORM_KEY),
       description: formData.get(DESCR_FORM_KEY),
+      themes: selectedThemes,
+      tags: [...selectedAccessibilityTags, ...selectedCustomTags],
     };
-    const parse = createGameSchema.safeParse(input);
+    const parse = gameSchema.safeParse(input);
 
     if (parse.success) {
       try {
@@ -131,7 +127,7 @@ function CreateGame() {
             name: "Game with this title already exists",
           });
         } else {
-          router.replace("/games");
+          // router.replace("/games");
         }
       } catch (error) {
         console.error("Error creating game:", error);
@@ -221,21 +217,36 @@ function CreateGame() {
           <label htmlFor={DESCR_FORM_KEY} className="text-xl font-semibold">
             Theme(s)
           </label>
-          <ThemeSelect themes={themes} type="theme" />
+          <ThemeSelect
+            themes={themes}
+            type="theme"
+            selected={selectedThemes}
+            setSelected={setSelectedThemes}
+          />
         </div>
 
         <div className="relative flex w-full flex-col gap-3">
           <label htmlFor={DESCR_FORM_KEY} className="text-xl font-semibold">
             Accessibility
           </label>
-          <ThemeSelect themes={themes} type="tag" />
+          <TagSelect
+            tags={accessibilityTags}
+            type="accessibility"
+            selected={selectedAccessibilityTags}
+            setSelected={setSelectedAccessibilityTags}
+          />
         </div>
 
         <div className="relative flex w-full flex-col gap-3">
           <label htmlFor={DESCR_FORM_KEY} className="text-xl font-semibold">
             Tag(s)
           </label>
-          <ThemeSelect themes={themes} type="tag" />
+          <TagSelect
+            tags={customTags}
+            type="custom"
+            selected={selectedCustomTags}
+            setSelected={setSelectedCustomTags}
+          />
         </div>
 
         <div className="relative mt-10 flex w-full justify-end">

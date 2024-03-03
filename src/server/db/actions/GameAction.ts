@@ -15,7 +15,8 @@ export async function createGame(data: IGame) {
     //Ensure every ObjectID actually represents a Document
     if (data && data.themes) {
       const themePromises = data.themes.map((theme) =>
-        ThemeModel.findById(theme),
+        // ThemeModel.findById(theme),
+        ThemeModel.findOne({ name: theme.name }),
       );
       const themeResults = await Promise.all(themePromises);
       themeResults.forEach((result, index) => {

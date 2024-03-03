@@ -24,7 +24,10 @@ export default async function handler(
             error: parsedData.error.format(),
           });
         }
+
+        console.log("parsed", parsedData);
         const result = await createGame(parsedData.data);
+        console.log(result);
         return res.status(201).send({
           data: { id: result },
         });

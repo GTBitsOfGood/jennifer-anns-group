@@ -40,10 +40,35 @@ async function getThemeHandler(req: NextApiRequest, res: NextApiResponse) {
   return res.status(HTTP_STATUS_CODE.OK).send(themes);
 }
 
+// async function postThemeHandler(req: NextApiRequest, res: NextApiResponse) {
+//   try {
+//     console.log(req.body);
+//     const parsedBody = createThemeSchema.safeParse(JSON.parse(req.body));
+//     console.log(parsedBody);
+
+//     if (!parsedBody.success) {
+//       throw new ThemeInvalidInputException();
+//     }
+//     const newTheme = await createTheme(parsedBody.data);
+//     return res.status(HTTP_STATUS_CODE.OK).send({
+//       ...newTheme,
+//       _id: newTheme._id.toString(),
+//     });
+//   } catch (e) {
+//     if (e instanceof ThemeException) {
+//       return res.status(e.code);
+//     }
+//     return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+//   }
+// }
+
 async function postThemeHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
+    console.log(req.body);
     const parsedBody = createThemeSchema.safeParse(JSON.parse(req.body));
+
     if (!parsedBody.success) {
+      console.log(parsedBody.error);
       throw new ThemeInvalidInputException();
     }
     const newTheme = await createTheme(parsedBody.data);
@@ -53,8 +78,8 @@ async function postThemeHandler(req: NextApiRequest, res: NextApiResponse) {
     });
   } catch (e) {
     if (e instanceof ThemeException) {
-      return res.status(e.code);
+      return res.status(e.code).send({ error: e.message });
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    return customErrorHandler(res, e);
   }
 }

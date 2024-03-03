@@ -6,12 +6,37 @@ import { GenericUserErrorException } from "@/utils/exceptions";
 import { CreateThemeInput } from "@/pages/api/themes";
 import { Types } from "mongoose";
 
+// export async function createTheme(data: CreateThemeInput) {
+//   await connectMongoDB();
+//   const session = await ThemeModel.startSession();
+//   session.startTransaction();
+//   try {
+//     const theme = (await ThemeModel.create([data], { session }))[0];
+//     await GameModel.updateMany(
+//       {
+//         _id: {
+//           $in: data.games,
+//         },
+//       },
+//       {
+//         $push: {
+//           themes: theme._id,
+//         },
+//       },
+//     );
+//     await session.commitTransaction();
+//     return theme.toObject();
+//   } catch (e) {
+//     await session.abortTransaction();
+//     console.log(e);
+//     throw e;
+//   }
+// }
+
 export async function createTheme(data: CreateThemeInput) {
   await connectMongoDB();
-  const session = await ThemeModel.startSession();
-  session.startTransaction();
   try {
-    const theme = (await ThemeModel.create([data], { session }))[0];
+    const theme = await ThemeModel.create(data);
     await GameModel.updateMany(
       {
         _id: {
@@ -24,10 +49,8 @@ export async function createTheme(data: CreateThemeInput) {
         },
       },
     );
-    await session.commitTransaction();
     return theme.toObject();
   } catch (e) {
-    await session.abortTransaction();
     console.log(e);
     throw e;
   }
