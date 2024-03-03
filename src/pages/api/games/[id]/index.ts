@@ -79,7 +79,6 @@ async function editGameHandler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const updateData = editGameSchema.safeParse(JSON.parse(req.body));
-    console.log(updateData);
     if (!updateData.success) {
       throw new GameInvalidInputException();
     }

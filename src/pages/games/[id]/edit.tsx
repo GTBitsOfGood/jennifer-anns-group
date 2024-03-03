@@ -29,11 +29,11 @@ const EditGamePage = () => {
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
 
-  // useEffect(() => {
-  //   if (!session) {
-  //     router.push("/");
-  //   }
-  // }, [session]);
+  useEffect(() => {
+    if (!session) {
+      router.push("/");
+    }
+  }, [session]);
 
   useEffect(() => {
     if (currentUser) {
@@ -41,11 +41,11 @@ const EditGamePage = () => {
     }
   }, [currentUser]);
 
-  // useEffect(() => {
-  //   if (userData && userData.label !== "administrator") {
-  //     router.push("/");
-  //   }
-  // }, [userData]);
+  useEffect(() => {
+    if (userData && userData.label !== "administrator") {
+      router.push("/");
+    }
+  }, [userData]);
 
   async function getUserData() {
     try {
