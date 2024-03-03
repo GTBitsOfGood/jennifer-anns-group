@@ -6,18 +6,24 @@ import { X } from "lucide-react";
 
 interface Props {
   tags: ExtendId<ITag>[];
+  type: "accessibility" | "custom";
   selected: ExtendId<ITag>[];
   setSelected: React.Dispatch<React.SetStateAction<ExtendId<ITag>[]>>;
 }
 
-export default function TagSelect({ tags, selected, setSelected }: Props) {
+export default function TagSelect({
+  tags,
+  type,
+  selected,
+  setSelected,
+}: Props) {
   return (
     <div className="flex flex-row flex-wrap gap-3">
       {tags
         ? tags.map((tag, i) => (
             <Badge
               key={i}
-              variant={selected.includes(tag) ? "tag" : "outline"}
+              variant={selected.includes(tag) ? type : "outline"}
               className="max-h-8"
               onClick={() => setSelected([...selected, tag])}
             >

@@ -52,7 +52,7 @@ const pageAccessHOC = <P extends object>(Component: React.FC<P>) => {
             const responseData = await response.json();
             setLabel(responseData.label as Label);
           } catch (error) {
-            console.error("Error fetching user status:", error);
+            console.error("Error fetching user status");
           }
         }
       };

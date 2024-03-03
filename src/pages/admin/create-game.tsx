@@ -219,6 +219,7 @@ function CreateGame() {
           <label className="text-xl font-semibold">Accessibility</label>
           <TagSelect
             tags={accessibilityTags}
+            type="accessibility"
             selected={selectedAccessibilityTags}
             setSelected={setSelectedAccessibilityTags}
           />
@@ -228,6 +229,7 @@ function CreateGame() {
           <label className="text-xl font-semibold">Tag(s)</label>
           <TagSelect
             tags={customTags}
+            type="custom"
             selected={selectedCustomTags}
             setSelected={setSelectedCustomTags}
           />
