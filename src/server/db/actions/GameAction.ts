@@ -25,8 +25,7 @@ export async function createGame(data: IGame) {
   try {
     if (data && data.themes) {
       const themePromises = data.themes.map((theme) =>
-        // ThemeModel.findById(theme),
-        ThemeModel.findOne({ name: theme.name }),
+        ThemeModel.findById(theme),
       );
       const themeResults = await Promise.all(themePromises);
       themeResults.forEach((result) => {

@@ -1,29 +1,16 @@
 import { Badge } from "@/components/ui/badge";
-
-import { Document } from "mongodb";
 import { ITag } from "@/server/db/models/TagModel";
-
-import { tagSchema } from "@/utils/types";
-import { z } from "zod";
-import { useState } from "react";
+import { ExtendId } from "@/utils/types";
 
 import { X } from "lucide-react";
 
 interface Props {
-  tags: z.infer<typeof tagSchema>[];
-  type: "custom" | "accessibility";
-  selected: z.infer<typeof tagSchema>[];
-  setSelected: React.Dispatch<
-    React.SetStateAction<z.infer<typeof tagSchema>[]>
-  >;
+  tags: ExtendId<ITag>[];
+  selected: ExtendId<ITag>[];
+  setSelected: React.Dispatch<React.SetStateAction<ExtendId<ITag>[]>>;
 }
 
-export default function TagSelect({
-  tags,
-  type,
-  selected,
-  setSelected,
-}: Props) {
+export default function TagSelect({ tags, selected, setSelected }: Props) {
   return (
     <div className="flex flex-row flex-wrap gap-3">
       {tags

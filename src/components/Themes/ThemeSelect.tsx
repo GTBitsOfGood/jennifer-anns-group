@@ -1,33 +1,24 @@
 import { Badge } from "@/components/ui/badge";
 
-import { themeSchema } from "@/utils/types";
-import { z } from "zod";
-import { useState } from "react";
+import { ITheme } from "@/server/db/models/ThemeModel";
+import { ExtendId } from "@/utils/types";
 
 import { X } from "lucide-react";
 
 interface Props {
-  themes: z.infer<typeof themeSchema>[] | null;
-  type: "theme" | "tag";
-  selected: z.infer<typeof themeSchema>[];
-  setSelected: React.Dispatch<
-    React.SetStateAction<z.infer<typeof themeSchema>[]>
-  >;
+  themes: ExtendId<ITheme>[];
+  selected: ExtendId<ITheme>[];
+  setSelected: React.Dispatch<React.SetStateAction<ExtendId<ITheme>[]>>;
 }
 
-export default function ThemeSelect({
-  themes,
-  type,
-  selected,
-  setSelected,
-}: Props) {
+export default function ThemeSelect({ themes, selected, setSelected }: Props) {
   return (
     <div className="flex flex-row flex-wrap gap-3">
       {themes
         ? themes.map((theme, i) => (
             <Badge
               key={i}
-              variant={selected.includes(theme) ? type : "outline"}
+              variant={selected.includes(theme) ? "theme" : "outline"}
               className="max-h-8"
               onClick={() => setSelected([...selected, theme])}
             >
