@@ -12,7 +12,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import axios from "axios";
 import { CheckIcon, EditIcon, TrashIcon } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { INote } from "@/server/db/models/UserModel";
 import { IGame } from "@/server/db/models/GameModel";
 import { TextArea } from "../ui/textarea";
@@ -34,8 +34,8 @@ export default function NotesComponent({
   userId,
 }: NotesComponentProps) {
   const [newNote, setNewNote] = useState("");
-  const [editNoteId, setEditNoteId] = useState("");
-  const [editNote, setEditNote] = useState("");
+  const [editId, setEditId] = useState("");
+  const [editDescription, setEditDescription] = useState("");
 
   const { data: notes, refetch } = useQuery({
     queryKey: ["notes"],
@@ -52,53 +52,62 @@ export default function NotesComponent({
     retry: 3,
   });
 
-  async function handleAddNote() {
-    await axios.post(
-      `/api/users/${userId}/notes`,
-      JSON.stringify({
-        date: new Date(),
-        description: newNote,
-        gameId: gameData._id,
-      }),
-      {
+  const addNote = useMutation({
+    mutationFn: () => {
+      return axios.post(
+        `/api/users/${userId}/notes`,
+        JSON.stringify({
+          date: new Date(),
+          description: newNote,
+          gameId: gameData._id,
+        }),
+        {
+          headers: {
+            "Content-Type": "text",
+          },
+        },
+      );
+    },
+    onSuccess: () => {
+      refetch();
+      setNewNote("");
+    },
+  });
+
+  const deleteNote = useMutation({
+    mutationFn: (noteId: string) => {
+      return axios.delete(`/api/users/${userId}/notes/${noteId}`, {
         headers: {
           "Content-Type": "text",
         },
-      },
-    );
+      });
+    },
+    onSuccess: () => {
+      refetch();
+    },
+  });
 
-    setNewNote("");
-    await refetch();
-  }
-
-  async function handleDeleteNote(noteId: string) {
-    await axios.delete(`/api/users/${userId}/notes/${noteId}`, {
-      headers: {
-        "Content-Type": "text",
-      },
-    });
-
-    await refetch();
-  }
-
-  async function handleEditNote() {
-    await axios.put(
-      `/api/users/${userId}/notes/${editNoteId}`,
-      JSON.stringify({
-        date: new Date(),
-        description: editNote,
-        gameId: gameData._id,
-      }),
-      {
-        headers: {
-          "Content-Type": "text",
+  const editNote = useMutation({
+    mutationFn: () => {
+      return axios.put(
+        `/api/users/${userId}/notes/${editId}`,
+        JSON.stringify({
+          date: new Date(),
+          description: editDescription,
+          gameId: gameData._id,
+        }),
+        {
+          headers: {
+            "Content-Type": "text",
+          },
         },
-      },
-    );
-
-    await refetch();
-    setEditNoteId("");
-  }
+      );
+    },
+    onSuccess: async () => {
+      await refetch();
+      setEditId("");
+    },
+  });
 
   return (
     <ChakraProvider theme={theme}>
@@ -120,7 +129,7 @@ export default function NotesComponent({
               <Button
                 className="mt-4 block bg-blue-primary"
                 size="sm"
-                onClick={handleAddNote}
+                onClick={() => addNote.mutate()}
               >
                 Post
               </Button>
@@ -128,7 +137,7 @@ export default function NotesComponent({
             <div className="flex flex-col items-stretch">
               {notes?.data
                 ?.map((note: INote & { _id: string; date: string }) =>
-                  editNoteId !== note._id ? (
+                  editId !== note._id ? (
                     <div key={note._id} className="mb-4 flex flex-row">
                       <div className="mr-6 whitespace-nowrap text-blue-primary">
                         {formatDate(new Date(note.date))}
@@ -137,13 +146,13 @@ export default function NotesComponent({
                       <EditIcon
                         className="ml-6 inline-block shrink-0 cursor-pointer self-center"
                         onClick={() => {
-                          setEditNoteId(note._id);
-                          setEditNote(note.description);
+                          setEditId(note._id);
+                          setEditDescription(note.description);
                         }}
                       />
                       <TrashIcon
                         className="ml-4 inline-block shrink-0 cursor-pointer self-center"
-                        onClick={() => handleDeleteNote(note._id)}
+                        onClick={() => deleteNote.mutate(note._id)}
                       />
                     </div>
                   ) : (
@@ -156,17 +165,17 @@ export default function NotesComponent({
                           defaultValue={note.description}
                           className="h-24 text-base"
                           onChange={(e) => {
-                            setEditNote(e.target.value);
+                            setEditDescription(e.target.value);
                           }}
                         />
                       </div>
                       <CheckIcon
                         className="ml-6 inline-block shrink-0 cursor-pointer self-center"
-                        onClick={() => handleEditNote()}
+                        onClick={() => editNote.mutate()}
                       />
                       <TrashIcon
                         className="ml-4 inline-block shrink-0 cursor-pointer self-center"
-                        onClick={() => handleDeleteNote(note._id)}
+                        onClick={() => deleteNote.mutate(note._id)}
                       />
                     </div>
                   ),
