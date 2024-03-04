@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export const Footer = () => {
   // replace with actual social links when nonprofit gets back
   const socialLinks = {
@@ -21,6 +23,7 @@ export const Footer = () => {
             src="/logo_gray.svg"
             className="h-[127px] w-[158px]"
             style={{ marginBottom: "20px" }}
+            alt="Logo"
           ></img>
           <div className="flex flex-col items-start justify-center gap-2">
             <div className="font-['DM Sans'] text-sm font-normal text-slate-500">
@@ -40,13 +43,13 @@ export const Footer = () => {
           >
             {Object.entries(socialLinks).map(
               ([name, [link, width, height]]) => (
-                <a href={link} key={name} target="_blank">
+                <Link href={link} key={name} target="_blank">
                   <img
                     src={`/social/${name}.svg`}
                     className={`w-[${width}px] h-[${height}px]`}
                     alt={name}
                   />
-                </a>
+                </Link>
               ),
             )}
           </div>
@@ -82,7 +85,7 @@ export const Footer = () => {
           >
             Contact us
           </div>
-          <img src="/contact.svg"></img>
+          <img src="/contact.svg" alt="Contact"></img>
         </div>
       </div>
       <div style={{ marginBottom: "79px" }}>

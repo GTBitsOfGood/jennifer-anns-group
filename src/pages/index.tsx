@@ -15,13 +15,13 @@ const Home = () => {
     if (currentUser) {
       getUserData();
     }
-  }, [currentUser]);
+  }, [currentUser, userData?.label]);
 
   async function getUserData() {
     try {
       const response = await fetch(`/api/users/${currentUser?._id}`);
       const data = await response.json();
-      setUserData(data.data);
+      setUserData(data);
     } catch (error) {
       console.error("Error getting user:", error);
     }
@@ -30,8 +30,13 @@ const Home = () => {
   return (
     <div>
       <SessionProvider>
-        <Header label={userData?.label} />
+        <Header
+          label={userData?.label}
+          userData={userData}
+          setUserData={setUserData}
+        />
         <br></br>
+
         <Footer />
       </SessionProvider>
     </div>

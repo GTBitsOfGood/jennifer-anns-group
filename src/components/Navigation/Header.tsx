@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/router";
-import { ProfileModal } from "../ProfileModal/ProfileModal";
+import { ProfileModal, userDataSchema } from "../ProfileModal/ProfileModal";
 import { Button } from "../ui/button";
 import { UserLabel } from "@/utils/types";
+import { z } from "zod";
+import Link from "next/link";
 
 interface Props {
   label: UserLabel | null | undefined;
+  userData: z.infer<typeof userDataSchema> | undefined;
+  setUserData: React.Dispatch<
+    React.SetStateAction<z.infer<typeof userDataSchema> | undefined>
+  >;
 }
 
 enum UserType {
@@ -50,6 +56,7 @@ const Header = (props: Props) => {
   };
 
   const [selectedTab, setSelectedTab] = useState<number>(0);
+  const [userData, setUserData] = [props.userData, props.setUserData];
 
   function handlePageChange(tabname: string, index: number) {
     if (tabname != "Donate") {
@@ -75,11 +82,7 @@ const Header = (props: Props) => {
             alt="Logo"
             style={{ marginLeft: "6.8rem" }}
           />
-          {/* for some reason specifying the font in tailwind doesn't work for this */}
-          <div
-            className="ml-6 text-xl font-semibold text-stone-900 opacity-80"
-            style={{ fontFamily: "Open Sans" }}
-          >
+          <div className="ml-6 font-open-sans text-xl font-semibold text-stone-900 opacity-70">
             Jennifer Ann’s Group
           </div>
         </div>
@@ -96,12 +99,12 @@ const Header = (props: Props) => {
               onClick={() => handlePageChange(tabName, index)}
             >
               <div>
-                <a
+                <Link
                   href={tabLinks[tabName]}
                   target={tabName == "Donate" ? "_blank" : ""}
                 >
                   {tabName}
-                </a>
+                </Link>
                 {selectedTab === index && (
                   <div className="absolute left-1/2 top-8 h-0.5 w-full -translate-x-1/2 transform bg-orange-primary" />
                 )}
@@ -110,11 +113,12 @@ const Header = (props: Props) => {
           ))}
           <div className="px-4 py-2" style={{ marginLeft: "3.8rem" }}>
             {userType === UserType.Public ? (
+              // eslint-disable-next-line @next/next/no-html-link-for-pages
               <a href="/login">
                 <Button variant="mainorange">Log in</Button>
               </a>
             ) : (
-              <ProfileModal />
+              <ProfileModal userData={userData} setUserData={setUserData} />
             )}
           </div>
           <div
