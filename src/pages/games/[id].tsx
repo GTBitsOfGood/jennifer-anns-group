@@ -1,15 +1,47 @@
 import styles from "@/styles/game.module.css";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TabsComponent from "../../components/Tabs/TabsComponent";
 import TagsComponent from "../../components/Tags/TagsComponent";
-import { populatedGame } from "@/server/db/models/GameModel";
+import { z } from "zod";
+import { useSession } from "next-auth/react";
+import { userSchema } from "@/utils/types";
+import Image from "next/image";
+import Link from "next/link";
+import { populatedGameWithId } from "@/server/db/models/GameModel";
 
 const GamePage = () => {
   const gameID = useRouter().query.id;
-  const [gameData, setGameData] = useState<populatedGame>();
+  const [gameData, setGameData] = useState<populatedGameWithId>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const idSchema = z.string().length(24);
+
+  const userDataSchema = userSchema
+    .extend({
+      _id: idSchema,
+    })
+    .omit({ hashedPassword: true });
+
+  const { data: session } = useSession();
+  const currentUser = session?.user;
+  const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
+
+  useEffect(() => {
+    if (currentUser) {
+      getUserData();
+    }
+  }, [currentUser]);
+
+  async function getUserData() {
+    try {
+      const response = await fetch(`/api/users/${currentUser?._id}`);
+      const data = await response.json();
+      setUserData(data);
+    } catch (error) {
+      console.error("Error getting user:", error);
+    }
+  }
 
   const getGame = async () => {
     try {
@@ -44,8 +76,27 @@ const GamePage = () => {
   return (
     <div>
       <h1 className={styles.name}>{gameData.name}</h1>
-      <TabsComponent gameData={gameData} />
-      <TagsComponent gameData={gameData} />
+      {userData && userData.label === "administrator" ? (
+        <Link href={`/games/${gameID}/edit`}>
+          <div className="mx-auto flex w-[80vw] justify-end">
+            <button className="rounded-full bg-input-border">
+              <div className="flex flex-row py-2 pl-3.5 pr-4">
+                <Image
+                  width={24}
+                  height={24}
+                  src={`/editIcon.png`}
+                  alt="edit-icon"
+                />
+                <p className="ml-1 font-sans text-base font-medium text-blue-primary">
+                  Edit
+                </p>
+              </div>
+            </button>
+          </div>
+        </Link>
+      ) : null}
+      <TabsComponent mode="view" gameData={gameData} />
+      <TagsComponent mode="view" gameData={gameData} />
     </div>
   );
 };

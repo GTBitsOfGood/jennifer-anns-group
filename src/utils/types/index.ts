@@ -40,16 +40,16 @@ export const tagSchema = z.object({
 // Game
 export const gameSchema = z.object({
   //Make sure to modify gameSchema endpoints, as well as editGameSchema I suppose.
-  name: z.string().min(3).max(50),
+  name: z.string().min(3, "Title must be at least 3 characters").max(50),
   themes: z.array(z.string().refine(verifyObjectId)).optional(),
   tags: z.array(z.string().refine(verifyObjectId)).optional(),
   webGLBuild: z.boolean().optional(),
   builds: z.array(buildSchema).optional(),
-  description: z.string(),
+  description: z.string().min(1, "Description is required"),
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
   answerKey: z.string().url().optional(),
-  videoTrailer: z.string().url().optional(),
+  videoTrailer: z.string().url("Not a valid URL").or(z.literal("")),
 });
 
 // For editing game

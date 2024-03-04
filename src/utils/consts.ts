@@ -13,6 +13,7 @@ export enum Pages {
   HOME = "/",
   LOGIN = "/login",
   SIGNUP = "/signup",
+  CREATEGAME = "/admin/create-game",
 }
 
 export const ADMIN_CONTACT = "contact@jenniferann.org";

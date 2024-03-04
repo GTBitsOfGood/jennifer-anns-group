@@ -81,7 +81,7 @@ export async function editGame(allData: nextEditGame) {
   const data: IEditGame = allData.data;
   try {
     if (data && data.themes) {
-      const themeResults = await ThemeModel.find({ id: { $in: data.themes } });
+      const themeResults = await ThemeModel.find({ _id: { $in: data.themes } });
       if (themeResults.length !== data.themes.length) {
         throw new InvalidIdGameErrorException(
           "One of the given themes does not exist.",
@@ -89,7 +89,7 @@ export async function editGame(allData: nextEditGame) {
       }
     }
     if (data && data.tags) {
-      const tagResults = await TagModel.find({ id: { $in: data.tags } });
+      const tagResults = await TagModel.find({ _id: { $in: data.tags } });
       if (tagResults.length !== data.tags.length) {
         throw new InvalidIdGameErrorException(
           "One of the given tags does not exist.",
