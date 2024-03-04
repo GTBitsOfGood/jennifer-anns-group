@@ -34,8 +34,8 @@ export async function uploadBuildFiles(
           const { data } = await axios.post(`/api/games/${gameId}/builds`, {
             gameId,
           });
-          const uploadUrl = data.data.uploadUrl;
-          const uploadAuthToken = data.data.uploadAuthToken;
+          const uploadUrl = data.uploadUrl;
+          const uploadAuthToken = data.uploadAuthToken;
 
           const fileName = `${gameId}/${
             buildFileTypes[type as keyof typeof buildFileTypes]
