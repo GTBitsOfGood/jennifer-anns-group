@@ -88,13 +88,9 @@ const GamePage = () => {
         </>
       )}
       <EmbeddedGame gameId={gameId as string} />
-      {loaded && (
-        <>
-          <TabsComponent mode="view" gameData={gameData} />
-          {userData.label !== "administrator" && (
-            <NotesComponent gameId={gameId} userId={userId} />
-          )}
-        </>
+      <TabsComponent mode="view" gameData={gameData} />
+      {loaded && userData.label !== "administrator" && (
+        <NotesComponent gameId={gameId} userId={userId} />
       )}
       <TagsComponent mode="view" gameData={gameData} />
     </div>
