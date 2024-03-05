@@ -26,7 +26,6 @@ export async function createTheme(data: CreateThemeInput) {
     return theme.toObject();
   } catch (e) {
     await session.abortTransaction();
-    console.log(e);
     throw e;
   }
 }

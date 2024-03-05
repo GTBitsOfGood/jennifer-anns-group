@@ -133,8 +133,8 @@ export async function getGameById(id: string) {
   await connectMongoDB();
   try {
     const game = await GameModel.findById(id)
-      .populate<ITheme>("themes")
-      .populate<ITag>("tags");
+      .populate<{ themes: ITheme[] }>("themes")
+      .populate<{ tags: ITag[] }>("tags");
     return game;
   } catch (e) {
     throw e;
