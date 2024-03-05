@@ -6,7 +6,7 @@ faker.seed(123);
 function createRandomTheme(games: string[]): CreateThemeInput {
   //Making the Themes Company names
   const chosenGames = faker.helpers.arrayElements(games);
-  console.log(chosenGames);
+  // console.log(chosenGames);
   return {
     name: faker.company.name(),
     games: chosenGames,

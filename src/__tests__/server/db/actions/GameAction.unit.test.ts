@@ -1,16 +1,20 @@
 declare var global: any;
 import mongoose, { ConnectOptions } from "mongoose";
-import { getSelectedGames } from "@/server/db/actions/GameAction";
-import { randomTags } from "@/server/db/__mocks__/actions/TagAction";
-import { randomThemes } from "@/server/db/__mocks__/actions/ThemeAction";
-import { randomGames } from "@/server/db/__mocks__/actions/GameActions";
+import { randomTags } from "@/server/db/actions/__mocks__/TagAction";
+import { randomThemes } from "@/server/db/actions/__mocks__/ThemeAction";
+import { randomGames } from "@/server/db/actions/__mocks__/GameAction";
 import { createTag } from "@/server/db/actions/TagAction";
 import TagModel from "@/server/db/models/TagModel";
 import ThemeModel from "@/server/db/models/ThemeModel";
 import GameModel from "@/server/db/models/GameModel";
-jest.mock("../../../../server/db/mongodb", () => ({
-  connectMongoDB: jest.fn().mockImplementation(() => {}),
-}));
+import * as connectMongoDB from "@/server/db/mongodb";
+
+jest.mock("../../../../server/db/mongodb");
+jest.spyOn(connectMongoDB, "default").mockImplementation(async () => {
+  await mongoose.connect(global.__MONGO_URI__, {
+    useNewUrlParser: true,
+  } as ConnectOptions);
+});
 
 //Only testing getSelectedGames for now
 //Will directly populate games, themes and tags through mongodb
@@ -35,15 +39,16 @@ describe(" MongodDB Game - Unit Test", () => {
         await createTag(tag);
       }),
     ]);
-    console.log(games);
+    // console.log(games);
     const themes = await ThemeModel.insertMany(randomThemes(gameIds, 10));
   });
 
   afterEach(async () => {
-    GameModel.deleteMany({});
-    ThemeModel.deleteMany({});
-    TagModel.deleteMany({});
+    await GameModel.deleteMany({});
+    await ThemeModel.deleteMany({});
+    await TagModel.deleteMany({});
   });
+
   describe("getSelectedGames", () => {
     test("Filtering", async () => {
       expect(12).toBe(12);
