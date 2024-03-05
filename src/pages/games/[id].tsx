@@ -99,7 +99,7 @@ const GamePage = () => {
         </Link>
       ) : null}
       <TabsComponent mode="view" gameData={gameData} />
-      {userId && userData?.label !== "administrator" && (
+      {userData && userData.label !== "administrator" && userId && (
         <NotesComponent gameId={gameId} userId={userId} />
       )}
       <TagsComponent mode="view" gameData={gameData} />
