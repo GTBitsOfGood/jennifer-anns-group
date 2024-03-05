@@ -5,7 +5,7 @@ import cn from "classnames";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { TextArea } from "@/components/ui/textarea";
 import { MoveLeft } from "lucide-react";
 
 import { useState, useEffect } from "react";
@@ -193,7 +193,7 @@ function CreateGame() {
             Description
             <span className="text-orange-primary">*</span>
           </label>
-          <Textarea
+          <TextArea
             name={DESCR_FORM_KEY}
             className={
               validationErrors.description
