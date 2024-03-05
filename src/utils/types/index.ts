@@ -67,6 +67,12 @@ export const editGameSchema = z.object({
   videoTrailer: z.string().url().optional(),
 });
 
+// Notes
+export const noteSchema = z.object({
+  date: z.string().pipe(z.coerce.date()),
+  description: z.string(),
+  gameId: z.string().refine(verifyObjectId).optional(),
+});
 export enum UserLabel {
   Educator = "educator",
   Student = "student",
@@ -80,6 +86,7 @@ export const userSchema = z.object({
   hashedPassword: z.string(),
   firstName: z.string(),
   lastName: z.string(),
+  notes: z.array(noteSchema),
   label: z.nativeEnum(UserLabel),
 });
 

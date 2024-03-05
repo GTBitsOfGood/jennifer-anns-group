@@ -3,6 +3,7 @@ import { z } from "zod";
 import { buildSchema, gameSchema, AppType } from "../../../utils/types";
 import { ITheme } from "./ThemeModel";
 import { ITag } from "./TagModel";
+
 export interface IGame extends z.infer<typeof gameSchema> {}
 export type populatedGame = Omit<IGame, "tags" | "themes"> & {
   tags: ITag[];
