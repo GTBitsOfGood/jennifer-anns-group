@@ -30,6 +30,7 @@ const config = {
       fontFamily: {
         sans: ["Poppins", "sans-serif"], // Default `Poppins` font family to sans
         "open-sans-cond": ['"Open Sans Condensed"', "sans-serif"],
+        "open-sans": ['"Open Sans"', "sans-serif"],
         inter: ["Inter", "sans-serif"],
       },
       keyframes: {

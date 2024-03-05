@@ -42,16 +42,16 @@ export const tagSchema = z.object({
 
 export const gameSchema = z.object({
   //Make sure to modify gameSchema endpoints, as well as editGameSchema I suppose.
-  name: z.string().min(3).max(50),
+  name: z.string().min(3, "Title must be at least 3 characters").max(50),
   themes: z.array(z.string().refine(verifyObjectId)).optional(),
   tags: z.array(z.string().refine(verifyObjectId)).optional(),
   webGLBuild: z.boolean().optional(),
   builds: z.array(buildSchema).optional(),
-  description: z.string(),
+  description: z.string().min(1, "Description is required"),
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
   answerKey: z.string().url().optional(),
-  videoTrailer: z.string().url().optional(),
+  videoTrailer: z.string().url("Not a valid URL").or(z.literal("")),
 });
 //Since arrays from req.query are just strings, and need to be converted into arrays.
 
@@ -73,13 +73,20 @@ export const editGameSchema = z.object({
   videoTrailer: z.string().url().optional(),
 });
 
+export enum UserLabel {
+  Educator = "educator",
+  Student = "student",
+  Parent = "parent",
+  Administrator = "administrator",
+}
+
 // User
 export const userSchema = z.object({
   email: z.string().email("Not a valid email"),
   hashedPassword: z.string(),
   firstName: z.string(),
   lastName: z.string(),
-  label: z.enum(["educator", "student", "parent", "administrator"]),
+  label: z.nativeEnum(UserLabel),
 });
 
 export type ExtendId<T extends any> = T & { _id: string };

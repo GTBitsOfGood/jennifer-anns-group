@@ -51,19 +51,25 @@ async function editUser(
 export type EditUserParams = Parameters<typeof editUser>;
 export type EditUserReturnValue = ReturnType<typeof editUser>;
 
-export function ProfileModal() {
+type ProfileProps = {
+  userData: z.infer<typeof userDataSchema> | undefined;
+  setUserData: React.Dispatch<
+    React.SetStateAction<z.infer<typeof userDataSchema> | undefined>
+  >;
+};
+
+export function ProfileModal(props: ProfileProps) {
   const [profileState, setProfileState] = useState<ProfileState>("view");
   const [open, setOpen] = useState(false);
-
   const { data: session } = useSession();
   const currentUser = session?.user;
-  const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
+  const [userData, setUserData] = [props.userData, props.setUserData];
 
   useEffect(() => {
     if (currentUser) {
       getUserData();
     }
-  }, [currentUser]);
+  }, [currentUser, userData?.label]);
 
   async function getUserData() {
     try {

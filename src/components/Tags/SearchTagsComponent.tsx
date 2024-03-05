@@ -5,6 +5,8 @@ import Paper, { PaperProps } from "@mui/material/Paper";
 import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import { z } from "zod";
 import { themeSchema, tagSchema } from "@/utils/types";
+import { ThemeProvider } from "@mui/material";
+import muiTheme from "@/styles/muiTheme";
 
 const themeDataSchema = themeSchema.extend({
   _id: z.string().length(24),
@@ -118,26 +120,28 @@ export default function SearchTagsComponent({
   };
 
   return (
-    <div>
-      <Autocomplete
-        disablePortal
-        id="combo-box-demo"
-        options={options}
-        getOptionLabel={(t) => t.name}
-        className="sans-serif"
-        onChange={handleSelection}
-        PaperComponent={CustomPaper}
-        sx={{
-          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-            {
-              border: "1px solid black",
-            },
-          width: 560,
-        }}
-        renderInput={(params) => (
-          <TextField {...params} placeholder="Search themes/tags" />
-        )}
-      />
-    </div>
+    <ThemeProvider theme={muiTheme}>
+      <div>
+        <Autocomplete
+          disablePortal
+          id="combo-box-demo"
+          options={options}
+          getOptionLabel={(t) => t.name}
+          className="sans-serif"
+          onChange={handleSelection}
+          PaperComponent={CustomPaper}
+          sx={{
+            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+              {
+                border: "1px solid black",
+              },
+            width: 560,
+          }}
+          renderInput={(params) => (
+            <TextField {...params} placeholder="Search themes/tags" />
+          )}
+        />
+      </div>
+    </ThemeProvider>
   );
 }
