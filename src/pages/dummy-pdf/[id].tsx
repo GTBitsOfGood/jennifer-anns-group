@@ -1,6 +1,4 @@
 import { useRouter } from "next/router";
-import PDF from "@/components/PDF";
-import UploadPage from "@/components/UploadPDF";
 import PDFViewer from "@/components/PDFViewer";
 import { useQuery } from "@tanstack/react-query";
 import { ExtendId } from "@/utils/types";
