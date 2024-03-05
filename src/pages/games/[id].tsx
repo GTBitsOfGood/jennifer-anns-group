@@ -6,11 +6,10 @@ import TagsComponent from "../../components/Tags/TagsComponent";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { userSchema } from "@/utils/types";
-import Image from "next/image";
-import Link from "next/link";
 import EmbeddedGame from "@/components/EmbeddedGame";
 import NotesComponent from "@/components/Tabs/NotesComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
+import AdminEditButton from "@/components/GameComponent/AdminEditButton";
 
 const GamePage = () => {
   const gameId = useRouter().query.id as string;
@@ -75,32 +74,22 @@ const GamePage = () => {
     return <div>Game does not exist</div>;
   }
 
+  const loaded = userData && userId;
+
   return (
     <div>
       <h1 className={styles.name}>{gameData.name}</h1>
       <EmbeddedGame gameId={gameId as string} />
-      {userData && userData.label === "administrator" ? (
-        <Link href={`/games/${gameId}/edit`}>
-          <div className="mx-auto flex w-[80vw] justify-end">
-            <button className="rounded-full bg-input-border">
-              <div className="flex flex-row py-2 pl-3.5 pr-4">
-                <Image
-                  width={24}
-                  height={24}
-                  src={`/editIcon.png`}
-                  alt="edit-icon"
-                />
-                <p className="ml-1 font-sans text-base font-medium text-blue-primary">
-                  Edit
-                </p>
-              </div>
-            </button>
-          </div>
-        </Link>
-      ) : null}
-      <TabsComponent mode="view" gameData={gameData} />
-      {userData && userData.label !== "administrator" && userId && (
-        <NotesComponent gameId={gameId} userId={userId} />
+      {loaded && (
+        <>
+          {userData.label === "administrator" && (
+            <AdminEditButton gameId={gameId} />
+          )}
+          <TabsComponent mode="view" gameData={gameData} />
+          {userData.label !== "administrator" && (
+            <NotesComponent gameId={gameId} userId={userId} />
+          )}
+        </>
       )}
       <TagsComponent mode="view" gameData={gameData} />
     </div>
