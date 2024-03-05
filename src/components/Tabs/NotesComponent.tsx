@@ -28,7 +28,11 @@ export default function NotesComponent({
   const [editId, setEditId] = useState("");
   const [editDescription, setEditDescription] = useState("");
 
-  const { data: notes, refetch } = useQuery({
+  const {
+    data: notes,
+    refetch,
+    isLoading,
+  } = useQuery({
     queryKey: ["notes"],
     queryFn: async () => {
       const response = await fetch(
