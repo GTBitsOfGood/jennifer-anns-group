@@ -73,6 +73,12 @@ export const noteSchema = z.object({
   description: z.string(),
   gameId: z.string().refine(verifyObjectId).optional(),
 });
+export enum UserLabel {
+  Educator = "educator",
+  Student = "student",
+  Parent = "parent",
+  Administrator = "administrator",
+}
 
 // User
 export const userSchema = z.object({
@@ -80,8 +86,8 @@ export const userSchema = z.object({
   hashedPassword: z.string(),
   firstName: z.string(),
   lastName: z.string(),
-  label: z.enum(["educator", "student", "parent", "administrator"]),
   notes: z.array(noteSchema),
+  label: z.nativeEnum(UserLabel),
 });
 
 export type ExtendId<T extends any> = T & { _id: string };
