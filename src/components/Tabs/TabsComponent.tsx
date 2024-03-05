@@ -1,5 +1,4 @@
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
-import styles from "@/styles/tabs.module.css";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { ChangeEvent, Dispatch, useState } from "react";
 
@@ -25,13 +24,13 @@ export default function TabsComponent({ mode, gameData, setGameData }: Props) {
 
   return (
     <div>
-      <Tabs colorScheme="brand" className={styles.tabs}>
-        <TabList className={styles.tabTitle}>
+      <Tabs colorScheme="brand" className="m-auto w-5/6 font-sans">
+        <TabList>
           <Tab>Description</Tab>
           {gameData.parentingGuide ? <Tab>Parenting Guide</Tab> : null}
           {gameData.lesson ? <Tab>Lesson Plan</Tab> : null}
         </TabList>
-        <TabPanels className={styles.tabContent}>
+        <TabPanels className="mb-12 mt-8 text-gray-500">
           <TabPanel p="0px">
             {mode === "edit" ? (
               <div className="rounded-[20px] border border-solid border-grey bg-input-bg">

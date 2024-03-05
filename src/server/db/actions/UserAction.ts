@@ -23,6 +23,7 @@ export async function createUser(data: z.infer<typeof createUserSchema>) {
   const userData: z.infer<typeof userSchema> = {
     ...data,
     hashedPassword,
+    notes: [],
   };
 
   try {

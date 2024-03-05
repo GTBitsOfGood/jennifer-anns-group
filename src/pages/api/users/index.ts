@@ -9,7 +9,7 @@ import {
 } from "@/utils/exceptions/user";
 
 export const createUserSchema = userSchema
-  .omit({ hashedPassword: true })
+  .omit({ hashedPassword: true, notes: true })
   .extend({
     password: z.string(),
   });
