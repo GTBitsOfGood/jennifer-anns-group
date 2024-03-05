@@ -1,4 +1,3 @@
-import styles from "@/styles/tags.module.css";
 import { Tag, TagCloseButton, TagRightIcon } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { z } from "zod";
@@ -80,7 +79,7 @@ export default function TagsComponent({ mode, gameData, setGameData }: Props) {
 
   return (
     <div>
-      <div className={styles.tags}>
+      <div className="mx-auto flex w-[80vw] flex-row flex-wrap pt-36 font-inter text-base font-normal">
         {themes
           ? themes.map((theme) => (
               <Tag key={theme.name} bg="brand.400">

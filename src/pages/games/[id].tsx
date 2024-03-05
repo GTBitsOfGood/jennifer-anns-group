@@ -1,4 +1,3 @@
-import styles from "@/styles/game.module.css";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import TabsComponent from "../../components/Tabs/TabsComponent";
@@ -78,13 +77,19 @@ const GamePage = () => {
 
   return (
     <div>
-      <h1 className={styles.name}>{gameData.name}</h1>
-      <EmbeddedGame gameId={gameId as string} />
+      <h1 className="mt-[32px] text-center font-sans text-[56px] font-semibold">
+        {gameData.name}
+      </h1>
       {loaded && (
         <>
           {userData.label === "administrator" && (
             <AdminEditButton gameId={gameId} />
           )}
+        </>
+      )}
+      <EmbeddedGame gameId={gameId as string} />
+      {loaded && (
+        <>
           <TabsComponent mode="view" gameData={gameData} />
           {userData.label !== "administrator" && (
             <NotesComponent gameId={gameId} userId={userId} />
