@@ -1,4 +1,12 @@
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
+import {
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  ChakraProvider,
+} from "@chakra-ui/react";
+import chakraTheme from "@/styles/chakraTheme";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -105,79 +113,81 @@ export default function NotesComponent({
   });
 
   return (
-    <Tabs colorScheme="brand" className="m-auto w-5/6 font-sans">
-      <TabList>
-        <Tab>Notes</Tab>
-      </TabList>
-      <TabPanels className="my-6 text-gray-500">
-        <TabPanel p="0px">
-          <Input
-            className="border-input-border focus:border-blue-primary"
-            onChange={(e) => {
-              setNewNote(e.target.value);
-            }}
-            value={newNote}
-            placeholder="Add a note..."
-          />
-          <div className="mb-4 flex flex-col items-end">
-            <Button
-              className="mt-4 block bg-blue-primary"
-              size="sm"
-              onClick={() => addNote.mutate()}
-            >
-              Post
-            </Button>
-          </div>
-          <div className="flex flex-col items-stretch">
-            {notes?.data
-              ?.map((note: INote & { _id: string; date: string }) =>
-                editId !== note._id ? (
-                  <div key={note._id} className="mb-4 flex flex-row">
-                    <div className="mr-6 whitespace-nowrap text-blue-primary">
-                      {formatDate(new Date(note.date))}
-                    </div>
-                    <div className="grow">{note.description}</div>
-                    <EditIcon
-                      className="ml-6 inline-block shrink-0 cursor-pointer self-center"
-                      onClick={() => {
-                        setEditId(note._id);
-                        setEditDescription(note.description);
-                      }}
-                    />
-                    <TrashIcon
-                      className="ml-4 inline-block shrink-0 cursor-pointer self-center"
-                      onClick={() => deleteNote.mutate(note._id)}
-                    />
-                  </div>
-                ) : (
-                  <div key={note._id} className="mb-4 flex flex-row">
-                    <div className="mr-6 whitespace-nowrap text-blue-primary">
-                      {formatDate(new Date(note.date))}
-                    </div>
-                    <div className="w-full">
-                      <TextArea
-                        defaultValue={note.description}
-                        className="h-24 text-base"
-                        onChange={(e) => {
-                          setEditDescription(e.target.value);
+    <ChakraProvider theme={chakraTheme}>
+      <Tabs colorScheme="brand" className="m-auto w-5/6 font-sans">
+        <TabList>
+          <Tab>Notes</Tab>
+        </TabList>
+        <TabPanels className="my-6 text-gray-500">
+          <TabPanel p="0px">
+            <Input
+              className="border-input-border focus:border-blue-primary"
+              onChange={(e) => {
+                setNewNote(e.target.value);
+              }}
+              value={newNote}
+              placeholder="Add a note..."
+            />
+            <div className="mb-4 flex flex-col items-end">
+              <Button
+                className="mt-4 block bg-blue-primary"
+                size="sm"
+                onClick={() => addNote.mutate()}
+              >
+                Post
+              </Button>
+            </div>
+            <div className="flex flex-col items-stretch">
+              {notes?.data
+                ?.map((note: INote & { _id: string; date: string }) =>
+                  editId !== note._id ? (
+                    <div key={note._id} className="mb-4 flex flex-row">
+                      <div className="mr-6 whitespace-nowrap text-blue-primary">
+                        {formatDate(new Date(note.date))}
+                      </div>
+                      <div className="grow">{note.description}</div>
+                      <EditIcon
+                        className="ml-6 inline-block shrink-0 cursor-pointer self-center"
+                        onClick={() => {
+                          setEditId(note._id);
+                          setEditDescription(note.description);
                         }}
                       />
+                      <TrashIcon
+                        className="ml-4 inline-block shrink-0 cursor-pointer self-center"
+                        onClick={() => deleteNote.mutate(note._id)}
+                      />
                     </div>
-                    <CheckIcon
-                      className="ml-6 inline-block shrink-0 cursor-pointer self-center"
-                      onClick={() => editNote.mutate()}
-                    />
-                    <TrashIcon
-                      className="ml-4 inline-block shrink-0 cursor-pointer self-center"
-                      onClick={() => deleteNote.mutate(note._id)}
-                    />
-                  </div>
-                ),
-              )
-              .reverse()}
-          </div>
-        </TabPanel>
-      </TabPanels>
-    </Tabs>
+                  ) : (
+                    <div key={note._id} className="mb-4 flex flex-row">
+                      <div className="mr-6 whitespace-nowrap text-blue-primary">
+                        {formatDate(new Date(note.date))}
+                      </div>
+                      <div className="w-full">
+                        <TextArea
+                          defaultValue={note.description}
+                          className="h-24 text-base"
+                          onChange={(e) => {
+                            setEditDescription(e.target.value);
+                          }}
+                        />
+                      </div>
+                      <CheckIcon
+                        className="ml-6 inline-block shrink-0 cursor-pointer self-center"
+                        onClick={() => editNote.mutate()}
+                      />
+                      <TrashIcon
+                        className="ml-4 inline-block shrink-0 cursor-pointer self-center"
+                        onClick={() => deleteNote.mutate(note._id)}
+                      />
+                    </div>
+                  ),
+                )
+                .reverse()}
+            </div>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </ChakraProvider>
   );
 }

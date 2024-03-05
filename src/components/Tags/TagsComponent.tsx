@@ -1,4 +1,10 @@
-import { Tag, TagCloseButton, TagRightIcon } from "@chakra-ui/react";
+import {
+  Tag,
+  TagCloseButton,
+  TagRightIcon,
+  ChakraProvider,
+} from "@chakra-ui/react";
+import chakraTheme from "@/styles/chakraTheme";
 import { AddIcon } from "@chakra-ui/icons";
 import { z } from "zod";
 import { Dispatch, useEffect, useState } from "react";
@@ -78,60 +84,62 @@ export default function TagsComponent({ mode, gameData, setGameData }: Props) {
   }
 
   return (
-    <div>
-      <div className="m-auto flex w-5/6 flex-row flex-wrap pb-3 pt-6 font-inter text-base">
-        {themes
-          ? themes.map((theme) => (
-              <Tag key={theme.name} bg="brand.400">
-                {theme.name}
-                {mode === "edit" ? (
-                  <TagCloseButton onClick={() => removeTheme(theme)} />
-                ) : null}
-              </Tag>
-            ))
-          : null}
-        {tags
-          ? tags.sort(sortByTagType).map((tag) => (
-              <Tag
-                key={tag.name}
-                bg={tag.type === "accessibility" ? "brand.300" : "brand.500"}
-              >
-                {tag.name}
-                {mode === "edit" &&
-                tag.name !== "Parenting Guide" &&
-                tag.name !== "Lesson Plan" ? (
-                  <TagCloseButton onClick={() => removeTag(tag)} />
-                ) : null}
-              </Tag>
-            ))
-          : null}
-        {mode === "edit" && !search ? (
-          <Tag
-            className="cursor-pointer"
-            bg="brand.600"
-            color="white"
-            onClick={() => {
-              setSearch(true);
-            }}
-          >
-            Add
-            <TagRightIcon color="white" boxSize="12px" as={AddIcon} />
-          </Tag>
+    <ChakraProvider theme={chakraTheme}>
+      <div>
+        <div className="m-auto flex w-5/6 flex-row flex-wrap pb-3 pt-6 font-inter text-base">
+          {themes
+            ? themes.map((theme) => (
+                <Tag key={theme.name} bg="brand.400">
+                  {theme.name}
+                  {mode === "edit" ? (
+                    <TagCloseButton onClick={() => removeTheme(theme)} />
+                  ) : null}
+                </Tag>
+              ))
+            : null}
+          {tags
+            ? tags.sort(sortByTagType).map((tag) => (
+                <Tag
+                  key={tag.name}
+                  bg={tag.type === "accessibility" ? "brand.300" : "brand.500"}
+                >
+                  {tag.name}
+                  {mode === "edit" &&
+                  tag.name !== "Parenting Guide" &&
+                  tag.name !== "Lesson Plan" ? (
+                    <TagCloseButton onClick={() => removeTag(tag)} />
+                  ) : null}
+                </Tag>
+              ))
+            : null}
+          {mode === "edit" && !search ? (
+            <Tag
+              className="cursor-pointer"
+              bg="brand.600"
+              color="white"
+              onClick={() => {
+                setSearch(true);
+              }}
+            >
+              Add
+              <TagRightIcon color="white" boxSize="12px" as={AddIcon} />
+            </Tag>
+          ) : null}
+        </div>
+        {mode === "edit" && search && themes && tags ? (
+          <div className="mb-32 ml-[10vw] mt-7 font-sans">
+            <div className="absolute">
+              <SearchTagsComponent
+                setSearch={setSearch}
+                currThemes={themes}
+                setCurrThemes={setThemes}
+                currTags={tags}
+                setCurrTags={setTags}
+              />
+            </div>
+          </div>
         ) : null}
       </div>
-      {mode === "edit" && search && themes && tags ? (
-        <div className="mb-32 ml-[10vw] mt-7 font-sans">
-          <div className="absolute">
-            <SearchTagsComponent
-              setSearch={setSearch}
-              currThemes={themes}
-              setCurrThemes={setThemes}
-              currTags={tags}
-              setCurrTags={setTags}
-            />
-          </div>
-        </div>
-      ) : null}
-    </div>
+    </ChakraProvider>
   );
 }

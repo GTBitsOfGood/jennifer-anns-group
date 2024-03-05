@@ -1,5 +1,6 @@
 import { getBuildFileUrl } from "@/utils/file";
-import { Spinner } from "@chakra-ui/react";
+import { ChakraProvider, Spinner } from "@chakra-ui/react";
+import chakraTheme from "@/styles/chakraTheme";
 import { useEffect, useState } from "react";
 import { Unity, useUnityContext } from "react-unity-webgl";
 
@@ -34,31 +35,33 @@ export default function RawEmbeddedGame({ gameId }: RawEmbeddedGameProps) {
   }, [devicePixelRatio]);
 
   return (
-    <div className="relative">
-      {!isLoaded && (
-        <div className="absolute top-1/2 flex w-full -translate-y-1/2 transform flex-col items-center">
-          <Spinner
-            className="mb-5 h-10 w-10"
-            thickness="4px"
-            emptyColor="#98A2B3"
-            color="#164C96"
-          />
-          <p className="text-xl">
-            Loading Game... {Math.round(loadingProgression * 100)}%
-          </p>
-        </div>
-      )}
-      {initialisationError && (
-        <div className="absolute top-1/2 flex w-full -translate-y-1/2 transform flex-col items-center">
-          <p className="text-xl">Failed to load game</p>
-        </div>
-      )}
-      <Unity
-        unityProvider={unityProvider}
-        devicePixelRatio={devicePixelRatio}
-        className="w-full"
-        tabIndex={1}
-      />
-    </div>
+    <ChakraProvider theme={chakraTheme}>
+      <div className="relative">
+        {!isLoaded && (
+          <div className="absolute top-1/2 flex w-full -translate-y-1/2 transform flex-col items-center">
+            <Spinner
+              className="mb-5 h-10 w-10"
+              thickness="4px"
+              emptyColor="#98A2B3"
+              color="#164C96"
+            />
+            <p className="text-xl">
+              Loading Game... {Math.round(loadingProgression * 100)}%
+            </p>
+          </div>
+        )}
+        {initialisationError && (
+          <div className="absolute top-1/2 flex w-full -translate-y-1/2 transform flex-col items-center">
+            <p className="text-xl">Failed to load game</p>
+          </div>
+        )}
+        <Unity
+          unityProvider={unityProvider}
+          devicePixelRatio={devicePixelRatio}
+          className="w-full"
+          tabIndex={1}
+        />
+      </div>
+    </ChakraProvider>
   );
 }
