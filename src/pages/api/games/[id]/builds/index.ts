@@ -32,7 +32,6 @@ async function createBuildHandler(req: any, res: NextApiResponse) {
     }
 
     const { uploadUrl, uploadAuthToken } = await getDirectUploadUrl();
-    console.log(uploadUrl, uploadAuthToken);
     if (!uploadUrl || !uploadAuthToken) {
       throw new BuildUploadException();
     }

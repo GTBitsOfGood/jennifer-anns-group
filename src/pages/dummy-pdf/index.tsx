@@ -78,7 +78,6 @@ function DummyPDFPage() {
       const newPost = (await newPostRes.json()) as ExtendId<IGame>;
 
       const { _id } = newPost;
-      console.log(e);
 
       const formData = new FormData(e.target as HTMLFormElement);
       const file = formData.get(FORM_LESSON_PLAN_FILE_KEY) as File | null;
@@ -86,7 +85,6 @@ function DummyPDFPage() {
         // Handle error in real `handleSubmit` for game forms
         return;
       }
-      console.log(file);
 
       const fileName = `${_id}/${uuidv4()}_${file.name}`;
 
