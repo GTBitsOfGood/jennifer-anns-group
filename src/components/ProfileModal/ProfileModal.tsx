@@ -24,7 +24,7 @@ export const userDataSchema = userSchema
   .extend({
     _id: idSchema,
   })
-  .omit({ hashedPassword: true });
+  .omit({ hashedPassword: true, notes: true });
 
 async function editUser(
   data: z.infer<typeof userDataSchema> | z.infer<typeof changePWSchema>,
