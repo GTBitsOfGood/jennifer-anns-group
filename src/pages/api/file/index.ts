@@ -32,6 +32,8 @@ async function getFileHandler(req: NextApiRequest, res: NextApiResponse) {
     const token = await getDirectUploadUrl();
     return res.status(HTTP_STATUS_CODE.OK).send(token);
   } catch (e) {
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send("Internal server error");
   }
 }
