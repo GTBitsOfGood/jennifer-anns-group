@@ -13,7 +13,7 @@ export default async function handler(
     case "GET":
       return getNotesHandler(req, res);
     case "POST":
-      return postNotesHandler(req, res);
+      return postNoteHandler(req, res);
     default:
       res.status(HTTP_STATUS_CODE.METHOD_NOT_ALLOWED).json({
         error: `Request method ${req.method} is not allowed`,
@@ -43,7 +43,7 @@ async function getNotesHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-async function postNotesHandler(req: NextApiRequest, res: NextApiResponse) {
+async function postNoteHandler(req: NextApiRequest, res: NextApiResponse) {
   const id = req.query.id as string;
 
   try {

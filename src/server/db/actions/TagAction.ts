@@ -10,7 +10,6 @@ export async function createTag(data: CreateTagInput) {
   session.startTransaction();
   try {
     const tag = (await TagModel.create([data], { session }))[0];
-    // const tag = await TagModel.create(data);
     await GameModel.updateMany(
       {
         _id: {
@@ -34,8 +33,8 @@ export async function createTag(data: CreateTagInput) {
 
 export async function deleteTag(id: string) {
   await connectMongoDB();
-  // const session = await TagModel.startSession();
-  // session.startTransaction();
+  const session = await TagModel.startSession();
+  session.startTransaction();
   try {
     const deletedTag = await TagModel.findByIdAndDelete(id.toString()); //To fix error with BSON
     if (!deletedTag) {
@@ -45,10 +44,10 @@ export async function deleteTag(id: string) {
       { tags: { $in: [id] } },
       { $pull: { tags: id } },
     );
-    // await session.commitTransaction();
+    await session.commitTransaction();
     return deletedTag.toObject();
   } catch (e) {
-    // await session.abortTransaction();
+    await session.abortTransaction();
     throw e;
   }
 }

@@ -12,7 +12,7 @@ export default async function handler(
     case "PUT":
       return editNoteHandler(req, res);
     case "DELETE":
-      return deleteNotesHandler(req, res);
+      return deleteNoteHandler(req, res);
     default:
       res.status(HTTP_STATUS_CODE.METHOD_NOT_ALLOWED).json({
         error: `Request method ${req.method} is not allowed`,
@@ -36,7 +36,7 @@ async function editNoteHandler(req: NextApiRequest, res: NextApiResponse) {
   });
 }
 
-async function deleteNotesHandler(req: NextApiRequest, res: NextApiResponse) {
+async function deleteNoteHandler(req: NextApiRequest, res: NextApiResponse) {
   const id = req.query.id as string;
   const noteId = req.query.noteId as string;
   try {
