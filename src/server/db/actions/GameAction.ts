@@ -133,42 +133,10 @@ export async function getGameById(id: string) {
   await connectMongoDB();
   try {
     const game = await GameModel.findById(id)
-      .populate<ITheme>("themes")
-      .populate<ITag>("tags");
+      .populate<{ themes: ITheme[] }>("themes")
+      .populate<{ tags: ITag[] }>("tags");
     return game;
   } catch (e) {
-    throw e;
-  }
-}
-
-export async function uploadFile(file: any) {
-  const connection = await connectMongoDB();
-  if (!connection) {
-    throw new Error("MongoDB not connected.");
-  }
-  // if (type != "lessonPlan" && type != "parentingGuide") {
-  //   throw new Error("Invalid file type- not lesson plan or parenting guide.");
-  // }
-  try {
-    const bucket = new GridFSBucket(connection);
-    if (!file) {
-      throw new Error("Empty file.");
-    }
-    const fileData = file;
-    const fileStream = new Readable();
-    fileStream.push(fileData);
-    fileStream.push(null);
-    const uploadOptions = {
-      metadata: {
-        type: "parentingGuide",
-      },
-      contentType: "application/pdf",
-    };
-    const uploadStream = bucket.openUploadStream("filename.pdf", uploadOptions);
-    fileStream.pipe(uploadStream);
-    return uploadStream;
-  } catch (e) {
-    console.log(e);
     throw e;
   }
 }
