@@ -1,4 +1,5 @@
 import axios from "axios";
+import { CLOUDFLARE_URL } from "./consts";
 
 // there's probably a better place to put these
 type BuildFileType = "data" | "framework" | "loader" | "code";
@@ -74,11 +75,9 @@ export async function uploadBuildFiles(
 }
 
 export function getBuildFileUrl(gameId: string, type: BuildFileType) {
-  const CLOUDFLARE_URL = "https://cloudflare-b2.bogjenniferanns.workers.dev";
-
   const fileName = `${gameId}/${
     buildFileTypes[type as keyof typeof buildFileTypes]
   }`;
 
-  return `${CLOUDFLARE_URL}/${fileName}`;
+  return `${CLOUDFLARE_URL}/webgl-builds/${fileName}`;
 }
