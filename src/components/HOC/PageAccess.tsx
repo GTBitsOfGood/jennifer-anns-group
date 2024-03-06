@@ -30,9 +30,15 @@ enum Label {
 }
 
 const pageRequiredLabels: Record<Pages, Array<Label>> = {
-  [Pages.HOME]: [Label.STUDENT, Label.PARENT, Label.EDUCATOR, Label.NONE], // Allow any role or no role
-  [Pages.LOGIN]: [Label.STUDENT, Label.PARENT, Label.EDUCATOR, Label.NONE], // Allow any role or no role
-  [Pages.SIGNUP]: [Label.STUDENT, Label.PARENT, Label.EDUCATOR, Label.NONE], // Allow any role or no role
+  [Pages.HOME]: [
+    Label.STUDENT,
+    Label.PARENT,
+    Label.EDUCATOR,
+    Label.ADMINISTRATOR,
+    Label.NONE,
+  ], // Allow all users
+  [Pages.LOGIN]: [Label.NONE], // Only allow public users
+  [Pages.SIGNUP]: [Label.NONE], // Only allow public users
   [Pages.CREATEGAME]: [Label.ADMINISTRATOR], // Only allow administrator role
 };
 
@@ -65,6 +71,7 @@ const pageAccessHOC = <P extends object>(Component: React.FC<P>) => {
     useEffect(() => {
       if (
         status !== "loading" &&
+        label !== "loading" &&
         (!pageRequiredLabels[router.pathname as Pages].includes(label) ||
           pageRequiredAuthentication[router.pathname as Pages] !== status)
       ) {
