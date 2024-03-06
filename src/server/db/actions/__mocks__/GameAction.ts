@@ -52,8 +52,6 @@ export async function createRandomGameQueries(n: number) {
   const accessibilityTagNames = tags
     .filter((tag) => tag.type === "accessibility")
     .map((tag) => tag.name);
-  console.log(accessibilityTagNames, "Accessibility");
-  console.log(customTagNames, "custom");
   const gameNames = games.map((game) => game.name);
   const NUM_GAMES = gameNames.length;
   return Array.from({ length: n }).map(() => {
