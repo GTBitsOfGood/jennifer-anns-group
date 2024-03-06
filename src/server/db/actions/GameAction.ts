@@ -16,8 +16,16 @@ import {
 import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
 
-const RESULTS_PER_PAGE = 6;
+export const RESULTS_PER_PAGE = 7;
 
+export const buildConverter: { [key: string]: string } = {
+  amazon: "Amazon App",
+  android: "Android App",
+  appstore: "App Store",
+  linux: "Linux Download",
+  mac: "Mac Download",
+  windows: "windows",
+};
 export async function createGame(data: IGame) {
   await connectMongoDB();
 
@@ -128,7 +136,7 @@ export async function getSelectedGames(
       );
     }
     //Add to filters object
-    filters.themes = { $all: [foundTheme] };
+    filters.themes = { $in: [foundTheme._id] };
     //Essentially ensures that the themes array contains foundTheme.
   }
   //For Accessibility and normal Tags, add it to the filter object using reduce.
@@ -181,7 +189,7 @@ export async function getSelectedGames(
   }
 
   //Filtering based on game build (filtering should be add)
-  if (query.gameBuilds) {
+  if (query.gameBuilds && query.gameBuilds.length !== 0) {
     if (query.gameBuilds.includes(GameBuildsEnum.webgl)) {
       //WebGl requires a different type of filter, as it is seperate from the other builds
       filters.webGLBuild = true;
@@ -191,14 +199,7 @@ export async function getSelectedGames(
     //Right now picks where at least one type is included, not all types.
     //Add directly to aggregate pipeline. Transform it then unwind it back.
     //Converts AppType to field used in filter.
-    const buildConverter: { [key: string]: string } = {
-      amazon: "Amazon App",
-      android: "Android App",
-      appstore: "App Store",
-      linux: "Linux Download",
-      mac: "Mac Download",
-      windows: "windows",
-    };
+
     const filterableBuilds = query.gameBuilds.map(
       (build: string) => buildConverter[build],
     );
@@ -220,7 +221,7 @@ export async function getSelectedGames(
   aggregate.match(filters);
   aggregate.skip((query.page - 1) * RESULTS_PER_PAGE);
   aggregate.limit(RESULTS_PER_PAGE);
-  const games = await aggregate.exec();
+  const games: IGame[] = await aggregate.exec(); //While aggregate can return any type, I remove and add fields.
   return games;
 }
 

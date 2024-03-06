@@ -82,6 +82,7 @@ export const GetGameQuerySchema = z.object({
     .optional(),
   page: z.string().transform(convertINT).pipe(z.number().gte(1)),
 });
+export type GameQuery = z.infer<typeof GetGameQuerySchema>;
 
 async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
