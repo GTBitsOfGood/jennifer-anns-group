@@ -72,16 +72,18 @@ describe(" MongodDB Game - Unit Test", () => {
       const actualResults = await Promise.all(
         queries.map(async (query, index) => {
           const result = await getSelectedGames(query);
-          return result.length;
+          return result;
         }),
       );
       const predictedResults = await Promise.all(
         queries.map(async (query, index) => {
           const result = await manualFilter(query);
-          return result.length;
+          return result;
         }),
       );
-      expect(actualResults).toEqual(predictedResults);
+      expect(JSON.stringify(actualResults)).toEqual(
+        JSON.stringify(predictedResults),
+      );
       //Based on that filter call the action.
       //Manually filter based on that filter and ensure the outputs match. Connect to the database in one of the mock functions to properly create the queries.
     });
