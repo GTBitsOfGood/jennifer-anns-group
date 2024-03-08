@@ -5,9 +5,9 @@ import connectMongoDB from "../mongodb";
 import { deleteBuild } from "./BuildAction";
 import { FilterQuery } from "mongoose";
 import { z } from "zod";
-import { editGameSchema } from "@/utils/types";
+import { AppType, ExtendId, editGameSchema } from "@/utils/types";
 import mongoose from "mongoose";
-import { GetGameQuerySchema, GameBuildsEnum } from "@/pages/api/games";
+import { GetGameQuerySchema } from "@/pages/api/games";
 import {
   GameNotFoundException,
   InvalidIdGameErrorException,
@@ -190,7 +190,7 @@ export async function getSelectedGames(
 
   //Filtering based on game build (filtering should be add)
   if (query.gameBuilds && query.gameBuilds.length !== 0) {
-    if (query.gameBuilds.includes(GameBuildsEnum.webgl)) {
+    if (query.gameBuilds.includes(AppType.webgl)) {
       //WebGl requires a different type of filter, as it is seperate from the other builds
       filters.webGLBuild = true;
       //Remove webGL for further filtering based on other normal games.
@@ -221,7 +221,7 @@ export async function getSelectedGames(
   aggregate.match(filters);
   aggregate.skip((query.page - 1) * RESULTS_PER_PAGE);
   aggregate.limit(RESULTS_PER_PAGE);
-  const games: IGame[] = await aggregate.exec(); //While aggregate can return any type, I remove and add fields.
+  const games: ExtendId<IGame>[] = await aggregate.exec(); //While aggregate can return any type, I remove and add fields.
   return games;
 }
 

@@ -9,14 +9,14 @@ const verifyObjectId = (value: string) => {
   return false;
 };
 
-// Build
 export enum AppType {
-  AmazonApp = "Amazon App",
-  AndroidApp = "Android App",
-  AppStore = "App Store",
-  LinuxDownload = "Linux Download",
-  MacDownload = "Mac Download",
-  WindowsDownload = "Windows Download",
+  amazon = "amazon",
+  android = "android",
+  appstore = "appstore",
+  linux = "linux",
+  mac = "mac",
+  webgl = "webgl",
+  windows = "windows",
 }
 
 export const buildSchema = z.object({

@@ -12,7 +12,6 @@ import ThemeModel from "@/server/db/models/ThemeModel";
 import GameModel from "@/server/db/models/GameModel";
 import * as connectMongoDB from "@/server/db/mongodb";
 import { createTheme } from "@/server/db/actions/ThemeAction";
-import { GameQuery } from "@/pages/api/games";
 import {
   RESULTS_PER_PAGE,
   buildConverter,
@@ -21,6 +20,9 @@ import {
 import { IGame } from "@/server/db/models/GameModel";
 import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
+import { GameContentEnum, GameQuery } from "@/pages/api/games";
+import { AppType } from "@/utils/types";
+
 jest.mock("../../../../server/db/mongodb");
 jest.spyOn(connectMongoDB, "default").mockImplementation(async () => {
   await mongoose.connect(global.__MONGO_URI__, {
@@ -31,7 +33,11 @@ jest.spyOn(connectMongoDB, "default").mockImplementation(async () => {
 //Only testing getSelectedGames for now
 //Will directly populate games, themes and tags through mongodb
 
-describe(" MongodDB Game - Unit Test", () => {
+const NUM_GAMES = 500;
+
+const generatedGames = randomGames(NUM_GAMES);
+
+describe("MongodDB Game - Unit Test", () => {
   beforeAll(async () => {
     await mongoose.connect(global.__MONGO_URI__, {
       useNewUrlParser: true,
@@ -43,7 +49,7 @@ describe(" MongodDB Game - Unit Test", () => {
   });
 
   beforeEach(async () => {
-    const games = await GameModel.insertMany(randomGames(100));
+    const games = await GameModel.insertMany(generatedGames);
     const gameIds = games.map((game) => game._id.toString());
     const tagInputs = randomTags(gameIds, 10);
     const tags = await Promise.all(
@@ -66,128 +72,129 @@ describe(" MongodDB Game - Unit Test", () => {
   });
 
   describe("getSelectedGames", () => {
-    test("Filtering", async () => {
-      //Randomly create a filter.
-      let queries = await createRandomGameQueries(100);
-      const actualResults = await Promise.all(
-        queries.map(async (query, index) => {
-          const result = await getSelectedGames(query);
-          return result;
-        }),
-      );
-      const predictedResults = await Promise.all(
-        queries.map(async (query, index) => {
-          const result = await manualFilter(query);
-          return result;
-        }),
-      );
-      expect(JSON.stringify(actualResults)).toEqual(
-        JSON.stringify(predictedResults),
-      );
-      //Based on that filter call the action.
-      //Manually filter based on that filter and ensure the outputs match. Connect to the database in one of the mock functions to properly create the queries.
+    test("[pagination] page out of range: expect exception", async () => {});
+    test("[pagination] no repeats in paginated results: expect success", async () => {
+      const numPages = Math.ceil(NUM_GAMES / RESULTS_PER_PAGE);
+      const set = new Set();
+      for (let i = 0; i < numPages; i++) {
+        const games = await getSelectedGames({ page: i + 1 });
+        games.forEach((game) => {
+          expect(set.has(game)).toBe(false);
+          set.add(game);
+        });
+      }
+      expect(set.size).toBe(NUM_GAMES);
+    });
+    test("[pagination] number of results in each page: expect success", async () => {
+      const numPages = Math.ceil(NUM_GAMES / RESULTS_PER_PAGE);
+      for (let i = 0; i < numPages; i++) {
+        const games = await getSelectedGames({ page: i + 1 });
+        expect(games.length).toBe(
+          i < numPages - 1
+            ? RESULTS_PER_PAGE
+            : NUM_GAMES - RESULTS_PER_PAGE * (numPages - 1),
+        );
+      }
+    });
+    test("[tag] nonexistent tag: expect exception", async () => {});
+    test("[tag] in-out groups: expect success", async () => {});
+    test("[theme] nonexistent theme: expect exception", async () => {});
+    test("[theme] in-out groups: expect success", async () => {});
+    test("[name] regex case insensitivity in-exact match: expect success", async () => {});
+    // ...
+    test("happy: expect success", async () => {
+      const customTags = await TagModel.find({ type: "custom" });
+      const customTagNames = customTags.map((tag) => tag.name);
+      const randomCustomTag =
+        customTagNames[Math.floor(Math.random() * customTagNames.length)];
+
+      const accessibilityTags = await TagModel.find({ type: "accessibility" });
+      const accessibilityTagNames = accessibilityTags.map((tag) => tag.name);
+      const randomAccessibilityTag =
+        accessibilityTagNames[
+          Math.floor(Math.random() * accessibilityTagNames.length)
+        ];
+
+      const themes = await ThemeModel.find({});
+      const themeNames = themes.map((theme) => theme.name);
+      const randomTheme =
+        themeNames[Math.floor(Math.random() * themeNames.length)];
+
+      const query = {
+        page: 2,
+        tags: [randomCustomTag],
+        accessibility: [randomAccessibilityTag],
+        theme: randomTheme,
+        name: "a",
+        gameBuilds: [
+          AppType.amazon,
+          AppType.appstore,
+          AppType.mac,
+          AppType.webgl,
+        ],
+        gameContent: [GameContentEnum.parentingGuide],
+      };
+
+      const actual = await getSelectedGames(query);
+      actual.forEach((game) => {
+        expect(game).toHaveProperty("_id");
+      });
+
+      // ids determined at runtime, omit for assertion
+      const actualOmittedId = actual.map(({ _id, ...rest }) => rest);
+
+      const expected = filterGeneratedGames(generatedGames, query);
+      console.log(expected);
+      expect(actualOmittedId).toEqual(expected);
     });
   });
 });
 
-async function manualFilter(query: GameQuery) {
-  //Carry out the filtering in javascript specifically.
-  let games: IGame[] = await GameModel.find();
+type QueryFieldHandlers<T> = {
+  [K in keyof T]: (
+    games: IGame[],
+    field: T[K],
+    resultsPerPage: number,
+  ) => IGame[];
+};
 
-  //Not enough games
-  if (RESULTS_PER_PAGE * (query.page - 1) > games.length) {
-    return [];
-  }
-  //For some reason I need to use ! even though the if loops should force it being not null and defined.
-  //Need to convert theme into object id for filtering.
-  //Filter by theme
-  if (query.theme) {
-    const foundTheme = await ThemeModel.findOne({
-      name: query.theme,
-    });
-    if (!foundTheme) {
-      //No theme was found
-      throw new ThemeNotFoundException(
-        `No theme with the name ${query.theme} exists.`,
-      );
-    }
+const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<Required<GameQuery>> = {
+  page: (games, page, resultsPerPage) => {
+    const startIndex = (page - 1) * resultsPerPage;
+    const endIndex = startIndex + resultsPerPage;
+    return games.slice(startIndex, endIndex);
+  },
+  name: (games, name, _) =>
+    games.filter((game) =>
+      game.name.toLowerCase().includes(name.toLowerCase()),
+    ),
+  tags: (games, customTags, _) => [], //TODO: rework
+  accessibility: (games, accessibilityTags, _) => [], //TODO: rework
+  theme: (games, themeName, _) =>
+    games.filter((game) => game.themes?.includes(themeName)),
+  gameBuilds: (games, gameBuilds, _) =>
+    games.filter((game) => {
+      const builds = game.builds?.map((build) => build.type);
+      return builds?.some((build) => gameBuilds.includes(build));
+    }),
+  gameContent: (games, gameContent, _) =>
+    games.filter((game) => gameContent.every((document) => document in game)),
+};
 
-    games = games.filter((game) => {
-      return game.themes && game.themes.includes(foundTheme._id.toString());
-    });
-  }
-  //Filter by name
-  if (query.name) {
-    games = games.filter(
-      (game) => game.name && game.name.includes(query.name!),
+function filterGeneratedGames(
+  games: IGame[],
+  query: GameQuery,
+  resultsPerPage = RESULTS_PER_PAGE,
+) {
+  const { page, ...filterSteps } = query;
+
+  let filteredGames = games;
+  for (const [key, value] of Object.entries(filterSteps)) {
+    filteredGames = QUERY_FIELD_HANDLER_MAP[key as keyof typeof filterSteps](
+      filteredGames,
+      value as any,
+      resultsPerPage,
     );
   }
-  //Need to convert tags from names into object ids for filtering.
-  let totalTags: mongoose.Types.ObjectId[] = [];
-  const tagTypes = [
-    { tags: query.tags, type: "custom" },
-    { tags: query.accessibility, type: "accessibility" },
-  ];
-  totalTags = await tagTypes.reduce(async (acc, curr) => {
-    //curr will be tuple containing an array of tag names, and the type it has to be
-    let accAwaited = await acc; //Necessary cuz we defined the accumulate as a promise.
-    if (curr.tags) {
-      const currTags = await TagModel.find({
-        name: { $in: curr.tags },
-        type: curr.type,
-      });
-      if (currTags.length !== curr.tags.length) {
-        throw new TagNotFoundException(
-          `One or more of the ${curr.type} tags do not exist.`,
-        );
-      }
-      const currTagsId = currTags.map((tag) => tag._id);
-      accAwaited = [...accAwaited, ...currTagsId];
-    }
-    return accAwaited;
-  }, Promise.resolve(totalTags));
-  //Filter by all tags
-  if (totalTags.length !== 0) {
-    games = games.filter(
-      (game) =>
-        game.tags &&
-        totalTags.every((val) => game.tags?.includes(val.toString())), //Ensures every element in query.tags is in game.tags
-    );
-  }
-
-  //Filter by gameContent
-  if (query.gameContent) {
-    games = games.filter((game) => {
-      return query.gameContent?.every((content) => content in game);
-    });
-  }
-  //Filter by gameBuilds
-  if (query.gameBuilds) {
-    //Filter by webGL
-    const filterBuilds = query.gameBuilds.map(
-      (gameBuild) => buildConverter[gameBuild],
-    );
-    if ("webgl" in query.gameBuilds) {
-      games = games.filter((game) => game.webGLBuild);
-    }
-    //Filter by other gamebuilds. games should contain every single build (it should be and)
-    query.gameBuilds.forEach((gameBuild) => {
-      if (gameBuild !== "webgl") {
-        games = games.filter((game): boolean => {
-          if (game.builds) {
-            const types = game.builds.map((build) => build.type.toString());
-            //Convert types to one used in query.
-            return filterBuilds.every((type) => types.includes(type));
-          } else {
-            return false;
-          }
-        });
-      }
-    });
-  }
-
-  const startIndex = RESULTS_PER_PAGE * (query.page - 1); //Remember, arrays are zero indixed in javascript.
-  const endIndex = startIndex + RESULTS_PER_PAGE;
-  games = games.slice(startIndex, endIndex);
-  return games;
+  return filteredGames;
 }

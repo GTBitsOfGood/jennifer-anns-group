@@ -9,8 +9,7 @@ import { ITheme } from "../../models/ThemeModel";
 import connectMongoDB from "../../mongodb";
 import { RESULTS_PER_PAGE } from "../GameAction";
 import { GameQuery } from "@/pages/api/games";
-faker.seed(123); //Currently have faker seed set for testing of testing.
-//Assuming currently no themes or tags are passed in. They will be populated in later.
+
 function createRandomGame(): IGame {
   const appTypeValues = Object.values(AppType);
   const numBuilds = faker.number.int({ min: 0, max: appTypeValues.length });

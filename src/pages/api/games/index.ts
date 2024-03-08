@@ -4,7 +4,7 @@ import {
   createGame,
   getSelectedGames,
 } from "../../../server/db/actions/GameAction";
-import { gameSchema } from "../../../utils/types";
+import { AppType, gameSchema } from "../../../utils/types";
 import { NextApiRequest, NextApiResponse } from "next";
 import {
   GameInvalidInputException,
@@ -32,16 +32,6 @@ export enum GameContentEnum {
   parentingGuide = "parentingGuide",
   lesson = "lesson",
   videoTrailer = "videoTrailer",
-}
-
-export enum GameBuildsEnum {
-  amazon = "amazon",
-  android = "android",
-  appstore = "appstore",
-  linux = "linux",
-  mac = "mac",
-  webgl = "webgl",
-  windows = "windows",
 }
 
 const convertINT = (val: string, ctx: RefinementCtx) => {
@@ -73,8 +63,8 @@ export const GetGameQuerySchema = z.object({
     .or(z.string().transform(putSingleStringInArray))
     .optional(),
   gameBuilds: z
-    .array(z.nativeEnum(GameBuildsEnum))
-    .or(z.nativeEnum(GameBuildsEnum).transform(putSingleStringInArray))
+    .array(z.nativeEnum(AppType))
+    .or(z.nativeEnum(AppType).transform(putSingleStringInArray))
     .optional(),
   gameContent: z
     .array(z.nativeEnum(GameContentEnum))
