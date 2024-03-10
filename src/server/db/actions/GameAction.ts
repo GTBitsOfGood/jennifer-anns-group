@@ -218,11 +218,26 @@ export async function getSelectedGames(
     //I need builds to contain several builds, all of which have types which should be in query.gameBuilds.
   }
   //Need to add extra filtering outside of GameModel.find for
+
   aggregate.match(filters);
-  aggregate.skip((query.page - 1) * RESULTS_PER_PAGE);
-  aggregate.limit(RESULTS_PER_PAGE);
-  const games: ExtendId<IGame>[] = await aggregate.exec(); //While aggregate can return any type, I remove and add fields.
-  return games;
+  aggregate.facet({
+    games: [
+      { $skip: (query.page - 1) * RESULTS_PER_PAGE },
+      { $limit: RESULTS_PER_PAGE },
+    ],
+    count: [{ $count: "count" }],
+  });
+  const results = await aggregate.exec();
+  let count = 0;
+  if (results[0].count.length != 0) {
+    count = results[0].count[0].count;
+  }
+  const games: ExtendId<IGame>[] = results[0].games; //While aggregate can return any type, I remove and add fields.
+
+  if (games.length == 0) {
+    throw new GameNotFoundException("No Games found at this page");
+  }
+  return { games: games, count: count };
 }
 
 export async function getGameById(id: string) {

@@ -1,13 +1,15 @@
 import { faker } from "@faker-js/faker";
 import { CreateThemeInput } from "@/pages/api/themes";
-
+import mongoose from "mongoose";
+import { ExtendId } from "@/utils/types";
 faker.seed(123);
 
-function createRandomTheme(games: string[]): CreateThemeInput {
+function createRandomTheme(games: string[]): ExtendId<CreateThemeInput> {
   //Making the Themes Company names
   const chosenGames = faker.helpers.arrayElements(games);
   // console.log(chosenGames);
   return {
+    _id: new mongoose.Types.ObjectId().toString(),
     name: faker.company.name(),
     games: chosenGames,
   };

@@ -9,11 +9,13 @@ import { ITheme } from "../../models/ThemeModel";
 import connectMongoDB from "../../mongodb";
 import { RESULTS_PER_PAGE } from "../GameAction";
 import { GameQuery } from "@/pages/api/games";
-
-function createRandomGame(): IGame {
+import { ExtendId } from "@/utils/types";
+import mongoose from "mongoose";
+function createRandomGame(): ExtendId<IGame> {
   const appTypeValues = Object.values(AppType);
   const numBuilds = faker.number.int({ min: 0, max: appTypeValues.length });
   return {
+    _id: new mongoose.Types.ObjectId().toString(),
     themes: [],
     tags: [],
     name: faker.person.fullName(),
