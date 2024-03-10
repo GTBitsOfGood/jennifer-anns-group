@@ -35,7 +35,7 @@ jest.spyOn(connectMongoDB, "default").mockImplementation(async () => {
 //Only testing getSelectedGames for now
 //Will directly populate games, themes and tags through mongodb
 
-const NUM_GAMES = 1;
+const NUM_GAMES = 300;
 //Let's make new games and tags for each test.
 let generatedGames: ExtendId<IGame>[];
 let tagInputs: ExtendId<CreateTagInput>[];
@@ -226,31 +226,24 @@ describe("MongodDB Game - Unit Test", () => {
     });
     // ...
     test("happy: expect success", async () => {
+      //
       const customTags = await TagModel.find({ type: "custom" });
-      const customTagNames = customTags.map((tag) => tag.name);
       const randomCustomTag =
-        customTagNames[Math.floor(Math.random() * customTagNames.length)];
-
+        customTags[Math.floor(Math.random() * customTags.length)];
       const accessibilityTags = await TagModel.find({
         type: "accessibility",
       });
-      const accessibilityTagNames = accessibilityTags.map((tag) => tag.name);
       const randomAccessibilityTag =
-        accessibilityTagNames[
-          Math.floor(Math.random() * accessibilityTagNames.length)
-        ];
+        accessibilityTags[Math.floor(Math.random() * accessibilityTags.length)];
 
       const themes = await ThemeModel.find({});
-      const themeNames = themes.map((theme) => theme.name);
-      const randomTheme =
-        themeNames[Math.floor(Math.random() * themeNames.length)];
-
+      const randomTheme = themes[Math.floor(Math.random() * themes.length)];
       const query = {
         page: 1,
-        tags: [randomCustomTag],
-        accessibility: [randomAccessibilityTag],
-        theme: randomTheme,
-        name: "a",
+        tags: [randomCustomTag.name],
+        accessibility: [randomAccessibilityTag.name],
+        theme: randomTheme.name,
+        name: faker.string.alpha({ length: 1 }),
         gameBuilds: [
           AppType.amazon,
           AppType.appstore,
@@ -259,29 +252,40 @@ describe("MongodDB Game - Unit Test", () => {
         ],
         gameContent: [GameContentEnum.parentingGuide],
       };
+
+      // ids determined at runtime, omit for assertion
+      //Removing this cuz ids are now no longer determined at runtime.
+      const modifiedQuery = query;
+      if (query.tags != undefined) {
+        modifiedQuery.tags = [randomCustomTag._id.toString()];
+      }
+
+      if (query.accessibility != undefined) {
+        modifiedQuery.accessibility = [randomAccessibilityTag._id.toString()];
+      }
+      if (query.theme != undefined) {
+        modifiedQuery.theme = randomTheme._id.toString();
+      }
+      const expected = filterGeneratedGames(generatedGames, modifiedQuery);
+      console.log("Expected Games", expected);
       let actual: {
         games: ExtendId<IGame>[];
         count: number;
       };
-      try {
-        actual = await getSelectedGames(query);
-      } catch (e) {
-        if (e instanceof GameNotFoundException) {
-          actual = { games: [], count: 0 }; //Accounts for the case when we grab none of the games via the test.
-        } else {
-          throw e;
-        }
+      if (expected.length == 0) {
+        await expect(getSelectedGames(modifiedQuery)).rejects.toThrow(
+          GameNotFoundException,
+        );
+      } else {
+        actual = await getSelectedGames(modifiedQuery);
+        actual.games.forEach((game) => {
+          expect(game).toHaveProperty("_id");
+        });
+        console.log("Actual games", actual.games);
+        expect(actual.games).toEqual(expected);
+        console.log(query);
+        console.log(query.tags);
       }
-      actual.games.forEach((game) => {
-        expect(game).toHaveProperty("_id");
-      });
-
-      // ids determined at runtime, omit for assertion
-      //Removing this cuz ids are now no longer determined at runtime.
-      const expected = filterGeneratedGames(generatedGames, query);
-      console.log("Expected Games", expected);
-      console.log("Actual games", actual.games);
-      expect(actual.games).toEqual(expected);
     });
   });
 
@@ -303,10 +307,17 @@ describe("MongodDB Game - Unit Test", () => {
       games.filter((game) =>
         game.name.toLowerCase().includes(name.toLowerCase()),
       ),
-    tags: (games, customTags, _) =>
-      games.filter((game) =>
-        customTags.every((tag) => game.tags?.includes(tag)),
-      ), //TODO: rework. should ensure that games contains at least one of that tag.
+    tags: (games, customTags, _) => {
+      console.log("games passed to Tags", games.length);
+      const filteredGames = games.filter((game) => {
+        if (game.tags !== undefined) {
+          return customTags.every((tag) => game.tags!.includes(tag));
+        }
+        return false;
+      });
+      console.log("games from Tags", filteredGames.length);
+      return filteredGames;
+    }, //TODO: rework. should ensure that games contains at least one of that tag.
     accessibility: (games, accessibilityTags, _) =>
       games.filter((game) =>
         accessibilityTags.every((tag) => game.tags?.includes(tag)),
@@ -330,14 +341,20 @@ describe("MongodDB Game - Unit Test", () => {
     const { page, ...filterSteps } = query;
 
     let filteredGames = games;
+    console.log("Before:", filteredGames.length);
     for (const [key, value] of Object.entries(filterSteps)) {
       filteredGames = QUERY_FIELD_HANDLER_MAP[key as keyof typeof filterSteps](
         filteredGames,
         value as any,
         resultsPerPage,
       );
-      console.log("Filtered games:", key, filteredGames);
+      console.log("Filtered games:", key, filteredGames.length);
     }
+    filteredGames = QUERY_FIELD_HANDLER_MAP["page"](
+      filteredGames,
+      page,
+      RESULTS_PER_PAGE,
+    );
     return filteredGames;
   }
 
