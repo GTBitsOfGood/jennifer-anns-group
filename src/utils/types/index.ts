@@ -93,6 +93,11 @@ export const userSchema = z.object({
   label: z.nativeEnum(UserLabel),
 });
 
+// User
+export const adminSchema = z.object({
+  email: z.string().email("Not a valid email"),
+});
+
 export type ExtendId<T extends any> = T & { _id: string };
 
 // For changing password
