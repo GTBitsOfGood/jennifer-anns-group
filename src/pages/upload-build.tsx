@@ -3,8 +3,8 @@ import axios from "axios";
 import { useState } from "react";
 
 // there's probably a better place to put these
-type BuildFileType = "data" | "framework" | "loader" | "code";
-const buildFileTypes = Object.freeze({
+export type BuildFileType = "data" | "framework" | "loader" | "code";
+export const buildFileTypes = Object.freeze({
   data: "build.data",
   framework: "build.framework.js",
   loader: "build.loader.js",
@@ -70,14 +70,6 @@ async function uploadBuildFiles(gameId: string, files: Map<string, File>) {
       },
     },
   );
-}
-
-export function getBuildFileUrl(gameId: string, type: BuildFileType) {
-  const fileName = `${gameId}/${
-    buildFileTypes[type as keyof typeof buildFileTypes]
-  }`;
-
-  return `${CLOUDFLARE_URL}/webgl-builds/${fileName}`;
 }
 
 export default function BuildUpload() {
