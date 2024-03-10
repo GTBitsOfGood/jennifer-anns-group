@@ -1,8 +1,17 @@
-import { getBuildFileUrl } from "@/utils/file";
 import { ChakraProvider, Spinner } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { useEffect, useState } from "react";
 import { Unity, useUnityContext } from "react-unity-webgl";
+import { CLOUDFLARE_URL } from "@/utils/consts";
+import { BuildFileType, buildFileTypes } from "@/pages/upload-build";
+
+function getBuildFileUrl(gameId: string, type: BuildFileType) {
+  const fileName = `${gameId}/${
+    buildFileTypes[type as keyof typeof buildFileTypes]
+  }`;
+
+  return `${CLOUDFLARE_URL}/webgl-builds/${fileName}`;
+}
 
 interface RawEmbeddedGameProps {
   gameId: string;
