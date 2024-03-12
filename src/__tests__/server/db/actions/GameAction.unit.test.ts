@@ -10,8 +10,6 @@ import GameModel from "@/server/db/models/GameModel";
 import * as connectMongoDB from "@/server/db/mongodb";
 import { createTheme } from "@/server/db/actions/ThemeAction";
 import { ExtendId } from "@/utils/types";
-import { ITag } from "@/server/db/models/TagModel";
-import { ITheme } from "@/server/db/models/ThemeModel";
 import {
   RESULTS_PER_PAGE,
   getSelectedGames,
@@ -32,14 +30,28 @@ jest.spyOn(connectMongoDB, "default").mockImplementation(async () => {
   } as ConnectOptions);
 });
 
-//Only testing getSelectedGames for now
-//Will directly populate games, themes and tags through mongodb
-
 const NUM_GAMES = 300;
-//Let's make new games and tags for each test.
-let generatedGames: ExtendId<IGame>[];
-let tagInputs: ExtendId<CreateTagInput>[];
-let themeInputs: ExtendId<CreateThemeInput>[];
+let generatedGames: ExtendId<IGame>[] = randomGames(NUM_GAMES);
+
+const gameIds = generatedGames.map((game) => game._id.toString());
+let tagInputs: ExtendId<CreateTagInput>[] = randomTags(gameIds, 10);
+let themeInputs: ExtendId<CreateThemeInput>[] = randomThemes(gameIds, 10);
+themeInputs.forEach((themeInput) => {
+  const gameIDs = themeInput.games;
+  generatedGames.forEach((game) => {
+    if (gameIDs.includes(game._id)) {
+      game.themes = [...(game.themes ?? []), themeInput._id];
+    }
+  });
+});
+tagInputs.forEach((tag) => {
+  const gameIDs = tag.games;
+  generatedGames.forEach((game) => {
+    if (gameIDs.includes(game._id)) {
+      game.tags = [...(game.themes ?? []), tag._id];
+    }
+  });
+});
 
 describe("MongodDB Game - Unit Test", () => {
   beforeAll(async () => {
@@ -53,36 +65,7 @@ describe("MongodDB Game - Unit Test", () => {
   });
 
   beforeEach(async () => {
-    generatedGames = randomGames(NUM_GAMES);
     await GameModel.insertMany(generatedGames);
-    const gameIds = generatedGames.map((game) => game._id.toString());
-    //Create random themes and tags. These have preset ids as well.
-    tagInputs = randomTags(gameIds, 10);
-    themeInputs = randomThemes(gameIds, 10);
-    //Adds all themes to games
-    themeInputs.forEach((themeInput) => {
-      const gameIDs = themeInput.games;
-      //Go through every game and add the proper theme.
-      //Appears to add themes that do not exist.
-      generatedGames.forEach((game) => {
-        if (gameIDs.includes(game._id)) {
-          game.themes ?? [];
-          //The nullish coalescing operators ensures game.themes is defined
-          game.themes = [...game.themes!, themeInput._id];
-        }
-      });
-    });
-    //Adds all tags to games (not seperated by type in game)
-    tagInputs.forEach((tag) => {
-      const gameIDs = tag.games;
-      generatedGames.forEach((game) => {
-        if (gameIDs.includes(game._id)) {
-          game.tags ?? [];
-          //The nullish coalescing operators ensures game.themes is defined
-          game.tags = [...game.tags!, tag._id];
-        }
-      });
-    });
 
     //Adds Tags and Themes to database.
     await Promise.all(
@@ -105,7 +88,6 @@ describe("MongodDB Game - Unit Test", () => {
 
   describe("getSelectedGames", () => {
     test("[pagination] page out of range: expect exception", async () => {
-      //TODO: Expect an exception or an empty list?
       const numPages = Math.ceil(NUM_GAMES / RESULTS_PER_PAGE);
       await expect(getSelectedGames({ page: numPages + 1 })).rejects.toThrow(
         GameNotFoundException,
@@ -135,21 +117,18 @@ describe("MongodDB Game - Unit Test", () => {
       }
     });
     test("[tag] nonexistent tag: expect exception", async () => {
-      //Create a non-existent tag name
-      const tag = faker.string.alphanumeric({ length: 40 });
-      //The alphanumeric numeric string is a list of 40 random characters, while the tags are actual names.
-      //There is almost no change this tag will be present in the games.
+      const tag = faker.string.numeric({ length: 40 });
+
       await expect(getSelectedGames({ page: 1, tags: [tag] })).rejects.toThrow(
         TagNotFoundException,
       );
-      //Call the API and expect an exception
-      //
     });
     test("[tag] in-out groups: expect success", async () => {
       //Ensure that the length of the in-group is the same as the one of the in group.
       const tag = faker.helpers.arrayElement(tagInputs);
       //Loop through all pages to make a list of all games with that tag
       let query: GameQuery = {
+        //Add it directly inside
         page: 1,
       };
       //Filter generated gams
@@ -162,6 +141,7 @@ describe("MongodDB Game - Unit Test", () => {
       let results = await getSelectedGames(query);
       let games = results.games;
       const numPages = Math.ceil(results.count / RESULTS_PER_PAGE) - 1; //-1 Since one page has already ben traversed.
+      //Ensure we start at page 1
       for (let page = 2; page < 2 + numPages; page++) {
         query.page = page;
         const result = await getSelectedGames(query);
@@ -175,7 +155,7 @@ describe("MongodDB Game - Unit Test", () => {
     });
     test("[theme] nonexistent theme: expect exception", async () => {
       //Create a non-existent tag name
-      const theme = faker.string.alphanumeric({ length: 40 });
+      const theme = faker.string.numeric({ length: 40 });
       //The alphanumeric numeric string is a list of 40 random characters, while the themes are actual names.
       //There is almost no change this theme will be present in the games.
       await expect(getSelectedGames({ page: 1, theme: theme })).rejects.toThrow(
