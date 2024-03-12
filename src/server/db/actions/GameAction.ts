@@ -17,7 +17,7 @@ import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
 
 export const RESULTS_PER_PAGE = 7;
-
+//Conver to Record and fix those issues later. TODO. Remove this and just directly convert enum to string.
 export const buildConverter: { [key: string]: string } = {
   amazon: "Amazon App",
   android: "Android App",
