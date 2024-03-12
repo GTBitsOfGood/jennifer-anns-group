@@ -47,6 +47,7 @@ const chakraTheme = extendTheme({
       400: "#A9CBEB",
       500: "#F2F2F2",
       600: "#2352A0",
+      700: "#E1E4ED",
     },
   },
   components: {
