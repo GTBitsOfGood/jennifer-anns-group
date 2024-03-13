@@ -9,7 +9,7 @@ import ThemeModel from "@/server/db/models/ThemeModel";
 import GameModel from "@/server/db/models/GameModel";
 import * as connectMongoDB from "@/server/db/mongodb";
 import { createTheme } from "@/server/db/actions/ThemeAction";
-import { ExtendId } from "@/utils/types";
+import { ExtendId, NonWebGLBuilds } from "@/utils/types";
 import {
   RESULTS_PER_PAGE,
   getSelectedGames,
@@ -128,12 +128,12 @@ describe("MongodDB Game - Unit Test", () => {
       } else {
         query.accessibility = [tag.name];
       }
+      //Get num pages by manually filtering.
 
-      let results = await getSelectedGames(query);
-      let games = results.games;
-      const numPages = Math.ceil(results.count / RESULTS_PER_PAGE) - 1; //-1 Since one page has already ben traversed.
+      let games: ExtendId<IGame>[] = [];
+      const numPages = Math.ceil(tag.games.length / RESULTS_PER_PAGE);
       //Ensure we start at page 1
-      for (let page = 2; page < 2 + numPages; page++) {
+      for (let page = 1; page <= numPages; page++) {
         query.page = page;
         const result = await getSelectedGames(query);
         games = [...games, ...result.games];
@@ -161,10 +161,9 @@ describe("MongodDB Game - Unit Test", () => {
         theme: theme.name,
       };
 
-      let results = await getSelectedGames(query);
-      let games = results.games;
-      const numPages = Math.ceil(results.count / RESULTS_PER_PAGE) - 1; //-1 Since one page has already ben traversed.
-      for (let page = 2; page < 2 + numPages; page++) {
+      let games: ExtendId<IGame>[] = [];
+      const numPages = Math.ceil(theme.games.length / RESULTS_PER_PAGE); //-1 Since one page has already ben traversed.
+      for (let page = 1; page <= numPages; page++) {
         query.page = page;
         const result = await getSelectedGames(query);
         games = [...games, ...result.games];
@@ -216,7 +215,7 @@ describe("MongodDB Game - Unit Test", () => {
         theme: randomTheme.name,
         name: faker.string.alpha({ length: 1 }),
         //Remove some gamebuilds to make the test less restrictive.
-        gameBuilds: [AllBuilds.webgl],
+        gameBuilds: [AllBuilds.amazon],
         gameContent: [GameContentEnum.parentingGuide],
       };
       // ids determined at runtime, omit for assertion
@@ -231,7 +230,7 @@ describe("MongodDB Game - Unit Test", () => {
       const expected = filterGeneratedGames(generatedGames, modifiedQuery);
       console.log(
         "EXPECTED",
-        expected.map((expected) => expected.builds),
+        expected.map((expected) => expected.webGLBuild),
       );
 
       //console.log("Expected Games", expected);
@@ -243,7 +242,7 @@ describe("MongodDB Game - Unit Test", () => {
       } else {
         const actual = await getSelectedGames(query);
 
-        console.log("Actual games", actual.games);
+        //console.log("Actual games", actual.games);
         //We shouldn't need to do this.
         actual.games = actual.games.map((game) => {
           game._id = game._id.toString();
@@ -257,7 +256,10 @@ describe("MongodDB Game - Unit Test", () => {
         });
         expect(actual.games.length).toEqual(expected.length);
         expect(actual.games).toEqual(expected);
-        console.log("ACTUAL", actual.games);
+        console.log(
+          "ACTUAL",
+          actual.games.map((game) => game.webGLBuild),
+        );
       }
     });
   });
@@ -281,13 +283,13 @@ describe("MongodDB Game - Unit Test", () => {
         game.name.toLowerCase().includes(name.toLowerCase()),
       ),
     tags: (games, customTags, _) => {
-      console.log("games passed to Tags", games.length);
+      //console.log("games passed to Tags", games.length);
       const filteredGames = games.filter((game) => {
         if (game.tags !== undefined) {
-          console.log("Custom Tags", customTags);
-          console.log("Game Tags", game.tags);
+          //console.log("Custom Tags", customTags);
+          //console.log("Game Tags", game.tags);
           const result = customTags.every((tag) => game.tags!.includes(tag));
-          console.log("Result", result);
+          //console.log("Result", result);
           return result;
         }
         return false;
@@ -302,11 +304,8 @@ describe("MongodDB Game - Unit Test", () => {
       games.filter((game) => game.themes?.includes(theme)),
     gameBuilds: (games, gameBuilds, _) =>
       games.filter((game) => {
-        // if (gameBuilds.includes(AllBuilds.webgl) {
-        //   pass
-        // }
         const builds = game.builds?.map((build) => build.type);
-        return builds?.some((build) => gameBuilds.includes(build));
+        return gameBuilds?.every((build) => builds?.includes(build));
       }),
     gameContent: (games, gameContent, _) =>
       games.filter((game) => gameContent.every((document) => document in game)),
@@ -319,19 +318,19 @@ describe("MongodDB Game - Unit Test", () => {
   ) {
     const { page, ...filterSteps } = query;
     let filteredGames = games;
-    console.log("Before:", filteredGames.length);
+    //console.log("Before:", filteredGames.length);
     for (const [key, value] of Object.entries(filterSteps)) {
       filteredGames = QUERY_FIELD_HANDLER_MAP[key as keyof typeof filterSteps](
         filteredGames,
         value as any,
         resultsPerPage,
       );
-      console.log("Filtered games:", key, filteredGames.length);
+      //console.log("Filtered games:", key, filteredGames.length);
     }
     filteredGames = filteredGames.sort((game1, game2) =>
       game1.name.localeCompare(game2.name),
     );
-    console.log("Before paginization", filteredGames.length);
+    //console.log("Before paginization", filteredGames.length);
     filteredGames = QUERY_FIELD_HANDLER_MAP["page"](
       filteredGames,
       page,
