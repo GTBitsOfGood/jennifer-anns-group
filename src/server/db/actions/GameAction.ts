@@ -185,6 +185,7 @@ export async function getSelectedGames(
     if (query.gameBuilds.includes(AllBuilds.webgl)) {
       //WebGl requires a different type of filter, as it is seperate from the other builds
       //filters.webGLBuild = true;
+      //aggregate.match({ webGLBuild: true });
       //Remove webGL for further filtering based on other normal games.
       query.gameBuilds = query.gameBuilds.filter((item) => item !== "webgl");
     }

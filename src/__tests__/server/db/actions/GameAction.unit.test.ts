@@ -10,6 +10,7 @@ import GameModel from "@/server/db/models/GameModel";
 import * as connectMongoDB from "@/server/db/mongodb";
 import { createTheme } from "@/server/db/actions/ThemeAction";
 import { ExtendId, NonWebGLBuilds } from "@/utils/types";
+import { IBuild } from "@/server/db/models/GameModel";
 import {
   RESULTS_PER_PAGE,
   getSelectedGames,
@@ -240,7 +241,12 @@ describe("MongodDB Game - Unit Test", () => {
           GameNotFoundException,
         );
       } else {
-        const actual = await getSelectedGames(query);
+        const actual: {
+          games: ExtendId<
+            Omit<IGame, "builds"> & { builds: (IBuild & { _id: string })[] }
+          >[];
+          count: number;
+        } = await getSelectedGames(query);
 
         //console.log("Actual games", actual.games);
         //We shouldn't need to do this.
@@ -304,7 +310,7 @@ describe("MongodDB Game - Unit Test", () => {
       games.filter((game) => game.themes?.includes(theme)),
     gameBuilds: (games, gameBuilds, _) =>
       games.filter((game) => {
-        const builds = game.builds?.map((build) => build.type);
+        const builds = game.builds?.map((build) => build.type.toString());
         return gameBuilds?.every((build) => builds?.includes(build));
       }),
     gameContent: (games, gameContent, _) =>
