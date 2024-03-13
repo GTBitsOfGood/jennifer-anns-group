@@ -8,7 +8,6 @@ const verifyObjectId = (value: string) => {
   }
   return false;
 };
-//TODO: Add note clarifying whats going on.
 export enum AllBuilds {
   amazon = "amazon",
   android = "android",

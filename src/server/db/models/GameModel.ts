@@ -12,7 +12,7 @@ export type populatedGameWithId = Omit<IGame, "tags" | "themes"> & {
   themes: (ITheme & { _id: string })[];
 };
 
-interface IBuild extends z.infer<typeof buildSchema> {}
+export interface IBuild extends z.infer<typeof buildSchema> {}
 
 //You must use mongoose.Schema.Types.ObjectId when defining Schemas that contain an ObjectId.
 const BuildSchema = new Schema<IBuild>({
