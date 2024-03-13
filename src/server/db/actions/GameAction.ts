@@ -1,4 +1,4 @@
-import GameModel, { IGame } from "../models/GameModel";
+import GameModel, { IBuild, IGame } from "../models/GameModel";
 import ThemeModel, { ITheme } from "../models/ThemeModel";
 import TagModel, { ITag } from "../models/TagModel";
 import connectMongoDB from "../mongodb";
@@ -201,7 +201,9 @@ export async function getSelectedGames(
   if (results[0].count.length != 0) {
     count = results[0].count[0].count;
   }
-  const games: ExtendId<IGame>[] = results[0].games;
+  const games: ExtendId<
+    Omit<IGame, "builds"> & { builds: ExtendId<IBuild>[] }
+  >[] = results[0].games;
 
   if (games.length == 0) {
     throw new GameNotFoundException("No Games found at this page");
@@ -213,8 +215,8 @@ export async function getGameById(id: string) {
   await connectMongoDB();
   try {
     const game = await GameModel.findById(id)
-      .populate<ITheme>("themes")
-      .populate<ITag>("tags");
+      .populate<{ themes: ITheme[] }>("themes")
+      .populate<{ tags: ITag[] }>("tags");
     return game;
   } catch (e) {
     throw e;

@@ -216,12 +216,7 @@ describe("MongodDB Game - Unit Test", () => {
           GameNotFoundException,
         );
       } else {
-        const actual: {
-          games: ExtendId<
-            Omit<IGame, "builds"> & { builds: (IBuild & { _id: string })[] }
-          >[];
-          count: number;
-        } = await getSelectedGames(query);
+        const actual = await getSelectedGames(query);
 
         actual.games = actual.games.map((game) => {
           game._id = game._id.toString();
