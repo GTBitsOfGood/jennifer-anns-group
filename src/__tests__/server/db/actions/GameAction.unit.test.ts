@@ -16,7 +16,7 @@ import {
 } from "@/server/db/actions/GameAction";
 import { IGame } from "@/server/db/models/GameModel";
 import { GameContentEnum, GameQuery } from "@/pages/api/games";
-import { AppType } from "@/utils/types";
+import { AllBuilds } from "@/utils/types";
 import { faker } from "@faker-js/faker";
 import { GameNotFoundException } from "@/utils/exceptions/game";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
@@ -48,7 +48,7 @@ tagInputs.forEach((tag) => {
   const gameIDs = tag.games;
   generatedGames.forEach((game) => {
     if (gameIDs.includes(game._id)) {
-      game.tags = [...(game.themes ?? []), tag._id];
+      game.tags = [...(game.tags ?? []), tag._id];
     }
   });
 });
@@ -66,18 +66,9 @@ describe("MongodDB Game - Unit Test", () => {
 
   beforeEach(async () => {
     await GameModel.insertMany(generatedGames);
-
+    await TagModel.insertMany(tagInputs);
+    await ThemeModel.insertMany(themeInputs);
     //Adds Tags and Themes to database.
-    await Promise.all(
-      tagInputs.map(async (tag) => {
-        return await createTag(tag);
-      }),
-    );
-    await Promise.all(
-      themeInputs.map(async (theme) => {
-        return await createTheme(theme);
-      }),
-    );
   });
 
   afterEach(async () => {
@@ -220,26 +211,30 @@ describe("MongodDB Game - Unit Test", () => {
       const randomTheme = themes[Math.floor(Math.random() * themes.length)];
       const query = {
         page: 1,
-        //tags: [randomCustomTag.name],
-        //accessibility: [randomAccessibilityTag.name],
-        //theme: randomTheme.name,
-        //name: faker.string.alpha({ length: 1 }),
+        tags: [randomCustomTag.name],
+        accessibility: [randomAccessibilityTag.name],
+        theme: randomTheme.name,
+        name: faker.string.alpha({ length: 1 }),
         //Remove some gamebuilds to make the test less restrictive.
-        //gameBuilds: [AppType.amazon],
-        //gameContent: [GameContentEnum.parentingGuide],
+        gameBuilds: [AllBuilds.webgl],
+        gameContent: [GameContentEnum.parentingGuide],
       };
-
       // ids determined at runtime, omit for assertion
       //Removing this cuz ids are now no longer determined at runtime.
       const modifiedQuery = {
         ...query,
+        //Uncomment later when everything works.
         tags: [randomCustomTag._id.toString()],
         accessibility: [randomAccessibilityTag._id.toString()],
         theme: randomTheme._id.toString(),
       };
       const expected = filterGeneratedGames(generatedGames, modifiedQuery);
-      console.log("Expected Games", expected);
-      console.log(modifiedQuery.theme, "THEME");
+      console.log(
+        "EXPECTED",
+        expected.map((expected) => expected.builds),
+      );
+
+      //console.log("Expected Games", expected);
       //TODO: Add comment about why we need this if statement
       if (expected.length == 0) {
         await expect(getSelectedGames(query)).rejects.toThrow(
@@ -247,12 +242,22 @@ describe("MongodDB Game - Unit Test", () => {
         );
       } else {
         const actual = await getSelectedGames(query);
-        actual.games.forEach((game) => {
-          expect(game).toHaveProperty("_id");
-        });
+
         console.log("Actual games", actual.games);
+        //We shouldn't need to do this.
+        actual.games = actual.games.map((game) => {
+          game._id = game._id.toString();
+          game.themes = game.themes?.map((theme) => theme.toString());
+          game.tags = game.tags?.map((tag) => tag.toString());
+          game.builds = game.builds?.map((build) => {
+            build._id = build._id.toString();
+            return build;
+          });
+          return game;
+        });
+        expect(actual.games.length).toEqual(expected.length);
         expect(actual.games).toEqual(expected);
-        console.log(query);
+        console.log("ACTUAL", actual.games);
       }
     });
   });
@@ -279,11 +284,14 @@ describe("MongodDB Game - Unit Test", () => {
       console.log("games passed to Tags", games.length);
       const filteredGames = games.filter((game) => {
         if (game.tags !== undefined) {
-          return customTags.every((tag) => game.tags!.includes(tag));
+          console.log("Custom Tags", customTags);
+          console.log("Game Tags", game.tags);
+          const result = customTags.every((tag) => game.tags!.includes(tag));
+          console.log("Result", result);
+          return result;
         }
         return false;
       });
-      console.log("games from Tags", filteredGames.length);
       return filteredGames;
     }, //TODO: rework. should ensure that games contains at least one of that tag.
     accessibility: (games, accessibilityTags, _) =>
@@ -294,6 +302,9 @@ describe("MongodDB Game - Unit Test", () => {
       games.filter((game) => game.themes?.includes(theme)),
     gameBuilds: (games, gameBuilds, _) =>
       games.filter((game) => {
+        // if (gameBuilds.includes(AllBuilds.webgl) {
+        //   pass
+        // }
         const builds = game.builds?.map((build) => build.type);
         return builds?.some((build) => gameBuilds.includes(build));
       }),
@@ -317,12 +328,17 @@ describe("MongodDB Game - Unit Test", () => {
       );
       console.log("Filtered games:", key, filteredGames.length);
     }
-    //Add sorting right here by object id.
+    filteredGames = filteredGames.sort((game1, game2) =>
+      game1.name.localeCompare(game2.name),
+    );
+    console.log("Before paginization", filteredGames.length);
     filteredGames = QUERY_FIELD_HANDLER_MAP["page"](
       filteredGames,
       page,
       RESULTS_PER_PAGE,
     );
+    console.log("After paginization:", filteredGames.length);
+
     return filteredGames;
   }
 

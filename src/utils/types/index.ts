@@ -8,8 +8,8 @@ const verifyObjectId = (value: string) => {
   }
   return false;
 };
-
-export enum AppType {
+//TODO: Add note clarifying whats going on.
+export enum AllBuilds {
   amazon = "amazon",
   android = "android",
   appstore = "appstore",
@@ -19,8 +19,17 @@ export enum AppType {
   windows = "windows",
 }
 
+export enum NonWebGLBuilds {
+  amazon = "amazon",
+  android = "android",
+  appstore = "appstore",
+  linux = "linux",
+  mac = "mac",
+  windows = "windows",
+}
+
 export const buildSchema = z.object({
-  type: z.nativeEnum(AppType),
+  type: z.nativeEnum(NonWebGLBuilds),
   link: z.string().url(),
   instructions: z.string().optional(),
 });
@@ -90,7 +99,7 @@ export const userSchema = z.object({
 });
 
 export type ExtendId<T extends any> = T & { _id: string };
-
+export type ExtendVersion<T extends any> = T & { __v: number };
 // For changing password
 export const changePWSchema = z.object({
   oldpassword: z.string(),

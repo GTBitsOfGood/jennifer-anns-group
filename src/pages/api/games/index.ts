@@ -4,7 +4,7 @@ import {
   createGame,
   getSelectedGames,
 } from "../../../server/db/actions/GameAction";
-import { AppType, gameSchema } from "../../../utils/types";
+import { AllBuilds, gameSchema } from "../../../utils/types";
 import { NextApiRequest, NextApiResponse } from "next";
 import {
   GameInvalidInputException,
@@ -63,8 +63,8 @@ export const GetGameQuerySchema = z.object({
     .or(z.string().transform(putSingleStringInArray))
     .optional(),
   gameBuilds: z
-    .array(z.nativeEnum(AppType))
-    .or(z.nativeEnum(AppType).transform(putSingleStringInArray))
+    .array(z.nativeEnum(AllBuilds))
+    .or(z.nativeEnum(AllBuilds).transform(putSingleStringInArray))
     .optional(),
   gameContent: z
     .array(z.nativeEnum(GameContentEnum))
