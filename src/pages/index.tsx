@@ -5,6 +5,9 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { userDataSchema } from "@/components/ProfileModal/ProfileModal";
 import { z } from "zod";
+import Image from "next/image";
+import discordIcon from "../../public/social/Discord.svg";
+import Link from "next/link";
 
 const Home = () => {
   const { data: session } = useSession();
@@ -69,6 +72,26 @@ const Home = () => {
             <h1 className="text-5xl font-semibold text-orange-primary">
               Check out what's new!
             </h1>
+          </div>
+          <div className="bg-blue-bg flex w-full flex-col items-center px-32 py-16">
+            <div className="flex flex-row justify-center">
+              <Image
+                src={discordIcon}
+                className="mr-16 -rotate-6 fill-blue-primary"
+                alt="Discord Icon"
+              />
+              <div>
+                <h2 className="mb-4 text-3xl font-semibold text-blue-primary">
+                  Want to learn more about Gaming Against Violence?
+                </h2>
+                <p className="text-3xl italic text-blue-primary">
+                  Join our{" "}
+                  <Link className="underline" href="" target="_blank">
+                    Jennifer Ann’s Group’s discord!
+                  </Link>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
         <Footer />
