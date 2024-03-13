@@ -105,13 +105,20 @@ export async function editGame(allData: nextEditGame) {
   }
   return newGame;
 }
+
+export type GetSelectedGamesOutput = ExtendId<
+  Omit<IGame, "builds"> & { builds: ExtendId<IBuild>[] }
+>[];
+
 //TODO: Refactor get selected actions to be similar to the test.
 export async function getSelectedGames(
   query: z.infer<typeof GetGameQuerySchema>,
 ) {
   await connectMongoDB();
 
-  let filters: FilterQuery<IGame> = {};
+  let filterFieldsAnd: FilterQuery<IGame> = {};
+  let filterFieldsOr: FilterQuery<IGame> = {};
+
   const aggregate = GameModel.aggregate([]);
   if (query.theme) {
     const foundTheme = await ThemeModel.findOne({
@@ -122,7 +129,7 @@ export async function getSelectedGames(
         `No theme with the name ${query.theme} exists.`,
       );
     }
-    filters.themes = { $in: [foundTheme._id] };
+    filterFieldsAnd.themes = { $in: [foundTheme._id] };
   }
 
   let totalTags: mongoose.Types.ObjectId[] = [];
@@ -148,7 +155,7 @@ export async function getSelectedGames(
     return accAwaited;
   }, Promise.resolve(totalTags));
   if (totalTags.length !== 0) {
-    filters.tags = { $all: totalTags };
+    filterFieldsAnd.tags = { $all: totalTags };
   }
 
   if (query.name && query.name !== "") {
@@ -156,37 +163,44 @@ export async function getSelectedGames(
       "[a-zA-Z0-9_]*" + query.name + "[a-zA-Z0-9_]*",
       "i",
     );
-    filters.name = { $regex: reg_string };
+    filterFieldsAnd.name = { $regex: reg_string };
   }
   if (query.gameContent) {
-    filters = query.gameContent.reduce((acc, curr) => {
+    filterFieldsAnd = query.gameContent.reduce((acc, curr) => {
       acc[curr] = { $exists: true };
       return acc;
-    }, filters);
+    }, filterFieldsAnd);
   }
 
   if (query.gameBuilds && query.gameBuilds.length !== 0) {
-    if (query.gameBuilds.includes(AllBuilds.webgl)) {
-      query.gameBuilds = query.gameBuilds.filter((item) => item !== "webgl");
-    }
-
-    const filterableBuilds = query.gameBuilds.map(
-      (build: string) => AllBuilds[build as keyof typeof AllBuilds],
+    const nonWebGLBuilds = query.gameBuilds.filter(
+      (build) => build !== AllBuilds.webgl,
     );
-    aggregate.addFields({
-      types: {
-        $map: {
-          input: "$builds",
-          as: "buildGame",
-          in: "$$buildGame.type",
-        },
-      },
-    });
-    aggregate.match({ types: { $all: filterableBuilds } });
-    aggregate.project({ types: 0 });
+
+    filterFieldsOr["builds.type"] = {
+      $in: nonWebGLBuilds,
+    };
+
+    if (query.gameBuilds.includes(AllBuilds.webgl)) {
+      filterFieldsOr.webGLBuild = true;
+    }
   }
 
-  aggregate.match(filters);
+  const andFilters = Object.entries(filterFieldsAnd).map(([k, v]) => ({
+    [k]: v,
+  }));
+  const orFilters = Object.entries(filterFieldsOr).map(([k, v]) => ({
+    [k]: v,
+  }));
+
+  const allSteps = [
+    ...andFilters,
+    ...(orFilters.length > 0 ? [{ $or: orFilters }] : []),
+  ];
+
+  aggregate.match({
+    ...(allSteps.length > 0 && { $and: allSteps }),
+  });
   aggregate.sort({ name: 1 });
   aggregate.facet({
     games: [
@@ -201,9 +215,7 @@ export async function getSelectedGames(
   if (results[0].count.length != 0) {
     count = results[0].count[0].count;
   }
-  const games: ExtendId<
-    Omit<IGame, "builds"> & { builds: ExtendId<IBuild>[] }
-  >[] = results[0].games;
+  const games: GetSelectedGamesOutput = results[0].games;
 
   if (games.length == 0) {
     throw new GameNotFoundException("No Games found at this page");

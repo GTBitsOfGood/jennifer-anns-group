@@ -197,7 +197,7 @@ describe("MongodDB Game - Unit Test", () => {
         accessibility: [randomAccessibilityTag.name],
         theme: randomTheme.name,
         name: faker.string.alpha({ length: 1 }),
-        gameBuilds: [AllBuilds.amazon],
+        gameBuilds: [AllBuilds.webgl, AllBuilds.amazon],
         gameContent: [GameContentEnum.parentingGuide],
       };
 
@@ -228,7 +228,9 @@ describe("MongodDB Game - Unit Test", () => {
           });
           return game;
         });
-        expect(actual.games.length).toEqual(expected.length);
+        console.log(JSON.stringify(actual.games));
+        console.log(JSON.stringify(expected));
+        expect(actual.games.length).toBe(expected.length);
         expect(actual.games).toEqual(expected);
         console.log(
           "ACTUAL",
@@ -274,8 +276,18 @@ describe("MongodDB Game - Unit Test", () => {
       games.filter((game) => game.themes?.includes(theme)),
     gameBuilds: (games, gameBuilds, _) =>
       games.filter((game) => {
-        const builds = game.builds?.map((build) => build.type.toString());
-        return gameBuilds?.every((build) => builds?.includes(build));
+        const gameBuildTypes = game.builds?.map((build) => build.type);
+        const queryNonWebGLBuilds = gameBuilds.filter(
+          (build) => build !== AllBuilds.webgl,
+        );
+        const sharesWithQueryBuild = gameBuildTypes?.some((buildType) =>
+          queryNonWebGLBuilds?.includes(buildType),
+        );
+
+        return (
+          sharesWithQueryBuild ||
+          (gameBuilds.includes(AllBuilds.webgl) && game.webGLBuild === true)
+        );
       }),
     gameContent: (games, gameContent, _) =>
       games.filter((game) => gameContent.every((document) => document in game)),
@@ -295,9 +307,7 @@ describe("MongodDB Game - Unit Test", () => {
         resultsPerPage,
       );
     }
-    filteredGames = filteredGames.sort((game1, game2) =>
-      game1.name.localeCompare(game2.name),
-    );
+    filteredGames = filteredGames.sort((a, b) => a.name.localeCompare(b.name));
     filteredGames = QUERY_FIELD_HANDLER_MAP["page"](
       filteredGames,
       page,
