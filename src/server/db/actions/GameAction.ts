@@ -5,7 +5,7 @@ import connectMongoDB from "../mongodb";
 import { deleteBuild } from "./BuildAction";
 import { FilterQuery } from "mongoose";
 import { z } from "zod";
-import { AppType, ExtendId, editGameSchema } from "@/utils/types";
+import { AllBuilds, ExtendId, editGameSchema } from "@/utils/types";
 import mongoose from "mongoose";
 import { GetGameQuerySchema } from "@/pages/api/games";
 import {
@@ -18,14 +18,6 @@ import { TagNotFoundException } from "@/utils/exceptions/tag";
 
 export const RESULTS_PER_PAGE = 7;
 //Conver to Record and fix those issues later. TODO. Remove this and just directly convert enum to string.
-export const buildConverter: { [key: string]: string } = {
-  amazon: "Amazon App",
-  android: "Android App",
-  appstore: "App Store",
-  linux: "Linux Download",
-  mac: "Mac Download",
-  windows: "windows",
-};
 export async function createGame(data: IGame) {
   await connectMongoDB();
 
@@ -190,7 +182,7 @@ export async function getSelectedGames(
 
   //Filtering based on game build (filtering should be add)
   if (query.gameBuilds && query.gameBuilds.length !== 0) {
-    if (query.gameBuilds.includes(AppType.webgl)) {
+    if (query.gameBuilds.includes(AllBuilds.webgl)) {
       //WebGl requires a different type of filter, as it is seperate from the other builds
       filters.webGLBuild = true;
       //Remove webGL for further filtering based on other normal games.
@@ -198,10 +190,10 @@ export async function getSelectedGames(
     }
     //Right now picks where at least one type is included, not all types.
     //Add directly to aggregate pipeline. Transform it then unwind it back.
-    //Converts AppType to field used in filter.
+    //Converts AllBuilds to field used in filter.
 
     const filterableBuilds = query.gameBuilds.map(
-      (build: string) => buildConverter[build],
+      (build: string) => AllBuilds[build as keyof typeof AllBuilds],
     );
     aggregate.addFields({
       types: {
@@ -220,6 +212,7 @@ export async function getSelectedGames(
   //Need to add extra filtering outside of GameModel.find for
 
   aggregate.match(filters);
+  aggregate.sort({ name: 1 });
   aggregate.facet({
     games: [
       { $skip: (query.page - 1) * RESULTS_PER_PAGE },
@@ -228,6 +221,7 @@ export async function getSelectedGames(
     count: [{ $count: "count" }],
   });
   const results = await aggregate.exec();
+
   let count = 0;
   if (results[0].count.length != 0) {
     count = results[0].count[0].count;

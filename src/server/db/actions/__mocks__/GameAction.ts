@@ -1,17 +1,21 @@
 import { IGame } from "../../models/GameModel";
-import { AppType } from "@/utils/types";
 import { faker } from "@faker-js/faker";
-
-import { ExtendId } from "@/utils/types";
+import { NonWebGLBuilds } from "@/utils/types";
+import { ExtendId, ExtendVersion } from "@/utils/types";
 import mongoose from "mongoose";
-function createRandomGame(): ExtendId<IGame> {
-  const appTypeValues = Object.values(AppType);
+let salt = 0;
+
+function createRandomGame(): ExtendVersion<ExtendId<IGame>> {
+  const appTypeValues = Object.values(NonWebGLBuilds);
   const numBuilds = faker.number.int({ min: 0, max: appTypeValues.length });
+  salt++;
   return {
+    __v: 0,
     _id: new mongoose.Types.ObjectId().toString(),
     themes: [],
     tags: [],
-    name: faker.person.fullName(),
+    //Salt added to ensure uniqueness.
+    name: faker.person.fullName() + salt.toString(),
     description: faker.lorem.paragraph(),
     webGLBuild: faker.datatype.boolean(),
     lesson: faker.internet.url(),
@@ -21,7 +25,8 @@ function createRandomGame(): ExtendId<IGame> {
     builds: Array.from({ length: numBuilds }).map(() => {
       //Allows for repeats of builds, which we want.
       return {
-        type: faker.helpers.enumValue(AppType),
+        _id: new mongoose.Types.ObjectId().toString(),
+        type: faker.helpers.enumValue(NonWebGLBuilds),
         link: faker.internet.url(),
         instructions: faker.lorem.paragraph(),
       };
