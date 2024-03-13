@@ -4,18 +4,45 @@ import { userDataSchema } from "@/components/ProfileModal/ProfileModal";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { Divider } from "@chakra-ui/react";
+import { Divider, InputGroup, InputLeftElement } from "@chakra-ui/react";
 import GameCard from "@/components/GameComponent/GameCard";
-import { gameSchema } from "@/utils/types";
+import { gameSchema, themeSchema } from "@/utils/types";
+import {
+  Search2Icon,
+  TriangleDownIcon,
+  TriangleUpIcon,
+} from "@chakra-ui/icons";
+import { Input } from "@chakra-ui/react";
 
 export default function Games() {
   const { data: session } = useSession();
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
   const [games, setGames] = useState<z.infer<typeof gameSchema>[]>();
+  //   const [themes, setThemes] = useState<z.infer<typeof themeSchema>[]>();
+  const [themes, setThemes] = useState<string[]>();
+  const [selectedTheme, setSelectedTheme] = useState("");
+
   useEffect(() => {
     getGames();
+    getThemes();
   }, []);
+
+  async function getGames() {
+    const response = await fetch(`/api/games/?page=1`);
+    const data = await response.json();
+    setGames(data);
+  }
+
+  async function getThemes() {
+    const response = await fetch(`/api/themes`);
+    const data = await response.json();
+    const themesString = data.map((theme: z.infer<typeof themeSchema>) => {
+      return theme.name;
+    });
+    themesString.sort();
+    setThemes(themesString);
+  }
 
   useEffect(() => {
     if (currentUser) {
@@ -33,12 +60,6 @@ export default function Games() {
     }
   }
 
-  async function getGames() {
-    const response = await fetch(`/api/games/?page=1`);
-    const data = await response.json();
-    setGames(data);
-  }
-
   return (
     <div>
       <Header
@@ -52,17 +73,54 @@ export default function Games() {
         Game Gallery
       </h1>
 
-      <div className="margin-auto ml-[10vw] w-[80vw]">
+      <div className="m-auto mb-11 flex w-[80vw] flex-row">
+        <InputGroup w="200px">
+          <InputLeftElement pointerEvents="none">
+            <Search2Icon color="gray.500" />
+          </InputLeftElement>
+          <Input
+            borderColor="gray.500"
+            bg="gray.50"
+            color="gray.500"
+            placeholder="Filter by name"
+          />
+        </InputGroup>
+        <div className="ml-5 flex w-24 flex-row items-center justify-center space-x-1 rounded-full border border-[#A9CBEB] bg-blue-50">
+          <p className="py-2.5 font-inter text-sm font-bold text-[#2352A0]">
+            Filter
+          </p>
+          <TriangleDownIcon color="brand.600" height="9px" />
+        </div>
+      </div>
+
+      <div className="m-auto ml-[10vw] w-[80vw]">
         <Divider borderColor="brand.700" borderWidth="1px" />
       </div>
 
-      <div className="flex flex-row">
-        {/* <ScrollBar /> */}
+      <div className="m-auto mt-[60px] flex w-[90vw] flex-row">
+        <div className="flex h-[370px] w-[240px] flex-col overflow-y-scroll">
+          <p className="mb-[26px] font-sans text-2xl text-neutral-500">
+            All Games
+          </p>
+          {themes
+            ? themes.map((theme) => {
+                return (
+                  <p className="mb-[26px] font-sans text-2xl text-neutral-500">
+                    {theme}
+                  </p>
+                );
+              })
+            : null}
+        </div>
 
-        <div className="ml-6 mt-[60px] flex flex-row flex-wrap">
+        <div className="ml-6 flex flex-row flex-wrap">
           {games
             ? games.map((game) => {
-                return <GameCard game={game} />;
+                return (
+                  <div className="mb-6 mr-6">
+                    <GameCard game={game} />
+                  </div>
+                );
               })
             : null}
         </div>
