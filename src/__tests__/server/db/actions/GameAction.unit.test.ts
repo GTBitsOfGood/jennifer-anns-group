@@ -69,7 +69,6 @@ describe("MongodDB Game - Unit Test", () => {
     await GameModel.insertMany(generatedGames);
     await TagModel.insertMany(tagInputs);
     await ThemeModel.insertMany(themeInputs);
-    //Adds Tags and Themes to database.
   });
 
   afterEach(async () => {
@@ -116,75 +115,60 @@ describe("MongodDB Game - Unit Test", () => {
       );
     });
     test("[tag] in-out groups: expect success", async () => {
-      //Ensure that the length of the in-group is the same as the one of the in group.
       const tag = faker.helpers.arrayElement(tagInputs);
-      //Loop through all pages to make a list of all games with that tag
       let query: GameQuery = {
-        //Add it directly inside
         page: 1,
       };
-      //Filter generated gams
       if (tag.type == "custom") {
         query.tags = [tag.name];
       } else {
         query.accessibility = [tag.name];
       }
-      //Get num pages by manually filtering.
 
       let games: ExtendId<IGame>[] = [];
       const numPages = Math.ceil(tag.games.length / RESULTS_PER_PAGE);
-      //Ensure we start at page 1
       for (let page = 1; page <= numPages; page++) {
         query.page = page;
         const result = await getSelectedGames(query);
         games = [...games, ...result.games];
       }
-      //Ensure that the lists of objectids with that tag matches exactly what the tag has in the games array.
       const gameIds = games.map((game) => game._id.toString());
       gameIds.sort();
       tag.games.sort();
       expect(gameIds).toStrictEqual(tag.games);
     });
     test("[theme] nonexistent theme: expect exception", async () => {
-      //Create a non-existent tag name
       const theme = faker.string.numeric({ length: 40 });
-      //The alphanumeric numeric string is a list of 40 random characters, while the themes are actual names.
-      //There is almost no change this theme will be present in the games.
+
       await expect(getSelectedGames({ page: 1, theme: theme })).rejects.toThrow(
         ThemeNotFoundException,
       );
     });
     test("[theme] in-out groups: expect success", async () => {
       const theme = faker.helpers.arrayElement(themeInputs);
-      //Loop through all pages to make a list of all games with that tag
       let query: GameQuery = {
         page: 1,
         theme: theme.name,
       };
-
       let games: ExtendId<IGame>[] = [];
-      const numPages = Math.ceil(theme.games.length / RESULTS_PER_PAGE); //-1 Since one page has already ben traversed.
+      const numPages = Math.ceil(theme.games.length / RESULTS_PER_PAGE);
       for (let page = 1; page <= numPages; page++) {
         query.page = page;
         const result = await getSelectedGames(query);
         games = [...games, ...result.games];
       }
-      //Ensure that the lists of objectids with that tag matches exactly what the tag has in the games array.
       const gameIds = games.map((game) => game._id.toString());
       gameIds.sort();
       theme.games.sort();
       expect(gameIds).toStrictEqual(theme.games);
     });
     test("[name] regex case insensitivity in-exact match: expect success", async () => {
-      //Randomly pick the name of a game from generatedGames
-      //Take a random subslice of that game, with random capitilization
-      //Call the action and expect that game to be in generated Games.
       const randomGame = faker.helpers.arrayElement(generatedGames);
       const randomName = randomGame.name;
       const substring = randomlyCapitalizeSubString(randomName);
       let results = await getSelectedGames({ name: substring, page: 1 });
       let games = results.games;
-      const numPages = Math.ceil(results.count / RESULTS_PER_PAGE) - 1; //-1 Since one page has already ben traversed.
+      const numPages = Math.ceil(results.count / RESULTS_PER_PAGE) - 1;
       for (let page = 2; page < 2 + numPages; page++) {
         const result = await getSelectedGames({
           name: substring,
@@ -195,9 +179,7 @@ describe("MongodDB Game - Unit Test", () => {
       const selectedNames = games.map((game) => game.name);
       expect(selectedNames).toContain(randomName);
     });
-    // ...
     test("happy: expect success", async () => {
-      //
       const customTags = await TagModel.find({ type: "custom" });
       const randomCustomTag =
         customTags[Math.floor(Math.random() * customTags.length)];
@@ -215,27 +197,20 @@ describe("MongodDB Game - Unit Test", () => {
         accessibility: [randomAccessibilityTag.name],
         theme: randomTheme.name,
         name: faker.string.alpha({ length: 1 }),
-        //Remove some gamebuilds to make the test less restrictive.
         gameBuilds: [AllBuilds.amazon],
         gameContent: [GameContentEnum.parentingGuide],
       };
-      // ids determined at runtime, omit for assertion
-      //Removing this cuz ids are now no longer determined at runtime.
+
       const modifiedQuery = {
         ...query,
-        //Uncomment later when everything works.
         tags: [randomCustomTag._id.toString()],
         accessibility: [randomAccessibilityTag._id.toString()],
         theme: randomTheme._id.toString(),
       };
       const expected = filterGeneratedGames(generatedGames, modifiedQuery);
-      console.log(
-        "EXPECTED",
-        expected.map((expected) => expected.webGLBuild),
-      );
 
-      //console.log("Expected Games", expected);
-      //TODO: Add comment about why we need this if statement
+      //We need to check if the length is zero because the expected action from getSelectedGames
+      //if it returns nothing is to throw an error
       if (expected.length == 0) {
         await expect(getSelectedGames(query)).rejects.toThrow(
           GameNotFoundException,
@@ -248,8 +223,6 @@ describe("MongodDB Game - Unit Test", () => {
           count: number;
         } = await getSelectedGames(query);
 
-        //console.log("Actual games", actual.games);
-        //We shouldn't need to do this.
         actual.games = actual.games.map((game) => {
           game._id = game._id.toString();
           game.themes = game.themes?.map((theme) => theme.toString());
@@ -289,23 +262,19 @@ describe("MongodDB Game - Unit Test", () => {
         game.name.toLowerCase().includes(name.toLowerCase()),
       ),
     tags: (games, customTags, _) => {
-      //console.log("games passed to Tags", games.length);
       const filteredGames = games.filter((game) => {
         if (game.tags !== undefined) {
-          //console.log("Custom Tags", customTags);
-          //console.log("Game Tags", game.tags);
           const result = customTags.every((tag) => game.tags!.includes(tag));
-          //console.log("Result", result);
           return result;
         }
         return false;
       });
       return filteredGames;
-    }, //TODO: rework. should ensure that games contains at least one of that tag.
+    },
     accessibility: (games, accessibilityTags, _) =>
       games.filter((game) =>
         accessibilityTags.every((tag) => game.tags?.includes(tag)),
-      ), //TODO: rework
+      ),
     theme: (games, theme, _) =>
       games.filter((game) => game.themes?.includes(theme)),
     gameBuilds: (games, gameBuilds, _) =>
@@ -324,25 +293,21 @@ describe("MongodDB Game - Unit Test", () => {
   ) {
     const { page, ...filterSteps } = query;
     let filteredGames = games;
-    //console.log("Before:", filteredGames.length);
     for (const [key, value] of Object.entries(filterSteps)) {
       filteredGames = QUERY_FIELD_HANDLER_MAP[key as keyof typeof filterSteps](
         filteredGames,
         value as any,
         resultsPerPage,
       );
-      //console.log("Filtered games:", key, filteredGames.length);
     }
     filteredGames = filteredGames.sort((game1, game2) =>
       game1.name.localeCompare(game2.name),
     );
-    //console.log("Before paginization", filteredGames.length);
     filteredGames = QUERY_FIELD_HANDLER_MAP["page"](
       filteredGames,
       page,
       RESULTS_PER_PAGE,
     );
-    console.log("After paginization:", filteredGames.length);
 
     return filteredGames;
   }

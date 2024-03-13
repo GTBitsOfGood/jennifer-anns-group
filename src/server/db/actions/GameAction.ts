@@ -17,7 +17,6 @@ import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
 
 export const RESULTS_PER_PAGE = 7;
-//Conver to Record and fix those issues later. TODO. Remove this and just directly convert enum to string.
 export async function createGame(data: IGame) {
   await connectMongoDB();
 
@@ -25,7 +24,6 @@ export async function createGame(data: IGame) {
 
   if (existingGame) throw new GameAlreadyExistsException();
 
-  // add theme and tag IDs to the game
   try {
     if (data && data.themes) {
       const themePromises = data.themes.map((theme) =>
@@ -51,7 +49,6 @@ export async function createGame(data: IGame) {
     throw e;
   }
 
-  // create the game
   try {
     const game = await GameModel.create(data);
     return game.toObject();
@@ -88,7 +85,7 @@ export async function editGame(allData: nextEditGame) {
     if (themeResults.length !== data.themes.length) {
       throw new InvalidIdGameErrorException(
         "One of the given themes does not exist.",
-      ); //Using non-null assertion, as if condition should ensure data.tags is non-null
+      );
     }
   }
   if (data && data.tags) {
@@ -96,7 +93,7 @@ export async function editGame(allData: nextEditGame) {
     if (tagResults.length !== data.tags.length) {
       throw new InvalidIdGameErrorException(
         "One of the given tags does not exist.",
-      ); //Using non-null assertion, as if condition should ensure data.tags is non-null
+      );
     }
   }
 
@@ -108,40 +105,33 @@ export async function editGame(allData: nextEditGame) {
   }
   return newGame;
 }
+//TODO: Refactor get selected actions to be similar to the test.
 export async function getSelectedGames(
   query: z.infer<typeof GetGameQuerySchema>,
 ) {
   await connectMongoDB();
-  //Want to be able to filter by specific tags,game_builds, etc.
-  //Find the corresponding id to the Theme tag.
+
   let filters: FilterQuery<IGame> = {};
   const aggregate = GameModel.aggregate([]);
   if (query.theme) {
-    //Find corresponding themeObject in mongodb
     const foundTheme = await ThemeModel.findOne({
       name: query.theme,
     });
     if (!foundTheme) {
-      //No theme was found
       throw new ThemeNotFoundException(
         `No theme with the name ${query.theme} exists.`,
       );
     }
-    //Add to filters object
     filters.themes = { $in: [foundTheme._id] };
-    //Essentially ensures that the themes array contains foundTheme.
   }
-  //For Accessibility and normal Tags, add it to the filter object using reduce.
-  //Find the correspoding tag ids for the accessibility TAGS.
-  //Combine the accessibility and custom section via array.reduce=make an array that
+
   let totalTags: mongoose.Types.ObjectId[] = [];
   const tagTypes = [
     { tags: query.tags, type: "custom" },
     { tags: query.accessibility, type: "accessibility" },
   ];
   totalTags = await tagTypes.reduce(async (acc, curr) => {
-    //curr will be tuple containing an array of tag names, and the type it has to be
-    let accAwaited = await acc; //Necessary cuz we defined the accumulate as a promise.
+    let accAwaited = await acc;
     if (curr.tags) {
       const currTags = await TagModel.find({
         name: { $in: curr.tags },
@@ -157,22 +147,17 @@ export async function getSelectedGames(
     }
     return accAwaited;
   }, Promise.resolve(totalTags));
-  //const totalTags = [...custom, ...accessibility];
   if (totalTags.length !== 0) {
-    //Add to filters
     filters.tags = { $all: totalTags };
   }
-  //Currently ignoring filtering by build, as that hasn't yet been implemented.
 
-  //Match by name with regex
   if (query.name && query.name !== "") {
     const reg_string = new RegExp(
-      "[a-zA-Z0-9_]*" + query.name + "[a-zA-Z0-9_]*", //Can't use /w* because prettier doesn't like it.
+      "[a-zA-Z0-9_]*" + query.name + "[a-zA-Z0-9_]*",
       "i",
     );
     filters.name = { $regex: reg_string };
   }
-  //Match by gameContent, by ensuring they all exist.
   if (query.gameContent) {
     filters = query.gameContent.reduce((acc, curr) => {
       acc[curr] = { $exists: true };
@@ -180,18 +165,10 @@ export async function getSelectedGames(
     }, filters);
   }
 
-  //Filtering based on game build (filtering should be add)
   if (query.gameBuilds && query.gameBuilds.length !== 0) {
     if (query.gameBuilds.includes(AllBuilds.webgl)) {
-      //WebGl requires a different type of filter, as it is seperate from the other builds
-      //filters.webGLBuild = true;
-      //aggregate.match({ webGLBuild: true });
-      //Remove webGL for further filtering based on other normal games.
       query.gameBuilds = query.gameBuilds.filter((item) => item !== "webgl");
     }
-    //Right now picks where at least one type is included, not all types.
-    //Add directly to aggregate pipeline. Transform it then unwind it back.
-    //Converts AllBuilds to field used in filter.
 
     const filterableBuilds = query.gameBuilds.map(
       (build: string) => AllBuilds[build as keyof typeof AllBuilds],
@@ -207,10 +184,7 @@ export async function getSelectedGames(
     });
     aggregate.match({ types: { $all: filterableBuilds } });
     aggregate.project({ types: 0 });
-    //aggregate.match({ types: { $all: query.gameBuilds } });
-    //I need builds to contain several builds, all of which have types which should be in query.gameBuilds.
   }
-  //Need to add extra filtering outside of GameModel.find for
 
   aggregate.match(filters);
   aggregate.sort({ name: 1 });
@@ -227,7 +201,7 @@ export async function getSelectedGames(
   if (results[0].count.length != 0) {
     count = results[0].count[0].count;
   }
-  const games: ExtendId<IGame>[] = results[0].games; //While aggregate can return any type, I remove and add fields.
+  const games: ExtendId<IGame>[] = results[0].games;
 
   if (games.length == 0) {
     throw new GameNotFoundException("No Games found at this page");
