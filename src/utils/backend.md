@@ -1,6 +1,6 @@
 # Backend
 
-So sorry for how many changes and refactorings we've done to the backend guys!! Hopefully this guide helps a little. It's currently only updated for what exists in the backend as of Sprint 2, but I will update it to include what will be added in future sprint as well!
+So sorry for how many changes and refactorings we've done to the backend guys!! Hopefully this guide helps a little. It's currently only updated for what exists in the backend as of Sprint 2, but I will update it to include what will be added in future sprints as well!
 
 ## Models
 
@@ -27,7 +27,7 @@ This file contains the schema for the game model, including relationships with t
 - webGLBuild: Boolean, default: false
   - Sprint 1: this was originally "game" when we thought webGL was the only build we were supporting
   - Sprint 2: modified to a boolean that signifies whether or not the game has a build
-- builds: Array of BuildSchema, default: []
+- builds: [BuildSchema]
   - Sprint 2: added to point to all the builds for a game EXCEPT webGL
 - lesson: String
 - parentingGuide: String
@@ -68,6 +68,36 @@ This file contains the schema for the user model, which is used to store user in
 - firstName: String, required
 - lastName: String, required
 - label: String, enum: ["student", "parent", "educator", "administrator"], required
+- notes: [NotesSchema], required
+  - Sprint 3: added to support notes for games
+
+### NotesModel
+
+This file contains the schema for the notes model, which is used to store notes for games. This model was implemented in Sprint 3.
+
+- date: Date, required
+- description: String, required
+- gameId: ObjectId, ref: "Game", required
+
+### AdminModel
+
+This file contains the schema for the admin model, which is used to store authorized admin emails. This means that only users with these emails will have the ability to sign up as an admin. This model will be implemented in Sprint 4.
+
+- email: String, required, unique
+
+### HomePageModel
+
+This file contains the schema for the home page model, which is used to store the information that will be displayed on the home page. This model will be implemented in Sprint 4.
+
+- mdTitle: String, required
+- mdDescription: String, required
+- gameBoyTitle: String, required
+- gameBoys: [GameBoySchema], required
+
+This file also contains the schema for the Gameboy model, which is a subdocument of the home page model. This schema will be implemented in Sprint 4.
+
+- gameID: ObjectId, ref: "Game", required
+- description: String, required
 
 ## Actions
 
@@ -112,6 +142,28 @@ This file contains the functions:
 - `getUser` which returns a user given an id
 - `editUser` which updates a user's information (and only updates the email if the email is not already in use)
 - `editPassword` which updates a user's password after verifying the user's old password
+
+### NotesAction
+
+- `getNotes` which returns all the notes given a userId and gameId
+- `createNote` which creates a note given data (INote) and a userId
+- `updateNote` which updates a note given a userId, noteId, and data (INote)
+- `deleteNote` which deletes a note given a userId and noteId
+
+### AdminAction
+
+These actions will be implemented in Sprint 4.
+
+- `createAdmin` which adds an authorized admin email to the database
+- `deleteAdmin` which removes an authorized admin email from the database. Drew and Susanne's emails cannot be removed.
+- `getAdmin` which returns the email of an authorized admin given an id
+
+### HomePageAction
+
+These actions will be implemented in Sprint 4. There is no createHomePage function because there will only be one document in this collection.
+
+- `editHomePage` which updates the information on the home page
+- `getHomePage` which returns the information on the home page
 
 ## API Endpoints
 

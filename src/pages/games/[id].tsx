@@ -1,4 +1,3 @@
-import styles from "@/styles/game.module.css";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import TabsComponent from "../../components/Tabs/TabsComponent";
@@ -6,32 +5,33 @@ import TagsComponent from "../../components/Tags/TagsComponent";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { userSchema } from "@/utils/types";
-import Image from "next/image";
-import Link from "next/link";
+import EmbeddedGame from "@/components/EmbeddedGame";
+import NotesComponent from "@/components/Tabs/NotesComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
+import AdminEditButton from "@/components/GameComponent/AdminEditButton";
 
 const GamePage = () => {
-  const gameID = useRouter().query.id;
+  const gameId = useRouter().query.id as string;
   const [gameData, setGameData] = useState<populatedGameWithId>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const idSchema = z.string().length(24);
 
+  const { data: session } = useSession();
+  const idSchema = z.string().length(24);
   const userDataSchema = userSchema
     .extend({
       _id: idSchema,
     })
     .omit({ hashedPassword: true });
-
-  const { data: session } = useSession();
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
+  const userId = currentUser?._id as string | undefined;
 
   useEffect(() => {
     if (currentUser) {
       getUserData();
     }
-  }, [currentUser]);
+  }, [currentUser, getUserData]);
 
   async function getUserData() {
     try {
@@ -45,7 +45,7 @@ const GamePage = () => {
 
   const getGame = async () => {
     try {
-      const response = await fetch(`/api/games/${gameID}`);
+      const response = await fetch(`/api/games/${gameId}`);
       if (!response.ok) {
         setError("Failed to fetch game");
       }
@@ -57,7 +57,7 @@ const GamePage = () => {
     }
   };
 
-  if (gameID && loading) {
+  if (gameId && loading) {
     getGame();
   }
 
@@ -66,36 +66,32 @@ const GamePage = () => {
   }
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <></>;
   }
 
   if (!gameData) {
     return <div>Game does not exist</div>;
   }
 
+  const loaded = userData && userId;
+
   return (
     <div>
-      <h1 className={styles.name}>{gameData.name}</h1>
-      {userData && userData.label === "administrator" ? (
-        <Link href={`/games/${gameID}/edit`}>
-          <div className="mx-auto flex w-[80vw] justify-end">
-            <button className="rounded-full bg-input-border">
-              <div className="flex flex-row py-2 pl-3.5 pr-4">
-                <Image
-                  width={24}
-                  height={24}
-                  src={`/editIcon.png`}
-                  alt="edit-icon"
-                />
-                <p className="ml-1 font-sans text-base font-medium text-blue-primary">
-                  Edit
-                </p>
-              </div>
-            </button>
-          </div>
-        </Link>
-      ) : null}
+      <h1 className="mt-[32px] text-center font-sans text-[56px] font-semibold">
+        {gameData.name}
+      </h1>
+      {loaded && (
+        <>
+          {userData.label === "administrator" && (
+            <AdminEditButton gameId={gameId} />
+          )}
+        </>
+      )}
+      <EmbeddedGame gameId={gameId as string} />
       <TabsComponent mode="view" gameData={gameData} />
+      {loaded && userData.label !== "administrator" && (
+        <NotesComponent gameId={gameId} userId={userId} />
+      )}
       <TagsComponent mode="view" gameData={gameData} />
     </div>
   );

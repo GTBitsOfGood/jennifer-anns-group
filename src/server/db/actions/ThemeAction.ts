@@ -7,10 +7,9 @@ import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 export async function createTheme(data: CreateThemeInput) {
   await connectMongoDB();
   const session = await ThemeModel.startSession();
-  // session.startTransaction();
+  session.startTransaction();
   try {
-    // const theme = (await ThemeModel.create([data], { session }))[0];
-    const theme = await ThemeModel.create(data);
+    const theme = (await ThemeModel.create([data], { session }))[0];
     await GameModel.updateMany(
       {
         _id: {
@@ -23,19 +22,18 @@ export async function createTheme(data: CreateThemeInput) {
         },
       },
     );
-    // await session.commitTransaction();
+    await session.commitTransaction();
     return theme.toObject();
   } catch (e) {
-    // await session.abortTransaction();
-    console.log(e);
+    await session.abortTransaction();
     throw e;
   }
 }
 
 export async function deleteTheme(id: string) {
   await connectMongoDB();
-  // const session = await ThemeModel.startSession();
-  // session.startTransaction();
+  const session = await ThemeModel.startSession();
+  session.startTransaction();
   try {
     const deletedTheme = await ThemeModel.findByIdAndDelete(id.toString()); //To fix BSON Error
 
@@ -47,10 +45,10 @@ export async function deleteTheme(id: string) {
       { themes: { $in: [id] } },
       { $pull: { themes: id } },
     );
-    // await session.commitTransaction();
+    await session.commitTransaction();
     return deletedTheme;
   } catch (e) {
-    // await session.abortTransaction();
+    await session.abortTransaction();
     throw e;
   }
 }
