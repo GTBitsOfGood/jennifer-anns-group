@@ -1,4 +1,3 @@
-import { Db } from "mongodb";
 import mongoose from "mongoose";
 
 export const uri = process.env.MONGODB_URI;
