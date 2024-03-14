@@ -32,8 +32,15 @@ export default function FilterBody({
     "Lesson plan",
     "Video trailer",
   ];
-  const [accessibilityOptions, setAccessibilityOptions] = useState<string[]>();
-  const [tagsOptions, setTagsOptions] = useState<string[]>();
+  const [accessibilityOptions, setAccessibilityOptions] = useState<string[]>(
+    [],
+  );
+  const [tagsOptions, setTagsOptions] = useState<string[]>([]);
+  const [selectedGameBuilds, setSelectedGameBuilds] = useState<string[]>([]);
+  const [selectedAccessibility, setSelectedAccessibility] = useState<string[]>(
+    [],
+  );
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   useEffect(() => {
     getAllTags();
@@ -61,7 +68,29 @@ export default function FilterBody({
       </p>
       <div className="mb-[52px] ml-[52px] mr-[52px]">
         {gameBuildsOptions.map((gameBuild) => {
-          return <Tag cursor="pointer">{gameBuild}</Tag>;
+          return (
+            <Tag
+              variant={
+                !selectedGameBuilds.includes(gameBuild)
+                  ? "filter"
+                  : "filter_selected"
+              }
+              onClick={() => {
+                if (selectedGameBuilds.includes(gameBuild)) {
+                  setSelectedGameBuilds(
+                    selectedGameBuilds.filter((gb) => {
+                      return gb !== gameBuild;
+                    }),
+                  );
+                } else {
+                  setSelectedGameBuilds([...selectedGameBuilds, gameBuild]);
+                }
+              }}
+              cursor="pointer"
+            >
+              {gameBuild}
+            </Tag>
+          );
         })}
       </div>
 
@@ -71,10 +100,12 @@ export default function FilterBody({
       {
         <CheckboxGroup>
           <VStack align="start" ml="52px" mb="52px">
-            <Checkbox>Parenting guide</Checkbox>
-            <Checkbox>Lesson plan</Checkbox>
-            <Checkbox>Video trailer</Checkbox>
-            {userLabel ? <Checkbox>Answer key</Checkbox> : null}
+            {gameContentOptions.map((content) => {
+              return <Checkbox>{content}</Checkbox>;
+            })}
+            {userLabel === "administrator" ? (
+              <Checkbox>Answer key</Checkbox>
+            ) : null}
           </VStack>
         </CheckboxGroup>
       }
@@ -83,15 +114,55 @@ export default function FilterBody({
         Accessibility
       </p>
       <div className="mb-[52px] ml-[52px]">
-        {accessibilityOptions?.map((a) => {
-          return <Tag cursor="pointer">{a}</Tag>;
+        {accessibilityOptions.map((a) => {
+          return (
+            <Tag
+              variant={
+                !selectedAccessibility.includes(a)
+                  ? "filter"
+                  : "filter_selected"
+              }
+              onClick={() => {
+                if (selectedAccessibility.includes(a)) {
+                  setSelectedAccessibility(
+                    selectedAccessibility.filter((acc) => {
+                      return acc !== a;
+                    }),
+                  );
+                } else {
+                  setSelectedAccessibility([...selectedAccessibility, a]);
+                }
+              }}
+              cursor="pointer"
+            >
+              {a}
+            </Tag>
+          );
         })}
       </div>
 
       <p className="mb-5 ml-16	font-sans font-extrabold text-gray-500">Tags</p>
       <div className="mb-[52px] ml-[52px]">
         {tagsOptions?.map((t) => {
-          return <Tag cursor="pointer">{t}</Tag>;
+          return (
+            <Tag
+              variant={!selectedTags.includes(t) ? "filter" : "filter_selected"}
+              onClick={() => {
+                if (selectedTags.includes(t)) {
+                  setSelectedTags(
+                    selectedTags.filter((tag) => {
+                      return tag !== t;
+                    }),
+                  );
+                } else {
+                  setSelectedTags([...selectedTags, t]);
+                }
+              }}
+              cursor="pointer"
+            >
+              {t}
+            </Tag>
+          );
         })}
       </div>
 

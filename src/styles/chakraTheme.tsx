@@ -38,6 +38,20 @@ const Tag = tagHelper.defineMultiStyleConfig({
       borderRadius: "full",
     },
   },
+  variants: {
+    filter: {
+      container: {
+        color: "#535353",
+        bg: "#F6F6F6",
+      },
+    },
+    filter_selected: {
+      container: {
+        color: "#535353",
+        bg: "#B0CAE8",
+      },
+    },
+  },
 });
 
 const chakraTheme = extendTheme({
