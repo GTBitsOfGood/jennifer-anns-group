@@ -4,7 +4,15 @@ import { userDataSchema } from "@/components/ProfileModal/ProfileModal";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { Divider, InputGroup, InputLeftElement } from "@chakra-ui/react";
+import {
+  Divider,
+  InputGroup,
+  InputLeftElement,
+  Popover,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
+} from "@chakra-ui/react";
 import GameCard from "@/components/GameComponent/GameCard";
 import { gameSchema, themeSchema } from "@/utils/types";
 import {
@@ -13,15 +21,21 @@ import {
   TriangleUpIcon,
 } from "@chakra-ui/icons";
 import { Input } from "@chakra-ui/react";
+import FilterBody from "@/components/GameComponent/FilterBody";
 
 export default function Games() {
   const { data: session } = useSession();
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
   const [games, setGames] = useState<z.infer<typeof gameSchema>[]>();
-  //   const [themes, setThemes] = useState<z.infer<typeof themeSchema>[]>();
   const [themes, setThemes] = useState<string[]>();
-  const [selectedTheme, setSelectedTheme] = useState("");
+  const [selectedTheme, setSelectedTheme] = useState("All Games");
+  const [gameBuilds, setGameBuilds] = useState<string[]>();
+  const [gameContent, setGameContent] = useState<string[]>();
+  const [accessibility, setAccessibility] = useState<string[]>();
+  const [tags, setTags] = useState<string[]>();
+  const [name, setName] = useState("");
+  const [filterOpen, setFilterOpen] = useState(false);
 
   useEffect(() => {
     getGames();
@@ -85,12 +99,30 @@ export default function Games() {
             placeholder="Filter by name"
           />
         </InputGroup>
-        <div className="ml-5 flex w-24 flex-row items-center justify-center space-x-1 rounded-full border border-[#A9CBEB] bg-blue-50">
-          <p className="py-2.5 font-inter text-sm font-bold text-[#2352A0]">
-            Filter
-          </p>
-          <TriangleDownIcon color="brand.600" height="9px" />
-        </div>
+        <Popover>
+          <PopoverTrigger>
+            <div
+              onClick={() => {
+                setFilterOpen(!filterOpen);
+              }}
+              className="ml-5 flex w-24 cursor-pointer flex-row items-center justify-center space-x-1 rounded-full border border-[#A9CBEB] bg-blue-50"
+            >
+              <p className="select-none	py-2.5 font-inter text-sm font-bold text-[#2352A0]">
+                Filter
+              </p>
+              {filterOpen ? (
+                <TriangleUpIcon color="brand.600" height="9px" />
+              ) : (
+                <TriangleDownIcon color="brand.600" height="9px" />
+              )}
+            </div>
+          </PopoverTrigger>
+          <PopoverContent mt="10px" ml="32vw" w="750px" h="800px">
+            <PopoverBody>
+              {<FilterBody userLabel={userData?.label} />}
+            </PopoverBody>
+          </PopoverContent>
+        </Popover>
       </div>
 
       <div className="m-auto ml-[10vw] w-[80vw]">
@@ -98,14 +130,32 @@ export default function Games() {
       </div>
 
       <div className="m-auto mt-[60px] flex w-[90vw] flex-row">
-        <div className="flex h-[370px] w-[240px] flex-col overflow-y-scroll">
-          <p className="mb-[26px] font-sans text-2xl text-neutral-500">
+        <div className="flex h-[365px] w-[260px] flex-col overflow-y-scroll">
+          <p
+            onClick={() => {
+              setSelectedTheme("All Games");
+            }}
+            className={
+              selectedTheme === "All Games"
+                ? "mb-[26px] cursor-pointer font-sans text-2xl font-bold text-[#2352A0]"
+                : "mb-[26px] cursor-pointer font-sans text-2xl text-neutral-500"
+            }
+          >
             All Games
           </p>
           {themes
             ? themes.map((theme) => {
                 return (
-                  <p className="mb-[26px] font-sans text-2xl text-neutral-500">
+                  <p
+                    onClick={() => {
+                      setSelectedTheme(theme);
+                    }}
+                    className={
+                      selectedTheme === theme
+                        ? "mb-[26px] cursor-pointer font-sans text-2xl font-bold text-[#2352A0]"
+                        : "mb-[26px] cursor-pointer font-sans text-2xl text-neutral-500"
+                    }
+                  >
                     {theme}
                   </p>
                 );
