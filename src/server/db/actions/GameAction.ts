@@ -133,7 +133,7 @@ type QueryFieldHandlers<T> = {
     field: number,
     filterFieldsAnd: FilterQuery<IGame>,
     filterFieldsOr: FilterQuery<IGame>,
-  ) => Aggregate<any>;
+  ) => Aggregate<{ games: GetSelectedGamesOutput; count: number }[]>;
 };
 
 const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
@@ -149,7 +149,10 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
       ...andFilters,
       ...(orFilters.length > 0 ? [{ $or: orFilters }] : []),
     ];
-    const aggregate = GameModel.aggregate();
+    const aggregate = GameModel.aggregate<{
+      games: GetSelectedGamesOutput;
+      count: number;
+    }>();
 
     aggregate.match({
       ...(allSteps.length > 0 && { $and: allSteps }),
@@ -162,6 +165,11 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
       ],
       count: [{ $count: "count" }],
     });
+    aggregate.project({
+      count: { $arrayElemAt: ["$count.count", 0] },
+      games: 1,
+    });
+    //Add aggregate project step here to simplify and make the type easier.
     return aggregate;
   },
   theme: async (theme, filterFieldsAnd, filterFieldsOr) => {
@@ -284,17 +292,11 @@ async function getSelectedGamesHelper(query: GameQuery) {
     initialFilterAnd,
     initialFilterOr,
   );
-  const results = await aggregate.exec();
-  let count = 0;
-  if (results[0].count.length !== 0) {
-    count = results[0].count[0].count;
-  }
-  const games: GetSelectedGamesOutput = results[0].games;
-
-  if (games.length == 0) {
+  const results = (await aggregate.exec())[0];
+  if (results.games.length == 0) {
     throw new GameNotFoundException("No Games found at this page");
   }
-  return { games: games, count: count };
+  return results;
 }
 
 export async function getGameById(id: string) {
