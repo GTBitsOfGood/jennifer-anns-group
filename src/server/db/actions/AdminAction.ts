@@ -46,3 +46,13 @@ export async function getAdminByEmail(email: string) {
     throw e;
   }
 }
+
+export async function getAllAdmins() {
+  await connectMongoDB();
+  try {
+    const admins = await AdminModel.find({}).sort({ email: 1 });
+    return admins ? admins : {};
+  } catch (e) {
+    throw e;
+  }
+}

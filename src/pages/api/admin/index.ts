@@ -1,4 +1,8 @@
-import { createAdmin, getAdminByEmail } from "@/server/db/actions/AdminAction";
+import {
+  createAdmin,
+  getAdminByEmail,
+  getAllAdmins,
+} from "@/server/db/actions/AdminAction";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import {
   AdminException,
@@ -44,11 +48,16 @@ async function postAdminHandler(req: NextApiRequest, res: NextApiResponse) {
 async function getAdminHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const email = req.query.email;
-    if (!email || Array.isArray(email)) {
-      throw new AdminInvalidInputException();
+    if (!email) {
+      const admins = await getAllAdmins();
+      return res.status(HTTP_STATUS_CODE.OK).send(admins);
+    } else {
+      if (Array.isArray(email)) {
+        throw new AdminInvalidInputException();
+      }
+      const newAdmin = await getAdminByEmail(email);
+      return res.status(HTTP_STATUS_CODE.OK).send(newAdmin);
     }
-    const newAdmin = await getAdminByEmail(email);
-    return res.status(HTTP_STATUS_CODE.OK).send(newAdmin);
   } catch (e: any) {
     if (e instanceof AdminException) {
       return res.status(e.code).send(e.message);

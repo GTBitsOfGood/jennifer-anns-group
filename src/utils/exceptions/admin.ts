@@ -21,13 +21,13 @@ export class AdminDoesNotExistException extends AdminException {
 }
 
 export class AdminAlreadyExistsException extends AdminException {
-  constructor(message = "Admin already exists") {
+  constructor(message = "Duplicate email address") {
     super(message, HTTP_STATUS_CODE.BAD_REQUEST);
   }
 }
 
 export class AdminInvalidInputException extends AdminException {
-  constructor(message = "Invalid admin input") {
+  constructor(message = "Invalid email address") {
     super(message, HTTP_STATUS_CODE.BAD_REQUEST);
   }
 }
