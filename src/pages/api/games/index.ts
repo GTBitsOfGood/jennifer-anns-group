@@ -4,7 +4,7 @@ import {
   createGame,
   getSelectedGames,
 } from "../../../server/db/actions/GameAction";
-import { AppType, gameSchema } from "../../../utils/types";
+import { AllBuilds, GameContentEnum, gameSchema } from "../../../utils/types";
 import { NextApiRequest, NextApiResponse } from "next";
 import {
   GameInvalidInputException,
@@ -26,53 +26,6 @@ export default async function handler(
       });
   }
 }
-
-export enum GameContentEnum {
-  answerKey = "answerKey",
-  parentingGuide = "parentingGuide",
-  lesson = "lesson",
-  videoTrailer = "videoTrailer",
-}
-
-const convertINT = (val: string, ctx: RefinementCtx) => {
-  const result = parseInt(val);
-  if (isNaN(result)) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Not a valid integer",
-    });
-    return z.NEVER;
-  } else {
-    return result;
-  }
-};
-const putSingleStringInArray = (val: string) => {
-  return [val];
-};
-
-//Query parameters can pass in a single value but need to be an array, so moddifying it to expect that.
-export const GetGameQuerySchema = z.object({
-  name: z.string().min(3).max(50).optional(),
-  theme: z.string().optional(),
-  tags: z
-    .array(z.string())
-    .or(z.string().transform(putSingleStringInArray))
-    .optional(),
-  accessibility: z
-    .array(z.string())
-    .or(z.string().transform(putSingleStringInArray))
-    .optional(),
-  gameBuilds: z
-    .array(z.nativeEnum(AppType))
-    .or(z.nativeEnum(AppType).transform(putSingleStringInArray))
-    .optional(),
-  gameContent: z
-    .array(z.nativeEnum(GameContentEnum))
-    .or(z.nativeEnum(GameContentEnum).transform(putSingleStringInArray)) //In this case where only thing is passed into gameContent.
-    .optional(),
-  page: z.string().transform(convertINT).pipe(z.number().gte(1)),
-});
-export type GameQuery = z.infer<typeof GetGameQuerySchema>;
 
 async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -109,3 +62,43 @@ async function postGameHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }
+
+const convertINT = (val: string, ctx: RefinementCtx) => {
+  const result = parseInt(val);
+  if (isNaN(result)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Not a valid integer",
+    });
+    return z.NEVER;
+  } else {
+    return result;
+  }
+};
+const putSingleStringInArray = (val: string) => {
+  return [val];
+};
+
+//Query parameters can pass in a single value but need to be an array, so moddifying it to expect that.
+export const GetGameQuerySchema = z.object({
+  name: z.string().min(3).max(50).optional(),
+  theme: z.string().optional(),
+  tags: z
+    .array(z.string())
+    .or(z.string().transform(putSingleStringInArray))
+    .optional(),
+  accessibility: z
+    .array(z.string())
+    .or(z.string().transform(putSingleStringInArray))
+    .optional(),
+  gameBuilds: z
+    .array(z.nativeEnum(AllBuilds))
+    .or(z.nativeEnum(AllBuilds).transform(putSingleStringInArray))
+    .optional(),
+  gameContent: z
+    .array(z.nativeEnum(GameContentEnum))
+    .or(z.nativeEnum(GameContentEnum).transform(putSingleStringInArray)) //In this case where only thing is passed into gameContent.
+    .optional(),
+  page: z.string().transform(convertINT).pipe(z.number().gte(1)),
+});
+export type GameQuery = z.infer<typeof GetGameQuerySchema>;

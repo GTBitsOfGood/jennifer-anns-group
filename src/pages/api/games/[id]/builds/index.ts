@@ -1,7 +1,4 @@
-import {
-  deleteBuild,
-  getBuildUploadUrl,
-} from "@/server/db/actions/BuildAction";
+import { deleteBuild } from "@/server/db/actions/BuildAction";
 import { editGame, getGameById } from "@/server/db/actions/GameAction";
 import {
   GameNotFoundException,
@@ -12,6 +9,7 @@ import {
 } from "@/utils/exceptions/game";
 import { NextApiResponse } from "next";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
+import { BucketType, getDirectUploadUrl } from "@/utils/file";
 
 export default async function handler(req: any, res: NextApiResponse) {
   switch (req.method) {
@@ -33,8 +31,9 @@ async function createBuildHandler(req: any, res: NextApiResponse) {
       throw new GameNotFoundException();
     }
 
-    const { uploadUrl, uploadAuthToken } = await getBuildUploadUrl();
-    console.log(uploadUrl, uploadAuthToken);
+    const { uploadUrl, uploadAuthToken } = await getDirectUploadUrl(
+      BucketType.WebGLBuilds,
+    );
     if (!uploadUrl || !uploadAuthToken) {
       throw new BuildUploadException();
     }

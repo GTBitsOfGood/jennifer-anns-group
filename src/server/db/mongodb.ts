@@ -4,7 +4,7 @@ export const uri = process.env.MONGODB_URI;
 
 const connectMongoDB = async () => {
   try {
-    mongoose.connect(uri);
+    await mongoose.connect(uri);
   } catch (e) {
     console.log(e);
   }

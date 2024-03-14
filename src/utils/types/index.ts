@@ -8,8 +8,7 @@ const verifyObjectId = (value: string) => {
   }
   return false;
 };
-
-export enum AppType {
+export enum AllBuilds {
   amazon = "amazon",
   android = "android",
   appstore = "appstore",
@@ -19,8 +18,24 @@ export enum AppType {
   windows = "windows",
 }
 
+export enum NonWebGLBuilds {
+  amazon = "amazon",
+  android = "android",
+  appstore = "appstore",
+  linux = "linux",
+  mac = "mac",
+  windows = "windows",
+}
+
+export enum GameContentEnum {
+  answerKey = "answerKey",
+  parentingGuide = "parentingGuide",
+  lesson = "lesson",
+  videoTrailer = "videoTrailer",
+}
+
 export const buildSchema = z.object({
-  type: z.nativeEnum(AppType),
+  type: z.nativeEnum(NonWebGLBuilds),
   link: z.string().url(),
   instructions: z.string().optional(),
 });
@@ -51,7 +66,10 @@ export const gameSchema = z.object({
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
   answerKey: z.string().url().optional(),
-  videoTrailer: z.string().url("Not a valid URL").or(z.literal("")),
+  videoTrailer: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.string().url().optional(),
+  ),
 });
 //Since arrays from req.query are just strings, and need to be converted into arrays.
 
@@ -73,6 +91,12 @@ export const editGameSchema = z.object({
   videoTrailer: z.string().url().optional(),
 });
 
+// Notes
+export const noteSchema = z.object({
+  date: z.string().pipe(z.coerce.date()),
+  description: z.string(),
+  gameId: z.string().refine(verifyObjectId).optional(),
+});
 export enum UserLabel {
   Educator = "educator",
   Student = "student",
@@ -86,11 +110,12 @@ export const userSchema = z.object({
   hashedPassword: z.string(),
   firstName: z.string(),
   lastName: z.string(),
+  notes: z.array(noteSchema),
   label: z.nativeEnum(UserLabel),
 });
 
 export type ExtendId<T extends any> = T & { _id: string };
-
+export type ExtendVersion<T extends any> = T & { __v: number };
 // For changing password
 export const changePWSchema = z.object({
   oldpassword: z.string(),

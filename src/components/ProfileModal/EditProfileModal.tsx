@@ -23,7 +23,7 @@ import {
   EditUserReturnValue,
 } from "./ProfileModal";
 
-const formUserSchema = userSchema.omit({ hashedPassword: true });
+const formUserSchema = userSchema.omit({ hashedPassword: true, notes: true });
 
 type EditProps = {
   setProfileState: React.Dispatch<React.SetStateAction<ProfileState>>;

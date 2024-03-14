@@ -1,8 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 import { z } from "zod";
-import { buildSchema, gameSchema, AppType } from "../../../utils/types";
+import { buildSchema, gameSchema, AllBuilds } from "../../../utils/types";
 import { ITheme } from "./ThemeModel";
 import { ITag } from "./TagModel";
+
 export interface IGame extends z.infer<typeof gameSchema> {}
 export type populatedGame = Omit<IGame, "tags" | "themes"> & {
   tags: ITag[];
@@ -12,11 +13,11 @@ export type populatedGameWithId = Omit<IGame, "tags" | "themes"> & {
   themes: (ITheme & { _id: string })[];
 };
 
-interface IBuild extends z.infer<typeof buildSchema> {}
+export interface IBuild extends z.infer<typeof buildSchema> {}
 
 //You must use mongoose.Schema.Types.ObjectId when defining Schemas that contain an ObjectId.
 const BuildSchema = new Schema<IBuild>({
-  type: { type: String, enum: Object.values(AppType), required: true },
+  type: { type: String, enum: Object.values(AllBuilds), required: true },
   link: { type: String, required: true },
   instructions: { type: String },
 });
