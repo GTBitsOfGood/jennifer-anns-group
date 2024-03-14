@@ -209,8 +209,6 @@ describe("MongodDB Game - Unit Test", () => {
       };
       const expected = filterGeneratedGames(generatedGames, modifiedQuery);
 
-      //We need to check if the length is zero because the expected action from getSelectedGames
-      //if it returns nothing is to throw an error
       if (expected.length == 0) {
         await expect(getSelectedGames(query)).rejects.toThrow(
           GameNotFoundException,
@@ -228,14 +226,8 @@ describe("MongodDB Game - Unit Test", () => {
           });
           return game;
         });
-        console.log(JSON.stringify(actual.games));
-        console.log(JSON.stringify(expected));
         expect(actual.games.length).toBe(expected.length);
         expect(actual.games).toEqual(expected);
-        console.log(
-          "ACTUAL",
-          actual.games.map((game) => game.webGLBuild),
-        );
       }
     });
   });
