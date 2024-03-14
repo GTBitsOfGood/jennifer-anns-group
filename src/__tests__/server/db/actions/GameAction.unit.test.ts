@@ -1,29 +1,25 @@
 declare var global: any;
 import mongoose, { ConnectOptions } from "mongoose";
+import * as connectMongoDB from "@/server/db/mongodb";
+import { faker } from "@faker-js/faker";
 import { randomTags } from "@/server/db/actions/__mocks__/TagAction";
 import { randomThemes } from "@/server/db/actions/__mocks__/ThemeAction";
 import { randomGames } from "@/server/db/actions/__mocks__/GameAction";
-import { createTag } from "@/server/db/actions/TagAction";
-import TagModel from "@/server/db/models/TagModel";
-import ThemeModel from "@/server/db/models/ThemeModel";
-import GameModel from "@/server/db/models/GameModel";
-import * as connectMongoDB from "@/server/db/mongodb";
-import { createTheme } from "@/server/db/actions/ThemeAction";
-import { ExtendId, NonWebGLBuilds } from "@/utils/types";
-import { IBuild } from "@/server/db/models/GameModel";
 import {
   RESULTS_PER_PAGE,
   getSelectedGames,
 } from "@/server/db/actions/GameAction";
-import { IGame } from "@/server/db/models/GameModel";
-import { GameContentEnum, GameQuery } from "@/pages/api/games";
-import { AllBuilds } from "@/utils/types";
-import { faker } from "@faker-js/faker";
+import TagModel from "@/server/db/models/TagModel";
+import ThemeModel from "@/server/db/models/ThemeModel";
+import GameModel, { IGame } from "@/server/db/models/GameModel";
+import { ExtendId, AllBuilds, GameContentEnum } from "@/utils/types";
+import { GameQuery } from "@/pages/api/games";
+import { CreateTagInput } from "@/pages/api/tags";
+import { CreateThemeInput } from "@/pages/api/themes";
 import { GameNotFoundException } from "@/utils/exceptions/game";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
 import { ThemeNotFoundException } from "@/utils/exceptions/theme";
-import { CreateTagInput } from "@/pages/api/tags";
-import { CreateThemeInput } from "@/pages/api/themes";
+
 jest.mock("../../../../server/db/mongodb");
 jest.spyOn(connectMongoDB, "default").mockImplementation(async () => {
   await mongoose.connect(global.__MONGO_URI__, {
@@ -33,7 +29,6 @@ jest.spyOn(connectMongoDB, "default").mockImplementation(async () => {
 
 const NUM_GAMES = 300;
 let generatedGames: ExtendId<IGame>[] = randomGames(NUM_GAMES);
-
 const gameIds = generatedGames.map((game) => game._id.toString());
 let tagInputs: ExtendId<CreateTagInput>[] = randomTags(gameIds, 10);
 let themeInputs: ExtendId<CreateThemeInput>[] = randomThemes(gameIds, 10);
@@ -191,6 +186,7 @@ describe("MongodDB Game - Unit Test", () => {
 
       const themes = await ThemeModel.find({});
       const randomTheme = themes[Math.floor(Math.random() * themes.length)];
+      // NOTE: if you comment out tags, accessibility, or themes, you must also comment them out from modifiedQuery
       const query = {
         page: 1,
         tags: [randomCustomTag.name],

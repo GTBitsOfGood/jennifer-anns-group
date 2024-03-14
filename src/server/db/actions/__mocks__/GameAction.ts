@@ -1,7 +1,6 @@
 import { IGame } from "../../models/GameModel";
 import { faker } from "@faker-js/faker";
-import { NonWebGLBuilds } from "@/utils/types";
-import { ExtendId, ExtendVersion } from "@/utils/types";
+import { NonWebGLBuilds, ExtendId, ExtendVersion } from "@/utils/types";
 import mongoose from "mongoose";
 let salt = 0;
 function createRandomGame(): ExtendVersion<ExtendId<IGame>> {

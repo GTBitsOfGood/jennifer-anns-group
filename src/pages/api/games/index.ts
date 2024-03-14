@@ -4,7 +4,7 @@ import {
   createGame,
   getSelectedGames,
 } from "../../../server/db/actions/GameAction";
-import { AllBuilds, gameSchema } from "../../../utils/types";
+import { AllBuilds, GameContentEnum, gameSchema } from "../../../utils/types";
 import { NextApiRequest, NextApiResponse } from "next";
 import {
   GameInvalidInputException,
@@ -27,11 +27,40 @@ export default async function handler(
   }
 }
 
-export enum GameContentEnum {
-  answerKey = "answerKey",
-  parentingGuide = "parentingGuide",
-  lesson = "lesson",
-  videoTrailer = "videoTrailer",
+async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    //TODO: Putback parsing
+    const parsedQuery = GetGameQuerySchema.safeParse(req.query); //JSON.parse not necessary
+    if (!parsedQuery.success) {
+      //Convert to current format.
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .send(parsedQuery.error.format());
+    }
+    const games = await getSelectedGames(parsedQuery.data);
+    return res.status(HTTP_STATUS_CODE.OK).send(games);
+  } catch (e: any) {
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+  }
+}
+
+async function postGameHandler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    const parsedData = gameSchema.safeParse(JSON.parse(req.body));
+    if (!parsedData.success) {
+      throw new GameInvalidInputException();
+    }
+    const newGame = await createGame(parsedData.data);
+    return res.status(HTTP_STATUS_CODE.CREATED).send({
+      ...newGame,
+      _id: newGame._id.toString(),
+    });
+  } catch (e: any) {
+    if (e instanceof GameException) {
+      return res.status(e.code).send(e.message);
+    }
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+  }
 }
 
 const convertINT = (val: string, ctx: RefinementCtx) => {
@@ -73,39 +102,3 @@ export const GetGameQuerySchema = z.object({
   page: z.string().transform(convertINT).pipe(z.number().gte(1)),
 });
 export type GameQuery = z.infer<typeof GetGameQuerySchema>;
-
-async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    //TODO: Putback parsing
-    const parsedQuery = GetGameQuerySchema.safeParse(req.query); //JSON.parse not necessary
-    if (!parsedQuery.success) {
-      //Convert to current format.
-      return res
-        .status(HTTP_STATUS_CODE.BAD_REQUEST)
-        .send(parsedQuery.error.format());
-    }
-    const games = await getSelectedGames(parsedQuery.data);
-    return res.status(HTTP_STATUS_CODE.OK).send(games);
-  } catch (e: any) {
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
-  }
-}
-
-async function postGameHandler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    const parsedData = gameSchema.safeParse(JSON.parse(req.body));
-    if (!parsedData.success) {
-      throw new GameInvalidInputException();
-    }
-    const newGame = await createGame(parsedData.data);
-    return res.status(HTTP_STATUS_CODE.CREATED).send({
-      ...newGame,
-      _id: newGame._id.toString(),
-    });
-  } catch (e: any) {
-    if (e instanceof GameException) {
-      return res.status(e.code).send(e.message);
-    }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
-  }
-}

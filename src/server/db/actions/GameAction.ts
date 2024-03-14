@@ -3,11 +3,9 @@ import ThemeModel, { ITheme } from "../models/ThemeModel";
 import TagModel, { ITag } from "../models/TagModel";
 import connectMongoDB from "../mongodb";
 import { deleteBuild } from "./BuildAction";
-import { FilterQuery, Aggregate } from "mongoose";
+import mongoose, { FilterQuery, Aggregate } from "mongoose";
 import { z } from "zod";
 import { AllBuilds, ExtendId, editGameSchema } from "@/utils/types";
-import mongoose from "mongoose";
-
 import { GameQuery, GetGameQuerySchema } from "@/pages/api/games";
 import {
   GameNotFoundException,
@@ -16,9 +14,9 @@ import {
 } from "@/utils/exceptions/game";
 import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
-import { Filter } from "mongodb";
 
-export const RESULTS_PER_PAGE = 7;
+export const RESULTS_PER_PAGE = 6;
+
 export async function createGame(data: IGame) {
   await connectMongoDB();
 
@@ -116,7 +114,32 @@ export async function getSelectedGames(
   query: z.infer<typeof GetGameQuerySchema>,
 ) {
   await connectMongoDB();
-  return await getSelectedGamesHelper(query);
+  const { page, ...filterSteps } = query;
+  let initialFilterAnd: FilterQuery<IGame> = {};
+  let initialFilterOr: FilterQuery<IGame> = {};
+  for (const [key, value] of Object.entries(filterSteps)) {
+    const handler = QUERY_FIELD_HANDLER_MAP[key as keyof typeof filterSteps];
+    if (handler) {
+      const result = await handler(
+        value as any,
+        initialFilterAnd,
+        initialFilterOr,
+      );
+
+      initialFilterAnd = result.filterFieldsAnd;
+      initialFilterOr = result.filterFieldsOr;
+    }
+  }
+  const aggregate = QUERY_FIELD_HANDLER_MAP["page"](
+    page,
+    initialFilterAnd,
+    initialFilterOr,
+  );
+  const results = (await aggregate.exec())[0];
+  if (results.games.length == 0) {
+    throw new GameNotFoundException("No Games found at this page");
+  }
+  return results;
 }
 
 type QueryFieldHandlers<T> = {
@@ -269,35 +292,6 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
     };
   },
 };
-
-async function getSelectedGamesHelper(query: GameQuery) {
-  const { page, ...filterSteps } = query;
-  let initialFilterAnd: FilterQuery<IGame> = {};
-  let initialFilterOr: FilterQuery<IGame> = {};
-  for (const [key, value] of Object.entries(filterSteps)) {
-    const handler = QUERY_FIELD_HANDLER_MAP[key as keyof typeof filterSteps];
-    if (handler) {
-      const result = await handler(
-        value as any,
-        initialFilterAnd,
-        initialFilterOr,
-      );
-
-      initialFilterAnd = result.filterFieldsAnd;
-      initialFilterOr = result.filterFieldsOr;
-    }
-  }
-  const aggregate = QUERY_FIELD_HANDLER_MAP["page"](
-    page,
-    initialFilterAnd,
-    initialFilterOr,
-  );
-  const results = (await aggregate.exec())[0];
-  if (results.games.length == 0) {
-    throw new GameNotFoundException("No Games found at this page");
-  }
-  return results;
-}
 
 export async function getGameById(id: string) {
   await connectMongoDB();

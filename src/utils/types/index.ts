@@ -27,6 +27,13 @@ export enum NonWebGLBuilds {
   windows = "windows",
 }
 
+export enum GameContentEnum {
+  answerKey = "answerKey",
+  parentingGuide = "parentingGuide",
+  lesson = "lesson",
+  videoTrailer = "videoTrailer",
+}
+
 export const buildSchema = z.object({
   type: z.nativeEnum(NonWebGLBuilds),
   link: z.string().url(),
