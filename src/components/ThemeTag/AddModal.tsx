@@ -13,7 +13,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { IGame } from "@/server/db/models/GameModel";
 import { useCallback, useState } from "react";
 import { z } from "zod";
-import { ITheme } from "@/server/db/models/ThemeModel";
 import { CreateThemeInput } from "@/pages/api/themes";
 import { CreateTagInput } from "@/pages/api/tags";
 
