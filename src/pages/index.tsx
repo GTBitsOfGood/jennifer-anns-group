@@ -7,6 +7,9 @@ import { userDataSchema } from "@/components/ProfileModal/ProfileModal";
 import { z } from "zod";
 import Image from "next/image";
 import discordIcon from "../../public/social/Discord.svg";
+import bogLogo1 from "../../public/bog_logo_1.svg";
+import bogLogo2 from "../../public/bog_logo_2.svg";
+import gameboy from "../../public/gameboy.png";
 import Link from "next/link";
 
 const Home = () => {
@@ -40,14 +43,14 @@ const Home = () => {
         />
         <div className="flex flex-col items-center">
           <div className="flex flex-col items-center py-32">
-            <h1 className="font-rubik text-stone-primary mb-12 text-7xl font-extrabold">
+            <h1 className="mb-12 font-rubik text-7xl font-extrabold text-stone-primary">
               Jennifer Ann's Group
             </h1>
             <h2 className="text-5xl font-medium italic text-orange-primary">
               Gaming against violence.
             </h2>
           </div>
-          <div className="bg-blue-bg flex w-full flex-col items-center px-32 py-16">
+          <div className="flex w-full flex-col items-center bg-blue-bg px-32 py-16">
             <div className="flex w-4/5 flex-col items-center">
               <h1 className="mb-12 text-3xl font-medium">
                 Welcome to Jennifer Ann's Group
@@ -69,11 +72,37 @@ const Home = () => {
             </div>
           </div>
           <div className="py-16">
-            <h1 className="text-5xl font-semibold text-orange-primary">
+            <h1 className="mb-12 text-center text-5xl font-semibold text-orange-primary">
               Check out what's new!
             </h1>
+            <div className="grid grid-cols-3 gap-x-20 px-16">
+              <div>
+                <Image src={gameboy} alt="gameboy" />
+                <p className="mt-12 text-center text-gray-500">
+                  When it's colder than the far side of the moon and spitting
+                  rain too, you've still got to look good.
+                </p>
+              </div>
+              <div>
+                <Image src={gameboy} alt="gameboy" />
+                <p className="mt-12 text-center text-gray-500">
+                  When it's colder than the far side of the moon and spitting
+                  rain too, you've still got to look good. From water-repellent
+                  leather to a rugged outsole, the Lunar Force 1 adapts AF-1
+                  style.
+                </p>
+              </div>
+              <div>
+                <Image src={gameboy} alt="gameboy" />
+                <p className="mt-12 text-center text-gray-500">
+                  When it's colder than the far side of the moon and spitting
+                  rain too, you've still got to look good. From water-repellent
+                  leather to a rugged outsole.
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="bg-blue-bg flex w-full flex-col items-center px-32 py-16">
+          <div className="flex w-full flex-col items-center bg-blue-bg px-32 py-16">
             <div className="flex flex-row justify-center">
               <Image
                 src={discordIcon}
@@ -87,9 +116,55 @@ const Home = () => {
                 <p className="text-3xl italic text-blue-primary">
                   Join our{" "}
                   <Link className="underline" href="" target="_blank">
-                    Jennifer Ann’s Group’s discord!
+                    Jennifer Ann's Group's discord!
                   </Link>
                 </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex w-full flex-col px-32 py-32">
+            <div className="flex flex-row content-start items-center">
+              <Image src={bogLogo2} alt="Bits of Good Logo" />
+              <div className="ml-12">
+                <Image src={bogLogo1} alt="Bits of Good Logo" />
+                <p className="mt-3 text-2xl font-semibold text-orange-primary">
+                  Thanks to Bits of Good for helping create our site!
+                </p>
+              </div>
+            </div>
+            <div className="mt-16 flex flex-row justify-between">
+              <div className="w-2/5">
+                <h1 className="mb-8 text-2xl font-medium">
+                  About Bits of Good
+                </h1>
+                <p className="text-lg">
+                  Georgia Tech Bits of Good connects students with local
+                  nonprofits by building powerful web apps, redefining social
+                  good to make an impact with a technical background.
+                </p>
+              </div>
+              <div className="flex w-2/5 flex-col items-end">
+                <div>
+                  <h1 className="mb-8 text-2xl font-medium">
+                    Special thanks to:
+                  </h1>
+                  <div className="flex flex-row space-x-8 text-lg">
+                    <ul>
+                      <li>Annie Vallamattam</li>
+                      <li>Helen Chen</li>
+                      <li>Liane Nguyen</li>
+                      <li>Xingyi Luo</li>
+                    </ul>
+                    <ul>
+                      <li>Aakash Gupta</li>
+                      <li>Ankith Thalanki</li>
+                      <li>Katsuki Chan</li>
+                      <li>Lauren Ji</li>
+                      <li>Nathan Gong</li>
+                      <li>Uma Anand</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
