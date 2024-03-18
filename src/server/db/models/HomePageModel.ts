@@ -6,7 +6,7 @@ export interface IGameBoy extends z.infer<typeof gameBoySchema> {}
 export interface IHomePage extends z.infer<typeof homePageSchema> {}
 
 const GameBoySchema = new Schema<IGameBoy>({
-  gameId: { type: Schema.Types.ObjectId, ref: "Game", required: true },
+  gameId: { type: Schema.Types.ObjectId, ref: "Game" },
   description: { type: String, required: true },
 });
 

@@ -18,7 +18,6 @@ export default async function handler(
     switch (req.method) {
       case "PUT":
         const parsedData = editHomePageSchema.safeParse(JSON.parse(req.body));
-        console.log(parsedData);
         if (!parsedData.success) {
           throw new HomePageInvalidInputException();
         }

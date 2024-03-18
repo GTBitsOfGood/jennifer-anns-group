@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { WarningTwoIcon } from "@chakra-ui/icons";
 import cx from "classnames";
+import EditGameBoyModal from "@/components/HomePage/EditGameBoyModal";
 
 const mdParser = new MarkdownIt();
 
@@ -33,8 +34,8 @@ const Home = () => {
   const [edit, setEdit] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
-  const [editTitleDescriptionError, setEditTitleDescriptionError] =
-    useState("");
+  const [editError, setEditError] = useState("");
+  const [editGameBoy, setEditGameBoy] = useState(false);
 
   const {
     data: pageData,
@@ -71,10 +72,10 @@ const Home = () => {
     onSuccess: async () => {
       await refetch();
       setEdit(false);
-      setEditTitleDescriptionError("");
+      setEditError("");
     },
-    onError: (error) => {
-      setEditTitleDescriptionError("Failed to update title and description");
+    onError: () => {
+      setEditError("Failed to update title and description");
     },
   });
 
@@ -115,19 +116,9 @@ const Home = () => {
               Gaming against violence.
             </h2>
           </div>
-          <div className="relative flex w-full flex-col items-center bg-blue-bg px-32 py-16">
-            {userData?.label === "administrator" && !edit && (
-              <Edit2Icon
-                className="absolute top-24 cursor-pointer self-end text-gray-500"
-                onClick={() => {
-                  setEdit(true);
-                  setEditTitle(pageData.mdTitle);
-                  setEditDescription(pageData.mdDescription);
-                }}
-              />
-            )}
+          <div className="flex w-full flex-col items-center bg-blue-bg py-16">
             {edit ? (
-              <div className="flex flex-col space-y-6">
+              <div className="flex w-4/5 max-w-7xl flex-col space-y-6">
                 <div className="flex space-x-4">
                   <h1 className="inline-block text-2xl font-medium">
                     Title<span className="text-orange-primary">*</span>
@@ -150,16 +141,14 @@ const Home = () => {
                 />
                 <div
                   className={cx("flex", {
-                    "justify-between": editTitleDescriptionError,
-                    "justify-end": !editTitleDescriptionError,
+                    "justify-between": editError,
+                    "justify-end": !editError,
                   })}
                 >
-                  {editTitleDescriptionError && (
+                  {editError && (
                     <div className="flex content-center space-x-2">
                       <WarningTwoIcon className="h-full text-delete-red" />
-                      <p className="py-2 text-delete-red">
-                        {editTitleDescriptionError}
-                      </p>
+                      <p className="py-2 text-delete-red">{editError}</p>
                     </div>
                   )}
                   <div className="flex justify-end space-x-3 self-end">
@@ -167,7 +156,7 @@ const Home = () => {
                       className="bg-transparent text-black hover:bg-transparent"
                       onClick={() => {
                         setEdit(false);
-                        setEditTitleDescriptionError("");
+                        setEditError("");
                       }}
                     >
                       Cancel
@@ -176,9 +165,7 @@ const Home = () => {
                       className="bg-blue-primary"
                       onClick={() => {
                         if (!editTitle || !editDescription) {
-                          setEditTitleDescriptionError(
-                            "Title and description are required!",
-                          );
+                          setEditError("Title and description are required!");
                           return;
                         }
                         editTitleDescription.mutate();
@@ -190,33 +177,58 @@ const Home = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex w-4/5 flex-col items-center">
-                <h1 className="mb-12 text-3xl font-medium">
-                  {pageData.mdTitle}
-                </h1>
-                <Markdown className="mb-8 space-y-4 text-center text-lg text-gray-500">
-                  {pageData.mdDescription}
-                </Markdown>
+              <div className="relative flex w-full max-w-7xl flex-col items-center">
+                {userData?.label === "administrator" && (
+                  <Edit2Icon
+                    className="absolute right-20 top-4 cursor-pointer self-end text-gray-500"
+                    onClick={() => {
+                      setEdit(true);
+                      setEditTitle(pageData.mdTitle);
+                      setEditDescription(pageData.mdDescription);
+                    }}
+                  />
+                )}
+                <div className="w-4/5 items-center">
+                  <h1 className="mb-12 text-center text-3xl font-medium">
+                    {pageData.mdTitle}
+                  </h1>
+                  <Markdown className="mb-8 space-y-4 text-center text-lg text-gray-500">
+                    {pageData.mdDescription}
+                  </Markdown>
+                </div>
               </div>
             )}
           </div>
-          <div className="py-16">
+          <div className="relative flex w-full flex-col items-center py-16">
+            {userData?.label === "administrator" && !edit && (
+              <EditGameBoyModal
+                gameBoyTitle={pageData.gameBoyTitle}
+                gameBoyData={pageData.gameBoys}
+                refetchHomePage={refetch}
+              />
+            )}
             <h1 className="mb-12 text-center text-5xl font-semibold text-orange-primary">
               {pageData.gameBoyTitle}
             </h1>
-            <div className="grid grid-cols-3 gap-x-20 px-16">
-              {pageData.gameBoys.map((gameBoy: IGameBoy) => (
-                <div key={gameBoy.gameId}>
-                  <Image src={gameboy} alt="gameboy" />
-                  <p className="mt-12 text-center text-gray-500">
-                    {gameBoy.description}
-                  </p>
-                </div>
-              ))}
+            <div className="flex w-full max-w-7xl justify-center space-x-20 px-16">
+              {pageData.gameBoys.map((gameBoy: IGameBoy) => {
+                if (!gameBoy.gameId) {
+                  return <></>;
+                }
+
+                return (
+                  <div key={gameBoy.gameId} className="max-w-xs flex-1">
+                    <Image src={gameboy} alt="gameboy" />
+                    <p className="mt-12 text-center text-gray-500">
+                      {gameBoy.description}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </div>
           <div className="flex w-full flex-col items-center bg-blue-bg px-32 py-16">
-            <div className="flex flex-row justify-center">
+            <div className="flex flex-row items-center">
               <Image
                 src={discordIcon}
                 className="mr-16 -rotate-6 fill-blue-primary"
@@ -235,7 +247,7 @@ const Home = () => {
               </div>
             </div>
           </div>
-          <div className="flex w-full flex-col px-32 py-32">
+          <div className="flex w-full max-w-7xl flex-col px-32 py-32">
             <div className="flex flex-row content-start items-center">
               <Image src={bogLogo2} alt="Bits of Good Logo" />
               <div className="ml-12">
