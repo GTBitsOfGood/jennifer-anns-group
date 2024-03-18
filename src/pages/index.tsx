@@ -13,7 +13,7 @@ import gameboy from "../../public/gameboy.png";
 import Link from "next/link";
 import { Edit2Icon } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { IGameBoy } from "@/server/db/models/HomePageModel";
+import { IHomePage } from "@/server/db/models/HomePageModel";
 import MdEditor from "react-markdown-editor-lite";
 import MarkdownIt from "markdown-it";
 import Markdown from "react-markdown";
@@ -48,7 +48,7 @@ const Home = () => {
         throw new Error("Failed to fetch homepage");
       }
       const data = await response.json();
-      return data;
+      return data as IHomePage;
     },
     retry: 3,
   });
@@ -96,6 +96,10 @@ const Home = () => {
 
   if (isLoading) {
     return <></>;
+  }
+
+  if (!pageData) {
+    return <>Missing home page data</>;
   }
 
   return (
@@ -210,13 +214,13 @@ const Home = () => {
               {pageData.gameBoyTitle}
             </h1>
             <div className="flex w-full max-w-7xl justify-center space-x-20 px-16">
-              {pageData.gameBoys.map((gameBoy: IGameBoy) => {
+              {pageData.gameBoys.map((gameBoy, index) => {
                 if (!gameBoy.gameId) {
                   return <></>;
                 }
 
                 return (
-                  <div key={gameBoy.gameId} className="max-w-xs flex-1">
+                  <div key={index} className="max-w-xs flex-1">
                     <Image src={gameboy} alt="gameboy" />
                     <p className="mt-12 text-center text-gray-500">
                       {gameBoy.description}

@@ -115,6 +115,7 @@ export default function EditGameBoyModal({
   }
 
   function validateForm() {
+    // missing title
     if (!newTitle) {
       setValidationErrors({
         title: "Title is required!",
@@ -122,6 +123,8 @@ export default function EditGameBoyModal({
       });
       return false;
     }
+
+    // missing game 1 fields
     if (!newData[0].gameId || !newData[0].description) {
       setValidationErrors({
         title: validationErrors.title,
@@ -139,6 +142,7 @@ export default function EditGameBoyModal({
       return false;
     }
 
+    // missing description for other games
     for (let i = 1; i < 3; i++) {
       if (newData[i].gameId && !newData[i].description) {
         setValidationErrors({
@@ -158,6 +162,7 @@ export default function EditGameBoyModal({
       }
     }
 
+    // game 3 without game 2
     if (!newData[1].gameId && newData[2].gameId) {
       setValidationErrors({
         title: validationErrors.title,
@@ -222,7 +227,9 @@ export default function EditGameBoyModal({
               </h1>
               <div className="relative w-full">
                 <Select
-                  defaultValue={gameBoy.gameId}
+                  defaultValue={
+                    gameBoy.gameId === undefined ? "no-game" : gameBoy.gameId
+                  }
                   onValueChange={(value) => {
                     setNewData((prev) => {
                       const newData = [...prev];
