@@ -1,5 +1,5 @@
 import { extendTheme } from "@chakra-ui/react";
-import { tabsAnatomy, tagAnatomy } from "@chakra-ui/anatomy";
+import { tabsAnatomy, tagAnatomy, checkboxAnatomy } from "@chakra-ui/anatomy";
 import { createMultiStyleConfigHelpers } from "@chakra-ui/react";
 
 const tabsHelper = createMultiStyleConfigHelpers(tabsAnatomy.keys);
@@ -54,6 +54,23 @@ const Tag = tagHelper.defineMultiStyleConfig({
   },
 });
 
+const checkboxHelper = createMultiStyleConfigHelpers(checkboxAnatomy.keys);
+
+const Checkbox = checkboxHelper.defineMultiStyleConfig({
+  variants: {
+    filter: {
+      container: {
+        fontWeight: "medium",
+        color: "#6C757D",
+        colorScheme: "brand.600",
+        _checked: {
+          color: "#2352A0",
+        },
+      },
+    },
+  },
+});
+
 const chakraTheme = extendTheme({
   colors: {
     brand: {
@@ -67,6 +84,7 @@ const chakraTheme = extendTheme({
   components: {
     Tag,
     Tabs,
+    Checkbox,
   },
 });
 

@@ -1,21 +1,29 @@
 import { UserLabel, tagSchema } from "@/utils/types";
 import { Checkbox, CheckboxGroup, Tag, VStack } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { z } from "zod";
 
 interface Props {
   gameBuilds: string[];
+  setGameBuilds: Dispatch<SetStateAction<string[]>>;
   gameContent: string[];
+  setGameContent: Dispatch<SetStateAction<string[]>>;
   accessibility: string[];
+  setAcccessibility: Dispatch<SetStateAction<string[]>>;
   tags: string[];
+  setTags: Dispatch<SetStateAction<string[]>>;
   userLabel: UserLabel;
 }
 
 export default function FilterBody({
   gameBuilds,
+  setGameBuilds,
   gameContent,
+  setGameContent,
   accessibility,
+  setAcccessibility,
   tags,
+  setTags,
   userLabel,
 }: Props) {
   const gameBuildsOptions = [
@@ -61,6 +69,13 @@ export default function FilterBody({
     );
   }
 
+  function applyFilters() {
+    setGameBuilds(selectedGameBuilds);
+    setAcccessibility(selectedAccessibility);
+    setTags(selectedTags);
+    // haven't done game content yet
+  }
+
   return (
     <div>
       <p className="mb-5 ml-16 mt-11	font-sans font-extrabold text-gray-500">
@@ -101,7 +116,7 @@ export default function FilterBody({
         <CheckboxGroup>
           <VStack align="start" ml="52px" mb="52px">
             {gameContentOptions.map((content) => {
-              return <Checkbox>{content}</Checkbox>;
+              return <Checkbox variant="filter">{content}</Checkbox>;
             })}
             {userLabel === "administrator" ? (
               <Checkbox>Answer key</Checkbox>
@@ -170,7 +185,10 @@ export default function FilterBody({
         <button className="font-sans font-semibold text-blue-primary">
           Cancel
         </button>
-        <button className="h-12 w-[120px] rounded-md bg-blue-primary font-sans font-semibold text-white">
+        <button
+          onClick={applyFilters}
+          className="h-12 w-[120px] rounded-md bg-blue-primary font-sans font-semibold text-white"
+        >
           Apply
         </button>
       </div>

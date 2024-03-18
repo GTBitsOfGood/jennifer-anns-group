@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import {
-  ChakraBaseProvider,
+  Box,
   ChakraProvider,
   Divider,
   InputGroup,
@@ -25,30 +25,91 @@ import {
 import { Input } from "@chakra-ui/react";
 import FilterBody from "@/components/GameComponent/FilterBody";
 import chakraTheme from "@/styles/chakraTheme";
+import { useRouter } from "next/router";
 
 export default function Games() {
   const { data: session } = useSession();
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
-  const [games, setGames] = useState<z.infer<typeof gameSchema>[]>();
-  const [themes, setThemes] = useState<string[]>();
+  const [games, setGames] = useState<z.infer<typeof gameSchema>[]>([]);
+  const [themes, setThemes] = useState<string[]>([]);
   const [selectedTheme, setSelectedTheme] = useState("All Games");
-  const [gameBuilds, setGameBuilds] = useState<string[]>();
-  const [gameContent, setGameContent] = useState<string[]>();
-  const [accessibility, setAccessibility] = useState<string[]>();
-  const [tags, setTags] = useState<string[]>();
+  const [gameBuilds, setGameBuilds] = useState<string[]>([]);
+  const [gameContent, setGameContent] = useState<string[]>([]);
+  const [accessibility, setAccessibility] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
   const [name, setName] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
+  const router = useRouter();
+  const [empty, setEmpty] = useState(false);
+
+  interface QueryParams {
+    page: number;
+    gameBuilds?: string[];
+    name?: string;
+    theme?: string;
+    gameContent?: string[];
+    accessibility?: string[];
+    tags?: string[];
+  }
 
   useEffect(() => {
     getGames();
     getThemes();
   }, []);
 
+  useEffect(() => {
+    getGames();
+  }, [selectedTheme, gameBuilds, gameContent, accessibility, name]);
+
   async function getGames() {
-    const response = await fetch(`/api/games/?page=1`);
-    const data = await response.json();
-    setGames(data.games);
+    const queryParams: QueryParams = {
+      page: 1,
+      theme: selectedTheme,
+    };
+
+    if (gameBuilds.length > 0) {
+      queryParams.gameBuilds = gameBuilds;
+    }
+
+    if (gameContent.length > 0) {
+      queryParams.gameContent = gameContent;
+    }
+
+    if (accessibility.length > 0) {
+      queryParams.accessibility = accessibility;
+    }
+
+    if (tags.length > 0) {
+      queryParams.tags = tags;
+    }
+
+    if (name.length >= 3) {
+      queryParams.name = name;
+    }
+
+    if (selectedTheme === "All Games") {
+      delete queryParams.theme;
+    }
+
+    const queryString = new URLSearchParams(queryParams).toString();
+
+    try {
+      const response = await fetch(`/api/games/?${queryString}`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        setGames(data.games);
+        setEmpty(false);
+      } else {
+        const message = await response.text();
+        if (message === "No Games found at this page") {
+          setEmpty(true);
+        }
+      }
+    } catch (e) {
+      console.log(e.message);
+    }
   }
 
   async function getThemes() {
@@ -77,6 +138,10 @@ export default function Games() {
     }
   }
 
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setName(event.target.value);
+  };
+
   return (
     <ChakraProvider theme={chakraTheme}>
       <div>
@@ -91,42 +156,62 @@ export default function Games() {
           Game Gallery
         </h1>
 
-        <div className="m-auto mb-11 flex w-[80vw] flex-row">
-          <InputGroup w="200px">
-            <InputLeftElement pointerEvents="none">
-              <Search2Icon color="gray.500" />
-            </InputLeftElement>
-            <Input
-              borderColor="gray.500"
-              bg="gray.50"
-              color="gray.500"
-              placeholder="Filter by name"
-            />
-          </InputGroup>
-          <Popover>
-            <PopoverTrigger>
-              <div
-                onClick={() => {
-                  setFilterOpen(!filterOpen);
-                }}
-                className="ml-5 flex w-24 cursor-pointer flex-row items-center justify-center space-x-1 rounded-full border border-[#A9CBEB] bg-blue-50"
-              >
-                <p className="select-none	py-2.5 font-inter text-sm font-bold text-[#2352A0]">
-                  Filter
-                </p>
-                {filterOpen ? (
-                  <TriangleUpIcon color="brand.600" height="9px" />
-                ) : (
-                  <TriangleDownIcon color="brand.600" height="9px" />
-                )}
-              </div>
-            </PopoverTrigger>
-            <PopoverContent mt="10px" ml="32vw" w="750px" h="800px">
-              <PopoverBody>
-                {<FilterBody userLabel={userData?.label} />}
-              </PopoverBody>
-            </PopoverContent>
-          </Popover>
+        <div className="m-auto mb-11 flex w-[80vw] flex-row justify-between">
+          <div className="flex flex-row">
+            <InputGroup w="200px">
+              <InputLeftElement pointerEvents="none">
+                <Search2Icon color="gray.500" />
+              </InputLeftElement>
+              <Input
+                onChange={handleInputChange}
+                borderColor="gray.500"
+                bg="gray.50"
+                color="gray.500"
+                placeholder="Filter by name"
+              />
+            </InputGroup>
+            <Popover isOpen={filterOpen} onClose={() => setFilterOpen(false)}>
+              <PopoverTrigger>
+                <Box
+                  onClick={() => {
+                    setFilterOpen(!filterOpen);
+                  }}
+                  className="ml-5 flex w-24 cursor-pointer flex-row items-center justify-center space-x-1 rounded-full border border-[#A9CBEB] bg-blue-50"
+                >
+                  <p className="select-none	py-2.5 font-inter text-sm font-bold text-[#2352A0]">
+                    Filter
+                  </p>
+                  {filterOpen ? (
+                    <TriangleUpIcon color="brand.600" height="9px" />
+                  ) : (
+                    <TriangleDownIcon color="brand.600" height="9px" />
+                  )}
+                </Box>
+              </PopoverTrigger>
+              <PopoverContent mt="10px" ml="32vw" w="750px" h="800px">
+                <PopoverBody>
+                  {
+                    <FilterBody
+                      setAcccessibility={setAccessibility}
+                      setGameBuilds={setGameBuilds}
+                      setTags={setTags}
+                      userLabel={userData?.label}
+                    />
+                  }
+                </PopoverBody>
+              </PopoverContent>
+            </Popover>
+          </div>
+          {userData?.label === "administrator" ? (
+            <button
+              onClick={() => {
+                router.push("/games/create");
+              }}
+              className="rounded-md bg-blue-primary px-5 font-sans font-semibold text-[#FAFBFC]"
+            >
+              Create Game
+            </button>
+          ) : null}
         </div>
 
         <div className="m-auto ml-[10vw] w-[80vw]">
@@ -167,16 +252,22 @@ export default function Games() {
               : null}
           </div>
 
-          <div className="ml-6 flex flex-row flex-wrap">
-            {games
-              ? games.map((game) => {
-                  return (
-                    <div className="mb-6 mr-6">
-                      <GameCard game={game} />
-                    </div>
-                  );
-                })
-              : null}
+          <div className="ml-6 flex w-full flex-row flex-wrap">
+            {!empty ? (
+              games.map((game) => {
+                return (
+                  <div className="mb-6 mr-6">
+                    <GameCard game={game} />
+                  </div>
+                );
+              })
+            ) : (
+              <div className="flex w-full flex-row justify-center">
+                <p className="mt-40 w-[360px]	text-center font-sans text-[34px] font-medium text-blue-primary">
+                  Oops! No games match this search
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
