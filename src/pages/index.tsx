@@ -109,7 +109,7 @@ const Home = () => {
         <div className="flex flex-col items-center">
           <div className="flex flex-col items-center py-32">
             <h1 className="mb-12 font-rubik text-7xl font-extrabold text-stone-primary">
-              Jennifer Ann's Group
+              Jennifer Ann&apos;s Group
             </h1>
             <h2 className="text-5xl font-medium italic text-orange-primary">
               Gaming against violence.
@@ -229,7 +229,7 @@ const Home = () => {
                 <p className="text-3xl italic text-blue-primary">
                   Join our{" "}
                   <Link className="underline" href="" target="_blank">
-                    Jennifer Ann's Group's discord!
+                    Jennifer Ann&apos;s Group&apos;s discord!
                   </Link>
                 </p>
               </div>
