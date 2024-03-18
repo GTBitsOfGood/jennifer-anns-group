@@ -45,7 +45,7 @@ const GameSchema = new Schema<IGame>({
 });
 
 const GameModel =
-  (mongoose.models.Game as mongoose.Model<IGame>) ?? //will need to comment this out and restart to reload the game schema
+  (mongoose.models.Game as mongoose.Model<IGame>) ??
   mongoose.model("Game", GameSchema);
 
 export default GameModel;

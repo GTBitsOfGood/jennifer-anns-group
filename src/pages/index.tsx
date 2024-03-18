@@ -11,11 +11,72 @@ import bogLogo1 from "../../public/bog_logo_1.svg";
 import bogLogo2 from "../../public/bog_logo_2.svg";
 import gameboy from "../../public/gameboy.png";
 import Link from "next/link";
+import { Edit2Icon } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { IGameBoy } from "@/server/db/models/HomePageModel";
+import MdEditor from "react-markdown-editor-lite";
+import MarkdownIt from "markdown-it";
+import Markdown from "react-markdown";
+import "react-markdown-editor-lite/lib/index.css";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import axios from "axios";
+import { WarningTwoIcon } from "@chakra-ui/icons";
+import cx from "classnames";
+
+const mdParser = new MarkdownIt();
 
 const Home = () => {
   const { data: session } = useSession();
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
+  const [edit, setEdit] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editTitleDescriptionError, setEditTitleDescriptionError] =
+    useState("");
+
+  const {
+    data: pageData,
+    refetch,
+    isLoading,
+  } = useQuery({
+    queryKey: ["homepage"],
+    queryFn: async () => {
+      const response = await fetch("/api/homepage");
+      if (!response.ok) {
+        throw new Error("Failed to fetch homepage");
+      }
+      const data = await response.json();
+      return data;
+    },
+    retry: 3,
+  });
+
+  const editTitleDescription = useMutation({
+    mutationFn: () => {
+      return axios.put(
+        "/api/homepage",
+        JSON.stringify({
+          mdTitle: editTitle,
+          mdDescription: editDescription,
+        }),
+        {
+          headers: {
+            "Content-Type": "text",
+          },
+        },
+      );
+    },
+    onSuccess: async () => {
+      await refetch();
+      setEdit(false);
+      setEditTitleDescriptionError("");
+    },
+    onError: (error) => {
+      setEditTitleDescriptionError("Failed to update title and description");
+    },
+  });
 
   useEffect(() => {
     if (currentUser) {
@@ -31,6 +92,10 @@ const Home = () => {
     } catch (error) {
       console.error("Error getting user:", error);
     }
+  }
+
+  if (isLoading) {
+    return <></>;
   }
 
   return (
@@ -50,56 +115,104 @@ const Home = () => {
               Gaming against violence.
             </h2>
           </div>
-          <div className="flex w-full flex-col items-center bg-blue-bg px-32 py-16">
-            <div className="flex w-4/5 flex-col items-center">
-              <h1 className="mb-12 text-3xl font-medium">
-                Welcome to Jennifer Ann's Group
-              </h1>
-              <p className="mb-8 text-center text-lg text-gray-500">
-                When it's colder than the far side of the moon and spitting rain
-                too, you've still got to look good. From water-repellent leather
-                to a rugged outsole, the Lunar Force 1 adapts AF-1 style, so you
-                can keep your flame burning when the weather hits. Metal lace
-                hardware and extended tongue bring mountain boot toughness.
-              </p>
-              <p className="text-center text-lg text-gray-500">
-                When it's colder than the far side of the moon and spitting rain
-                too, you've still got to look good. From water-repellent leather
-                to a rugged outsole, the Lunar Force 1 adapts AF-1 style, so you
-                can keep your flame burning when the weather hits. Metal lace
-                hardware and extended tongue bring mountain boot toughness.
-              </p>
-            </div>
+          <div className="relative flex w-full flex-col items-center bg-blue-bg px-32 py-16">
+            {userData?.label === "administrator" && !edit && (
+              <Edit2Icon
+                className="absolute top-24 cursor-pointer self-end text-gray-500"
+                onClick={() => {
+                  setEdit(true);
+                  setEditTitle(pageData.mdTitle);
+                  setEditDescription(pageData.mdDescription);
+                }}
+              />
+            )}
+            {edit ? (
+              <div className="flex flex-col space-y-6">
+                <div className="flex space-x-4">
+                  <h1 className="inline-block text-2xl font-medium">
+                    Title<span className="text-orange-primary">*</span>
+                  </h1>
+                  <div className="w-96">
+                    <Input
+                      defaultValue={pageData.mdTitle}
+                      onChange={(e) => {
+                        setEditTitle(e.target.value);
+                      }}
+                    />
+                  </div>
+                </div>
+                <MdEditor
+                  renderHTML={(text) => mdParser.render(text)}
+                  defaultValue={pageData.mdDescription}
+                  onChange={(data) => {
+                    setEditDescription(data.text);
+                  }}
+                />
+                <div
+                  className={cx("flex", {
+                    "justify-between": editTitleDescriptionError,
+                    "justify-end": !editTitleDescriptionError,
+                  })}
+                >
+                  {editTitleDescriptionError && (
+                    <div className="flex content-center space-x-2">
+                      <WarningTwoIcon className="h-full text-delete-red" />
+                      <p className="py-2 text-delete-red">
+                        {editTitleDescriptionError}
+                      </p>
+                    </div>
+                  )}
+                  <div className="flex justify-end space-x-3 self-end">
+                    <Button
+                      className="bg-transparent text-black hover:bg-transparent"
+                      onClick={() => {
+                        setEdit(false);
+                        setEditTitleDescriptionError("");
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      className="bg-blue-primary"
+                      onClick={() => {
+                        if (!editTitle || !editDescription) {
+                          setEditTitleDescriptionError(
+                            "Title and description are required!",
+                          );
+                          return;
+                        }
+                        editTitleDescription.mutate();
+                      }}
+                    >
+                      Save changes
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex w-4/5 flex-col items-center">
+                <h1 className="mb-12 text-3xl font-medium">
+                  {pageData.mdTitle}
+                </h1>
+                <Markdown className="mb-8 space-y-4 text-center text-lg text-gray-500">
+                  {pageData.mdDescription}
+                </Markdown>
+              </div>
+            )}
           </div>
           <div className="py-16">
             <h1 className="mb-12 text-center text-5xl font-semibold text-orange-primary">
-              Check out what's new!
+              {pageData.gameBoyTitle}
             </h1>
             <div className="grid grid-cols-3 gap-x-20 px-16">
-              <div>
-                <Image src={gameboy} alt="gameboy" />
-                <p className="mt-12 text-center text-gray-500">
-                  When it's colder than the far side of the moon and spitting
-                  rain too, you've still got to look good.
-                </p>
-              </div>
-              <div>
-                <Image src={gameboy} alt="gameboy" />
-                <p className="mt-12 text-center text-gray-500">
-                  When it's colder than the far side of the moon and spitting
-                  rain too, you've still got to look good. From water-repellent
-                  leather to a rugged outsole, the Lunar Force 1 adapts AF-1
-                  style.
-                </p>
-              </div>
-              <div>
-                <Image src={gameboy} alt="gameboy" />
-                <p className="mt-12 text-center text-gray-500">
-                  When it's colder than the far side of the moon and spitting
-                  rain too, you've still got to look good. From water-repellent
-                  leather to a rugged outsole.
-                </p>
-              </div>
+              {pageData.gameBoys.map((gameBoy: IGameBoy) => (
+                <div key={gameBoy.gameId}>
+                  <Image src={gameboy} alt="gameboy" />
+                  <p className="mt-12 text-center text-gray-500">
+                    {gameBoy.description}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
           <div className="flex w-full flex-col items-center bg-blue-bg px-32 py-16">

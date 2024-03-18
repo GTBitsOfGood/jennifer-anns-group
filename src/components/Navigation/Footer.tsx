@@ -90,7 +90,7 @@ export const Footer = () => {
       </div>
       <div style={{ marginBottom: "79px" }}>
         <center>
-          <div className="w-[1241px] border-t border-zinc-200"></div>
+          <div className="w-full border-t border-zinc-200"></div>
         </center>
       </div>
     </div>
