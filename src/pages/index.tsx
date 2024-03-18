@@ -35,7 +35,6 @@ const Home = () => {
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editError, setEditError] = useState("");
-  const [editGameBoy, setEditGameBoy] = useState(false);
 
   const {
     data: pageData,
