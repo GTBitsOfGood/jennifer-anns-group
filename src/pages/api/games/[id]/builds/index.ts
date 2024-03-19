@@ -9,7 +9,7 @@ import {
 } from "@/utils/exceptions/game";
 import { NextApiResponse } from "next";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
-import { getDirectUploadUrl } from "@/pages/api/file";
+import { BucketType, getDirectUploadUrl } from "@/utils/file";
 
 export default async function handler(req: any, res: NextApiResponse) {
   switch (req.method) {
@@ -31,7 +31,9 @@ async function createBuildHandler(req: any, res: NextApiResponse) {
       throw new GameNotFoundException();
     }
 
-    const { uploadUrl, uploadAuthToken } = await getDirectUploadUrl();
+    const { uploadUrl, uploadAuthToken } = await getDirectUploadUrl(
+      BucketType.WebGLBuilds,
+    );
     if (!uploadUrl || !uploadAuthToken) {
       throw new BuildUploadException();
     }

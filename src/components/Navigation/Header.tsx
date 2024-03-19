@@ -73,15 +73,10 @@ const Header = (props: Props) => {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-white">
-      <div className="relative flex h-16 w-screen items-center justify-between bg-white px-8">
+    <div className="fixed left-0 top-0 flex w-full justify-center">
+      <div className="mx-auto flex h-16 w-10/12 items-center justify-between bg-white p-12">
         <div className="flex items-center">
-          <img
-            className="w-50 h-auto"
-            src="/logo_gray.svg"
-            alt="Logo"
-            style={{ marginLeft: "6.8rem" }}
-          />
+          <img className="w-50 h-auto" src="/logo_gray.svg" alt="Logo" />
           <div className="ml-6 font-open-sans text-xl font-semibold text-stone-900 opacity-70">
             Jennifer Ann’s Group
           </div>
@@ -90,12 +85,11 @@ const Header = (props: Props) => {
           {tabData[userType].map((tabName, index) => (
             <div
               key={index}
-              className={`font-Outfit mr-4 text-center text-sm ${
+              className={`font-Outfit mr-8 cursor-pointer text-center text-sm ${
                 selectedTab === index
                   ? "relative font-bold text-orange-primary"
                   : "font-normal text-stone-900 opacity-50"
               } hover:text-orange-primary`}
-              style={{ marginRight: "2.2rem", cursor: "pointer" }}
               onClick={() => handlePageChange(tabName, index)}
             >
               <div>
@@ -111,7 +105,7 @@ const Header = (props: Props) => {
               </div>
             </div>
           ))}
-          <div className="px-4 py-2" style={{ marginLeft: "3.8rem" }}>
+          <div className="ml-10 px-4 py-2">
             {userType === UserType.Public ? (
               // eslint-disable-next-line @next/next/no-html-link-for-pages
               <a href="/login">
@@ -122,8 +116,7 @@ const Header = (props: Props) => {
             )}
           </div>
           <div
-            className="rounded-md border border-gray-100 bg-white px-4 py-2 shadow"
-            style={{ marginRight: "6.8rem", cursor: "pointer" }}
+            className="cursor-pointer rounded-md border border-gray-100 bg-white px-4 py-2 shadow"
             onClick={() => handleSignUpLogOut()}
           >
             <div className="font-Outfit text-center text-sm font-normal text-neutral-600">
@@ -132,7 +125,7 @@ const Header = (props: Props) => {
           </div>
         </div>
       </div>
-    </header>
+    </div>
   );
 };
 

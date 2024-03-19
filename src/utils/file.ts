@@ -1,83 +1,23 @@
-import axios from "axios";
-import { CLOUDFLARE_URL } from "./consts";
+import { env } from "process";
+import connectB2 from "@/server/db/b2";
 
-// there's probably a better place to put these
-type BuildFileType = "data" | "framework" | "loader" | "code";
-const buildFileTypes = Object.freeze({
-  data: "build.data",
-  framework: "build.framework.js",
-  loader: "build.loader.js",
-  code: "build.wasm",
-});
-
-export async function uploadBuildFiles(
-  gameId: string,
-  files: Map<string, File>,
-) {
-  if (files.size !== 4) {
-    throw new Error("Invalid build files");
-  }
-
-  for (const type of Object.keys(buildFileTypes)) {
-    if (!files.has(type)) {
-      throw new Error(`Missing file: ${type}`);
-    }
-  }
-
-  // atomic uploads?
-  await Promise.all(
-    Array.from(files.entries()).map(async ([type, file]) => {
-      let retryCount = 0;
-      let success = false;
-
-      while (retryCount < 4 && !success) {
-        try {
-          const { data } = await axios.post(`/api/games/${gameId}/builds`, {
-            gameId,
-          });
-          const uploadUrl = data.uploadUrl;
-          const uploadAuthToken = data.uploadAuthToken;
-
-          const fileName = `${gameId}/${
-            buildFileTypes[type as keyof typeof buildFileTypes]
-          }`;
-
-          await axios.post(uploadUrl, file, {
-            headers: {
-              Authorization: uploadAuthToken,
-              "X-Bz-File-Name": fileName,
-              "Content-Type": file.type,
-              "X-Bz-Content-Sha1": "do_not_verify",
-            },
-          });
-
-          success = true;
-        } catch (error) {
-          retryCount++;
-        }
-      }
-
-      if (!success) {
-        throw new Error("Failed to upload file after 4 retries");
-      }
-    }),
-  );
-
-  await axios.put(
-    `/api/games/${gameId}`,
-    JSON.stringify({ webGLBuild: true }),
-    {
-      headers: {
-        "Content-Type": "text",
-      },
-    },
-  );
+export enum BucketType {
+  ApplicationFiles,
+  WebGLBuilds,
 }
 
-export function getBuildFileUrl(gameId: string, type: BuildFileType) {
-  const fileName = `${gameId}/${
-    buildFileTypes[type as keyof typeof buildFileTypes]
-  }`;
+export const bucketTypeIdMap: Record<BucketType, string> = {
+  [BucketType.ApplicationFiles]: env.B2_BUCKET_ID_APPLICATION,
+  [BucketType.WebGLBuilds]: env.B2_BUCKET_ID_BUILD,
+};
 
-  return `${CLOUDFLARE_URL}/webgl-builds/${fileName}`;
+export async function getDirectUploadUrl(bucket: BucketType) {
+  const b2 = await connectB2();
+
+  const bucketId = bucketTypeIdMap[bucket];
+  const response = await b2.getUploadUrl({ bucketId });
+  const uploadUrl = response.data.uploadUrl;
+  const uploadAuthToken = response.data.authorizationToken;
+
+  return { uploadUrl, uploadAuthToken };
 }

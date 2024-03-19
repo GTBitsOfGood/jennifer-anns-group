@@ -1,7 +1,15 @@
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { NextApiRequest, NextApiResponse } from "next";
-import connectB2 from "@/server/db/b2";
+import { BucketType, getDirectUploadUrl } from "@/utils/file";
 
+/**
+ * This endpoint assumes that all incoming requests hit the `application-files` bucket.
+ * Anything involving WebGL builds shall use `/api/games/[id]/builds` instead.
+ *
+ * @param req
+ * @param res
+ * @returns
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -16,20 +24,9 @@ export default async function handler(
   }
 }
 
-export async function getDirectUploadUrl() {
-  const b2 = await connectB2();
-
-  const bucketId = process.env.B2_BUCKET_ID_APPLICATION;
-  const response = await b2.getUploadUrl({ bucketId });
-  const uploadUrl = response.data.uploadUrl;
-  const uploadAuthToken = response.data.authorizationToken;
-
-  return { uploadUrl, uploadAuthToken };
-}
-
 async function getFileHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const token = await getDirectUploadUrl();
+    const token = await getDirectUploadUrl(BucketType.ApplicationFiles);
     return res.status(HTTP_STATUS_CODE.OK).send(token);
   } catch (e) {
     return res

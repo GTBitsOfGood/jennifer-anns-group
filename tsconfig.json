@@ -17,12 +17,8 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "env.d.ts",
-    "scripts/add-admin-emails.ts"
-  ],
-  "exclude": ["node_modules"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "env.d.ts", "scripts/add-admin-emails.ts"],
+  "exclude": ["node_modules"],
+  "types": ["jest", "node"]
 }
+
