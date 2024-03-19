@@ -13,7 +13,8 @@
     "secrets:linux": "echo Enter Bitwarden Password: && read BW_PASSWORD && (bw logout || exit 0) && export BW_SESSION=`bw login product@bitsofgood.org $BW_PASSWORD --raw` && npm run secrets:get",
     "secrets:windows": "set /p BW_PASSWORD=Enter Bitwarden Password:&& (bw logout || VER>NUL) && npm run secrets:login",
     "secrets:login": "FOR /F %a IN ('bw login product@bitsofgood.org %BW_PASSWORD% --raw') DO SET BW_SESSION=%a && npm run secrets:get",
-    "secrets:get": "bw sync && bw get item 59607d65-8de1-4105-8eaf-b11f0038670c | fx .notes > \".env\""
+    "secrets:get": "bw sync && bw get item 59607d65-8de1-4105-8eaf-b11f0038670c | fx .notes > \".env\"",
+    "add-admin-emails": "tsx scripts/add-admin-emails.ts"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
@@ -37,6 +38,7 @@
     "class-variance-authority": "^0.7.0",
     "classnames": "^2.5.1",
     "clsx": "^2.1.0",
+    "dotenv": "^16.4.5",
     "framer-motion": "^11.0.3",
     "fx": "^31.0.0",
     "lucide-react": "^0.316.0",
@@ -51,6 +53,7 @@
     "react-unity-webgl": "^9.5.0",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.7.1",
     "uuid": "^9.0.1",
     "zod": "^3.22.4"
   },

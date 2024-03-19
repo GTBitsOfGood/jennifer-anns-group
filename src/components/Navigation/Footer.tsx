@@ -11,7 +11,7 @@ export const Footer = () => {
   };
 
   return (
-    <div className="flex h-[541px] w-screen flex-col justify-between">
+    <div className="flex h-[541px] w-screen flex-col justify-between border border-gray-100">
       <div className="flex justify-between">
         <div
           style={{

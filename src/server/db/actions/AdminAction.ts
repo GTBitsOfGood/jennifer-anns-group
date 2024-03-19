@@ -5,14 +5,16 @@ import {
   AdminAlreadyExistsException,
   AdminDoesNotExistException,
 } from "@/utils/exceptions/admin";
+import UserModel from "../models/UserModel";
+import { UserLabel } from "@/utils/types";
 
 export async function createAdmin(data: IAdmin) {
   await connectMongoDB();
   const existingAdmin = await AdminModel.findOne({ email: data.email });
   if (existingAdmin) throw new AdminAlreadyExistsException();
   try {
-    const game = await AdminModel.create(data);
-    return game.toObject();
+    const admin = await AdminModel.create(data);
+    return admin.toObject();
   } catch (e) {
     throw e;
   }
@@ -25,13 +27,19 @@ export async function deleteAdmin(data: ObjectId) {
     if (!admin) {
       throw new AdminDoesNotExistException();
     }
-    const deletedGame = await AdminModel.findOneAndDelete({
+    const deletedAdmin = await AdminModel.findOneAndDelete({
       email: admin.email,
     });
-    if (!deletedGame) {
+    if (!deletedAdmin) {
       throw new AdminDoesNotExistException();
     }
-    return deletedGame.toObject();
+    const correspondingUser = await UserModel.findOne({ email: admin.email });
+    if (correspondingUser) {
+      await UserModel.findByIdAndUpdate(correspondingUser._id, {
+        label: UserLabel.Student,
+      });
+    }
+    return deletedAdmin.toObject();
   } catch (e) {
     throw e;
   }

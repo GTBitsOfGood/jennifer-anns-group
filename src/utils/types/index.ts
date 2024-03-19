@@ -76,6 +76,7 @@ export const noteSchema = z.object({
   description: z.string(),
   gameId: z.string().refine(verifyObjectId).optional(),
 });
+
 export enum UserLabel {
   Educator = "educator",
   Student = "student",
@@ -93,7 +94,7 @@ export const userSchema = z.object({
   label: z.nativeEnum(UserLabel),
 });
 
-// User
+// Admin
 export const adminSchema = z.object({
   email: z.string().email("Not a valid email"),
 });
