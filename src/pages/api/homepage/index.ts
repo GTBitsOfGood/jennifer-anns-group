@@ -1,34 +1,42 @@
-import HomePageModel from "@/server/db/models/HomePageModel";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import {
   HomePageDoesNotExistException,
   HomePageException,
   HomePageInvalidInputException,
 } from "@/utils/exceptions/homepage";
-import { editHomePageSchema } from "@/utils/types";
+import { editHomePageSchema, homePageSchema } from "@/utils/types";
 import { NextApiRequest, NextApiResponse } from "next";
+import {
+  createHomePage,
+  editHomePage,
+  getHomePage,
+} from "@/server/db/actions/HomePageAction";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
   try {
-    const homePage = await HomePageModel.findOne({ singleton: true });
+    const homePage = await getHomePage();
 
     switch (req.method) {
       case "PUT":
-        const parsedData = editHomePageSchema.safeParse(JSON.parse(req.body));
-        if (!parsedData.success) {
-          throw new HomePageInvalidInputException();
-        }
-
         if (homePage) {
-          await HomePageModel.findOneAndUpdate(
-            { singleton: true },
-            parsedData.data,
-          );
+          const parsedData = editHomePageSchema.safeParse(JSON.parse(req.body));
+          if (!parsedData.success) {
+            throw new HomePageInvalidInputException();
+          }
+
+          await editHomePage(parsedData.data);
         } else {
-          await HomePageModel.create({ ...parsedData.data, singleton: true });
+          const parsedData = homePageSchema
+            .omit({ singleton: true })
+            .safeParse(JSON.parse(req.body));
+          if (!parsedData.success) {
+            throw new HomePageInvalidInputException();
+          }
+
+          await createHomePage(parsedData.data);
         }
         return res.status(HTTP_STATUS_CODE.OK).send({
           message: "Home page successfully updated!",

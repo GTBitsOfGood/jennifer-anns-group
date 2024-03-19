@@ -112,10 +112,10 @@ const Home = () => {
         />
         <div className="flex flex-col items-center">
           <div className="flex flex-col items-center py-32">
-            <h1 className="mb-12 font-rubik text-7xl font-extrabold text-stone-primary">
+            <h1 className="mb-12 text-center font-rubik text-7xl font-extrabold text-stone-primary">
               Jennifer Ann&apos;s Group
             </h1>
-            <h2 className="text-5xl font-medium italic text-orange-primary">
+            <h2 className="text-center text-5xl font-medium italic text-orange-primary">
               Gaming against violence.
             </h2>
           </div>

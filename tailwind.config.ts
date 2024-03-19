@@ -35,6 +35,7 @@ const config = {
         sans: ["Poppins", "sans-serif"], // Default `Poppins` font family to sans
         "open-sans-cond": ['"Open Sans Condensed"', "sans-serif"],
         "open-sans": ['"Open Sans"', "sans-serif"],
+        "dm-sans": ['"DM Sans"', "sans-serif"],
         inter: ["Inter", "sans-serif"],
         rubik: ["Rubik", "Poppins", "sans-serif"],
       },

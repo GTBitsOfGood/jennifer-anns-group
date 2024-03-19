@@ -68,7 +68,7 @@ export default function EditGameBoyModal({
         throw new Error("Failed to fetch games");
       }
       const data = await response.json();
-      return data;
+      return data.games as (IGame & { _id: string })[];
     },
     retry: 3,
   });

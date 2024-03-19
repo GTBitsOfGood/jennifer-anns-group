@@ -1,9 +1,14 @@
-import { gameBoySchema, homePageSchema } from "@/utils/types";
+import {
+  editHomePageSchema,
+  gameBoySchema,
+  homePageSchema,
+} from "../../../utils/types";
 import mongoose, { Schema } from "mongoose";
 import { z } from "zod";
 
 export interface IGameBoy extends z.infer<typeof gameBoySchema> {}
 export interface IHomePage extends z.infer<typeof homePageSchema> {}
+export interface IEditHomePage extends z.infer<typeof editHomePageSchema> {}
 
 const GameBoySchema = new Schema<IGameBoy>({
   gameId: { type: Schema.Types.ObjectId, ref: "Game" },
