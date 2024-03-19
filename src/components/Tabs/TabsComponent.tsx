@@ -9,7 +9,7 @@ import {
 import chakraTheme from "@/styles/chakraTheme";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { ChangeEvent, Dispatch, useState } from "react";
-
+import ReactPlayer from "react-player";
 interface Props {
   mode: string;
   gameData: populatedGameWithId;
@@ -36,6 +36,7 @@ export default function TabsComponent({ mode, gameData, setGameData }: Props) {
         <Tabs colorScheme="brand" className="m-auto w-5/6 font-sans">
           <TabList>
             <Tab>Description</Tab>
+            {gameData.videoTrailer ? <Tab>Trailer</Tab>: null}
             {gameData.parentingGuide ? <Tab>Parenting Guide</Tab> : null}
             {gameData.lesson ? <Tab>Lesson Plan</Tab> : null}
           </TabList>
@@ -53,6 +54,10 @@ export default function TabsComponent({ mode, gameData, setGameData }: Props) {
                 <p>{gameData.description}</p>
               )}
             </TabPanel>
+            {gameData.videoTrailer ? <TabPanel className="flex justify-center"><ReactPlayer url={gameData.videoTrailer} controls={true} width={1400} height={797} /></TabPanel> : null}
+            {gameData.parentingGuide ? <TabPanel>Parenting Guide</TabPanel> : null}
+            {gameData.lesson ? <TabPanel>Lesson Plan</TabPanel> : null}
+
           </TabPanels>
         </Tabs>
       </div>
