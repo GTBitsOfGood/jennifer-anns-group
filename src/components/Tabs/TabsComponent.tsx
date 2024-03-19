@@ -14,9 +14,15 @@ interface Props {
   mode: string;
   gameData: populatedGameWithId;
   setGameData?: Dispatch<populatedGameWithId>;
+  admin?: boolean;
 }
 
-export default function TabsComponent({ mode, gameData, setGameData }: Props) {
+export default function TabsComponent({
+  mode,
+  gameData,
+  setGameData,
+  admin,
+}: Props) {
   const [description, setDescription] = useState(gameData.description);
 
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -36,9 +42,10 @@ export default function TabsComponent({ mode, gameData, setGameData }: Props) {
         <Tabs colorScheme="brand" className="m-auto w-5/6 font-sans">
           <TabList>
             <Tab>Description</Tab>
-            {gameData.videoTrailer ? <Tab>Trailer</Tab>: null}
+            {gameData.videoTrailer ? <Tab>Trailer</Tab> : null}
             {gameData.parentingGuide ? <Tab>Parenting Guide</Tab> : null}
             {gameData.lesson ? <Tab>Lesson Plan</Tab> : null}
+            {gameData.answerKey && admin ? <Tab>Answer Key</Tab> : null}
           </TabList>
           <TabPanels className="mb-12 mt-8 text-gray-500">
             <TabPanel p="0px">
@@ -54,10 +61,20 @@ export default function TabsComponent({ mode, gameData, setGameData }: Props) {
                 <p>{gameData.description}</p>
               )}
             </TabPanel>
-            {gameData.videoTrailer ? <TabPanel className="flex justify-center"><ReactPlayer url={gameData.videoTrailer} controls={true} width={1400} height={797} /></TabPanel> : null}
-            {gameData.parentingGuide ? <TabPanel>Parenting Guide</TabPanel> : null}
+            {gameData.videoTrailer ? (
+              <TabPanel className="flex justify-center">
+                <ReactPlayer
+                  url={gameData.videoTrailer}
+                  controls={true}
+                  width={1400}
+                  height={797}
+                />
+              </TabPanel>
+            ) : null}
+            {gameData.parentingGuide ? (
+              <TabPanel>Parenting Guide</TabPanel>
+            ) : null}
             {gameData.lesson ? <TabPanel>Lesson Plan</TabPanel> : null}
-
           </TabPanels>
         </Tabs>
       </div>

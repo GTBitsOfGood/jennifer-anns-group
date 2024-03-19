@@ -31,7 +31,8 @@ const EditGamePage = () => {
 
   useEffect(() => {
     if (!session) {
-      router.push("/");
+      //TODO: Remove commenting once done.
+      //router.push("/");
     }
   }, [session]);
 
@@ -143,12 +144,14 @@ const EditGamePage = () => {
         mode="edit"
         gameData={gameData}
         setGameData={setGameData}
+        admin={userData && userData.label === "administrator"}
       />
       {gameData.tags && gameData.themes ? (
         <TagsComponent
           mode="edit"
           gameData={gameData}
           setGameData={setGameData}
+          admin={userData && userData.label === "administrator"}
         />
       ) : null}
       <div className="mx-auto mb-40 mt-24 flex w-[80vw] justify-end">
@@ -172,3 +175,9 @@ const EditGamePage = () => {
 };
 
 export default EditGamePage;
+
+//TODO: Add "add" button for videoTrailer
+
+//TODO: Add edit button for videoTrailer
+
+//TODO: Add delete button for videoTrailer

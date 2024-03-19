@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import TabsComponent from "../../components/Tabs/TabsComponent";
 import TagsComponent from "../../components/Tags/TagsComponent";
+import ContactComponent from "../../components/NonProfit/ContactComponent";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { userSchema } from "@/utils/types";
@@ -88,11 +89,20 @@ const GamePage = () => {
         </>
       )}
       <EmbeddedGame gameId={gameId as string} />
-      <TabsComponent mode="view" gameData={gameData} />
+      <TabsComponent
+        mode="view"
+        gameData={gameData}
+        admin={userData && userData.label === "administrator"}
+      />
       {loaded && userData.label !== "administrator" && (
         <NotesComponent gameId={gameId} userId={userId} />
       )}
-      <TagsComponent mode="view" gameData={gameData} />
+      <ContactComponent />
+      <TagsComponent
+        mode="view"
+        gameData={gameData}
+        admin={userData && userData.label === "administrator"}
+      />
     </div>
   );
 };
