@@ -38,7 +38,10 @@ function DeleteModal({ open, setOpen, admin }: Props) {
         <div className="flex flex-col items-center gap-8">
           <h2 className="text-center font-inter text-2xl font-semibold text-blue-primary">
             Are you sure you want to <br /> delete account <br />
-            <span className="break-all font-normal">"{admin?.email}"</span> ?
+            <span className="break-all font-normal">
+              &quot;{admin?.email}&quot;
+            </span>{" "}
+            ?
           </h2>
           <div className="text-center text-base font-normal text-black ">
             This account will automatically change to student role
