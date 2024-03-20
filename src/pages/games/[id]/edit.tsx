@@ -144,14 +144,14 @@ const EditGamePage = () => {
         mode="edit"
         gameData={gameData}
         setGameData={setGameData}
-        admin={userData && userData.label === "administrator"}
+        admin={true}
       />
       {gameData.tags && gameData.themes ? (
         <TagsComponent
           mode="edit"
           gameData={gameData}
           setGameData={setGameData}
-          admin={userData && userData.label === "administrator"}
+          admin={true}
         />
       ) : null}
       <div className="mx-auto mb-40 mt-24 flex w-[80vw] justify-end">

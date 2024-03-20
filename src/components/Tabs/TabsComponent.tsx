@@ -5,11 +5,15 @@ import {
   Tab,
   TabPanel,
   ChakraProvider,
+  Flex,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
+import DeleteVideoTrailer from "../GameScreen/DeleteVideoTrailerComponent";
+import EditVideoTrailer from "../GameScreen/EditVideoTrailerComponent";
 import { ChangeEvent, Dispatch, useState } from "react";
 import ReactPlayer from "react-player";
+import { Delete } from "lucide-react";
 interface Props {
   mode: string;
   gameData: populatedGameWithId;
@@ -42,7 +46,9 @@ export default function TabsComponent({
         <Tabs colorScheme="brand" className="m-auto w-5/6 font-sans">
           <TabList>
             <Tab>Description</Tab>
-            {gameData.videoTrailer ? <Tab>Trailer</Tab> : null}
+            {gameData.videoTrailer || mode === "edit" ? (
+              <Tab>Trailer</Tab>
+            ) : null}
             {gameData.parentingGuide ? <Tab>Parenting Guide</Tab> : null}
             {gameData.lesson ? <Tab>Lesson Plan</Tab> : null}
             {gameData.answerKey && admin ? <Tab>Answer Key</Tab> : null}
@@ -62,13 +68,20 @@ export default function TabsComponent({
               )}
             </TabPanel>
             {gameData.videoTrailer ? (
-              <TabPanel className="flex justify-center">
+              <TabPanel className="flex flex-col justify-center">
                 <ReactPlayer
                   url={gameData.videoTrailer}
                   controls={true}
                   width={1400}
                   height={797}
                 />
+                {mode === "edit" ? (
+                  <Flex className="flex-row">
+                    <EditVideoTrailer gameData={gameData} />
+
+                    <DeleteVideoTrailer gameData={gameData} />
+                  </Flex>
+                ) : null}
               </TabPanel>
             ) : null}
             {gameData.parentingGuide ? (
@@ -81,3 +94,5 @@ export default function TabsComponent({
     </ChakraProvider>
   );
 }
+
+//TODO: Make it so that the tabPanels are conditionally rendered as well.
