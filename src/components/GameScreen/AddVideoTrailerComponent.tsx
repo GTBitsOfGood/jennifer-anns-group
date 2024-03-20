@@ -11,6 +11,9 @@ import {
   FormControl,
   Input,
   FormLabel,
+  Button,
+  Icon,
+  Image,
   Flex,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
@@ -37,7 +40,6 @@ export default function AddVideoTrailer({ gameData }: Props) {
   }, [isOpen]);
   async function addVideoTrailer() {
     //The themes is populated and cant be send to the endpoint
-    //TODO: Add capability to
     if (URL_REGEX.test(url)) {
       gameData.videoTrailer = url;
       onClose();
@@ -50,12 +52,20 @@ export default function AddVideoTrailer({ gameData }: Props) {
   return (
     <ChakraProvider theme={chakraTheme}>
       <div>
-        <button
+        <Button
+          rightIcon={
+            <Icon
+              as={Image}
+              src={"/octicon_upload-24upload.svg"}
+              boxSize="20px"
+            />
+          }
           onClick={onOpen}
-          className="m-5 rounded-md border border-black bg-white px-[17px] py-2 font-sans text-xl font-semibold text-black"
+          bg="white"
+          className="w-151 h-46 m-5 rounded-md border border-black px-[17px] py-2 font-sans text-xl font-semibold text-black"
         >
           Add Trailer
-        </button>
+        </Button>
         <AlertDialog
           motionPreset="slideInBottom"
           leastDestructiveRef={cancelRef}
@@ -123,6 +133,3 @@ export default function AddVideoTrailer({ gameData }: Props) {
     </ChakraProvider>
   );
 }
-
-//TODO: Clean up tailwind css of AddVideoTrailer, first clean up EditVideoTrailer then copy and paste
-//TODO: AddTrailer doesn't properly work right now.

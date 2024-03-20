@@ -8,12 +8,14 @@ import {
   AlertDialogCloseButton,
   useDisclosure,
   ChakraProvider,
+  Button,
   Flex,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
 import { useRef } from "react";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
+import { CloseIcon } from "@chakra-ui/icons";
 
 interface Props {
   gameData: populatedGameWithId;
@@ -27,7 +29,6 @@ export default function DeleteVideoTrailer({ gameData }: Props) {
 
   async function deleteVideoTrailer() {
     //The themes is populated and cant be send to the endpoint
-    //TODO: How do I delete a field with the API endpoint?
     gameData.videoTrailer = "";
     router.push(`/games/${gameID}/edit`);
   }
@@ -35,12 +36,15 @@ export default function DeleteVideoTrailer({ gameData }: Props) {
   return (
     <ChakraProvider theme={chakraTheme}>
       <div>
-        <button
+        <Button
           onClick={onOpen}
-          className="mt-5 rounded-md border border-delete-red bg-white px-[17px] py-2 font-sans text-xl font-semibold text-delete-red"
+          rightIcon={<CloseIcon color="deleteRed" boxSize="10px" />}
+          bg="white"
+          color="deleteRed"
+          className="w-183 mt-5 h-48 rounded-md border border-delete-red bg-white px-[17px] py-2 font-sans text-xl font-semibold text-delete-red"
         >
           Delete Trailer
-        </button>
+        </Button>
         <AlertDialog
           motionPreset="slideInBottom"
           leastDestructiveRef={cancelRef}

@@ -61,8 +61,9 @@ const EditGamePage = () => {
   const getGame = async () => {
     try {
       const response = await fetch(`/api/games/${gameID}`);
-      if (!response.ok) {
+      if (!response.ok || response.status !== 200) {
         setError("Failed to fetch game");
+        router.push("/");
       }
       const data = await response.json();
       setGameData(data);
@@ -177,8 +178,8 @@ const EditGamePage = () => {
 
 export default EditGamePage;
 
-//TODO: Add "add" button for videoTrailer
-
-//TODO: Add edit button for videoTrailer
-
-//TODO: Add delete button for videoTrailer
+//TODO: Change error statement and logic in add and edit trailer
+//TODO: Fix styling for Contact Jennifer Ann's, and make it go to another screen once done.
+//TODO: Add icons to Add Trailer, Delete Trailer, and Edit Trailer.
+//TODO: Create popup for Contact Jennifer Ann's when submitted
+//TODO: Make it so clicking the x on the Video Trailer tag lets you delete it.

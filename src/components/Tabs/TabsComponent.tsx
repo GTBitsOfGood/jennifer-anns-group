@@ -102,5 +102,3 @@ export default function TabsComponent({
     </ChakraProvider>
   );
 }
-
-//TODO: Set it up so that it only actually updates the database when you click save changes. Else wise it just changes the object.

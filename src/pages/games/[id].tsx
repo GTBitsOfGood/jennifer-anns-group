@@ -16,7 +16,7 @@ const GamePage = () => {
   const [gameData, setGameData] = useState<populatedGameWithId>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const router = useRouter();
   const { data: session } = useSession();
   const idSchema = z.string().length(24);
   const userDataSchema = userSchema
@@ -49,6 +49,7 @@ const GamePage = () => {
       const response = await fetch(`/api/games/${gameId}`);
       if (!response.ok) {
         setError("Failed to fetch game");
+        router.push("/");
       }
       const data = await response.json();
       setGameData(data);
@@ -108,3 +109,5 @@ const GamePage = () => {
 };
 
 export default GamePage;
+
+//Fix formatting of ContactComponent, and add that second screen once submitted.

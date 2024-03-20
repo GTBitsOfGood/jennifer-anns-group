@@ -6,6 +6,15 @@ import {
   TabPanel,
   ChakraProvider,
   Flex,
+  Button,
+  Modal,
+  ModalBody,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  Icon,
+  Image,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import {
@@ -15,9 +24,32 @@ import {
   FormHelperText,
   Input,
   Textarea,
+  useDisclosure,
 } from "@chakra-ui/react";
+import { useState, useEffect } from "react";
+export default function ContactComponent() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [firstName, setfirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [valid, setValid] = useState(false);
+  const colors = { true: "#2352A0", false: "#D9D9D9" };
+  useEffect(() => {
+    if (firstName !== "" && lastName !== "" && email !== "" && message !== "") {
+      setValid(true);
+    } else {
+      setValid(false);
+    }
+  }, [firstName, lastName, email, message]);
+  const onCloseFeatured = () => {
+    setfirstName("");
+    setLastName("");
+    setEmail("");
+    setMessage("");
+    onClose();
+  };
 
-export default function TabsComponent() {
   return (
     <ChakraProvider theme={chakraTheme}>
       <div>
@@ -32,40 +64,105 @@ export default function TabsComponent() {
               <Flex className="justify-between bg-white p-6">
                 <Flex className="flex-col">
                   <Flex className="flex-row">
-                    <FormControl>
+                    <FormControl className="mb-6 mr-3">
                       <FormLabel htmlFor="first-name">First Name</FormLabel>
                       <Input
                         className="space-x-4"
+                        value={firstName}
                         id="first-name"
                         type="text"
                         placeholder="Jennifer"
+                        borderColor="black"
+                        width="195px"
+                        height="43px"
+                        onChange={(event) => setfirstName(event.target.value)}
                       />
                     </FormControl>
-                    <FormControl>
+                    <FormControl className="mb-6 ml-4">
                       <FormLabel htmlFor="last-name">Last Name</FormLabel>
-                      <Input id="last-name" type="text" placeholder="Ann" />
+                      <Input
+                        borderColor="black"
+                        value={lastName}
+                        id="last-name"
+                        type="text"
+                        placeholder="Ann"
+                        width="195px"
+                        height="43px"
+                        onChange={(event) => setLastName(event.target.value)}
+                      />
                     </FormControl>
                   </Flex>
-                  <FormControl>
+                  <FormControl className="mb-2">
                     <FormLabel htmlFor="email">Email</FormLabel>
                     <Input
                       id="email"
                       type="email"
+                      value={email}
                       placeholder="johndoe@email.com"
+                      borderColor="black"
+                      width="418px"
+                      height="43px"
+                      onChange={(event) => setEmail(event.target.value)}
                     />
                   </FormControl>
                 </Flex>
-                <Flex className="flex-col">
+                <Flex className="flex-col items-end">
                   <FormControl>
                     <FormLabel htmlFor="message">Message</FormLabel>
-                    <Textarea id="message" placeholder="Enter your message" />
+                    <Textarea
+                      id="message"
+                      value={message}
+                      onChange={(event) => setMessage(event.target.value)}
+                      placeholder="Enter your message"
+                      borderColor="black"
+                      width="738px"
+                      height="154px"
+                    />
                   </FormControl>
-                  <button
+                  <Button
                     type="submit"
-                    className="w-219 h-47 mt-4 rounded-md border border-transparent bg-blue-primary px-4 py-2 text-sm font-medium text-white shadow-sm transition duration-200 hover:bg-blue-600 focus:outline-none focus:ring-2"
+                    width="219px"
+                    height="47px"
+                    color="white"
+                    bg={colors[`${valid}`]}
+                    _hover={{ bg: colors[`${valid}`] }}
+                    onClick={valid ? onOpen : () => {}}
+                    className="mt-8 rounded-md border border-transparent px-4 py-2 text-sm font-medium   focus:outline-none focus:ring-2"
                   >
                     Send Message
-                  </button>
+                  </Button>
+                  <Modal isOpen={isOpen} onClose={onCloseFeatured}>
+                    <ModalOverlay />
+                    <ModalContent
+                      className="mx-[110px] mt-[100px] flex flex-col items-center"
+                      border="4px"
+                      borderColor="brand.600"
+                      height="436"
+                      maxWidth="590"
+                      p="10"
+                    >
+                      <ModalHeader className="flex flex-col items-center text-center text-[26px] font-bold leading-tight text-blue-primary">
+                        <Icon
+                          as={Image}
+                          src={"/check-circle-fillcheckmark.svg"}
+                          boxSize="115px"
+                        />
+                        <span className="mb-8 mt-6 text-[26px] font-bold leading-tight text-blue-primary">
+                          Thanks, {firstName}!
+                        </span>
+                        <ModalCloseButton
+                          color="blue-primary"
+                          className="mx-[50px] mt-[45px]"
+                        />
+                      </ModalHeader>
+                      <ModalBody maxWidth="400">
+                        <span className="font-medium">
+                          Your message has been sent. Someone from out team will
+                          reply to your question shortly.
+                        </span>
+                      </ModalBody>
+                    </ModalContent>
+                  </Modal>
                 </Flex>
               </Flex>
             </TabPanel>

@@ -11,11 +11,16 @@ import {
   Input,
   FormLabel,
   Flex,
+  Button,
+  Icon,
+  Image,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
 import { useRef, useState, useEffect } from "react";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
+import { EditIcon } from "@chakra-ui/icons";
+import { Edit } from "lucide-react";
 
 const URL_REGEX =
   /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
@@ -36,7 +41,6 @@ export default function EditVideoTrailer({ gameData }: Props) {
   }, [isOpen]);
   async function editVideoTrailer() {
     //The themes is populated and cant be send to the endpoint
-    //TODO: Add capability to
     if (URL_REGEX.test(url)) {
       gameData.videoTrailer = url;
       onClose();
@@ -50,12 +54,20 @@ export default function EditVideoTrailer({ gameData }: Props) {
   return (
     <ChakraProvider theme={chakraTheme}>
       <div>
-        <button
+        <Button
+          rightIcon={
+            <Icon
+              as={Image}
+              src={"/pencileditIconOutline.svg"}
+              boxSize="20px"
+            />
+          }
           onClick={onOpen}
-          className="m-5 rounded-md border border-black bg-white px-[17px] py-2 font-sans text-xl font-semibold text-black"
+          bg="white"
+          className="w-151 h-46 m-5 rounded-md border border-black px-[17px] py-2 font-sans text-xl font-semibold text-black"
         >
           Edit Trailer
-        </button>
+        </Button>
         <AlertDialog
           motionPreset="slideInBottom"
           leastDestructiveRef={cancelRef}
@@ -123,5 +135,3 @@ export default function EditVideoTrailer({ gameData }: Props) {
     </ChakraProvider>
   );
 }
-
-//TODO: Clean up tailwind css of EditVideTrailer, then copy over here.

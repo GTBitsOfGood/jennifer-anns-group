@@ -6,7 +6,7 @@ import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 
 export async function createTheme(data: CreateThemeInput) {
   await connectMongoDB();
-  //TODO:Remove stransaction comments.
+  //TODO:Remove transaction comments.
   //const session = await ThemeModel.startSession();
   //session.startTransaction();
   try {
