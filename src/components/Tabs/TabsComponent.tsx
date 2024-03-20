@@ -47,7 +47,8 @@ export default function TabsComponent({
         <Tabs colorScheme="brand" className="m-auto w-5/6 font-sans">
           <TabList>
             <Tab>Description</Tab>
-            {gameData.videoTrailer || mode === "edit" ? (
+            {(gameData.videoTrailer && gameData.videoTrailer !== "") ||
+            mode === "edit" ? (
               <Tab>Trailer</Tab>
             ) : null}
             {gameData.parentingGuide ? <Tab>Parenting Guide</Tab> : null}
@@ -68,7 +69,7 @@ export default function TabsComponent({
                 <p>{gameData.description}</p>
               )}
             </TabPanel>
-            {gameData.videoTrailer ? (
+            {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
               <TabPanel className="flex flex-col justify-center">
                 <ReactPlayer
                   url={gameData.videoTrailer}
@@ -84,7 +85,9 @@ export default function TabsComponent({
                 )}
               </TabPanel>
             ) : null}
-            {gameData.videoTrailer === undefined && mode === "edit" ? (
+            {(gameData.videoTrailer === undefined ||
+              gameData.videoTrailer === "") &&
+            mode === "edit" ? (
               <TabPanel>
                 <AddVideoTrailer gameData={gameData} />
               </TabPanel>

@@ -28,14 +28,7 @@ export default function DeleteVideoTrailer({ gameData }: Props) {
   async function deleteVideoTrailer() {
     //The themes is populated and cant be send to the endpoint
     //TODO: How do I delete a field with the API endpoint?
-    gameData.videoTrailer = undefined;
-    const { themes, ...gameDatawithoutTheme } = gameData;
-    console.log("GameData", gameData);
-    const response = await fetch(`/api/games/${gameID}`, {
-      method: "PUT",
-      body: JSON.stringify(gameDatawithoutTheme),
-    });
-    console.log("RESPONSE", response);
+    gameData.videoTrailer = "";
     router.push(`/games/${gameID}/edit`);
   }
 
