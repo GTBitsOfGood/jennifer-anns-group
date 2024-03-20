@@ -5,7 +5,6 @@ import {
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogOverlay,
-  AlertDialogCloseButton,
   useDisclosure,
   ChakraProvider,
   FormControl,
@@ -39,7 +38,6 @@ export default function AddVideoTrailer({ gameData }: Props) {
     setIssue("");
   }, [isOpen]);
   async function addVideoTrailer() {
-    //The themes is populated and cant be send to the endpoint
     if (url === "") {
       setIssue("Required text field missing!");
       return;
@@ -48,7 +46,6 @@ export default function AddVideoTrailer({ gameData }: Props) {
       gameData.videoTrailer = url;
       onClose();
       router.push(`/games/${gameID}/edit`);
-      console.log(gameData.videoTrailer);
     } else {
       setIssue("Invalid URL");
     }

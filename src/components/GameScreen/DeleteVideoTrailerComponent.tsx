@@ -9,7 +9,6 @@ import {
   useDisclosure,
   ChakraProvider,
   Button,
-  Flex,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
@@ -94,5 +93,3 @@ export default function DeleteVideoTrailer({ gameData }: Props) {
     </ChakraProvider>
   );
 }
-
-//TODO: Clean up imports and remove console logs. Only do this at the end.

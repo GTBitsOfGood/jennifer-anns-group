@@ -19,8 +19,6 @@ import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
 import { useRef, useState, useEffect } from "react";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
-import { EditIcon } from "@chakra-ui/icons";
-import { Edit } from "lucide-react";
 
 const URL_REGEX =
   /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
@@ -40,7 +38,6 @@ export default function EditVideoTrailer({ gameData }: Props) {
     setIssue("");
   }, [isOpen]);
   async function editVideoTrailer() {
-    //The themes is populated and cant be send to the endpoint
     if (url === "") {
       setIssue("Required text field missing!");
       return;
@@ -49,7 +46,6 @@ export default function EditVideoTrailer({ gameData }: Props) {
       gameData.videoTrailer = url;
       onClose();
       router.push(`/games/${gameID}/edit`);
-      console.log(gameData.videoTrailer);
     } else {
       setIssue("Invalid URL");
     }

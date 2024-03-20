@@ -15,17 +15,13 @@ import {
   ModalCloseButton,
   Icon,
   Image,
-} from "@chakra-ui/react";
-import chakraTheme from "@/styles/chakraTheme";
-import {
   FormControl,
   FormLabel,
-  FormErrorMessage,
-  FormHelperText,
   Input,
   Textarea,
   useDisclosure,
 } from "@chakra-ui/react";
+import chakraTheme from "@/styles/chakraTheme";
 import { useState, useEffect } from "react";
 export default function ContactComponent() {
   const { isOpen, onOpen, onClose } = useDisclosure();

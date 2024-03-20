@@ -31,8 +31,7 @@ const EditGamePage = () => {
 
   useEffect(() => {
     if (!session) {
-      //TODO: Remove commenting once done.
-      //router.push("/");
+      router.push("/");
     }
   }, [session]);
 
@@ -177,5 +176,3 @@ const EditGamePage = () => {
 };
 
 export default EditGamePage;
-
-//TODO: Change error statement and logic in add and edit trailer
