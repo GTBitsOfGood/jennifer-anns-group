@@ -1,28 +1,26 @@
 import { UserLabel, tagSchema } from "@/utils/types";
-import { Checkbox, CheckboxGroup, Tag, VStack } from "@chakra-ui/react";
+import {
+  Checkbox,
+  CheckboxGroup,
+  Tag,
+  VStack,
+  useCheckboxGroup,
+} from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { z } from "zod";
 
 interface Props {
-  gameBuilds: string[];
   setGameBuilds: Dispatch<SetStateAction<string[]>>;
-  gameContent: string[];
   setGameContent: Dispatch<SetStateAction<string[]>>;
-  accessibility: string[];
   setAcccessibility: Dispatch<SetStateAction<string[]>>;
-  tags: string[];
   setTags: Dispatch<SetStateAction<string[]>>;
-  userLabel: UserLabel;
+  userLabel: UserLabel | undefined;
 }
 
 export default function FilterBody({
-  gameBuilds,
   setGameBuilds,
-  gameContent,
   setGameContent,
-  accessibility,
   setAcccessibility,
-  tags,
   setTags,
   userLabel,
 }: Props) {
@@ -49,10 +47,16 @@ export default function FilterBody({
     [],
   );
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedGameContent, setSelectedGameContent] = useState<string[]>([]);
+  const { value, onChange } = useCheckboxGroup();
 
   useEffect(() => {
     getAllTags();
   }, []);
+
+  useEffect(() => {
+    setSelectedGameContent(value.map(String));
+  }, [value]);
 
   async function getAllTags() {
     const response = await fetch(`/api/tags`);
@@ -73,7 +77,7 @@ export default function FilterBody({
     setGameBuilds(selectedGameBuilds);
     setAcccessibility(selectedAccessibility);
     setTags(selectedTags);
-    // haven't done game content yet
+    setGameContent(selectedGameContent);
   }
 
   return (
@@ -112,18 +116,26 @@ export default function FilterBody({
       <p className="mb-5 ml-16	font-sans font-extrabold text-gray-500">
         Game content
       </p>
-      {
-        <CheckboxGroup>
-          <VStack align="start" ml="52px" mb="52px">
-            {gameContentOptions.map((content) => {
-              return <Checkbox variant="filter">{content}</Checkbox>;
-            })}
-            {userLabel === "administrator" ? (
-              <Checkbox>Answer key</Checkbox>
-            ) : null}
-          </VStack>
-        </CheckboxGroup>
-      }
+      <CheckboxGroup>
+        <VStack align="start" ml="52px" mb="52px">
+          {gameContentOptions.map((content) => {
+            return (
+              <Checkbox
+                key={content}
+                value={content}
+                isChecked={value.includes(content)}
+                onChange={onChange}
+                variant="filter"
+              >
+                {content}
+              </Checkbox>
+            );
+          })}
+          {userLabel === "administrator" ? (
+            <Checkbox>Answer key</Checkbox>
+          ) : null}
+        </VStack>
+      </CheckboxGroup>
 
       <p className="mb-5 ml-16	font-sans font-extrabold text-gray-500">
         Accessibility

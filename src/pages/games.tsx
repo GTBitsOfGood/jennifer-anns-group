@@ -26,6 +26,7 @@ import { Input } from "@chakra-ui/react";
 import FilterBody from "@/components/GameComponent/FilterBody";
 import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
+import ThemeSidebar from "@/components/GameComponent/ThemeSidebar";
 
 export default function Games() {
   const { data: session } = useSession();
@@ -45,12 +46,12 @@ export default function Games() {
 
   interface QueryParams {
     page: number;
-    gameBuilds?: string[];
+    gameBuilds?: string;
     name?: string;
     theme?: string;
-    gameContent?: string[];
-    accessibility?: string[];
-    tags?: string[];
+    gameContent?: string;
+    accessibility?: string;
+    tags?: string;
   }
 
   useEffect(() => {
@@ -60,7 +61,7 @@ export default function Games() {
 
   useEffect(() => {
     getGames();
-  }, [selectedTheme, gameBuilds, gameContent, accessibility, name]);
+  }, [selectedTheme, gameBuilds, gameContent, accessibility, tags, name]);
 
   async function getGames() {
     const queryParams: QueryParams = {
@@ -69,19 +70,51 @@ export default function Games() {
     };
 
     if (gameBuilds.length > 0) {
-      queryParams.gameBuilds = gameBuilds;
+      setGameBuilds(
+        gameBuilds.map((gb) => {
+          if (gb === "Amazon") {
+            return "amazon";
+          } else if (gb === "Android") {
+            return "android";
+          } else if (gb === "App Store") {
+            return "appstore";
+          } else if (gb === "Linux") {
+            return "linux";
+          } else if (gb === "Mac") {
+            return "mac";
+          } else if (gb === "WebGL") {
+            return "webgl";
+          } else {
+            return "windows";
+          }
+        }),
+      );
+      queryParams.gameBuilds = gameBuilds.join(",");
     }
 
     if (gameContent.length > 0) {
-      queryParams.gameContent = gameContent;
+      setGameContent(
+        gameContent.map((gc) => {
+          if (gc === "Parenting guide") {
+            return "parentingGuide";
+          } else if (gc === "Lesson plan") {
+            return "lessonPlan";
+          } else if (gc === "Video trailer") {
+            return "videoTrailer";
+          } else {
+            return "answerKey";
+          }
+        }),
+      );
+      queryParams.gameContent = gameContent.join(",");
     }
 
     if (accessibility.length > 0) {
-      queryParams.accessibility = accessibility;
+      queryParams.accessibility = accessibility.join(",");
     }
 
     if (tags.length > 0) {
-      queryParams.tags = tags;
+      queryParams.tags = tags.join(",");
     }
 
     if (name.length >= 3) {
@@ -98,7 +131,6 @@ export default function Games() {
       const response = await fetch(`/api/games/?${queryString}`);
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setGames(data.games);
         setEmpty(false);
       } else {
@@ -107,7 +139,7 @@ export default function Games() {
           setEmpty(true);
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       console.log(e.message);
     }
   }
@@ -194,6 +226,7 @@ export default function Games() {
                     <FilterBody
                       setAcccessibility={setAccessibility}
                       setGameBuilds={setGameBuilds}
+                      setGameContent={setGameContent}
                       setTags={setTags}
                       userLabel={userData?.label}
                     />
@@ -219,38 +252,11 @@ export default function Games() {
         </div>
 
         <div className="m-auto mt-[60px] flex w-[90vw] flex-row">
-          <div className="flex h-[365px] w-[260px] flex-col overflow-y-scroll">
-            <p
-              onClick={() => {
-                setSelectedTheme("All Games");
-              }}
-              className={
-                selectedTheme === "All Games"
-                  ? "mb-[26px] cursor-pointer font-sans text-2xl font-bold text-[#2352A0]"
-                  : "mb-[26px] cursor-pointer font-sans text-2xl text-neutral-500"
-              }
-            >
-              All Games
-            </p>
-            {themes
-              ? themes.map((theme) => {
-                  return (
-                    <p
-                      onClick={() => {
-                        setSelectedTheme(theme);
-                      }}
-                      className={
-                        selectedTheme === theme
-                          ? "mb-[26px] cursor-pointer font-sans text-2xl font-bold text-[#2352A0]"
-                          : "mb-[26px] cursor-pointer font-sans text-2xl text-neutral-500"
-                      }
-                    >
-                      {theme}
-                    </p>
-                  );
-                })
-              : null}
-          </div>
+          <ThemeSidebar
+            themes={themes}
+            selectedTheme={selectedTheme}
+            setSelectedTheme={setSelectedTheme}
+          />
 
           <div className="ml-6 flex w-full flex-row flex-wrap">
             {!empty ? (
