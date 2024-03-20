@@ -5,6 +5,7 @@ import {
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogOverlay,
+  AlertDialogCloseButton,
   useDisclosure,
   ChakraProvider,
   FormControl,
@@ -19,29 +20,28 @@ import { populatedGameWithId } from "@/server/db/models/GameModel";
 
 const URL_REGEX =
   /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
-
 interface Props {
   gameData: populatedGameWithId;
 }
 
-export default function EditVideoTrailer({ gameData }: Props) {
+export default function AddVideoTrailer({ gameData }: Props) {
   const router = useRouter();
   const gameID = router.query.id;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement | null>(null);
-  const [url, setUrl] = useState(gameData.videoTrailer ?? "");
+  const [url, setUrl] = useState("");
   const [issue, setIssue] = useState(false);
+
   useEffect(() => {
     setIssue(false);
   }, [isOpen]);
-  async function editVideoTrailer() {
+  async function addVideoTrailer() {
     //The themes is populated and cant be send to the endpoint
     //TODO: Add capability to
     if (URL_REGEX.test(url)) {
       gameData.videoTrailer = url;
       onClose();
       router.push(`/games/${gameID}/edit`);
-      console.log(gameData.videoTrailer);
     } else {
       setIssue(true);
     }
@@ -54,7 +54,7 @@ export default function EditVideoTrailer({ gameData }: Props) {
           onClick={onOpen}
           className="m-5 rounded-md border border-black bg-white px-[17px] py-2 font-sans text-xl font-semibold text-black"
         >
-          Edit Trailer
+          Add Trailer
         </button>
         <AlertDialog
           motionPreset="slideInBottom"
@@ -65,24 +65,27 @@ export default function EditVideoTrailer({ gameData }: Props) {
         >
           <AlertDialogOverlay />
 
-          <AlertDialogContent height="274" maxWidth="809">
+          <AlertDialogContent
+            border="4px"
+            borderColor="brand.600"
+            height="444"
+            maxWidth="585"
+          >
+            <div>
+              <AlertDialogCloseButton mr="50px" mt="50px" color="brand.600" />
+            </div>
             <AlertDialogHeader p="0">
-              <div className="float-left mx-[40px] mt-[20px] text-center text-[26px] font-bold leading-tight text-blue-primary">
-                Edit Trailer
+              <div className="mx-[110px] mt-[100px] text-center text-[26px] font-bold leading-tight text-blue-primary">
+                Add Trailer
               </div>
             </AlertDialogHeader>
-            <AlertDialogBody p="2" mt="20px" mx="20px">
+            <AlertDialogBody p="0" mt="50px">
               <div className="text-center font-sans text-base font-normal">
                 <FormControl className="flex flex-col justify-center">
-                  <Flex className="flex-row items-center justify-center">
-                    <FormLabel className="text-center font-bold" htmlFor="url">
-                      URL
-                    </FormLabel>
+                  <Flex className="flex-row items-center">
+                    <FormLabel htmlFor="url">URL</FormLabel>
                     <Input
                       id="url"
-                      className="mb-2 mt-6"
-                      borderColor="black"
-                      borderWidth="1.5px"
                       type="text"
                       value={url}
                       onChange={(event) => {
@@ -92,24 +95,24 @@ export default function EditVideoTrailer({ gameData }: Props) {
                     />
                   </Flex>
                   {issue === true ? (
-                    <FormLabel htmlFor="url" className="ml-12 text-delete-red">
+                    <FormLabel htmlFor="url" className="text-delete-red">
                       Invalid URL
                     </FormLabel>
                   ) : null}
                 </FormControl>
               </div>
             </AlertDialogBody>
-            <AlertDialogFooter p="0" justifyContent="end">
+            <AlertDialogFooter p="0" justifyContent="center">
               <button
                 onClick={onClose}
-                className="mb-7 mr-[22px] h-[42px] w-[94px] rounded-[5px] font-sans font-semibold text-blue-primary"
+                className="mb-24 mr-[22px] h-[47px] w-[198px] rounded-[10px] bg-delete-red font-sans font-semibold text-white"
               >
                 Cancel
               </button>
               <button
                 ref={cancelRef}
-                onClick={editVideoTrailer}
-                className="mb-7 mr-[30px] h-[42px] w-[94px] rounded-[5px]  bg-blue-primary font-sans font-semibold text-white"
+                onClick={addVideoTrailer}
+                className="mb-24 ml-[22px] h-[47px] w-[198px] rounded-[10px] border-[1px] border-solid border-black font-sans font-semibold"
               >
                 Done
               </button>
@@ -121,4 +124,5 @@ export default function EditVideoTrailer({ gameData }: Props) {
   );
 }
 
-//TODO: Clean up tailwind css of EditVideTrailer, then copy over here.
+//TODO: Clean up tailwind css of AddVideoTrailer, first clean up EditVideoTrailer then copy and paste
+//TODO: AddTrailer doesn't properly work right now.

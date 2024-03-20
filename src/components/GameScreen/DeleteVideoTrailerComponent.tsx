@@ -36,7 +36,7 @@ export default function DeleteVideoTrailer({ gameData }: Props) {
       body: JSON.stringify(gameDatawithoutTheme),
     });
     console.log("RESPONSE", response);
-    router.push(`/games/${gameID}`);
+    router.push(`/games/${gameID}/edit`);
   }
 
   return (

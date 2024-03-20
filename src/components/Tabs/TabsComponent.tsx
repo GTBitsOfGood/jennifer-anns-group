@@ -10,6 +10,7 @@ import {
 import chakraTheme from "@/styles/chakraTheme";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import DeleteVideoTrailer from "../GameScreen/DeleteVideoTrailerComponent";
+import AddVideoTrailer from "../GameScreen/AddVideoTrailerComponent";
 import EditVideoTrailer from "../GameScreen/EditVideoTrailerComponent";
 import { ChangeEvent, Dispatch, useState } from "react";
 import ReactPlayer from "react-player";
@@ -72,16 +73,20 @@ export default function TabsComponent({
                 <ReactPlayer
                   url={gameData.videoTrailer}
                   controls={true}
-                  width={1400}
-                  height={797}
+                  width={1300}
+                  height={731}
                 />
-                {mode === "edit" ? (
+                {mode === "edit" && (
                   <Flex className="flex-row">
                     <EditVideoTrailer gameData={gameData} />
-
                     <DeleteVideoTrailer gameData={gameData} />
                   </Flex>
-                ) : null}
+                )}
+              </TabPanel>
+            ) : null}
+            {gameData.videoTrailer === undefined && mode === "edit" ? (
+              <TabPanel>
+                <AddVideoTrailer gameData={gameData} />
               </TabPanel>
             ) : null}
             {gameData.parentingGuide ? (
@@ -95,4 +100,4 @@ export default function TabsComponent({
   );
 }
 
-//TODO: Make it so that the tabPanels are conditionally rendered as well.
+//TODO: Set it up so that it only actually updates the database when you click save changes. Else wise it just changes the object.
