@@ -33,19 +33,24 @@ export default function AddVideoTrailer({ gameData }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement | null>(null);
   const [url, setUrl] = useState("");
-  const [issue, setIssue] = useState(false);
+  const [issue, setIssue] = useState("");
 
   useEffect(() => {
-    setIssue(false);
+    setIssue("");
   }, [isOpen]);
   async function addVideoTrailer() {
     //The themes is populated and cant be send to the endpoint
+    if (url === "") {
+      setIssue("Required text field missing!");
+      return;
+    }
     if (URL_REGEX.test(url)) {
       gameData.videoTrailer = url;
       onClose();
       router.push(`/games/${gameID}/edit`);
+      console.log(gameData.videoTrailer);
     } else {
-      setIssue(true);
+      setIssue("Invalid URL");
     }
   }
 
@@ -104,9 +109,15 @@ export default function AddVideoTrailer({ gameData }: Props) {
                       placeholder="https://www.youtube.com/trailer/aB3sv3-?24"
                     />
                   </Flex>
-                  {issue === true ? (
+                  {issue !== "" ? (
                     <FormLabel htmlFor="url" className="ml-12 text-delete-red">
-                      Invalid URL
+                      <Icon
+                        as={Image}
+                        className="mr-2"
+                        src={"/error.svg"}
+                        boxSize="20px"
+                      />
+                      {issue}
                     </FormLabel>
                   ) : null}
                 </FormControl>

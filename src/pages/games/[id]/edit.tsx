@@ -179,7 +179,3 @@ const EditGamePage = () => {
 export default EditGamePage;
 
 //TODO: Change error statement and logic in add and edit trailer
-//TODO: Fix styling for Contact Jennifer Ann's, and make it go to another screen once done.
-//TODO: Add icons to Add Trailer, Delete Trailer, and Edit Trailer.
-//TODO: Create popup for Contact Jennifer Ann's when submitted
-//TODO: Make it so clicking the x on the Video Trailer tag lets you delete it.
