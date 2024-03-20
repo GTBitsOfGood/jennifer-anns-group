@@ -14,6 +14,7 @@ interface Props {
   setGameContent: Dispatch<SetStateAction<string[]>>;
   setAcccessibility: Dispatch<SetStateAction<string[]>>;
   setTags: Dispatch<SetStateAction<string[]>>;
+  setFiltersApplied: Dispatch<SetStateAction<boolean>>;
   userLabel: UserLabel | undefined;
 }
 
@@ -22,6 +23,7 @@ export default function FilterBody({
   setGameContent,
   setAcccessibility,
   setTags,
+  setFiltersApplied,
   userLabel,
 }: Props) {
   const gameBuildsOptions = [
@@ -78,6 +80,7 @@ export default function FilterBody({
     setAcccessibility(selectedAccessibility);
     setTags(selectedTags);
     setGameContent(selectedGameContent);
+    setFiltersApplied(true);
   }
 
   return (

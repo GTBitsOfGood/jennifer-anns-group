@@ -14,6 +14,7 @@ import {
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
+  Tag,
 } from "@chakra-ui/react";
 import GameCard from "@/components/GameComponent/GameCard";
 import { gameSchema, themeSchema } from "@/utils/types";
@@ -43,6 +44,7 @@ export default function Games() {
   const [filterOpen, setFilterOpen] = useState(false);
   const router = useRouter();
   const [empty, setEmpty] = useState(false);
+  const [filtersApplied, setFiltersApplied] = useState(false);
 
   interface QueryParams {
     page: number;
@@ -60,8 +62,12 @@ export default function Games() {
   }, []);
 
   useEffect(() => {
-    getGames();
-  }, [selectedTheme, gameBuilds, gameContent, accessibility, tags, name]);
+    if (filtersApplied) {
+      getGames();
+      console.log(gameBuilds);
+      setFiltersApplied(false);
+    }
+  }, [filtersApplied]);
 
   async function getGames() {
     const queryParams: QueryParams = {
@@ -70,43 +76,40 @@ export default function Games() {
     };
 
     if (gameBuilds.length > 0) {
-      setGameBuilds(
-        gameBuilds.map((gb) => {
-          if (gb === "Amazon") {
-            return "amazon";
-          } else if (gb === "Android") {
-            return "android";
-          } else if (gb === "App Store") {
-            return "appstore";
-          } else if (gb === "Linux") {
-            return "linux";
-          } else if (gb === "Mac") {
-            return "mac";
-          } else if (gb === "WebGL") {
-            return "webgl";
-          } else {
-            return "windows";
-          }
-        }),
-      );
-      queryParams.gameBuilds = gameBuilds.join(",");
+      const passBuilds = gameBuilds.map((gb) => {
+        console.log(gb);
+        if (gb === "Amazon") {
+          return "amazon";
+        } else if (gb === "Android") {
+          return "android";
+        } else if (gb === "App Store") {
+          return "appstore";
+        } else if (gb === "Linux") {
+          return "linux";
+        } else if (gb === "Mac") {
+          return "mac";
+        } else if (gb === "WebGL") {
+          return "webgl";
+        } else {
+          return "windows";
+        }
+      });
+      queryParams.gameBuilds = passBuilds.join(",");
     }
 
     if (gameContent.length > 0) {
-      setGameContent(
-        gameContent.map((gc) => {
-          if (gc === "Parenting guide") {
-            return "parentingGuide";
-          } else if (gc === "Lesson plan") {
-            return "lessonPlan";
-          } else if (gc === "Video trailer") {
-            return "videoTrailer";
-          } else {
-            return "answerKey";
-          }
-        }),
-      );
-      queryParams.gameContent = gameContent.join(",");
+      const passContent = gameContent.map((gc) => {
+        if (gc === "Parenting guide") {
+          return "parentingGuide";
+        } else if (gc === "Lesson plan") {
+          return "lessonPlan";
+        } else if (gc === "Video trailer") {
+          return "videoTrailer";
+        } else {
+          return "answerKey";
+        }
+      });
+      queryParams.gameContent = passContent.join(",");
     }
 
     if (accessibility.length > 0) {
@@ -189,7 +192,7 @@ export default function Games() {
         </h1>
 
         <div className="m-auto mb-11 flex w-[80vw] flex-row justify-between">
-          <div className="flex flex-row">
+          <div className="flex flex-row items-center">
             <InputGroup w="200px">
               <InputLeftElement pointerEvents="none">
                 <Search2Icon color="gray.500" />
@@ -202,15 +205,15 @@ export default function Games() {
                 placeholder="Filter by name"
               />
             </InputGroup>
-            <Popover isOpen={filterOpen} onClose={() => setFilterOpen(false)}>
+            <Popover>
               <PopoverTrigger>
                 <Box
                   onClick={() => {
                     setFilterOpen(!filterOpen);
                   }}
-                  className="ml-5 flex w-24 cursor-pointer flex-row items-center justify-center space-x-1 rounded-full border border-[#A9CBEB] bg-blue-50"
+                  className="ml-5 mr-5 flex h-9 w-24 cursor-pointer flex-row items-center justify-center space-x-1 rounded-full border border-[#A9CBEB] bg-blue-50"
                 >
-                  <p className="select-none	py-2.5 font-inter text-sm font-bold text-[#2352A0]">
+                  <p className="select-none font-inter text-sm font-bold text-[#2352A0]">
                     Filter
                   </p>
                   {filterOpen ? (
@@ -222,29 +225,42 @@ export default function Games() {
               </PopoverTrigger>
               <PopoverContent mt="10px" ml="32vw" w="750px" h="800px">
                 <PopoverBody>
-                  {
-                    <FilterBody
-                      setAcccessibility={setAccessibility}
-                      setGameBuilds={setGameBuilds}
-                      setGameContent={setGameContent}
-                      setTags={setTags}
-                      userLabel={userData?.label}
-                    />
-                  }
+                  <FilterBody
+                    setAcccessibility={setAccessibility}
+                    setGameBuilds={setGameBuilds}
+                    setGameContent={setGameContent}
+                    setTags={setTags}
+                    setFiltersApplied={setFiltersApplied}
+                    userLabel={userData?.label}
+                  />
                 </PopoverBody>
               </PopoverContent>
             </Popover>
+            <div className="flex flex-row flex-wrap items-center">
+              {gameBuilds.map((gb) => {
+                return <Tag variant="filter_selected">{gb}</Tag>;
+              })}
+              {gameContent.map((gc) => {
+                return <Tag variant="filter_selected">{gc}</Tag>;
+              })}
+              {accessibility.map((acc) => {
+                return <Tag variant="filter_selected">{acc}</Tag>;
+              })}
+              {tags.map((tag) => {
+                return <Tag variant="filter_selected">{tag}</Tag>;
+              })}
+            </div>
           </div>
-          {userData?.label === "administrator" ? (
-            <button
-              onClick={() => {
-                router.push("/games/create");
-              }}
-              className="rounded-md bg-blue-primary px-5 font-sans font-semibold text-[#FAFBFC]"
-            >
-              Create Game
-            </button>
-          ) : null}
+          {/* {userData?.label === "administrator" ? ( */}
+          <button
+            onClick={() => {
+              router.push("/games/create");
+            }}
+            className="ml-5 h-10 w-[150px] rounded-md bg-blue-primary	font-sans font-semibold text-[#FAFBFC]"
+          >
+            Create Game
+          </button>
+          {/* ) : null} */}
         </div>
 
         <div className="m-auto ml-[10vw] w-[80vw]">
