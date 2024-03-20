@@ -65,27 +65,27 @@ export default function AddVideoTrailer({ gameData }: Props) {
         >
           <AlertDialogOverlay />
 
-          <AlertDialogContent
-            border="4px"
-            borderColor="brand.600"
-            height="444"
-            maxWidth="585"
-          >
-            <div>
-              <AlertDialogCloseButton mr="50px" mt="50px" color="brand.600" />
-            </div>
+          <AlertDialogContent height="274" maxWidth="809">
             <AlertDialogHeader p="0">
-              <div className="mx-[110px] mt-[100px] text-center text-[26px] font-bold leading-tight text-blue-primary">
-                Add Trailer
+              <div className="float-left mx-[40px] mt-[20px] text-center text-[26px] font-bold leading-tight text-blue-primary">
+                Edit Trailer
               </div>
             </AlertDialogHeader>
-            <AlertDialogBody p="0" mt="50px">
+            <AlertDialogBody p="2" mt="20px" mx="20px">
               <div className="text-center font-sans text-base font-normal">
                 <FormControl className="flex flex-col justify-center">
-                  <Flex className="flex-row items-center">
-                    <FormLabel htmlFor="url">URL</FormLabel>
+                  <Flex className="flex-row items-center justify-center">
+                    <FormLabel
+                      className="mt-5 text-center font-bold"
+                      htmlFor="url"
+                    >
+                      URL<span className="text-delete-red">*</span>
+                    </FormLabel>
                     <Input
                       id="url"
+                      className="mb-2 mt-6"
+                      borderColor="black"
+                      borderWidth="1.5px"
                       type="text"
                       value={url}
                       onChange={(event) => {
@@ -95,24 +95,24 @@ export default function AddVideoTrailer({ gameData }: Props) {
                     />
                   </Flex>
                   {issue === true ? (
-                    <FormLabel htmlFor="url" className="text-delete-red">
+                    <FormLabel htmlFor="url" className="ml-12 text-delete-red">
                       Invalid URL
                     </FormLabel>
                   ) : null}
                 </FormControl>
               </div>
             </AlertDialogBody>
-            <AlertDialogFooter p="0" justifyContent="center">
+            <AlertDialogFooter p="0" justifyContent="end">
               <button
                 onClick={onClose}
-                className="mb-24 mr-[22px] h-[47px] w-[198px] rounded-[10px] bg-delete-red font-sans font-semibold text-white"
+                className="mb-7 mr-[22px] h-[42px] w-[94px] rounded-[5px] font-sans font-semibold text-blue-primary"
               >
                 Cancel
               </button>
               <button
                 ref={cancelRef}
                 onClick={addVideoTrailer}
-                className="mb-24 ml-[22px] h-[47px] w-[198px] rounded-[10px] border-[1px] border-solid border-black font-sans font-semibold"
+                className="mb-7 mr-[30px] h-[42px] w-[94px] rounded-[5px]  bg-blue-primary font-sans font-semibold text-white"
               >
                 Done
               </button>

@@ -75,8 +75,11 @@ export default function EditVideoTrailer({ gameData }: Props) {
               <div className="text-center font-sans text-base font-normal">
                 <FormControl className="flex flex-col justify-center">
                   <Flex className="flex-row items-center justify-center">
-                    <FormLabel className="text-center font-bold" htmlFor="url">
-                      URL
+                    <FormLabel
+                      className="mt-5 text-center font-bold"
+                      htmlFor="url"
+                    >
+                      URL<span className="text-delete-red">*</span>
                     </FormLabel>
                     <Input
                       id="url"
