@@ -175,6 +175,7 @@ export default function Games() {
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
+    setFiltersApplied(true);
   };
 
   return (
@@ -192,7 +193,7 @@ export default function Games() {
         </h1>
 
         <div className="m-auto mb-11 flex w-[80vw] flex-row justify-between">
-          <div className="flex flex-row items-center">
+          <div className="flex flex-row">
             <InputGroup w="200px">
               <InputLeftElement pointerEvents="none">
                 <Search2Icon color="gray.500" />
@@ -236,7 +237,7 @@ export default function Games() {
                 </PopoverBody>
               </PopoverContent>
             </Popover>
-            <div className="flex flex-row flex-wrap items-center">
+            <div className="flex flex-row flex-wrap">
               {gameBuilds.map((gb) => {
                 return <Tag variant="filter_selected">{gb}</Tag>;
               })}
@@ -272,6 +273,7 @@ export default function Games() {
             themes={themes}
             selectedTheme={selectedTheme}
             setSelectedTheme={setSelectedTheme}
+            setFiltersApplied={setFiltersApplied}
           />
 
           <div className="ml-6 flex w-full flex-row flex-wrap">

@@ -4,18 +4,21 @@ interface Props {
   themes: string[];
   selectedTheme: string;
   setSelectedTheme: Dispatch<SetStateAction<string>>;
+  setFiltersApplied: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function ThemeSidebar({
   themes,
   selectedTheme,
   setSelectedTheme,
+  setFiltersApplied,
 }: Props) {
   return (
     <div className="flex h-[365px] w-[260px] flex-col overflow-y-scroll">
       <p
         onClick={() => {
           setSelectedTheme("All Games");
+          setFiltersApplied(true);
         }}
         className={
           selectedTheme === "All Games"
@@ -31,6 +34,7 @@ export default function ThemeSidebar({
               <p
                 onClick={() => {
                   setSelectedTheme(theme);
+                  setFiltersApplied(true);
                 }}
                 className={
                   selectedTheme === theme
