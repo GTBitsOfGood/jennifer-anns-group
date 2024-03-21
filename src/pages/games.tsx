@@ -14,7 +14,9 @@ import {
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
-  Tag,
+  useDisclosure,
+  Text,
+  Button,
 } from "@chakra-ui/react";
 import GameCard from "@/components/GameComponent/GameCard";
 import { gameSchema, themeSchema } from "@/utils/types";
@@ -28,6 +30,7 @@ import FilterBody from "@/components/GameComponent/FilterBody";
 import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
 import ThemeSidebar from "@/components/GameComponent/ThemeSidebar";
+import SelectedFilters from "@/components/GameComponent/SelectedFilters";
 
 export default function Games() {
   const { data: session } = useSession();
@@ -41,10 +44,10 @@ export default function Games() {
   const [accessibility, setAccessibility] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [name, setName] = useState("");
-  const [filterOpen, setFilterOpen] = useState(false);
   const router = useRouter();
   const [empty, setEmpty] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   interface QueryParams {
     page: number;
@@ -64,7 +67,6 @@ export default function Games() {
   useEffect(() => {
     if (filtersApplied) {
       getGames();
-      console.log(gameBuilds);
       setFiltersApplied(false);
     }
   }, [filtersApplied]);
@@ -77,7 +79,6 @@ export default function Games() {
 
     if (gameBuilds.length > 0) {
       const passBuilds = gameBuilds.map((gb) => {
-        console.log(gb);
         if (gb === "Amazon") {
           return "amazon";
         } else if (gb === "Android") {
@@ -199,30 +200,34 @@ export default function Games() {
                 <Search2Icon color="gray.500" />
               </InputLeftElement>
               <Input
+                height="36px"
                 onChange={handleInputChange}
                 borderColor="gray.500"
                 bg="gray.50"
                 color="gray.500"
                 placeholder="Filter by name"
+                minW="200px"
               />
             </InputGroup>
-            <Popover>
+            <Popover onOpen={onOpen} onClose={onClose} isOpen={isOpen}>
               <PopoverTrigger>
-                <Box
-                  onClick={() => {
-                    setFilterOpen(!filterOpen);
-                  }}
-                  className="ml-5 mr-5 flex h-9 w-24 cursor-pointer flex-row items-center justify-center space-x-1 rounded-full border border-[#A9CBEB] bg-blue-50"
+                <Button
+                  borderRadius="100px"
+                  bg="brand.800"
+                  _hover={{ bg: "brand.800" }}
+                  minW="96px"
+                  height="36px"
+                  className="ml-5 mr-5 flex flex-row items-center justify-center space-x-1 border border-[#A9CBEB]"
                 >
-                  <p className="select-none font-inter text-sm font-bold text-[#2352A0]">
+                  <Text className="select-none font-inter text-sm font-bold text-[#2352A0]">
                     Filter
-                  </p>
-                  {filterOpen ? (
+                  </Text>
+                  {isOpen ? (
                     <TriangleUpIcon color="brand.600" height="9px" />
                   ) : (
                     <TriangleDownIcon color="brand.600" height="9px" />
                   )}
-                </Box>
+                </Button>
               </PopoverTrigger>
               <PopoverContent mt="10px" ml="32vw" w="750px" h="800px">
                 <PopoverBody>
@@ -238,18 +243,12 @@ export default function Games() {
               </PopoverContent>
             </Popover>
             <div className="flex flex-row flex-wrap">
-              {gameBuilds.map((gb) => {
-                return <Tag variant="filter_selected">{gb}</Tag>;
-              })}
-              {gameContent.map((gc) => {
-                return <Tag variant="filter_selected">{gc}</Tag>;
-              })}
-              {accessibility.map((acc) => {
-                return <Tag variant="filter_selected">{acc}</Tag>;
-              })}
-              {tags.map((tag) => {
-                return <Tag variant="filter_selected">{tag}</Tag>;
-              })}
+              <SelectedFilters
+                gameBuilds={gameBuilds}
+                gameContent={gameContent}
+                accessibility={accessibility}
+                tags={tags}
+              />
             </div>
           </div>
           {/* {userData?.label === "administrator" ? ( */}
@@ -257,7 +256,7 @@ export default function Games() {
             onClick={() => {
               router.push("/games/create");
             }}
-            className="ml-5 h-10 w-[150px] rounded-md bg-blue-primary	font-sans font-semibold text-[#FAFBFC]"
+            className="ml-5 h-10 min-w-[150px] rounded-md bg-blue-primary	font-sans font-semibold text-[#FAFBFC]"
           >
             Create Game
           </button>

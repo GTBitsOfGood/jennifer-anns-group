@@ -57,12 +57,19 @@ const Tag = tagHelper.defineMultiStyleConfig({
 const checkboxHelper = createMultiStyleConfigHelpers(checkboxAnatomy.keys);
 
 const Checkbox = checkboxHelper.defineMultiStyleConfig({
+  baseStyle: {
+    control: {
+      _checked: {
+        bg: "#2352A0",
+        border: "#00FFFFFF",
+      },
+    },
+  },
   variants: {
     filter: {
       container: {
         fontWeight: "medium",
         color: "#6C757D",
-        colorScheme: "brand.600",
         _checked: {
           color: "#2352A0",
         },
@@ -79,6 +86,7 @@ const chakraTheme = extendTheme({
       500: "#F2F2F2",
       600: "#2352A0",
       700: "#E1E4ED",
+      800: "#eff6ff",
     },
   },
   components: {
