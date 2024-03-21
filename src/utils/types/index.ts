@@ -8,19 +8,34 @@ const verifyObjectId = (value: string) => {
   }
   return false;
 };
+export enum AllBuilds {
+  amazon = "amazon",
+  android = "android",
+  appstore = "appstore",
+  linux = "linux",
+  mac = "mac",
+  webgl = "webgl",
+  windows = "windows",
+}
 
-// Build
-export enum AppType {
-  AmazonApp = "Amazon App",
-  AndroidApp = "Android App",
-  AppStore = "App Store",
-  LinuxDownload = "Linux Download",
-  MacDownload = "Mac Download",
-  WindowsDownload = "Windows Download",
+export enum NonWebGLBuilds {
+  amazon = "amazon",
+  android = "android",
+  appstore = "appstore",
+  linux = "linux",
+  mac = "mac",
+  windows = "windows",
+}
+
+export enum GameContentEnum {
+  answerKey = "answerKey",
+  parentingGuide = "parentingGuide",
+  lesson = "lesson",
+  videoTrailer = "videoTrailer",
 }
 
 export const buildSchema = z.object({
-  type: z.nativeEnum(AppType),
+  type: z.nativeEnum(NonWebGLBuilds),
   link: z.string().url(),
   instructions: z.string().optional(),
 });
@@ -38,6 +53,8 @@ export const tagSchema = z.object({
 });
 
 // Game
+//We might need to make two gameSchemas, one for input verification and another
+
 export const gameSchema = z.object({
   //Make sure to modify gameSchema endpoints, as well as editGameSchema I suppose.
   name: z.string().min(3, "Title must be at least 3 characters").max(50),
@@ -54,6 +71,10 @@ export const gameSchema = z.object({
     z.string().url().optional(),
   ),
 });
+//Since arrays from req.query are just strings, and need to be converted into arrays.
+
+//For validating game query in the GET endpoint
+//Be aware that zod.transform alters the data during parsing.
 
 // For editing game
 export const editGameSchema = z.object({
@@ -94,7 +115,7 @@ export const userSchema = z.object({
 });
 
 export type ExtendId<T extends any> = T & { _id: string };
-
+export type ExtendVersion<T extends any> = T & { __v: number };
 // For changing password
 export const changePWSchema = z.object({
   oldpassword: z.string(),

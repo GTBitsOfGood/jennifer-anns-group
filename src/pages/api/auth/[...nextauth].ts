@@ -1,11 +1,7 @@
-import NextAuth, { NextAuthOptions, User } from "next-auth";
-import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import { MongoClient } from "mongodb";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import { verifyUser } from "@/server/db/actions/UserAction";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { uri } from "@/server/db/mongodb";
 import { loginSchema } from "@/components/Login/LoginForm";
-import { userSchema } from "@/utils/types";
 
 /**
  *  @type {import("next-auth").NextAuthOptions}

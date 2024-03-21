@@ -40,7 +40,7 @@ This file contains the schema for the game model, including relationships with t
 
 This file also contains the schema for the build model, which is a subdocument of the game model. This schema was implemented in Sprint 2.
 
-- type: String, enum: see AppType in [types](types/index.ts), required
+- type: String, enum: see AllBuilds in [types](types/index.ts), required
   - these are the six other builds we will be supporting, but these will just be links to app stores or repositories for downloading and not embedded games like webGL
 - link: String, required
 - instructions: String
