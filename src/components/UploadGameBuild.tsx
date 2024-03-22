@@ -17,6 +17,7 @@ import WebGLUpload from "./WebGLUpload";
 
 import { z } from "zod";
 import { AllBuilds, NonWebGLBuilds, buildSchema } from "@/utils/types";
+import Image from "next/image";
 
 const BUILD_FORM_KEY = "build";
 const URL_FORM_KEY = "gameurl";
@@ -115,13 +116,19 @@ function UploadGameBuild(props: Props) {
     );
     setShowUploadedBuild(false);
   };
+
+  const cancelUpload = () => {
+    setShowAdditionalFields(false);
+    setShowUploadGameBuild(false);
+  };
+
   return (
     <>
       {!showUploadGameBuild ? (
         <div className="flex flex-row items-center gap-3">
           <Button
             variant="upload"
-            className="flex h-12 flex-row justify-start gap-3"
+            className="flex h-12 w-32 flex-row justify-start gap-3"
             type="button"
             onClick={() => setShowUploadGameBuild(true)}
           >
@@ -130,6 +137,13 @@ function UploadGameBuild(props: Props) {
           </Button>
           {showUploadedBuild && (
             <>
+              <Image
+                src={`/gamebuilds/${selectedOption}.png`}
+                height={24}
+                width={24}
+                className="mx-2"
+                alt=""
+              />
               <p>{url}</p>
               <X
                 className="cursor-pointer text-orange-primary"
@@ -277,7 +291,7 @@ function UploadGameBuild(props: Props) {
               variant="white"
               className="px-4 text-lg"
               type="button"
-              onClick={() => setShowUploadGameBuild(false)}
+              onClick={cancelUpload}
             >
               Cancel
             </Button>
