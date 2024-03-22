@@ -16,6 +16,7 @@ interface Props {
   setTags: Dispatch<SetStateAction<string[]>>;
   setFiltersApplied: Dispatch<SetStateAction<boolean>>;
   userLabel: UserLabel | undefined;
+  onClose: () => void;
 }
 
 export default function FilterBody({
@@ -25,6 +26,7 @@ export default function FilterBody({
   setTags,
   setFiltersApplied,
   userLabel,
+  onClose,
 }: Props) {
   const gameBuildsOptions = [
     "Amazon",
@@ -81,6 +83,7 @@ export default function FilterBody({
     setTags(selectedTags);
     setGameContent(selectedGameContent);
     setFiltersApplied(true);
+    onClose();
   }
 
   return (
@@ -92,6 +95,7 @@ export default function FilterBody({
         {gameBuildsOptions.map((gameBuild) => {
           return (
             <Tag
+              key={gameBuild}
               variant={
                 !selectedGameBuilds.includes(gameBuild)
                   ? "filter"
@@ -147,6 +151,7 @@ export default function FilterBody({
         {accessibilityOptions.map((a) => {
           return (
             <Tag
+              key={a}
               variant={
                 !selectedAccessibility.includes(a)
                   ? "filter"
@@ -176,6 +181,7 @@ export default function FilterBody({
         {tagsOptions?.map((t) => {
           return (
             <Tag
+              key={t}
               variant={!selectedTags.includes(t) ? "filter" : "filter_selected"}
               onClick={() => {
                 if (selectedTags.includes(t)) {
@@ -197,7 +203,12 @@ export default function FilterBody({
       </div>
 
       <div className=" ml-[52px] mr-[52px] flex flex-row justify-between">
-        <button className="font-sans font-semibold text-blue-primary">
+        <button
+          onClick={() => {
+            onClose();
+          }}
+          className="font-sans font-semibold text-blue-primary"
+        >
           Cancel
         </button>
         <button

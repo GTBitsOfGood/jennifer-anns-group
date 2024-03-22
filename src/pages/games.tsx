@@ -5,7 +5,6 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import {
-  Box,
   ChakraProvider,
   Divider,
   InputGroup,
@@ -49,16 +48,6 @@ export default function Games() {
   const [filtersApplied, setFiltersApplied] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  interface QueryParams {
-    page: number;
-    gameBuilds?: string;
-    name?: string;
-    theme?: string;
-    gameContent?: string;
-    accessibility?: string;
-    tags?: string;
-  }
-
   useEffect(() => {
     getGames();
     getThemes();
@@ -72,64 +61,64 @@ export default function Games() {
   }, [filtersApplied]);
 
   async function getGames() {
-    const queryParams: QueryParams = {
-      page: 1,
-      theme: selectedTheme,
-    };
+    const params = new URLSearchParams();
+    params.append("page", "1");
 
     if (gameBuilds.length > 0) {
-      const passBuilds = gameBuilds.map((gb) => {
+      gameBuilds.forEach((gb) => {
         if (gb === "Amazon") {
-          return "amazon";
+          params.append("gameBuilds", "amazon");
         } else if (gb === "Android") {
-          return "android";
+          params.append("gameBuilds", "android");
         } else if (gb === "App Store") {
-          return "appstore";
+          params.append("gameBuilds", "appstore");
         } else if (gb === "Linux") {
-          return "linux";
+          params.append("gameBuilds", "linux");
         } else if (gb === "Mac") {
-          return "mac";
+          params.append("gameBuilds", "mac");
         } else if (gb === "WebGL") {
-          return "webgl";
+          params.append("gameBuilds", "webgl");
         } else {
-          return "windows";
+          params.append("gameBuilds", "windows");
         }
       });
-      queryParams.gameBuilds = passBuilds.join(",");
     }
 
     if (gameContent.length > 0) {
-      const passContent = gameContent.map((gc) => {
+      gameContent.forEach((gc) => {
         if (gc === "Parenting guide") {
-          return "parentingGuide";
+          params.append("gameContent", "parentingGuide");
         } else if (gc === "Lesson plan") {
-          return "lessonPlan";
+          params.append("gameContent", "lessonPlan");
         } else if (gc === "Video trailer") {
-          return "videoTrailer";
+          params.append("gameContent", "videoTrailer");
         } else {
-          return "answerKey";
+          params.append("gameContent", "answerKey");
         }
       });
-      queryParams.gameContent = passContent.join(",");
     }
 
     if (accessibility.length > 0) {
-      queryParams.accessibility = accessibility.join(",");
+      accessibility.forEach((acc) => {
+        params.append("accessibility", acc);
+      });
     }
 
     if (tags.length > 0) {
-      queryParams.tags = tags.join(",");
+      tags.forEach((tag) => {
+        params.append("tags", tag);
+      });
     }
 
     if (name.length >= 3) {
-      queryParams.name = name;
+      params.append("name", name);
     }
 
-    if (selectedTheme === "All Games") {
-      delete queryParams.theme;
+    if (selectedTheme !== "All Games") {
+      params.append("theme", selectedTheme);
     }
 
-    const queryString = new URLSearchParams(queryParams).toString();
+    const queryString = params.toString();
 
     try {
       const response = await fetch(`/api/games/?${queryString}`);
@@ -238,6 +227,7 @@ export default function Games() {
                     setTags={setTags}
                     setFiltersApplied={setFiltersApplied}
                     userLabel={userData?.label}
+                    onClose={onClose}
                   />
                 </PopoverBody>
               </PopoverContent>
@@ -251,16 +241,16 @@ export default function Games() {
               />
             </div>
           </div>
-          {/* {userData?.label === "administrator" ? ( */}
-          <button
-            onClick={() => {
-              router.push("/games/create");
-            }}
-            className="ml-5 h-10 min-w-[150px] rounded-md bg-blue-primary	font-sans font-semibold text-[#FAFBFC]"
-          >
-            Create Game
-          </button>
-          {/* ) : null} */}
+          {userData?.label === "administrator" ? (
+            <button
+              onClick={() => {
+                router.push("/games/create");
+              }}
+              className="ml-5 h-10 min-w-[150px] rounded-md bg-blue-primary	font-sans font-semibold text-[#FAFBFC]"
+            >
+              Create Game
+            </button>
+          ) : null}
         </div>
 
         <div className="m-auto ml-[10vw] w-[80vw]">
@@ -279,7 +269,7 @@ export default function Games() {
             {!empty ? (
               games.map((game) => {
                 return (
-                  <div className="mb-6 mr-6">
+                  <div key={game.name} className="mb-6 mr-6">
                     <GameCard game={game} />
                   </div>
                 );

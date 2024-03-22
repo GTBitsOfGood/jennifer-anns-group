@@ -32,6 +32,7 @@ export default function ThemeSidebar({
         ? themes.map((theme) => {
             return (
               <p
+                key={theme}
                 onClick={() => {
                   setSelectedTheme(theme);
                   setFiltersApplied(true);
