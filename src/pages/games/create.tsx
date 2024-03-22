@@ -6,17 +6,18 @@ import cn from "classnames";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TextArea } from "@/components/ui/textarea";
-import { MoveLeft } from "lucide-react";
+import { MoveLeft, Plus } from "lucide-react";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { useRouter } from "next/router";
 import ThemeSelect from "@/components/Themes/ThemeSelect";
 import TagSelect from "@/components/Tags/TagSelect";
 import { ITheme } from "@/server/db/models/ThemeModel";
 import { ITag } from "@/server/db/models/TagModel";
-import { ExtendId, gameSchema } from "@/utils/types";
+import { ExtendId, buildSchema, gameSchema } from "@/utils/types";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { IGame } from "@/server/db/models/GameModel";
+import UploadGameBuild from "@/components/UploadGameBuild";
 
 const NAME_FORM_KEY = "name";
 const TRAILER_FORM_KEY = "videoTrailer";
@@ -45,6 +46,12 @@ function CreateGame() {
   const [selectedCustomTags, setSelectedCustomTags] = useState<
     ExtendId<ITag>[]
   >([]);
+
+  const [builds, setBuilds] = useState<z.infer<typeof buildSchema>[]>([]);
+
+  const [uploadGameComponents, setUploadGameComponents] = useState<
+    React.JSX.Element[]
+  >([<UploadGameBuild key={0} builds={builds} setBuilds={setBuilds} />]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -102,11 +109,13 @@ function CreateGame() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    console.log("hi");
     const formData = new FormData(e.currentTarget);
     const input = {
       name: formData.get(NAME_FORM_KEY),
       videoTrailer: formData.get(TRAILER_FORM_KEY),
       description: formData.get(DESCR_FORM_KEY),
+      builds: builds,
       themes: selectedThemes.map((theme) => theme._id),
       tags: [...selectedAccessibilityTags, ...selectedCustomTags].map(
         (tag) => tag._id,
@@ -134,6 +143,17 @@ function CreateGame() {
       });
     }
   }
+
+  const addUploadComponent = () => {
+    setUploadGameComponents((prevComponents) => [
+      ...prevComponents,
+      <UploadGameBuild
+        key={prevComponents.length}
+        builds={builds}
+        setBuilds={setBuilds}
+      />,
+    ]);
+  };
 
   return (
     <div className="m-12 md:mx-24">
@@ -169,6 +189,33 @@ function CreateGame() {
             {validationErrors.name}
           </p>
         </div>
+
+        <div className="relative flex w-full flex-col gap-3 md:w-2/3">
+          <label className="text-xl font-semibold">
+            Game Build
+            <span className="text-orange-primary">*</span>
+          </label>
+
+          {uploadGameComponents.map(
+            (component: React.JSX.Element, key: number) => (
+              <div key={key}>{component}</div>
+            ),
+          )}
+          <div
+            className={
+              "flex cursor-pointer flex-row items-center gap-2 p-2 text-blue-primary" +
+              (uploadGameComponents.length >= 7
+                ? "absolute hidden opacity-0"
+                : "")
+            }
+            onClick={addUploadComponent}
+          >
+            <Plus />
+            <p>Add Another Build</p>
+          </div>
+          {/* <UploadGameBuild builds={builds} setBuilds={setBuilds} /> */}
+        </div>
+
         <div className="relative flex w-full flex-col gap-3 md:w-2/3">
           <label htmlFor={TRAILER_FORM_KEY} className="text-xl font-semibold">
             Video Trailer Link
