@@ -1,27 +1,18 @@
-import { Plus } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "../ui/dialog";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  UseMutateFunction,
-} from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { IGame } from "@/server/db/models/GameModel";
 import { useCallback, useState } from "react";
 import { z } from "zod";
-import { ITheme } from "@/server/db/models/ThemeModel";
 import { CreateThemeInput } from "@/pages/api/themes";
 import { CreateTagInput } from "@/pages/api/tags";
 
@@ -128,9 +119,9 @@ function AddModal({ subject, open, setOpen }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="border-blue-primary border-4 flex flex-col gap-8">
+      <DialogContent className="flex flex-col gap-8 border-4 border-blue-primary">
         <DialogHeader>
-          <DialogTitle className="text-blue-primary text-xl tracking-normal font-semibold">{`New ${capitalizedSubject}`}</DialogTitle>
+          <DialogTitle className="text-xl font-semibold tracking-normal text-blue-primary">{`New ${capitalizedSubject}`}</DialogTitle>
         </DialogHeader>
         <div className="w-full">
           <form
@@ -147,11 +138,11 @@ function AddModal({ subject, open, setOpen }: Props) {
                 id={FORM_NAME_KEY}
                 name={FORM_NAME_KEY}
                 className={
-                  nameError ? "border-red-500 border" : "border-input-border"
+                  nameError ? "border border-red-500" : "border-input-border"
                 }
               />
               {nameError ? (
-                <p className=" absolute bottom-[-1.5em] text-red-500 text-xs">
+                <p className=" absolute bottom-[-1.5em] text-xs text-red-500">
                   {nameError}
                 </p>
               ) : null}
@@ -171,7 +162,7 @@ function AddModal({ subject, open, setOpen }: Props) {
                       />
                       <Label
                         htmlFor={game._id}
-                        className="bg-gray-200 rounded-full py-1.5 px-4 font-normal peer-checked:border-blue-primary border hover:cursor-pointer"
+                        className="rounded-full border bg-gray-200 px-4 py-1.5 font-normal hover:cursor-pointer peer-checked:border-blue-primary"
                       >
                         {game.name}
                       </Label>
@@ -182,7 +173,7 @@ function AddModal({ subject, open, setOpen }: Props) {
             </div>
           </form>
         </div>
-        <DialogFooter className="flex flex-row sm:justify-between w-full">
+        <DialogFooter className="flex w-full flex-row sm:justify-between">
           <DialogClose>
             <Button
               variant="ghost"

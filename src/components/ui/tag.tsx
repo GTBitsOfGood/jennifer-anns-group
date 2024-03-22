@@ -25,8 +25,8 @@ const Tag = ({
   return (
     <div
       className={cn(
-        `text-sm px-4 py-1.5 w-fit rounded-full ${variantBgColorMap[variant]}`,
-        className
+        `w-fit rounded-full px-4 py-1.5 text-sm ${variantBgColorMap[variant]}`,
+        className,
       )}
       {...props}
     >

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { useSession } from "next-auth/react";
@@ -17,19 +17,74 @@ const pageRequiredAuthentication: Record<
   [Pages.HOME]: undefined,
   [Pages.LOGIN]: "unauthenticated",
   [Pages.SIGNUP]: "unauthenticated",
+  [Pages.CREATEGAME]: "authenticated",
+};
+
+enum Label {
+  STUDENT = "student",
+  PARENT = "parent",
+  EDUCATOR = "educator",
+  ADMINISTRATOR = "administrator",
+  NONE = "",
+  LOADING = "loading",
+}
+
+const pageRequiredLabels: Record<Pages, Array<Label>> = {
+  [Pages.HOME]: [
+    Label.STUDENT,
+    Label.PARENT,
+    Label.EDUCATOR,
+    Label.ADMINISTRATOR,
+    Label.NONE,
+  ], // Allow all users
+  [Pages.LOGIN]: [Label.NONE], // Only allow public users
+  [Pages.SIGNUP]: [Label.NONE], // Only allow public users
+  [Pages.CREATEGAME]: [Label.ADMINISTRATOR], // Only allow administrator role
 };
 
 const pageAccessHOC = <P extends object>(Component: React.FC<P>) => {
   const WrappedComponent = (props: P) => {
     const router = useRouter();
-    const { status } = useSession();
+    const { status, data } = useSession();
+    const [label, setLabel] = useState<Label>(Label.LOADING);
+
+    useEffect(() => {
+      const fetchUserLabel = async () => {
+        if (status === "unauthenticated") {
+          setLabel(Label.NONE);
+        } else {
+          try {
+            const response = await fetch(`/api/users/${data?.user._id}`);
+            const responseData = await response.json();
+            setLabel(responseData.label as Label);
+          } catch (error) {
+            console.error("Error fetching user status");
+          }
+        }
+      };
+
+      if (status !== "loading") {
+        fetchUserLabel();
+      }
+    }, [status]);
+
+    useEffect(() => {
+      if (
+        status !== "loading" &&
+        label !== "loading" &&
+        (!pageRequiredLabels[router.pathname as Pages].includes(label) ||
+          pageRequiredAuthentication[router.pathname as Pages] !== status)
+      ) {
+        router.replace("/");
+      }
+    }, [label]);
 
     if (status === "loading") {
       return (
-        <div className="w-dvw h-dvh flex flex-col items-center justify-center">
+        <div className="flex h-dvh w-dvw flex-col items-center justify-center">
           <svg
             aria-hidden="true"
-            className="w-12 h-12 text-gray-200 animate-spin dark:text-gray-600 fill-blue-primary"
+            className="h-12 w-12 animate-spin fill-blue-primary text-gray-200 dark:text-gray-600"
             viewBox="0 0 100 101"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -47,11 +102,11 @@ const pageAccessHOC = <P extends object>(Component: React.FC<P>) => {
         </div>
       );
     }
-
-    if (pageRequiredAuthentication[router.pathname as Pages] === status) {
+    if (
+      pageRequiredAuthentication[router.pathname as Pages] === status &&
+      pageRequiredLabels[router.pathname as Pages].includes(label)
+    ) {
       return <Component {...props} />;
-    } else {
-      router.replace("/");
     }
   };
 

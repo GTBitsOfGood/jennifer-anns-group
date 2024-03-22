@@ -1,13 +1,9 @@
 import "@/styles/globals.css";
+import React from "react";
 import { SessionProvider } from "next-auth/react";
 import { AppProps } from "next/app";
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "../components/ui/toaster";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +15,7 @@ export default function App({
     <SessionProvider session={session}>
       <QueryClientProvider client={queryClient}>
         <Component {...pageProps} />
+        <Toaster />
       </QueryClientProvider>
     </SessionProvider>
   );

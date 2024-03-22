@@ -14,7 +14,7 @@ import {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   switch (req.method) {
     case "GET":
@@ -34,8 +34,8 @@ async function getThemeHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const themes = await getThemes();
     return res.status(HTTP_STATUS_CODE.OK).send(themes);
-  } catch (e) {
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+  } catch (e: any) {
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }
 
@@ -56,11 +56,11 @@ async function postThemeHandler(req: NextApiRequest, res: NextApiResponse) {
       ...newTheme,
       _id: newTheme._id.toString(),
     });
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof ThemeException) {
       return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }
 
@@ -78,10 +78,10 @@ async function deleteThemeHandler(req: NextApiRequest, res: NextApiResponse) {
     }
     const deletedTheme = await deleteTheme(parsedBody.data._id);
     return res.status(HTTP_STATUS_CODE.OK).send(deletedTheme);
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof ThemeException) {
-      return res.status(e.code).send("");
+      return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }

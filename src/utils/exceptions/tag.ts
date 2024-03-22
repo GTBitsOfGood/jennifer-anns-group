@@ -9,13 +9,13 @@ export abstract class TagException extends Error {
 }
 
 export class TagInvalidInputException extends TagException {
-  constructor(message = "Invalid theme input") {
+  constructor(message = "Invalid tag input") {
     super(message, HTTP_STATUS_CODE.BAD_REQUEST);
   }
 }
 
 export class TagNotFoundException extends TagException {
-  constructor(message = "Theme does not exist") {
+  constructor(message = "Tag does not exist") {
     super(message, HTTP_STATUS_CODE.BAD_REQUEST);
   }
 }

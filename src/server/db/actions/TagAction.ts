@@ -20,7 +20,7 @@ export async function createTag(data: CreateTagInput) {
         $push: {
           tags: tag._id,
         },
-      }
+      },
     );
 
     await session.commitTransaction();
@@ -42,7 +42,7 @@ export async function deleteTag(id: string) {
     }
     const results = await GameModel.updateMany(
       { tags: { $in: [id] } },
-      { $pull: { tags: id } }
+      { $pull: { tags: id } },
     );
     await session.commitTransaction();
     return deletedTag.toObject();

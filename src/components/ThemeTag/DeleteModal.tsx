@@ -1,21 +1,10 @@
 import { ITheme } from "@/server/db/models/ThemeModel";
 import { Button } from "../ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
-import { Tag } from "../ui/tag";
-import { X } from "lucide-react";
+import { Dialog, DialogClose, DialogContent, DialogFooter } from "../ui/dialog";
 import { ITag } from "@/server/db/models/TagModel";
 import { DeleteTagInput } from "@/pages/api/tags";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DeleteThemeInput } from "@/pages/api/themes";
-import { useState } from "react";
 
 type SubjectType = "theme" | "tag";
 
@@ -39,8 +28,6 @@ function DeleteModal({ open, setOpen, subject, subjectType }: Props) {
       queryClient.invalidateQueries({ queryKey: ["allThemes"] });
     },
   });
-
-  console.log(status);
 
   const { mutate: deleteTag } = useMutation({
     mutationFn: (tag: DeleteTagInput) =>
@@ -66,16 +53,16 @@ function DeleteModal({ open, setOpen, subject, subjectType }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        className="border-blue-primary border-4 flex flex-col gap-8 items-center"
+        className="flex flex-col items-center gap-8 border-4 border-blue-primary"
         showClose={false}
       >
         <div className="flex w-full flex-col items-center gap-4">
-          <h2 className="text-blue-primary text-xl font-semibold text-center">
+          <h2 className="text-center text-xl font-semibold text-blue-primary">
             Are you sure you want to delete *{subject.name}*?
           </h2>
           <p>{`Deleting a ${subjectType} is final and cannot be undone.`}</p>
         </div>
-        <DialogFooter className="flex flex-row sm:justify-around w-full gap-2">
+        <DialogFooter className="flex w-full flex-row gap-2 sm:justify-around">
           <Button
             variant="primary"
             type="submit"
@@ -84,7 +71,7 @@ function DeleteModal({ open, setOpen, subject, subjectType }: Props) {
             onClick={() => {
               mutateMap[subjectType](
                 { _id: subject._id },
-                { onSuccess: () => setOpen(false) }
+                { onSuccess: () => setOpen(false) },
               );
             }}
           >

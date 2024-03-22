@@ -20,13 +20,12 @@ export async function createTheme(data: CreateThemeInput) {
         $push: {
           themes: theme._id,
         },
-      }
+      },
     );
     await session.commitTransaction();
     return theme.toObject();
   } catch (e) {
     await session.abortTransaction();
-    console.log(e);
     throw e;
   }
 }
@@ -44,7 +43,7 @@ export async function deleteTheme(id: string) {
 
     const results = await GameModel.updateMany(
       { themes: { $in: [id] } },
-      { $pull: { themes: id } }
+      { $pull: { themes: id } },
     );
     await session.commitTransaction();
     return deletedTheme;

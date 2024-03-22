@@ -1,11 +1,7 @@
-import NextAuth, { NextAuthOptions, User } from "next-auth";
-import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import { MongoClient } from "mongodb";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import { verifyUser } from "@/server/db/actions/UserAction";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { uri } from "@/server/db/mongodb";
 import { loginSchema } from "@/components/Login/LoginForm";
-import { userSchema } from "@/utils/types";
 
 /**
  *  @type {import("next-auth").NextAuthOptions}
@@ -25,7 +21,6 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       const user = {
         _id: token._id,
-        email: token.email,
       };
       session.user = user;
       return session;
@@ -48,7 +43,7 @@ export const authOptions: NextAuthOptions = {
         const { email, password } = credentials;
         const user = await verifyUser(email, password);
 
-        return { _id: user._id, email: user.email };
+        return { _id: user._id };
       },
     }),
   ],

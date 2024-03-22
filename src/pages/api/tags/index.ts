@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { tagSchema } from "@/utils/types";
-import { ITag } from "@/server/db/models/TagModel";
 import {
   createTag,
   deleteTag,
@@ -12,7 +11,7 @@ import { TagException, TagInvalidInputException } from "@/utils/exceptions/tag";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   switch (req.method) {
     case "GET":
@@ -51,11 +50,12 @@ async function postTagHandler(req: NextApiRequest, res: NextApiResponse) {
       ...tag,
       _id: tag._id.toString(),
     });
-  } catch (e) {
+  } catch (e: any) {
+    console.log(e);
     if (e instanceof TagException) {
       return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send("");
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }
 
@@ -72,10 +72,10 @@ async function deleteTagHandler(req: NextApiRequest, res: NextApiResponse) {
     }
     const deletedTag = await deleteTag(parsedBody.data._id);
     return res.status(HTTP_STATUS_CODE.OK).send(deletedTag);
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof TagException) {
       return res.status(e.code).send(e.message);
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send("");
+    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }

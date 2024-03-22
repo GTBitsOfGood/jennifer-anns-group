@@ -13,4 +13,10 @@ export enum Pages {
   HOME = "/",
   LOGIN = "/login",
   SIGNUP = "/signup",
+  CREATEGAME = "/games/create",
 }
+
+export const ADMIN_CONTACT = "contact@jenniferann.org";
+
+export const CLOUDFLARE_URL =
+  "https://cloudflare-b2.bogjenniferanns.workers.dev";

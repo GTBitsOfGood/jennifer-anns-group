@@ -30,3 +30,9 @@ export class GenericUserErrorException extends UserException {
     super(message, HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
   }
 }
+
+export class UserInvalidInputException extends UserException {
+  constructor(message = "Invalid user input") {
+    super(message, HTTP_STATUS_CODE.BAD_REQUEST);
+  }
+}

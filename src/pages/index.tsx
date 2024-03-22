@@ -1,17 +1,46 @@
-import { Button } from "@/components/ui/button";
-import { signOut, useSession } from "next-auth/react";
-import React from "react";
+import { Footer } from "@/components/Navigation/Footer";
+import Header from "@/components/Navigation/Header";
+import { SessionProvider } from "next-auth/react";
+import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { userDataSchema } from "@/components/ProfileModal/ProfileModal";
+import { z } from "zod";
 
-const index = () => {
-  const { data, status } = useSession();
+const Home = () => {
+  const { data: session } = useSession();
+  const currentUser = session?.user;
+  const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
+
+  useEffect(() => {
+    if (currentUser) {
+      getUserData();
+    }
+  }, [currentUser, userData?.label]);
+
+  async function getUserData() {
+    try {
+      const response = await fetch(`/api/users/${currentUser?._id}`);
+      const data = await response.json();
+      setUserData(data);
+    } catch (error) {
+      console.error("Error getting user:", error);
+    }
+  }
+
   return (
     <div>
-      <h1 className="text-4xl text-orange-500 mt-10 ml-10">Hello World</h1>
-      {status === "authenticated" ? (
-        <Button onClick={() => signOut()}>Log out</Button>
-      ) : null}
+      <SessionProvider>
+        <Header
+          label={userData?.label}
+          userData={userData}
+          setUserData={setUserData}
+        />
+        <br></br>
+
+        <Footer />
+      </SessionProvider>
     </div>
   );
 };
 
-export default index;
+export default Home;
