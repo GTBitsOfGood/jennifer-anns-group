@@ -17,7 +17,6 @@ import {
   Text,
   Button,
 } from "@chakra-ui/react";
-import GameCard from "@/components/GameComponent/GameCard";
 import { gameSchema, themeSchema } from "@/utils/types";
 import {
   Search2Icon,
@@ -30,6 +29,7 @@ import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
 import ThemeSidebar from "@/components/GameComponent/ThemeSidebar";
 import SelectedFilters from "@/components/GameComponent/SelectedFilters";
+import GameCardView from "@/components/GameComponent/GameCardView";
 
 export default function Games() {
   const { data: session } = useSession();
@@ -218,7 +218,7 @@ export default function Games() {
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent mt="10px" ml="32vw" w="750px" h="800px">
+              <PopoverContent mt="10px" ml="32vw" w="750px" minH="800px">
                 <PopoverBody>
                   <FilterBody
                     setAcccessibility={setAccessibility}
@@ -257,30 +257,15 @@ export default function Games() {
           <Divider borderColor="brand.700" borderWidth="1px" />
         </div>
 
-        <div className="m-auto mt-[60px] flex w-[90vw] flex-row">
-          <ThemeSidebar
-            themes={themes}
-            selectedTheme={selectedTheme}
-            setSelectedTheme={setSelectedTheme}
-            setFiltersApplied={setFiltersApplied}
-          />
-
-          <div className="ml-6 flex w-full flex-row flex-wrap">
-            {!empty ? (
-              games.map((game) => {
-                return (
-                  <div key={game.name} className="mb-6 mr-6">
-                    <GameCard game={game} />
-                  </div>
-                );
-              })
-            ) : (
-              <div className="flex w-full flex-row justify-center">
-                <p className="mt-40 w-[360px]	text-center font-sans text-[34px] font-medium text-blue-primary">
-                  Oops! No games match this search
-                </p>
-              </div>
-            )}
+        <div className="m-auto flex flex-row justify-center">
+          <div className="m-auto mt-[60px] flex w-[85vw] flex-row">
+            <ThemeSidebar
+              themes={themes}
+              selectedTheme={selectedTheme}
+              setSelectedTheme={setSelectedTheme}
+              setFiltersApplied={setFiltersApplied}
+            />
+            <GameCardView empty={empty} games={games} />
           </div>
         </div>
 

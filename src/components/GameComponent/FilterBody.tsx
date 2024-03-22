@@ -138,8 +138,17 @@ export default function FilterBody({
               </Checkbox>
             );
           })}
-          {userLabel === "administrator" ? (
-            <Checkbox>Answer key</Checkbox>
+          {userLabel === "administrator" ||
+          userLabel === "parent" ||
+          userLabel === "educator" ? (
+            <Checkbox
+              value={"Answer key"}
+              isChecked={value.includes("Answer key")}
+              onChange={onChange}
+              variant="filter"
+            >
+              Answer key
+            </Checkbox>
           ) : null}
         </VStack>
       </CheckboxGroup>
@@ -202,7 +211,7 @@ export default function FilterBody({
         })}
       </div>
 
-      <div className=" ml-[52px] mr-[52px] flex flex-row justify-between">
+      <div className=" mb-[60px] ml-[52px] mr-[52px] flex flex-row justify-between">
         <button
           onClick={() => {
             onClose();

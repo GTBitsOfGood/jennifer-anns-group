@@ -14,7 +14,7 @@ export default function ThemeSidebar({
   setFiltersApplied,
 }: Props) {
   return (
-    <div className="flex h-[365px] w-[260px] flex-col overflow-y-scroll">
+    <div className="flex h-[365px] w-[268px] flex-col overflow-y-scroll">
       <p
         onClick={() => {
           setSelectedTheme("All Games");

@@ -19,7 +19,7 @@ export default function SelectedFilters({
     <div>
       {selected.map((item) => {
         return (
-          <Tag height="36px" variant="filter_selected">
+          <Tag key={item} height="36px" variant="filter_selected">
             {item}
           </Tag>
         );
