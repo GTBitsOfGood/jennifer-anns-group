@@ -60,6 +60,8 @@ function UploadGameBuild(props: Props) {
   const [url, setUrl] = useState<string>("");
   const [instructions, setInstructions] = useState<string>("");
 
+  const [uploadedFilenames, setUploadedFilenames] = useState<string[]>([]);
+
   const handleSelectChange = (value: AllBuilds) => {
     setSelectedOption(value);
     setInstructions(getInstructions(value));
@@ -109,6 +111,7 @@ function UploadGameBuild(props: Props) {
           return [...prevBuilds, parse.data];
         }
       });
+      setUploadedFilenames([parse.data.link]);
       setShowUploadGameBuild(false);
       setShowUploadedBuild(true);
     } else {
@@ -129,23 +132,59 @@ function UploadGameBuild(props: Props) {
     setInstructions(e.target.value);
   };
 
-  const deleteBuild = () => {
+  const deleteBuild = (file: number): void => {
     props.setBuilds((prevBuilds) =>
       prevBuilds.filter(
         (build) => build.type !== (selectedOption as NonWebGLBuilds),
       ),
     );
-    setShowUploadedBuild(false);
+    if (selectedOption === "webgl") {
+      switch (file) {
+        case 0:
+          props.setLoaderFile(null);
+          setUploadedFilenames((prevFilenames) =>
+            prevFilenames.filter((_, index) => index !== 0),
+          );
+          break;
+        case 1:
+          props.setDataFile(null);
+          setUploadedFilenames((prevFilenames) =>
+            prevFilenames.filter((_, index) => index !== 1),
+          );
+          break;
+        case 2:
+          props.setCodeFile(null);
+          setUploadedFilenames((prevFilenames) =>
+            prevFilenames.filter((_, index) => index !== 2),
+          );
+          break;
+        case 3:
+          props.setFrameworkFile(null);
+          setUploadedFilenames((prevFilenames) =>
+            prevFilenames.filter((_, index) => index !== 3),
+          );
+          break;
+        default:
+          break;
+      }
+    }
+    console.log("len", uploadedFilenames.length);
+    if (uploadedFilenames.length - 1 == 0) {
+      props.setUploadedWebGL(false);
+      setShowUploadedBuild(false);
+    }
   };
 
   const cancelUpload = () => {
+    deleteBuild(-1);
     setShowAdditionalFields(false);
     setShowUploadGameBuild(false);
   };
 
-  useEffect(() => {
-    console.log("log", props.loaderFile?.name);
-  }, [props.loaderFile]);
+  const handleUploadBuild = () => {
+    deleteBuild(-1);
+    setShowUploadGameBuild(true);
+  };
 
   return (
     <>
@@ -153,15 +192,15 @@ function UploadGameBuild(props: Props) {
         <div className="flex flex-row items-center gap-3">
           <Button
             variant="upload"
-            className="flex h-12 w-32 flex-row justify-start gap-3"
+            className="flex h-12 w-32 flex-row gap-3 self-start"
             type="button"
-            onClick={() => setShowUploadGameBuild(true)}
+            onClick={handleUploadBuild}
           >
             <Upload className="h-6 w-6" />
             <p className="font-normal">Upload</p>
           </Button>
           {showUploadedBuild && (
-            <>
+            <div className="flex flex-row items-start gap-2">
               <Image
                 src={`/gamebuilds/${selectedOption}.png`}
                 height={24}
@@ -169,14 +208,29 @@ function UploadGameBuild(props: Props) {
                 className="mx-2"
                 alt=""
               />
-              <p>{url}</p>
+              <div className="flex flex-col">
+                {uploadedFilenames.map((filename, index) => (
+                  <div key={index} className="flex flex-row items-center gap-3">
+                    <p>{filename}</p>
+                    <X
+                      className="cursor-pointer text-orange-primary"
+                      type="button"
+                      size={18}
+                      onClick={() => {
+                        deleteBuild(index);
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+              {/* <p>{url}</p>
               <X
                 className="cursor-pointer text-orange-primary"
                 type="button"
                 size={18}
                 onClick={deleteBuild}
-              />
-            </>
+              /> */}
+            </div>
           )}
         </div>
       ) : (
@@ -262,16 +316,14 @@ function UploadGameBuild(props: Props) {
                 <div>
                   <WebGLUpload
                     cancel={cancelUpload}
-                    loaderFile={props.loaderFile}
                     setLoaderFile={props.setLoaderFile}
-                    dataFile={props.dataFile}
                     setDataFile={props.setDataFile}
-                    codeFile={props.codeFile}
                     setCodeFile={props.setCodeFile}
-                    frameworkFile={props.frameworkFile}
                     setFrameworkFile={props.setFrameworkFile}
-                    uploadedWebGL={props.uploadedWebGL}
                     setUploadedWebGL={props.setUploadedWebGL}
+                    setUploadedFilenames={setUploadedFilenames}
+                    setShowUploadGameBuild={setShowUploadGameBuild}
+                    setShowUploadedBuild={setShowUploadedBuild}
                   />
                 </div>
               ) : (

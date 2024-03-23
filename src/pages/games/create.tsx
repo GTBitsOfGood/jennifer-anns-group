@@ -203,7 +203,6 @@ function CreateGame() {
 
       if (response.status === HTTP_STATUS_CODE.CREATED) {
         return response;
-        // router.replace("/games");
       } else if (response.status === HTTP_STATUS_CODE.BAD_REQUEST) {
         setValidationErrors((prevValidationErrors) => ({
           ...prevValidationErrors,
@@ -221,7 +220,17 @@ function CreateGame() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log("hi");
+    if (uploadedWebGL) {
+      if (
+        loaderFile === null ||
+        dataFile === null ||
+        codeFile === null ||
+        frameworkFile === null
+      ) {
+        alert("Please input all files");
+        return;
+      }
+    }
     const formData = new FormData(e.currentTarget);
     const input = {
       name: formData.get(NAME_FORM_KEY),
@@ -236,6 +245,13 @@ function CreateGame() {
     const parse = gameSchema.safeParse(input);
 
     if (parse.success) {
+      if (
+        (!parse.data.builds || parse.data?.builds.length == 0) &&
+        !uploadedWebGL
+      ) {
+        alert("Please add at least one Game Build.");
+        return;
+      }
       setValidationErrors({
         name: undefined,
         videoTrailer: undefined,
@@ -246,9 +262,10 @@ function CreateGame() {
         if (response) {
           if (uploadedWebGL) {
             const data = await response.json();
-            handleWebGLSubmit(data._id);
+            await handleWebGLSubmit(data._id);
           }
         }
+        router.replace("/games");
       } catch (error) {
         console.error("Error creating game:", error);
       }
@@ -344,6 +361,7 @@ function CreateGame() {
                 : "border-input-border focus:border-blue-primary",
               "h-12",
             )}
+            disabled={submitting}
           />
           <p className="absolute bottom-[-2em] text-xs text-red-500">
             {validationErrors.name}
@@ -383,6 +401,7 @@ function CreateGame() {
           <Input
             name={TRAILER_FORM_KEY}
             placeholder="https://www.example.com"
+            disabled={submitting}
             className={cn(
               validationErrors.videoTrailer
                 ? "border-red-500 focus-visible:ring-red-500"
@@ -402,6 +421,7 @@ function CreateGame() {
           </label>
           <TextArea
             name={DESCR_FORM_KEY}
+            disabled={submitting}
             className={
               validationErrors.description
                 ? "border-red-500 focus-visible:ring-red-500"

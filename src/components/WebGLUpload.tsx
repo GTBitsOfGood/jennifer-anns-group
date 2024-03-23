@@ -78,30 +78,26 @@ async function uploadBuildFiles(gameId: string, files: Map<string, File>) {
 
 interface Props {
   cancel: () => void;
-  loaderFile: null | File;
   setLoaderFile: React.Dispatch<React.SetStateAction<null | File>>;
-  dataFile: null | File;
   setDataFile: React.Dispatch<React.SetStateAction<null | File>>;
-  codeFile: null | File;
   setCodeFile: React.Dispatch<React.SetStateAction<null | File>>;
-  frameworkFile: null | File;
   setFrameworkFile: React.Dispatch<React.SetStateAction<null | File>>;
-  uploadedWebGL: boolean;
   setUploadedWebGL: React.Dispatch<React.SetStateAction<boolean>>;
+  setUploadedFilenames: React.Dispatch<React.SetStateAction<string[]>>;
+  setShowUploadGameBuild: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowUploadedBuild: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function WebGLUpload({
   cancel,
-  loaderFile,
   setLoaderFile,
-  dataFile,
   setDataFile,
-  codeFile,
   setCodeFile,
-  frameworkFile,
   setFrameworkFile,
-  uploadedWebGL,
   setUploadedWebGL,
+  setUploadedFilenames,
+  setShowUploadGameBuild,
+  setShowUploadedBuild,
 }: Props) {
   const [loaderName, setLoaderName] = useState<null | string>(null);
   const [dataName, setDataName] = useState<null | string>(null);
@@ -110,8 +106,6 @@ export default function WebGLUpload({
   // const [gameId, setGameId] = useState("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("hello");
-
     if (event.target.files === null || event.target.files.length === 0) return;
     const file = event.target.files[0];
     const name = event.target.name;
@@ -174,6 +168,9 @@ export default function WebGLUpload({
       return;
     }
     setUploadedWebGL(true);
+    setUploadedFilenames([loaderName, dataName, codeName, frameworkName]);
+    setShowUploadGameBuild(false);
+    setShowUploadedBuild(true);
   };
 
   const cancelSubmit = () => {
