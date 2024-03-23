@@ -1,19 +1,12 @@
-import React, { useState } from "react";
-import { signOut } from "next-auth/react";
+import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import Link from "next/link";
+import { signOut } from "next-auth/react";
 import { ProfileModal, userDataSchema } from "../ProfileModal/ProfileModal";
 import { Button } from "../ui/button";
-import { UserLabel } from "@/utils/types";
 import { z } from "zod";
-import Link from "next/link";
-
-interface Props {
-  label: UserLabel | null | undefined;
-  userData: z.infer<typeof userDataSchema> | undefined;
-  setUserData: React.Dispatch<
-    React.SetStateAction<z.infer<typeof userDataSchema> | undefined>
-  >;
-}
+import { UserLabel } from "@/utils/types";
 
 enum UserType {
   Public = "Public",
@@ -21,51 +14,75 @@ enum UserType {
   Admin = "Admin",
 }
 
-type TabLinks = {
-  [tabName: string]: string;
-};
-
-const userLabelToType: Record<UserLabel, UserType> = {
+const userLabelToType = {
   [UserLabel.Educator]: UserType.AccountHolder,
   [UserLabel.Student]: UserType.AccountHolder,
   [UserLabel.Parent]: UserType.AccountHolder,
   [UserLabel.Administrator]: UserType.Admin,
 };
 
-const Header = (props: Props) => {
+type TabLinks = {
+  [tabName: string]: string;
+};
+
+const tabLinks: TabLinks = {
+  Home: "/",
+  "Game Gallery": "/games",
+  Donate: "https://www.paypal.com/paypalme/stopTDV",
+  "Account Management": "/admin/account-management",
+  "Themes and Tags": "/admin/themes",
+};
+
+const tabData = {
+  [UserType.Public]: ["Home", "Game Gallery", "Donate"],
+  [UserType.AccountHolder]: ["Home", "Game Gallery", "Donate"],
+  [UserType.Admin]: [
+    "Home",
+    "Game Gallery",
+    "Donate",
+    "Account Management",
+    "Themes and Tags",
+  ],
+};
+
+const Header = () => {
   const router = useRouter();
-  const userType = props.label ? userLabelToType[props.label] : UserType.Public;
-  const tabData: { [key in UserType]: string[] } = {
-    [UserType.Public]: ["Home", "Game Gallery", "Donate"],
-    [UserType.AccountHolder]: ["Home", "Game Gallery", "Donate"],
-    [UserType.Admin]: [
-      "Home",
-      "Game Gallery",
-      "Donate",
-      "Account Management",
-      "Themes and Tags",
-    ],
-  };
+  const { data: session } = useSession();
+  const currentUser = session?.user;
+  const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
+  const [selectedTab, setSelectedTab] = useState(0);
+  const userType = userData?.label
+    ? userLabelToType[userData.label]
+    : UserType.Public;
 
-  const tabLinks: TabLinks = {
-    Home: "/",
-    "Game Gallery": "/games",
-    Donate: "https://www.paypal.com/paypalme/stopTDV",
-    "Account Management": "/admin/account-management",
-    "Themes and Tags": "/admin/themes",
-  };
+  useEffect(() => {
+    if (currentUser) {
+      getUserData();
+    }
+    const pathname = router.pathname;
+    const tabNames = Object.keys(tabLinks);
+    const index = tabNames.findIndex((name) => tabLinks[name] === pathname);
+    setSelectedTab(index !== -1 ? index : 0);
+  }, [currentUser, router.pathname]);
 
-  const [selectedTab, setSelectedTab] = useState<number>(0);
-  const [userData, setUserData] = [props.userData, props.setUserData];
+  async function getUserData() {
+    try {
+      const response = await fetch(`/api/users/${currentUser?._id}`);
+      const data = await response.json();
+      setUserData(data);
+    } catch (error) {
+      console.log("Error getting user:", error);
+    }
+  }
 
   function handlePageChange(tabname: string, index: number) {
-    if (tabname != "Donate") {
+    if (tabname !== "Donate") {
       setSelectedTab(index);
     }
   }
 
   function handleSignUpLogOut() {
-    if (userType != UserType.Public) {
+    if (userType !== UserType.Public) {
       signOut();
     } else {
       router.push("/signup");
@@ -95,7 +112,7 @@ const Header = (props: Props) => {
               <div>
                 <Link
                   href={tabLinks[tabName]}
-                  target={tabName == "Donate" ? "_blank" : ""}
+                  target={tabName === "Donate" ? "_blank" : ""}
                 >
                   {tabName}
                 </Link>
@@ -107,17 +124,16 @@ const Header = (props: Props) => {
           ))}
           <div className="ml-10 px-4 py-2">
             {userType === UserType.Public ? (
-              // eslint-disable-next-line @next/next/no-html-link-for-pages
-              <a href="/login">
+              <Link href="/login">
                 <Button variant="mainorange">Log in</Button>
-              </a>
+              </Link>
             ) : (
               <ProfileModal userData={userData} setUserData={setUserData} />
             )}
           </div>
           <div
             className="cursor-pointer rounded-md border border-gray-100 bg-white px-4 py-2 shadow"
-            onClick={() => handleSignUpLogOut()}
+            onClick={handleSignUpLogOut}
           >
             <div className="font-Outfit text-center text-sm font-normal text-neutral-600">
               {userType === UserType.Public ? "Sign up" : "Log out"}
