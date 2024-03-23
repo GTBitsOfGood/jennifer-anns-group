@@ -13,6 +13,7 @@ import Image from "next/image";
 import { buildSchema } from "@/utils/types";
 import { z } from "zod";
 import { Download } from "lucide-react";
+import GameBuildList from "../GameComponent/GameBuildList";
 
 interface Props {
   mode: string;
@@ -64,89 +65,17 @@ export default function TabsComponent({ mode, gameData, setGameData }: Props) {
             {gameData.lesson ? <TabPanel>Lesson Plan</TabPanel> : null}
             <TabPanel p="0px">
               {mode === "edit" ? (
-                <>
-                  {gameData.builds &&
-                    gameData?.builds.map(
-                      (data: z.infer<typeof buildSchema>, key: number) => (
-                        <div className="mb-10" key={key}>
-                          <div key={key} className="mb-10 flex flex-row gap-5">
-                            <div className="col-span-1 flex w-14 min-w-14">
-                              <Image
-                                src={`/gamebuilds/${data.type}.png`}
-                                height={30}
-                                width={36}
-                                objectFit="contain"
-                                className="mx-2 self-center"
-                                alt=""
-                              />
-                            </div>
-                            <div className="flex flex-col justify-center">
-                              <div
-                                className="flex cursor-pointer flex-row gap-2 font-semibold text-blue-primary"
-                                onClick={() => window.open(data.link, "_blank")}
-                              >
-                                <Download />
-                                Download
-                              </div>
-                            </div>
-                          </div>
-                          {data.instructions && (
-                            <div className="-mt-4 mb-6 flex flex-row">
-                              <div className="max-w-4/5 min-w-[78px]"></div>
-                              <div className="flex max-w-[80%] flex-col gap-2">
-                                <p className="text-sm text-blue-primary">
-                                  Instructions
-                                </p>
-                                <p className="text-sm">{data.instructions}</p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ),
-                    )}
-                </>
+                <GameBuildList
+                  gameData={gameData}
+                  editing={true}
+                  setGameData={setGameData}
+                />
               ) : (
-                <>
-                  {gameData.builds &&
-                    gameData?.builds.map(
-                      (data: z.infer<typeof buildSchema>, key: number) => (
-                        <div className="mb-10" key={key}>
-                          <div key={key} className="mb-10 flex flex-row gap-5">
-                            <div className="col-span-1 flex w-14 min-w-14">
-                              <Image
-                                src={`/gamebuilds/${data.type}.png`}
-                                height={30}
-                                width={36}
-                                objectFit="contain"
-                                className="mx-2 self-center"
-                                alt=""
-                              />
-                            </div>
-                            <div className="flex flex-col justify-center">
-                              <div
-                                className="flex cursor-pointer flex-row gap-2 font-semibold text-blue-primary"
-                                onClick={() => window.open(data.link, "_blank")}
-                              >
-                                <Download />
-                                Download
-                              </div>
-                            </div>
-                          </div>
-                          {data.instructions && (
-                            <div className="-mt-4 mb-6 flex flex-row">
-                              <div className="max-w-4/5 min-w-[78px]"></div>
-                              <div className="flex max-w-[80%] flex-col gap-2">
-                                <p className="text-sm text-blue-primary">
-                                  Instructions
-                                </p>
-                                <p className="text-sm">{data.instructions}</p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ),
-                    )}
-                </>
+                <GameBuildList
+                  gameData={gameData}
+                  editing={false}
+                  setGameData={setGameData}
+                />
               )}
             </TabPanel>
           </TabPanels>

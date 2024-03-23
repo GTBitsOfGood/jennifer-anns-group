@@ -168,7 +168,6 @@ function UploadGameBuild(props: Props) {
           break;
       }
     }
-    console.log("len", uploadedFilenames.length);
     if (uploadedFilenames.length - 1 == 0) {
       props.setUploadedWebGL(false);
       setShowUploadedBuild(false);

@@ -117,7 +117,7 @@ async function uploadBuildFiles(
     );
   }
 }
-function EditWebGLComponent(props: Props) {
+function AddEditWebGLComponent(props: Props) {
   const [loaderFile, setLoaderFile] = useState<null | File>(null);
   const [dataFile, setDataFile] = useState<null | File>(null);
   const [codeFile, setCodeFile] = useState<null | File>(null);
@@ -394,4 +394,4 @@ function EditWebGLComponent(props: Props) {
   );
 }
 
-export default EditWebGLComponent;
+export default AddEditWebGLComponent;

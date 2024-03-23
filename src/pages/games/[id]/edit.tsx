@@ -102,6 +102,7 @@ const EditGamePage = () => {
       themes: themeIds,
       description: gameData?.description,
       name: gameData?.name,
+      builds: gameData?.builds,
     };
 
     await fetch(`/api/games/${gameID}`, {
