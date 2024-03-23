@@ -201,29 +201,9 @@ export default function WebGLUpload({
     setFileName(null);
   };
 
-  useEffect(() => {
-    console.log("deojio", loaderName);
-  }, [loaderName]);
-
   return (
     <>
       <div className="flex w-full flex-col gap-4 py-4">
-        {/* <div className="flex w-full flex-row items-center justify-between gap-3">
-          <h1 className="text-md font-medium">Game ID</h1>
-
-           <span className="w-4/5">
-            <Input
-              type="text"
-              name="gameId"
-              className="w-full text-xs font-light"
-              onChange={(e) => {
-                setGameId(e.target.value);
-              }}
-            />
-          </span> 
-        </div> 
-        */}
-
         <div className="flex w-full flex-row items-center justify-between gap-3">
           <h1 className="text-md font-medium">
             Loader<span className="text-orange-primary">*</span>
