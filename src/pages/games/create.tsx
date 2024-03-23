@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { TextArea } from "@/components/ui/textarea";
 import { MoveLeft, Plus } from "lucide-react";
 
-import { useState, useEffect, ReactNode } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import ThemeSelect from "@/components/Themes/ThemeSelect";
 import TagSelect from "@/components/Tags/TagSelect";
@@ -18,6 +18,8 @@ import { ExtendId, buildSchema, gameSchema } from "@/utils/types";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { IGame } from "@/server/db/models/GameModel";
 import UploadGameBuild from "@/components/UploadGameBuild";
+
+import axios from "axios";
 
 const NAME_FORM_KEY = "name";
 const TRAILER_FORM_KEY = "videoTrailer";
@@ -29,11 +31,82 @@ export const createGameSchema = z.object({
   description: z.string().min(1, "Description is required"),
 });
 
+export type BuildFileType = "data" | "framework" | "loader" | "code";
+export const buildFileTypes = Object.freeze({
+  data: "build.data",
+  framework: "build.framework.js",
+  loader: "build.loader.js",
+  code: "build.wasm",
+});
+
+async function uploadBuildFiles(gameId: string, files: Map<string, File>) {
+  if (files.size !== 4) {
+    throw new Error("Invalid build files");
+  }
+
+  for (const type of Object.keys(buildFileTypes)) {
+    if (!files.has(type)) {
+      throw new Error(`Missing file: ${type}`);
+    }
+  }
+
+  // atomic uploads?
+  await Promise.all(
+    Array.from(files.entries()).map(async ([type, file]) => {
+      let retryCount = 0;
+      let success = false;
+
+      while (retryCount < 4 && !success) {
+        try {
+          const { data } = await axios.post(`/api/games/${gameId}/builds`, {
+            gameId,
+          });
+          const uploadUrl = data.uploadUrl;
+          const uploadAuthToken = data.uploadAuthToken;
+
+          const fileName = `${gameId}/${
+            buildFileTypes[type as keyof typeof buildFileTypes]
+          }`;
+
+          await axios.post(uploadUrl, file, {
+            headers: {
+              Authorization: uploadAuthToken,
+              "X-Bz-File-Name": fileName,
+              "Content-Type": file.type,
+              "X-Bz-Content-Sha1": "do_not_verify",
+            },
+          });
+
+          success = true;
+        } catch (error) {
+          retryCount++;
+        }
+      }
+
+      if (!success) {
+        throw new Error("Failed to upload file after 4 retries");
+      }
+    }),
+  );
+
+  await axios.put(
+    `/api/games/${gameId}`,
+    JSON.stringify({ webGLBuild: true }),
+    {
+      headers: {
+        "Content-Type": "text",
+      },
+    },
+  );
+}
+
 function CreateGame() {
   const router = useRouter();
 
   const [themes, setThemes] = useState<ExtendId<ITheme>[]>([]);
   const [selectedThemes, setSelectedThemes] = useState<ExtendId<ITheme>[]>([]);
+
+  const [uploadedWebGL, setUploadedWebGL] = useState(false);
 
   const [accessibilityTags, setAccessibilityTags] = useState<ExtendId<ITag>[]>(
     [],
@@ -49,9 +122,45 @@ function CreateGame() {
 
   const [builds, setBuilds] = useState<z.infer<typeof buildSchema>[]>([]);
 
+  const [loaderFile, setLoaderFile] = useState<null | File>(null);
+  const [dataFile, setDataFile] = useState<null | File>(null);
+  const [codeFile, setCodeFile] = useState<null | File>(null);
+  const [frameworkFile, setFrameworkFile] = useState<null | File>(null);
+
+  useEffect(() => {
+    console.log("data", dataFile?.name);
+  }, [dataFile]);
+
+  useEffect(() => {
+    console.log("loader", loaderFile?.name);
+  }, [loaderFile]);
+
+  useEffect(() => {
+    console.log("code", codeFile?.name);
+  }, [codeFile]);
+  useEffect(() => {
+    console.log("frameworkFile", frameworkFile?.name);
+  }, [frameworkFile]);
+
   const [uploadGameComponents, setUploadGameComponents] = useState<
     React.JSX.Element[]
-  >([<UploadGameBuild key={0} builds={builds} setBuilds={setBuilds} />]);
+  >([
+    <UploadGameBuild
+      key={0}
+      uploadedWebGL={uploadedWebGL}
+      setUploadedWebGL={setUploadedWebGL}
+      builds={builds}
+      setBuilds={setBuilds}
+      loaderFile={loaderFile}
+      setLoaderFile={setLoaderFile}
+      dataFile={dataFile}
+      setDataFile={setDataFile}
+      codeFile={codeFile}
+      setCodeFile={setCodeFile}
+      frameworkFile={frameworkFile}
+      setFrameworkFile={setFrameworkFile}
+    />,
+  ]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,7 +202,8 @@ function CreateGame() {
       });
 
       if (response.status === HTTP_STATUS_CODE.CREATED) {
-        router.replace("/games");
+        return response;
+        // router.replace("/games");
       } else if (response.status === HTTP_STATUS_CODE.BAD_REQUEST) {
         setValidationErrors((prevValidationErrors) => ({
           ...prevValidationErrors,
@@ -101,9 +211,11 @@ function CreateGame() {
         }));
       } else {
         console.error("Error creating game");
+        return;
       }
     } catch (error) {
       console.error("Error creating game");
+      return;
     }
   }
 
@@ -130,7 +242,13 @@ function CreateGame() {
         description: undefined,
       });
       try {
-        await createGame(parse.data);
+        const response = await createGame(parse.data);
+        if (response) {
+          if (uploadedWebGL) {
+            const data = await response.json();
+            handleWebGLSubmit(data._id);
+          }
+        }
       } catch (error) {
         console.error("Error creating game:", error);
       }
@@ -150,9 +268,51 @@ function CreateGame() {
       <UploadGameBuild
         key={prevComponents.length}
         builds={builds}
+        uploadedWebGL={uploadedWebGL}
+        setUploadedWebGL={setUploadedWebGL}
         setBuilds={setBuilds}
+        loaderFile={loaderFile}
+        setLoaderFile={setLoaderFile}
+        dataFile={dataFile}
+        setDataFile={setDataFile}
+        codeFile={codeFile}
+        setCodeFile={setCodeFile}
+        frameworkFile={frameworkFile}
+        setFrameworkFile={setFrameworkFile}
       />,
     ]);
+  };
+
+  const [submitting, setSubmitting] = useState<boolean>(false);
+
+  const handleWebGLSubmit = async (gameId: string) => {
+    if (
+      loaderFile === null ||
+      dataFile === null ||
+      codeFile === null ||
+      frameworkFile === null
+    ) {
+      alert("Please input all files");
+      return;
+    }
+
+    const files = new Map([
+      ["loader", loaderFile],
+      ["data", dataFile],
+      ["code", codeFile],
+      ["framework", frameworkFile],
+    ]);
+
+    try {
+      setSubmitting(true);
+      await uploadBuildFiles(gameId, files);
+      setSubmitting(false);
+
+      alert("Files uploaded successfully");
+    } catch (e) {
+      console.error(e);
+      alert("Failed to upload files");
+    }
   };
 
   return (
@@ -287,8 +447,9 @@ function CreateGame() {
             type="submit"
             variant="mainblue"
             className="px-6 py-6 text-2xl font-semibold"
+            disabled={submitting}
           >
-            Publish
+            {submitting ? "Uploading..." : "Publish"}
           </Button>
         </div>
       </form>

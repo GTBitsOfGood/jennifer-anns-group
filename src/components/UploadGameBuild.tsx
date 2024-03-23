@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -25,9 +25,19 @@ const INSTR_FORM_KEY = "instructions";
 
 interface Props {
   builds: z.infer<typeof buildSchema>[];
+  uploadedWebGL: boolean;
+  setUploadedWebGL: React.Dispatch<React.SetStateAction<boolean>>;
   setBuilds: React.Dispatch<
     React.SetStateAction<z.infer<typeof buildSchema>[]>
   >;
+  loaderFile: null | File;
+  setLoaderFile: React.Dispatch<React.SetStateAction<null | File>>;
+  dataFile: null | File;
+  setDataFile: React.Dispatch<React.SetStateAction<null | File>>;
+  codeFile: null | File;
+  setCodeFile: React.Dispatch<React.SetStateAction<null | File>>;
+  frameworkFile: null | File;
+  setFrameworkFile: React.Dispatch<React.SetStateAction<null | File>>;
 }
 
 function getInstructions(os: string): string {
@@ -87,7 +97,18 @@ function UploadGameBuild(props: Props) {
       setValidationErrors({
         link: undefined,
       });
-      props.setBuilds((prevBuilds) => [...prevBuilds, parse.data]);
+      props.setBuilds((prevBuilds) => {
+        const index = prevBuilds.findIndex(
+          (build) => build.type === parse.data.type,
+        );
+        if (index !== -1) {
+          const updatedBuilds = [...prevBuilds];
+          updatedBuilds[index] = parse.data;
+          return updatedBuilds;
+        } else {
+          return [...prevBuilds, parse.data];
+        }
+      });
       setShowUploadGameBuild(false);
       setShowUploadedBuild(true);
     } else {
@@ -121,6 +142,10 @@ function UploadGameBuild(props: Props) {
     setShowAdditionalFields(false);
     setShowUploadGameBuild(false);
   };
+
+  useEffect(() => {
+    console.log("log", props.loaderFile?.name);
+  }, [props.loaderFile]);
 
   return (
     <>
@@ -216,7 +241,9 @@ function UploadGameBuild(props: Props) {
                       >
                         Mac
                       </SelectItem>
-                      <SelectItem value="webgl">WebGL</SelectItem>
+                      <SelectItem disabled={props.uploadedWebGL} value="webgl">
+                        WebGL
+                      </SelectItem>
                       <SelectItem
                         disabled={props.builds.some(
                           (build) => build.type === "windows",
@@ -233,7 +260,19 @@ function UploadGameBuild(props: Props) {
             {showAdditionalFields &&
               (selectedOption === "webgl" ? (
                 <div>
-                  <WebGLUpload />
+                  <WebGLUpload
+                    cancel={cancelUpload}
+                    loaderFile={props.loaderFile}
+                    setLoaderFile={props.setLoaderFile}
+                    dataFile={props.dataFile}
+                    setDataFile={props.setDataFile}
+                    codeFile={props.codeFile}
+                    setCodeFile={props.setCodeFile}
+                    frameworkFile={props.frameworkFile}
+                    setFrameworkFile={props.setFrameworkFile}
+                    uploadedWebGL={props.uploadedWebGL}
+                    setUploadedWebGL={props.setUploadedWebGL}
+                  />
                 </div>
               ) : (
                 <>
@@ -282,28 +321,27 @@ function UploadGameBuild(props: Props) {
                       />
                     </span>
                   </div>
+                  <div className="flex-end mt-5 flex w-full justify-end gap-3">
+                    <Button
+                      variant="white"
+                      className="px-4 text-lg"
+                      type="button"
+                      onClick={cancelUpload}
+                    >
+                      Cancel
+                    </Button>
+
+                    <Button
+                      type="button"
+                      onClick={handleSubmitNonWebGL}
+                      variant="mainblue"
+                      className="px-4 text-lg"
+                    >
+                      Done
+                    </Button>
+                  </div>
                 </>
               ))}
-          </div>
-
-          <div className="flex-end mt-5 flex w-full justify-end gap-3">
-            <Button
-              variant="white"
-              className="px-4 text-lg"
-              type="button"
-              onClick={cancelUpload}
-            >
-              Cancel
-            </Button>
-
-            <Button
-              type="button"
-              onClick={handleSubmitNonWebGL}
-              variant="mainblue"
-              className="px-4 text-lg"
-            >
-              Done
-            </Button>
           </div>
         </div>
       )}
