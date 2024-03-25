@@ -65,7 +65,7 @@ export default function ContactComponent() {
           <TabPanels className="mb-12 mt-8 text-gray-500">
             <TabPanel p="0px">
               <Flex className="justify-between bg-white p-6">
-                <Flex className="flex-col">
+                <Flex className="m-2 flex-col">
                   <Flex className="flex-row">
                     <FormControl className="mb-6 mr-3">
                       <FormLabel htmlFor="first-name">First Name</FormLabel>
@@ -74,7 +74,7 @@ export default function ContactComponent() {
                         value={firstName}
                         id="first-name"
                         type="text"
-                        placeholder="Jennifer"
+                        placeholder="John"
                         borderColor="black"
                         width="195px"
                         height="43px"
@@ -88,7 +88,7 @@ export default function ContactComponent() {
                         value={lastName}
                         id="last-name"
                         type="text"
-                        placeholder="Ann"
+                        placeholder="Doe"
                         width="195px"
                         height="43px"
                         onChange={(event) => setLastName(event.target.value)}
@@ -109,7 +109,7 @@ export default function ContactComponent() {
                     />
                   </FormControl>
                 </Flex>
-                <Flex className="flex-col items-end">
+                <Flex className="mx-4 mb-2 mt-2 w-full flex-col items-end md:mx-8 lg:mx-16">
                   <FormControl>
                     <FormLabel htmlFor="message">Message</FormLabel>
                     <Textarea
@@ -118,7 +118,7 @@ export default function ContactComponent() {
                       onChange={(event) => setMessage(event.target.value)}
                       placeholder="Enter your message"
                       borderColor="black"
-                      width="738px"
+                      width="100%"
                       height="154px"
                     />
                   </FormControl>
