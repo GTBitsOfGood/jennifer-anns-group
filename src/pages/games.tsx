@@ -191,7 +191,12 @@ export default function Games() {
                 minW="200px"
               />
             </InputGroup>
-            <Popover onOpen={onOpen} onClose={onClose} isOpen={isOpen}>
+            <Popover
+              placement="bottom-start"
+              onOpen={onOpen}
+              onClose={onClose}
+              isOpen={isOpen}
+            >
               <PopoverTrigger>
                 <Button
                   borderRadius="100px"
@@ -211,7 +216,7 @@ export default function Games() {
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent mt="10px" ml="32vw" w="750px" minH="800px">
+              <PopoverContent mt="10px" w="750px" minH="800px">
                 <PopoverBody>
                   <FilterBody
                     setAcccessibility={setAccessibility}
