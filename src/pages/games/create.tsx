@@ -6,7 +6,7 @@ import cn from "classnames";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TextArea } from "@/components/ui/textarea";
-import { MoveLeft, Plus } from "lucide-react";
+import { AlertTriangleIcon, MoveLeft, Plus } from "lucide-react";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
@@ -127,6 +127,9 @@ function CreateGame() {
   const [codeFile, setCodeFile] = useState<null | File>(null);
   const [frameworkFile, setFrameworkFile] = useState<null | File>(null);
 
+  const [fileValidationError, setFileValidationError] =
+    useState<boolean>(false);
+
   const [uploadGameComponents, setUploadGameComponents] = useState<
     React.JSX.Element[]
   >([
@@ -212,8 +215,10 @@ function CreateGame() {
         codeFile === null ||
         frameworkFile === null
       ) {
-        alert("Please input all files");
+        setFileValidationError(true);
         return;
+      } else {
+        setFileValidationError(false);
       }
     }
     const formData = new FormData(e.currentTarget);
@@ -294,9 +299,10 @@ function CreateGame() {
       codeFile === null ||
       frameworkFile === null
     ) {
-      alert("Please input all files");
+      setFileValidationError(true);
       return;
     }
+    setFileValidationError(false);
 
     const files = new Map([
       ["loader", loaderFile],
@@ -376,6 +382,15 @@ function CreateGame() {
             <Plus />
             <p>Add Another Build</p>
           </div>
+
+          {fileValidationError && (
+            <div className="mt-2 flex h-14 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
+              <AlertTriangleIcon className="h-5 w-5" />
+              <p className="">
+                All files must be uploaded for the WebGL Build!
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="relative flex w-full flex-col gap-3 md:w-2/3">
