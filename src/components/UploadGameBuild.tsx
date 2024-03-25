@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Upload, X } from "lucide-react";
+import { AlertTriangleIcon, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -55,7 +55,6 @@ function getInstructions(os: string): string {
 
 function UploadGameBuild(props: Props) {
   const [selectedOption, setSelectedOption] = useState<AllBuilds | "">("");
-  const [showAdditionalFields, setShowAdditionalFields] = useState(false);
 
   const [url, setUrl] = useState<string>("");
   const [instructions, setInstructions] = useState<string>("");
@@ -65,9 +64,6 @@ function UploadGameBuild(props: Props) {
   const handleSelectChange = (value: AllBuilds) => {
     setSelectedOption(value);
     setInstructions(getInstructions(value));
-    if (!showAdditionalFields) {
-      setShowAdditionalFields(true);
-    }
   };
 
   const [showUploadGameBuild, setShowUploadGameBuild] =
@@ -115,9 +111,11 @@ function UploadGameBuild(props: Props) {
       setShowUploadGameBuild(false);
       setShowUploadedBuild(true);
     } else {
-      const errors = parse.error.formErrors.fieldErrors;
       setValidationErrors({
-        link: errors.link?.at(0),
+        link:
+          url === ""
+            ? "Required text field is missing!"
+            : "Please enter a valid URL",
       });
     }
   }
@@ -176,7 +174,13 @@ function UploadGameBuild(props: Props) {
 
   const cancelUpload = () => {
     deleteBuild(-1);
-    setShowAdditionalFields(false);
+
+    setSelectedOption("");
+    setUrl("");
+    setInstructions("");
+
+    setUploadedFilenames([]);
+    setShowUploadedBuild(false);
     setShowUploadGameBuild(false);
   };
 
@@ -222,13 +226,6 @@ function UploadGameBuild(props: Props) {
                   </div>
                 ))}
               </div>
-              {/* <p>{url}</p>
-              <X
-                className="cursor-pointer text-orange-primary"
-                type="button"
-                size={18}
-                onClick={deleteBuild}
-              /> */}
             </div>
           )}
         </div>
@@ -248,6 +245,7 @@ function UploadGameBuild(props: Props) {
                 <Select
                   name={BUILD_FORM_KEY}
                   onValueChange={handleSelectChange}
+                  defaultValue={selectedOption}
                 >
                   <SelectTrigger className="w-full text-xs font-light">
                     <SelectValue placeholder="Select an option" />
@@ -310,21 +308,19 @@ function UploadGameBuild(props: Props) {
                 </Select>
               </span>
             </div>
-            {showAdditionalFields &&
+            {selectedOption !== "" &&
               (selectedOption === "webgl" ? (
-                <div>
-                  <WebGLUpload
-                    cancel={cancelUpload}
-                    setLoaderFile={props.setLoaderFile}
-                    setDataFile={props.setDataFile}
-                    setCodeFile={props.setCodeFile}
-                    setFrameworkFile={props.setFrameworkFile}
-                    setUploadedWebGL={props.setUploadedWebGL}
-                    setUploadedFilenames={setUploadedFilenames}
-                    setShowUploadGameBuild={setShowUploadGameBuild}
-                    setShowUploadedBuild={setShowUploadedBuild}
-                  />
-                </div>
+                <WebGLUpload
+                  cancel={cancelUpload}
+                  setLoaderFile={props.setLoaderFile}
+                  setDataFile={props.setDataFile}
+                  setCodeFile={props.setCodeFile}
+                  setFrameworkFile={props.setFrameworkFile}
+                  setUploadedWebGL={props.setUploadedWebGL}
+                  setUploadedFilenames={setUploadedFilenames}
+                  setShowUploadGameBuild={setShowUploadGameBuild}
+                  setShowUploadedBuild={setShowUploadedBuild}
+                />
               ) : (
                 <>
                   <div className="flex w-full flex-row items-center justify-between gap-4">
@@ -349,9 +345,6 @@ function UploadGameBuild(props: Props) {
                           onChange={handleUrlChange}
                           type="url"
                         />
-                        <p className="absolute mt-11 text-xs text-red-500">
-                          {validationErrors.link}
-                        </p>
                       </div>
                     </span>
                   </div>
@@ -372,6 +365,12 @@ function UploadGameBuild(props: Props) {
                       />
                     </span>
                   </div>
+                  {validationErrors.link && (
+                    <div className="mt-2 flex h-10 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
+                      <AlertTriangleIcon className="h-5 w-5" />
+                      <p>{validationErrors.link}</p>
+                    </div>
+                  )}
                   <div className="flex-end mt-5 flex w-full justify-end gap-3">
                     <Button
                       variant="white"

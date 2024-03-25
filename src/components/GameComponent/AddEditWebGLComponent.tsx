@@ -222,7 +222,7 @@ function AddEditWebGLComponent(props: Props) {
 
   return (
     <div className="h-[65vh] font-sans">
-      <div className="border-3 group flex h-full w-full items-center justify-center rounded-sm border border-black">
+      <div className="border-3 group flex h-full w-full items-center justify-center rounded-md border border-black bg-[#FAFBFC]">
         <Dialog open={open} onOpenChange={handleOpenChange}>
           <DialogTrigger asChild>
             <Button
@@ -237,7 +237,7 @@ function AddEditWebGLComponent(props: Props) {
             </Button>
           </DialogTrigger>
 
-          <DialogContent className="border-4 border-solid border-blue-primary px-12 py-10 md:w-2/3">
+          <DialogContent className="border-4 border-solid border-blue-primary px-12 py-10 font-sans md:w-2/3">
             <DialogHeader>
               <DialogTitle className="-mb-2 text-lg font-semibold text-blue-primary">
                 {addOrEdit} WebGL Game
@@ -246,7 +246,7 @@ function AddEditWebGLComponent(props: Props) {
 
             <div className="flex w-full flex-col gap-4 py-4 font-sans">
               <div className="flex w-full flex-row items-center justify-between gap-3">
-                <h1 className="text-md font-medium">
+                <h1 className="text-md font-semibold">
                   Loader<span className="text-orange-primary">*</span>
                 </h1>
 
@@ -280,7 +280,7 @@ function AddEditWebGLComponent(props: Props) {
               </div>
 
               <div className="flex w-full flex-row items-center justify-between gap-3">
-                <h1 className="text-md font-medium">
+                <h1 className="text-md font-semibold">
                   Data<span className="text-orange-primary">*</span>
                 </h1>
 
@@ -312,7 +312,7 @@ function AddEditWebGLComponent(props: Props) {
               </div>
 
               <div className="flex w-full flex-row items-center justify-between gap-3">
-                <h1 className="text-md font-medium">
+                <h1 className="text-md font-semibold">
                   Code<span className="text-orange-primary">*</span>
                 </h1>
                 <span className="w-2/3">
@@ -343,7 +343,7 @@ function AddEditWebGLComponent(props: Props) {
               </div>
 
               <div className="flex w-full flex-row items-center justify-between gap-3">
-                <h1 className="text-md font-medium">
+                <h1 className="text-md font-semibold">
                   Framework<span className="text-orange-primary">*</span>
                 </h1>
                 <span className="w-2/3">

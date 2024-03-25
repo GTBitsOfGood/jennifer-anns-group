@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { NonWebGLBuilds, buildSchema } from "@/utils/types";
-import { Download, Pencil, Plus, Trash } from "lucide-react";
+import { AlertTriangleIcon, Download, Pencil, Plus, Trash } from "lucide-react";
 import { z } from "zod";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { Label } from "@/components/ui/label";
@@ -89,9 +89,11 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
       setInstructions("");
       setSelectedBuildType("");
     } else {
-      const errors = parse.error.formErrors.fieldErrors;
       setValidationErrors({
-        link: errors.link?.at(0),
+        link:
+          url === ""
+            ? "Required text field is missing!"
+            : "Please enter a valid URL",
       });
     }
   };
@@ -134,9 +136,11 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
       setSelectedBuildType("");
       setAddDialogOpen(false);
     } else {
-      const errors = parse.error.formErrors.fieldErrors;
       setValidationErrors({
-        link: errors.link?.at(0),
+        link:
+          url === ""
+            ? "Required text field is missing!"
+            : "Please enter a valid URL",
       });
     }
   };
@@ -168,7 +172,7 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
         gameData.builds.map(
           (data: z.infer<typeof buildSchema>, index: number) => (
             <div key={index} className="mb-4">
-              <div className="flex flex-row items-start justify-between">
+              <div className="flex flex-row items-center justify-between">
                 <div key={index} className="mb-2 flex flex-row gap-5">
                   <div className="flex max-h-14 min-h-14 w-14 min-w-14 max-w-14">
                     <Image
@@ -234,7 +238,7 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
                         </DialogHeader>
                         <div className="mt-4 flex flex-col gap-5">
                           <div className="flex w-full flex-row items-center justify-between gap-3">
-                            <Label className="text-md min-w-28 font-medium">
+                            <Label className="text-md min-w-28 font-semibold">
                               Game Build
                               <span className="text-orange-primary">*</span>
                             </Label>
@@ -327,7 +331,7 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
                           <div className="flex w-full flex-row items-center justify-between gap-4">
                             <Label
                               htmlFor="url"
-                              className="text-md font-medium"
+                              className="text-md font-semibold"
                             >
                               URL
                               <span className="text-orange-primary">*</span>
@@ -347,9 +351,6 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
                                       : "")
                                   }
                                 />
-                                <p className="absolute mt-10 text-xs text-red-500">
-                                  {validationErrors.link}
-                                </p>
                               </div>
                             </span>
                           </div>
@@ -357,7 +358,7 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
                           <div className="flex w-full flex-col items-start gap-3 md:flex-row md:gap-8">
                             <Label
                               htmlFor="instructions"
-                              className="text-md min-w-21 font-medium"
+                              className="text-md min-w-21 font-semibold"
                             >
                               Instructions
                             </Label>
@@ -372,6 +373,12 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
                               />
                             </span>
                           </div>
+                          {validationErrors.link && (
+                            <div className="mt-2 flex h-10 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
+                              <AlertTriangleIcon className="h-5 w-5" />
+                              <p>{validationErrors.link}</p>
+                            </div>
+                          )}
                           <div className="flex-end mt-5 flex w-full justify-end gap-3">
                             <Button
                               variant="white"
@@ -441,7 +448,7 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
               {data.instructions && (
                 <div className="mb-6 flex flex-row">
                   <div className="max-w-4/5 min-w-[78px]"></div>
-                  <div className="flex max-w-[80%] flex-col gap-2">
+                  <div className="flex max-w-[85%] flex-col gap-2">
                     <p className="text-sm text-blue-primary">Instructions</p>
                     <p className="text-sm">{data.instructions}</p>
                   </div>
@@ -482,7 +489,7 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
               </DialogHeader>
               <div className="mt-4 flex flex-col gap-5">
                 <div className="flex w-full flex-row items-center justify-between gap-3">
-                  <Label className="text-md min-w-28 font-medium">
+                  <Label className="text-md min-w-28 font-semibold">
                     Game Build
                     <span className="text-orange-primary">*</span>
                   </Label>
@@ -555,7 +562,7 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
                 </div>
 
                 <div className="flex w-full flex-row items-center justify-between gap-4">
-                  <Label htmlFor="url" className="text-md font-medium">
+                  <Label htmlFor="url" className="text-md font-semibold">
                     URL
                     <span className="text-orange-primary">*</span>
                   </Label>
@@ -574,9 +581,6 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
                             : "")
                         }
                       />
-                      <p className="absolute mt-10 text-xs text-red-500">
-                        {validationErrors.link}
-                      </p>
                     </div>
                   </span>
                 </div>
@@ -584,7 +588,7 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
                 <div className="flex w-full flex-col items-start gap-3 md:flex-row md:gap-8">
                   <Label
                     htmlFor="instructions"
-                    className="text-md min-w-21 font-medium"
+                    className="text-md min-w-21 font-semibold"
                   >
                     Instructions
                   </Label>
@@ -599,6 +603,12 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
                     />
                   </span>
                 </div>
+                {validationErrors.link && (
+                  <div className="mt-2 flex h-10 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
+                    <AlertTriangleIcon className="h-5 w-5" />
+                    <p>{validationErrors.link}</p>
+                  </div>
+                )}
                 <div className="flex-end mt-5 flex w-full justify-end gap-3">
                   <Button
                     variant="white"

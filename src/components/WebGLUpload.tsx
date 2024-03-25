@@ -119,7 +119,7 @@ export default function WebGLUpload({
 
   return (
     <>
-      <div className="flex w-full flex-col gap-4 py-4">
+      <div className="mt-2 flex w-full flex-col gap-4">
         <div className="flex w-full flex-row items-center justify-between gap-3">
           <h1 className="text-md font-medium">
             Loader<span className="text-orange-primary">*</span>
