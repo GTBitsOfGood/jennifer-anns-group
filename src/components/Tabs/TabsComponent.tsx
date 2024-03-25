@@ -10,11 +10,9 @@ import {
 import chakraTheme from "@/styles/chakraTheme";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import DeleteVideoTrailer from "../GameScreen/DeleteVideoTrailerComponent";
-import AddVideoTrailer from "../GameScreen/AddVideoTrailerComponent";
-import EditVideoTrailer from "../GameScreen/EditVideoTrailerComponent";
+import AddOrEditVideoTrailer from "../GameScreen/AddVideoTrailerComponent";
 import { ChangeEvent, Dispatch, useState } from "react";
-import ReactPlayer from "react-player";
-import { Delete } from "lucide-react";
+import ReactPlayer from "react-player/lazy";
 interface Props {
   mode: string;
   gameData: populatedGameWithId;
@@ -69,29 +67,32 @@ export default function TabsComponent({
                 <p>{gameData.description}</p>
               )}
             </TabPanel>
-            {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
-              <TabPanel className="flex flex-col justify-center">
-                <ReactPlayer
-                  url={gameData.videoTrailer}
-                  controls={true}
-                  width={1300}
-                  height={731}
-                />
-                {mode === "edit" && (
-                  <Flex className="flex-row">
-                    <EditVideoTrailer gameData={gameData} />
+            <TabPanel className="flex flex-col justify-center">
+              {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
+                <div style={{ paddingTop: "56.25%", position: "relative" }}>
+                  <ReactPlayer
+                    url={gameData.videoTrailer}
+                    controls={true}
+                    width="100%"
+                    height="100%" //TODO: Make height dynamically rescale.
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                    }}
+                  />
+                </div>
+              ) : null}
+              {mode === "edit" && (
+                <Flex className="flex-row">
+                  <AddOrEditVideoTrailer gameData={gameData} />
+                  {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
                     <DeleteVideoTrailer gameData={gameData} />
-                  </Flex>
-                )}
-              </TabPanel>
-            ) : null}
-            {(gameData.videoTrailer === undefined ||
-              gameData.videoTrailer === "") &&
-            mode === "edit" ? (
-              <TabPanel>
-                <AddVideoTrailer gameData={gameData} />
-              </TabPanel>
-            ) : null}
+                  ) : null}
+                </Flex>
+              )}
+            </TabPanel>
+
             {gameData.parentingGuide ? (
               <TabPanel>Parenting Guide</TabPanel>
             ) : null}

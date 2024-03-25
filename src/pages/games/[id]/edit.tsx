@@ -8,7 +8,6 @@ import React from "react";
 import DeleteGameComponent from "@/components/GameComponent/DeleteGameComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { useSession } from "next-auth/react";
-//Comment for ticket
 const EditGamePage = () => {
   const router = useRouter();
   const gameID = router.query.id;
@@ -31,7 +30,8 @@ const EditGamePage = () => {
 
   useEffect(() => {
     if (!session) {
-      router.push("/");
+      //TODO: remove this
+      //router.push("/");
     }
   }, [session]);
 

@@ -20,20 +20,31 @@ import { useRouter } from "next/router";
 import { useRef, useState, useEffect } from "react";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 
-const URL_REGEX =
-  /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
+const youtubeREGEX =
+  /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|live\/|v\/)?)([\w\-]+)(\S+)?$/;
+const vimeoREGEX =
+  /(http|https)?:\/\/(www\.|player\.)?vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|video\/|)(\d+)(?:|\/\?)/;
 interface Props {
   gameData: populatedGameWithId;
 }
 
-export default function AddVideoTrailer({ gameData }: Props) {
+//TODO: Condense into both add and edit  video trailer components.
+export default function AddOrEditVideoTrailer({ gameData }: Props) {
   const router = useRouter();
   const gameID = router.query.id;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement | null>(null);
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState(gameData.videoTrailer ?? "");
   const [issue, setIssue] = useState("");
-
+  const [addButton, setAddButton] = useState(true);
+  useEffect(() => {
+    console.log(gameData.videoTrailer, "STUFF");
+    if (gameData.videoTrailer === undefined || gameData.videoTrailer === "") {
+      setAddButton(true);
+    } else {
+      setAddButton(false);
+    }
+  }, [gameData]);
   useEffect(() => {
     setIssue("");
   }, [isOpen]);
@@ -42,32 +53,62 @@ export default function AddVideoTrailer({ gameData }: Props) {
       setIssue("Required text field missing!");
       return;
     }
-    if (URL_REGEX.test(url)) {
+    if (youtubeREGEX.test(url) || vimeoREGEX.test(url)) {
       gameData.videoTrailer = url;
       onClose();
       router.push(`/games/${gameID}/edit`);
     } else {
-      setIssue("Invalid URL");
+      setIssue("Invalid URL (Only Youtube and Vimeo videos allowed)");
+    }
+  }
+  async function editVideoTrailer() {
+    if (url === "") {
+      setIssue("Required text field missing!");
+      return;
+    }
+    if (youtubeREGEX.test(url) || vimeoREGEX.test(url)) {
+      gameData.videoTrailer = url;
+      onClose();
+      router.push(`/games/${gameID}/edit`);
+    } else {
+      setIssue("Invalid URL (Only Youtube and Vimeo videos allowed)");
     }
   }
 
   return (
     <ChakraProvider theme={chakraTheme}>
       <div>
-        <Button
-          rightIcon={
-            <Icon
-              as={Image}
-              src={"/octicon_upload-24upload.svg"}
-              boxSize="20px"
-            />
-          }
-          onClick={onOpen}
-          bg="white"
-          className="w-151 h-46 m-5 rounded-md border border-black px-[17px] py-2 font-sans text-xl font-semibold text-black"
-        >
-          Add Trailer
-        </Button>
+        {addButton ? (
+          <Button
+            rightIcon={
+              <Icon
+                as={Image}
+                src={"/octicon_upload-24upload.svg"}
+                boxSize="20px"
+              />
+            }
+            onClick={onOpen}
+            bg="white"
+            className="w-151 h-46 m-5 rounded-md border border-black px-[17px] py-2 font-sans text-xl font-semibold text-black"
+          >
+            Add Trailer
+          </Button>
+        ) : (
+          <Button
+            rightIcon={
+              <Icon
+                as={Image}
+                src={"/pencileditIconOutline.svg"}
+                boxSize="20px"
+              />
+            }
+            onClick={onOpen}
+            bg="white"
+            className="w-151 h-46 m-5 rounded-md border border-black px-[17px] py-2 font-sans text-xl font-semibold text-black"
+          >
+            Edit Trailer
+          </Button>
+        )}
         <AlertDialog
           motionPreset="slideInBottom"
           leastDestructiveRef={cancelRef}
@@ -80,7 +121,7 @@ export default function AddVideoTrailer({ gameData }: Props) {
           <AlertDialogContent height="274" maxWidth="809">
             <AlertDialogHeader p="0">
               <div className="float-left mx-[40px] mt-[20px] text-center text-[26px] font-bold leading-tight text-blue-primary">
-                Edit Trailer
+                {addButton ? "Add Trailer" : "Edit Trailer"}
               </div>
             </AlertDialogHeader>
             <AlertDialogBody p="2" mt="20px" mx="20px">
@@ -103,7 +144,7 @@ export default function AddVideoTrailer({ gameData }: Props) {
                       onChange={(event) => {
                         setUrl(event.target.value);
                       }}
-                      placeholder="https://www.youtube.com/trailer/aB3sv3-?24"
+                      placeholder="https://www.youtube.com"
                     />
                   </Flex>
                   {issue !== "" ? (
@@ -129,7 +170,7 @@ export default function AddVideoTrailer({ gameData }: Props) {
               </button>
               <button
                 ref={cancelRef}
-                onClick={addVideoTrailer}
+                onClick={addButton ? addVideoTrailer : editVideoTrailer}
                 className="mb-7 mr-[30px] h-[42px] w-[94px] rounded-[5px]  bg-blue-primary font-sans font-semibold text-white"
               >
                 Done

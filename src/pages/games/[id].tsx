@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import TabsComponent from "../../components/Tabs/TabsComponent";
 import TagsComponent from "../../components/Tags/TagsComponent";
-import ContactComponent from "../../components/NonProfit/ContactComponent";
+import ContactComponent from "../../components/Tabs/ContactComponent";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { userSchema } from "@/utils/types";
@@ -19,6 +19,7 @@ const GamePage = () => {
   const router = useRouter();
   const { data: session } = useSession();
   const idSchema = z.string().length(24);
+  const [visibleAnswer, setVisibleAnswer] = useState(false);
   const userDataSchema = userSchema
     .extend({
       _id: idSchema,
@@ -27,7 +28,13 @@ const GamePage = () => {
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
   const userId = currentUser?._id as string | undefined;
-
+  useEffect(() => {
+    if (userData && userData.label !== "student") {
+      setVisibleAnswer(true);
+    } else {
+      setVisibleAnswer(false);
+    }
+  }, [userData]);
   useEffect(() => {
     if (currentUser) {
       getUserData();
@@ -90,20 +97,12 @@ const GamePage = () => {
         </>
       )}
       <EmbeddedGame gameId={gameId as string} />
-      <TabsComponent
-        mode="view"
-        gameData={gameData}
-        admin={userData && userData.label === "administrator"}
-      />
+      <TabsComponent mode="view" gameData={gameData} admin={visibleAnswer} />
       {loaded && userData.label !== "administrator" && (
         <NotesComponent gameId={gameId} userId={userId} />
       )}
       <ContactComponent />
-      <TagsComponent
-        mode="view"
-        gameData={gameData}
-        admin={userData && userData.label === "administrator"}
-      />
+      <TagsComponent mode="view" gameData={gameData} admin={visibleAnswer} />
     </div>
   );
 };

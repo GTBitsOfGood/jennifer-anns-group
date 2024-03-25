@@ -31,8 +31,15 @@ export default function ContactComponent() {
   const [message, setMessage] = useState("");
   const [valid, setValid] = useState(false);
   const colors = { true: "#2352A0", false: "#D9D9D9" };
+  const emailRegex = /^\S+@\S+\.\S+$/;
   useEffect(() => {
-    if (firstName !== "" && lastName !== "" && email !== "" && message !== "") {
+    if (
+      firstName !== "" &&
+      lastName !== "" &&
+      email !== "" &&
+      message !== "" &&
+      emailRegex.test(email)
+    ) {
       setValid(true);
     } else {
       setValid(false);
@@ -48,7 +55,7 @@ export default function ContactComponent() {
 
   return (
     <ChakraProvider theme={chakraTheme}>
-      <div>
+      <div className="m-2">
         <Tabs colorScheme="brand" className="m-auto w-5/6 font-sans">
           <TabList>
             <Tab className="hover:bg-transparent">
