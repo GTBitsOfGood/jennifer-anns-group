@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
-import { X } from "lucide-react";
+import { AlertTriangle, AlertTriangleIcon, X } from "lucide-react";
 
 // there's probably a better place to put these
 export type BuildFileType = "data" | "framework" | "loader" | "code";
@@ -40,6 +40,9 @@ export default function WebGLUpload({
   const [codeName, setCodeName] = useState<null | string>(null);
   const [frameworkName, setFrameworkName] = useState<null | string>(null);
 
+  const [fileValidationError, setFileValidationError] =
+    useState<boolean>(false);
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files === null || event.target.files.length === 0) return;
     const file = event.target.files[0];
@@ -76,9 +79,10 @@ export default function WebGLUpload({
       codeName === null ||
       frameworkName === null
     ) {
-      alert("Please input all files");
+      setFileValidationError(true);
       return;
     }
+    setFileValidationError(false);
     setUploadedWebGL(true);
     setUploadedFilenames([loaderName, dataName, codeName, frameworkName]);
     setShowUploadGameBuild(false);
@@ -249,6 +253,13 @@ export default function WebGLUpload({
             )}
           </span>
         </div>
+        {fileValidationError && (
+          <div className="mt-2 flex h-14 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
+            <AlertTriangleIcon className="h-5 w-5" />
+            <p className="">All files must be uploaded!</p>
+          </div>
+        )}
+
         <div className="flex-end mt-5 flex w-full justify-end gap-3">
           <Button
             variant="white"

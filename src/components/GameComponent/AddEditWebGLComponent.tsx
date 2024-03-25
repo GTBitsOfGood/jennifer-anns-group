@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "../ui/label";
-import { Pencil, Plus, X } from "lucide-react";
+import { AlertTriangleIcon, Pencil, Plus, X } from "lucide-react";
 
 import { useState } from "react";
 
@@ -126,6 +126,7 @@ function AddEditWebGLComponent(props: Props) {
   const [open, setOpen] = useState(false);
 
   const [uploading, setUploading] = useState<boolean>(false);
+  const [fileValidationError, setFileValidationError] = useState(false);
 
   const router = useRouter();
 
@@ -160,7 +161,7 @@ function AddEditWebGLComponent(props: Props) {
       codeFile === null ||
       frameworkFile === null
     ) {
-      alert("Please select all files");
+      setFileValidationError(true);
       return;
     }
 
@@ -176,8 +177,8 @@ function AddEditWebGLComponent(props: Props) {
       if (gameId) {
         setUploading(true);
         await uploadBuildFiles(gameId.toString(), addOrEdit, files);
-        alert("Files uploaded successfully");
         setUploading(false);
+        setFileValidationError(false);
         setAddOrEdit("Edit");
         setOpen(false);
       }
@@ -196,11 +197,12 @@ function AddEditWebGLComponent(props: Props) {
   };
 
   const cancelSubmit = () => {
+    setOpen(false);
     setLoaderFile(null);
     setDataFile(null);
     setCodeFile(null);
     setFrameworkFile(null);
-    setOpen(false);
+    setFileValidationError(false);
   };
 
   const [addOrEdit, setAddOrEdit] = useState<"Add" | "Edit">("Add");
@@ -213,10 +215,15 @@ function AddEditWebGLComponent(props: Props) {
     }
   }, [props.gameData]);
 
+  const handleOpenChange = () => {
+    setOpen(!open);
+    setFileValidationError(false);
+  };
+
   return (
     <div className="h-[65vh] font-sans">
       <div className="border-3 group flex h-full w-full items-center justify-center rounded-sm border border-black">
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
           <DialogTrigger asChild>
             <Button
               type="button"
@@ -365,6 +372,12 @@ function AddEditWebGLComponent(props: Props) {
                   )}
                 </span>
               </div>
+              {fileValidationError && (
+                <div className="mt-2 flex h-10 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
+                  <AlertTriangleIcon className="h-5 w-5" />
+                  <p className="">All files must be uploaded!</p>
+                </div>
+              )}
               <div className="flex-end mt-5 flex w-full justify-end gap-3">
                 <Button
                   variant="white"

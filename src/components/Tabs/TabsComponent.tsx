@@ -9,10 +9,6 @@ import {
 import chakraTheme from "@/styles/chakraTheme";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { ChangeEvent, Dispatch, useState } from "react";
-import Image from "next/image";
-import { buildSchema } from "@/utils/types";
-import { z } from "zod";
-import { Download } from "lucide-react";
 import GameBuildList from "../GameComponent/GameBuildList";
 
 interface Props {
@@ -43,7 +39,8 @@ export default function TabsComponent({ mode, gameData, setGameData }: Props) {
             <Tab>Description</Tab>
             {gameData.parentingGuide ? <Tab>Parenting Guide</Tab> : null}
             {gameData.lesson ? <Tab>Lesson Plan</Tab> : null}
-            <Tab>Game Builds</Tab>
+            {((gameData?.builds && gameData.builds.length > 0) ||
+              mode === "edit") && <Tab>Game Builds</Tab>}
           </TabList>
           <TabPanels className="mb-12 mt-8 text-gray-500">
             <TabPanel p="0px">
@@ -63,21 +60,16 @@ export default function TabsComponent({ mode, gameData, setGameData }: Props) {
               <TabPanel>Parenting Guide</TabPanel>
             ) : null}
             {gameData.lesson ? <TabPanel>Lesson Plan</TabPanel> : null}
-            <TabPanel p="0px">
-              {mode === "edit" ? (
+            {((gameData?.builds && gameData.builds.length > 0) ||
+              mode === "edit") && (
+              <TabPanel p="0px">
                 <GameBuildList
                   gameData={gameData}
-                  editing={true}
+                  editing={mode === "edit"}
                   setGameData={setGameData}
                 />
-              ) : (
-                <GameBuildList
-                  gameData={gameData}
-                  editing={false}
-                  setGameData={setGameData}
-                />
-              )}
-            </TabPanel>
+              </TabPanel>
+            )}
           </TabPanels>
         </Tabs>
       </div>

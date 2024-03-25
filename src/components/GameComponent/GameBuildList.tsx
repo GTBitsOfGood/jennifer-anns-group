@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { NonWebGLBuilds, buildSchema } from "@/utils/types";
-import { Download, Pencil, Trash } from "lucide-react";
+import { Download, Pencil, Plus, Trash } from "lucide-react";
 import { z } from "zod";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { Label } from "@/components/ui/label";
@@ -34,7 +34,7 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
   const [editData, setEditData] = useState<z.infer<typeof buildSchema> | null>(
     null,
   );
-  const [url, setUrl] = useState<string | undefined>("");
+  const [url, setUrl] = useState<string>("");
   const [instructions, setInstructions] = useState<string | undefined>("");
   const [selectedBuildType, setSelectedBuildType] = useState<
     NonWebGLBuilds | ""
@@ -88,6 +88,51 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
       setUrl("");
       setInstructions("");
       setSelectedBuildType("");
+    } else {
+      const errors = parse.error.formErrors.fieldErrors;
+      setValidationErrors({
+        link: errors.link?.at(0),
+      });
+    }
+  };
+
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+
+  const handleAddBuild = () => {
+    if (!setGameData) return;
+
+    if (selectedBuildType === "") {
+      alert("Please select a Game Build type.");
+      return;
+    }
+    const input = {
+      type: selectedBuildType,
+      link: url,
+      instructions: instructions,
+    };
+    const parse = buildSchema.safeParse(input);
+
+    if (parse.success) {
+      setValidationErrors({
+        link: undefined,
+      });
+
+      const newBuild = {
+        ...input,
+      };
+
+      const buildsArray = gameData.builds || [];
+      const updatedBuilds = [...buildsArray, newBuild];
+
+      setGameData({
+        ...gameData,
+        builds: updatedBuilds,
+      });
+
+      setUrl("");
+      setInstructions("");
+      setSelectedBuildType("");
+      setAddDialogOpen(false);
     } else {
       const errors = parse.error.formErrors.fieldErrors;
       setValidationErrors({
@@ -405,6 +450,184 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
             </div>
           ),
         )}
+      {editing && !(gameData.builds && gameData.builds.length >= 6) && (
+        <div className="mt-12">
+          <Button
+            type="button"
+            onClick={() => setAddDialogOpen(true)}
+            className="rounded-xl border border-black bg-white px-4 py-2 font-sans text-lg text-xl font-semibold text-black hover:bg-gray-100"
+          >
+            <div className="flex items-center gap-2">
+              <p>Add Game Build</p>
+              <Plus />
+            </div>
+          </Button>
+
+          <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+            <DialogContent
+              className="border-4 border-solid border-blue-primary p-12 font-sans sm:max-w-[600px]"
+              onCloseAutoFocus={() => {
+                setUrl("");
+                setInstructions("");
+                setSelectedBuildType("");
+                setValidationErrors({
+                  link: undefined,
+                });
+              }}
+            >
+              <DialogHeader>
+                <DialogTitle className="-mb-2 text-lg font-semibold text-blue-primary">
+                  Add Game Build
+                </DialogTitle>
+              </DialogHeader>
+              <div className="mt-4 flex flex-col gap-5">
+                <div className="flex w-full flex-row items-center justify-between gap-3">
+                  <Label className="text-md min-w-28 font-medium">
+                    Game Build
+                    <span className="text-orange-primary">*</span>
+                  </Label>
+
+                  <span className="w-full">
+                    <Select
+                      value={selectedBuildType}
+                      onValueChange={(s) =>
+                        setSelectedBuildType(s as NonWebGLBuilds)
+                      }
+                      name="build-type"
+                    >
+                      <SelectTrigger className="w-full text-xs font-light">
+                        <SelectValue placeholder="Select an option" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup className="font-sans">
+                          <SelectItem
+                            disabled={gameData?.builds?.some(
+                              (build) => build.type === "amazon",
+                            )}
+                            value="amazon"
+                          >
+                            Amazon
+                          </SelectItem>
+                          <SelectItem
+                            disabled={gameData?.builds?.some(
+                              (build) => build.type === "android",
+                            )}
+                            value="android"
+                          >
+                            Android
+                          </SelectItem>
+                          <SelectItem
+                            disabled={gameData?.builds?.some(
+                              (build) => build.type === "appstore",
+                            )}
+                            value="appstore"
+                          >
+                            App Store
+                          </SelectItem>
+                          <SelectItem
+                            disabled={gameData?.builds?.some(
+                              (build) => build.type === "linux",
+                            )}
+                            value="linux"
+                          >
+                            Linux
+                          </SelectItem>
+                          <SelectItem
+                            disabled={gameData?.builds?.some(
+                              (build) => build.type === "mac",
+                            )}
+                            value="mac"
+                          >
+                            Mac
+                          </SelectItem>
+                          <SelectItem
+                            disabled={gameData?.builds?.some(
+                              (build) => build.type === "windows",
+                            )}
+                            value="windows"
+                          >
+                            Windows
+                          </SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </span>
+                </div>
+
+                <div className="flex w-full flex-row items-center justify-between gap-4">
+                  <Label htmlFor="url" className="text-md font-medium">
+                    URL
+                    <span className="text-orange-primary">*</span>
+                  </Label>
+
+                  <span className="w-full">
+                    <div className="flex flex-col">
+                      <Input
+                        id="url"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                        type="url"
+                        className={
+                          "w-full text-xs font-light" +
+                          (validationErrors.link
+                            ? " border-red-500 focus-visible:ring-red-500"
+                            : "")
+                        }
+                      />
+                      <p className="absolute mt-10 text-xs text-red-500">
+                        {validationErrors.link}
+                      </p>
+                    </div>
+                  </span>
+                </div>
+
+                <div className="flex w-full flex-col items-start gap-3 md:flex-row md:gap-8">
+                  <Label
+                    htmlFor="instructions"
+                    className="text-md min-w-21 font-medium"
+                  >
+                    Instructions
+                  </Label>
+                  <span className="w-full">
+                    <TextArea
+                      id="instructions"
+                      className="min-h-24 shrink text-xs font-light"
+                      value={instructions}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                        setInstructions(e.target.value)
+                      }
+                    />
+                  </span>
+                </div>
+                <div className="flex-end mt-5 flex w-full justify-end gap-3">
+                  <Button
+                    variant="white"
+                    className="px-4 text-lg"
+                    type="button"
+                    onClick={() => {
+                      setAddDialogOpen(false);
+                      setUrl("");
+                      setInstructions("");
+                      setSelectedBuildType("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button
+                    type="button"
+                    onClick={handleAddBuild}
+                    variant="mainblue"
+                    className="px-4 text-lg"
+                  >
+                    Done
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      )}
     </div>
   );
 }

@@ -376,7 +376,6 @@ function CreateGame() {
             <Plus />
             <p>Add Another Build</p>
           </div>
-          {/* <UploadGameBuild builds={builds} setBuilds={setBuilds} /> */}
         </div>
 
         <div className="relative flex w-full flex-col gap-3 md:w-2/3">
