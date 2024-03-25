@@ -127,21 +127,6 @@ function CreateGame() {
   const [codeFile, setCodeFile] = useState<null | File>(null);
   const [frameworkFile, setFrameworkFile] = useState<null | File>(null);
 
-  useEffect(() => {
-    console.log("data", dataFile?.name);
-  }, [dataFile]);
-
-  useEffect(() => {
-    console.log("loader", loaderFile?.name);
-  }, [loaderFile]);
-
-  useEffect(() => {
-    console.log("code", codeFile?.name);
-  }, [codeFile]);
-  useEffect(() => {
-    console.log("frameworkFile", frameworkFile?.name);
-  }, [frameworkFile]);
-
   const [uploadGameComponents, setUploadGameComponents] = useState<
     React.JSX.Element[]
   >([

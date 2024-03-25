@@ -19,46 +19,6 @@ const EditGamePage = () => {
   const [error, setError] = useState("");
   const [name, setName] = useState("");
 
-  const idSchema = z.string().length(24);
-
-  const userDataSchema = userSchema
-    .extend({
-      _id: idSchema,
-    })
-    .omit({ hashedPassword: true });
-
-  const { data: session } = useSession();
-  const currentUser = session?.user;
-  const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
-
-  // useEffect(() => {
-  //   if (!session) {
-  //     router.push("/");
-  //   }
-  // }, [session]);
-
-  useEffect(() => {
-    if (currentUser) {
-      getUserData();
-    }
-  }, [currentUser]);
-
-  // useEffect(() => {
-  //   if (userData && userData.label !== "administrator") {
-  //     router.push("/");
-  //   }
-  // }, [userData]);
-
-  async function getUserData() {
-    try {
-      const response = await fetch(`/api/users/${currentUser?._id}`);
-      const data = await response.json();
-      setUserData(data);
-    } catch (error) {
-      console.error("Error getting user:", error);
-    }
-  }
-
   const getGame = async () => {
     try {
       const response = await fetch(`/api/games/${gameID}`);

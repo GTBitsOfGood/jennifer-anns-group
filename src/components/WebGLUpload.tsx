@@ -1,7 +1,4 @@
-import { CLOUDFLARE_URL } from "@/utils/consts";
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { Input } from "./ui/input";
+import { useState } from "react";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { X } from "lucide-react";
@@ -14,67 +11,6 @@ export const buildFileTypes = Object.freeze({
   loader: "build.loader.js",
   code: "build.wasm",
 });
-
-async function uploadBuildFiles(gameId: string, files: Map<string, File>) {
-  if (files.size !== 4) {
-    throw new Error("Invalid build files");
-  }
-
-  for (const type of Object.keys(buildFileTypes)) {
-    if (!files.has(type)) {
-      throw new Error(`Missing file: ${type}`);
-    }
-  }
-
-  // atomic uploads?
-  await Promise.all(
-    Array.from(files.entries()).map(async ([type, file]) => {
-      let retryCount = 0;
-      let success = false;
-
-      while (retryCount < 4 && !success) {
-        try {
-          const { data } = await axios.post(`/api/games/${gameId}/builds`, {
-            gameId,
-          });
-          const uploadUrl = data.uploadUrl;
-          const uploadAuthToken = data.uploadAuthToken;
-
-          const fileName = `${gameId}/${
-            buildFileTypes[type as keyof typeof buildFileTypes]
-          }`;
-
-          await axios.post(uploadUrl, file, {
-            headers: {
-              Authorization: uploadAuthToken,
-              "X-Bz-File-Name": fileName,
-              "Content-Type": file.type,
-              "X-Bz-Content-Sha1": "do_not_verify",
-            },
-          });
-
-          success = true;
-        } catch (error) {
-          retryCount++;
-        }
-      }
-
-      if (!success) {
-        throw new Error("Failed to upload file after 4 retries");
-      }
-    }),
-  );
-
-  await axios.put(
-    `/api/games/${gameId}`,
-    JSON.stringify({ webGLBuild: true }),
-    {
-      headers: {
-        "Content-Type": "text",
-      },
-    },
-  );
-}
 
 interface Props {
   cancel: () => void;
@@ -103,7 +39,6 @@ export default function WebGLUpload({
   const [dataName, setDataName] = useState<null | string>(null);
   const [codeName, setCodeName] = useState<null | string>(null);
   const [frameworkName, setFrameworkName] = useState<null | string>(null);
-  // const [gameId, setGameId] = useState("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files === null || event.target.files.length === 0) return;
@@ -135,29 +70,6 @@ export default function WebGLUpload({
   };
 
   const handleSubmit = async () => {
-    // if (
-    //   loaderFile === null ||
-    //   dataFile === null ||
-    //   codeFile === null ||
-    //   frameworkFile === null
-    // ) {
-    //   alert("Please input all files");
-    //   return;
-    // }
-    // const files = new Map([
-    //   ["loader", loaderFile],
-    //   ["data", dataFile],
-    //   ["code", codeFile],
-    //   ["framework", frameworkFile],
-    // ]);
-    // try {
-    //   await uploadBuildFiles(gameId, files);
-    //   alert("Files uploaded successfully");
-    // } catch (e) {
-    //   console.error(e);
-    //   alert("Failed to upload files");
-    // }
-
     if (
       loaderName === null ||
       dataName === null ||
