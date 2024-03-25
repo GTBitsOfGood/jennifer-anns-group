@@ -6,10 +6,6 @@ import { useSession } from "next-auth/react";
 import { userDataSchema } from "@/components/ProfileModal/ProfileModal";
 import { z } from "zod";
 import Image from "next/image";
-import discordIcon from "../../public/social/Discord.svg";
-import bogLogo1 from "../../public/bog_logo_1.svg";
-import bogLogo2 from "../../public/bog_logo_2.svg";
-import gameboy from "../../public/gameboy.png";
 import Link from "next/link";
 import { Edit2Icon } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -221,7 +217,7 @@ const Home = () => {
 
                 return (
                   <div key={index} className="max-w-xs flex-1">
-                    <Image src={gameboy} alt="gameboy" />
+                    <img src={`/gameboy.png`} alt="gameboy" />
                     <p className="mt-12 text-center text-gray-500">
                       {gameBoy.description}
                     </p>
@@ -233,8 +229,10 @@ const Home = () => {
           <div className="flex w-full flex-col items-center bg-blue-bg px-32 py-16">
             <div className="flex flex-row items-center">
               <Image
-                src={discordIcon}
+                src={`/social/Discord.svg`}
                 className="mr-16 -rotate-6 fill-blue-primary"
+                width={120}
+                height={120}
                 alt="Discord Icon"
               />
               <div>
@@ -252,9 +250,9 @@ const Home = () => {
           </div>
           <div className="flex w-full max-w-7xl flex-col px-32 py-32">
             <div className="flex flex-row content-start items-center">
-              <Image src={bogLogo2} alt="Bits of Good Logo" />
+              <img src={`/bog_logo_2.svg`} alt="Bits of Good Logo" />
               <div className="ml-12">
-                <Image src={bogLogo1} alt="Bits of Good Logo" />
+                <img src={`/bog_logo_1.svg`} alt="Bits of Good Logo" />
                 <p className="mt-3 text-2xl font-semibold text-orange-primary">
                   Thanks to Bits of Good for helping create our site!
                 </p>
