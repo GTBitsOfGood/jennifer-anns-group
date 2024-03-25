@@ -47,6 +47,21 @@ export default function Games() {
   const [empty, setEmpty] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const gameBuildsMap: Record<string, string> = {
+    Amazon: "amazon",
+    Android: "android",
+    "App Store": "appstore",
+    Linux: "linux",
+    Mac: "mac",
+    WebGL: "webgl",
+    Windows: "windows",
+  };
+  const gameContentMap: Record<string, string> = {
+    "Parenting guide": "parentingGuide",
+    "Lesson plan": "lessonPlan",
+    "Video trailer": "videoTrailer",
+    "Answer key": "answerKey",
+  };
 
   useEffect(() => {
     getGames();
@@ -66,35 +81,13 @@ export default function Games() {
 
     if (gameBuilds.length > 0) {
       gameBuilds.forEach((gb) => {
-        if (gb === "Amazon") {
-          params.append("gameBuilds", "amazon");
-        } else if (gb === "Android") {
-          params.append("gameBuilds", "android");
-        } else if (gb === "App Store") {
-          params.append("gameBuilds", "appstore");
-        } else if (gb === "Linux") {
-          params.append("gameBuilds", "linux");
-        } else if (gb === "Mac") {
-          params.append("gameBuilds", "mac");
-        } else if (gb === "WebGL") {
-          params.append("gameBuilds", "webgl");
-        } else {
-          params.append("gameBuilds", "windows");
-        }
+        params.append("gameBuilds", gameBuildsMap[gb]);
       });
     }
 
     if (gameContent.length > 0) {
       gameContent.forEach((gc) => {
-        if (gc === "Parenting guide") {
-          params.append("gameContent", "parentingGuide");
-        } else if (gc === "Lesson plan") {
-          params.append("gameContent", "lessonPlan");
-        } else if (gc === "Video trailer") {
-          params.append("gameContent", "videoTrailer");
-        } else {
-          params.append("gameContent", "answerKey");
-        }
+        params.append("gameContent", gameContentMap[gc]);
       });
     }
 
