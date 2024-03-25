@@ -56,7 +56,7 @@ export default function ContactComponent() {
   return (
     <ChakraProvider theme={chakraTheme}>
       <div className="m-2">
-        <Tabs colorScheme="brand" className="m-auto w-5/6 font-sans">
+        <Tabs colorScheme="brand" className="m-auto w-5/6 min-w-max font-sans">
           <TabList>
             <Tab className="hover:bg-transparent">
               Contact Jennifer Ann&apos;s
@@ -64,7 +64,7 @@ export default function ContactComponent() {
           </TabList>
           <TabPanels className="mb-12 mt-8 text-gray-500">
             <TabPanel p="0px">
-              <Flex className="justify-between bg-white p-6">
+              <Flex className="justify-between bg-white p-0">
                 <Flex className="m-2 flex-col">
                   <Flex className="flex-row">
                     <FormControl className="mb-6 mr-3">
