@@ -8,6 +8,38 @@ const verifyObjectId = (value: string) => {
   }
   return false;
 };
+
+// Home Page
+export const gameBoySchema = z.object({
+  gameId: z.string().refine(verifyObjectId).optional(),
+  description: z.string(),
+});
+
+export const homePageSchema = z.object({
+  mdTitle: z.string(),
+  mdDescription: z.string(),
+  gameBoyTitle: z.string(),
+  gameBoys: z.array(gameBoySchema),
+  singleton: z.boolean(),
+});
+
+export const editHomePageSchema = z.object({
+  mdTitle: z.string().optional(),
+  mdDescription: z.string().optional(),
+  gameBoyTitle: z.string().optional(),
+  gameBoys: z.array(gameBoySchema).optional(),
+});
+
+// Build
+export enum AppType {
+  AmazonApp = "Amazon App",
+  AndroidApp = "Android App",
+  AppStore = "App Store",
+  LinuxDownload = "Linux Download",
+  MacDownload = "Mac Download",
+  WindowsDownload = "Windows Download",
+}
+
 export enum AllBuilds {
   amazon = "amazon",
   android = "android",
