@@ -162,22 +162,6 @@ export default function EditGameBoyModal({
       }
     }
 
-    // game 3 without game 2
-    if (!newData[1].gameId && newData[2].gameId) {
-      setValidationErrors({
-        title: validationErrors.title,
-        data: [
-          validationErrors.data[0],
-          {
-            gameId: "Game is required!",
-            description: validationErrors.data[2].description,
-          },
-          validationErrors.data[2],
-        ],
-      });
-      return false;
-    }
-
     return true;
   }
 
