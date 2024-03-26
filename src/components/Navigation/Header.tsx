@@ -85,7 +85,7 @@ const Header = (props: Props) => {
           {tabData[userType].map((tabName, index) => (
             <div
               key={index}
-              className={`font-Outfit mr-8 cursor-pointer text-center text-sm ${
+              className={`font-Outfit ml-8 cursor-pointer text-center text-sm ${
                 selectedTab === index
                   ? "relative font-bold text-orange-primary"
                   : "font-normal text-stone-900 opacity-50"
