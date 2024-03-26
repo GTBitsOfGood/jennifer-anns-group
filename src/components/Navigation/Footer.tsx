@@ -1,4 +1,5 @@
 import Link from "next/link";
+import React from "react";
 
 export const Footer = () => {
   // replace with actual social links when nonprofit gets back
@@ -11,8 +12,8 @@ export const Footer = () => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 flex w-full justify-center border border-gray-100">
-      <div className="flex w-10/12 flex-col justify-between">
+    <div className="flex w-full justify-center border-t border-zinc-200">
+      <div className="flex w-[calc(100%-4rem)] max-w-7xl flex-col justify-between">
         <div className="flex justify-between p-12">
           <div className="mb-5 ml-5 mr-5">
             <img
@@ -21,13 +22,13 @@ export const Footer = () => {
               alt="Logo"
             ></img>
             <div className="flex flex-col items-start justify-center gap-2">
-              <div className="font-['DM Sans'] text-sm font-normal text-slate-500">
+              <div className="font-dm-sans text-sm font-normal text-slate-500">
                 #stopTDV
               </div>
-              <div className="font-['DM Sans'] text-sm font-normal text-slate-500">
+              <div className="font-dm-sans text-sm font-normal text-slate-500">
                 501(c)(3) Public Charity
               </div>
-              <div className="font-['DM Sans'] text-sm font-normal text-slate-500">
+              <div className="font-dm-sans text-sm font-normal text-slate-500">
                 EIN 20-4618499
               </div>
             </div>
@@ -49,16 +50,16 @@ export const Footer = () => {
             </div>
           </div>
           <div className="m-5">
-            <div className="font-['DM Sans'] mb-10 text-xl font-bold leading-snug text-indigo-950">
+            <div className="mb-10 font-dm-sans text-xl font-bold leading-snug text-indigo-950">
               Mission
             </div>
-            <div className="font-['DM Sans'] text-lg font-normal text-slate-500">
+            <div className="font-dm-sans text-lg font-normal text-slate-500">
               Preventing teen dating violence through awareness, education, and
               advocacy.
             </div>
           </div>
           <div className="m-5">
-            <div className="font-['DM Sans'] mb-10 text-xl font-bold leading-snug text-indigo-950">
+            <div className="mb-10 font-dm-sans text-xl font-bold leading-snug text-indigo-950">
               Contact us
             </div>
             <img className="w-full" src="/contact.svg" alt="Contact"></img>
