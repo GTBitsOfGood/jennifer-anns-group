@@ -46,6 +46,7 @@ const AccountManagementPage = () => {
       });
       if (response.ok) {
         setNewEmail("");
+        setEmailError("")
       } else {
         const error = await response.text();
         setEmailError(error);
@@ -70,11 +71,6 @@ const AccountManagementPage = () => {
             placeholder="Email"
             value={newEmail}
             onChange={(e) => setNewEmail(e.target.value)}
-            onClick={() => {
-              if (emailError != "") {
-                setEmailError("");
-              }
-            }}
             name="Email"
           />
           <Button
