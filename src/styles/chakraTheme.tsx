@@ -1,5 +1,5 @@
 import { extendTheme } from "@chakra-ui/react";
-import { tabsAnatomy, tagAnatomy } from "@chakra-ui/anatomy";
+import { tabsAnatomy, tagAnatomy, checkboxAnatomy } from "@chakra-ui/anatomy";
 import { createMultiStyleConfigHelpers } from "@chakra-ui/react";
 
 const tabsHelper = createMultiStyleConfigHelpers(tabsAnatomy.keys);
@@ -38,6 +38,44 @@ const Tag = tagHelper.defineMultiStyleConfig({
       borderRadius: "full",
     },
   },
+  variants: {
+    filter: {
+      container: {
+        color: "#535353",
+        bg: "#F6F6F6",
+      },
+    },
+    filter_selected: {
+      container: {
+        color: "#535353",
+        bg: "#B0CAE8",
+      },
+    },
+  },
+});
+
+const checkboxHelper = createMultiStyleConfigHelpers(checkboxAnatomy.keys);
+
+const Checkbox = checkboxHelper.defineMultiStyleConfig({
+  baseStyle: {
+    control: {
+      _checked: {
+        bg: "#2352A0",
+        border: "#00FFFFFF",
+      },
+    },
+  },
+  variants: {
+    filter: {
+      container: {
+        fontWeight: "medium",
+        color: "#6C757D",
+        _checked: {
+          color: "#2352A0",
+        },
+      },
+    },
+  },
 });
 
 const chakraTheme = extendTheme({
@@ -47,11 +85,14 @@ const chakraTheme = extendTheme({
       400: "#A9CBEB",
       500: "#F2F2F2",
       600: "#2352A0",
+      700: "#E1E4ED",
+      800: "#eff6ff",
     },
   },
   components: {
     Tag,
     Tabs,
+    Checkbox,
   },
 });
 
