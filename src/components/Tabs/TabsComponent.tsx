@@ -9,6 +9,7 @@ import {
 import chakraTheme from "@/styles/chakraTheme";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { ChangeEvent, Dispatch, useState } from "react";
+import GameBuildList from "../GameComponent/GameBuildList";
 
 interface Props {
   mode: string;
@@ -38,6 +39,8 @@ export default function TabsComponent({ mode, gameData, setGameData }: Props) {
             <Tab>Description</Tab>
             {gameData.parentingGuide ? <Tab>Parenting Guide</Tab> : null}
             {gameData.lesson ? <Tab>Lesson Plan</Tab> : null}
+            {((gameData?.builds && gameData.builds.length > 0) ||
+              mode === "edit") && <Tab>Game Builds</Tab>}
           </TabList>
           <TabPanels className="mb-12 mt-8 text-gray-500">
             <TabPanel p="0px">
@@ -53,6 +56,20 @@ export default function TabsComponent({ mode, gameData, setGameData }: Props) {
                 <p>{gameData.description}</p>
               )}
             </TabPanel>
+            {gameData.parentingGuide ? (
+              <TabPanel>Parenting Guide</TabPanel>
+            ) : null}
+            {gameData.lesson ? <TabPanel>Lesson Plan</TabPanel> : null}
+            {((gameData?.builds && gameData.builds.length > 0) ||
+              mode === "edit") && (
+              <TabPanel p="0px">
+                <GameBuildList
+                  gameData={gameData}
+                  editing={mode === "edit"}
+                  setGameData={setGameData}
+                />
+              </TabPanel>
+            )}
           </TabPanels>
         </Tabs>
       </div>

@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config = {
+  important: true,
   darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",
@@ -20,6 +21,7 @@ const config = {
     extend: {
       colors: {
         "blue-primary": "#2352A0",
+        "blue-bg": "#A9CBEB",
         "orange-primary": "#FC9300",
         "input-bg": "#FAFBFC",
         "input-border": "#D9D9D9",
@@ -27,12 +29,15 @@ const config = {
         grey: "#666666",
         "gray-500": "#667085",
         placeholder: "#A3AED0",
+        "stone-primary": "#535353",
       },
       fontFamily: {
         sans: ["Poppins", "sans-serif"], // Default `Poppins` font family to sans
         "open-sans-cond": ['"Open Sans Condensed"', "sans-serif"],
         "open-sans": ['"Open Sans"', "sans-serif"],
+        "dm-sans": ['"DM Sans"', "sans-serif"],
         inter: ["Inter", "sans-serif"],
+        rubik: ["Rubik", "Poppins", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
