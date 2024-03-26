@@ -46,7 +46,7 @@ const AccountManagementPage = () => {
       });
       if (response.ok) {
         setNewEmail("");
-        setEmailError("")
+        setEmailError("");
       } else {
         const error = await response.text();
         setEmailError(error);
