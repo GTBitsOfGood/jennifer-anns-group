@@ -21,3 +21,8 @@ export const ADMIN_CONTACT = "contact@jenniferann.org";
 
 export const CLOUDFLARE_URL =
   "https://cloudflare-b2.bogjenniferanns.workers.dev";
+
+export const UNDELETABLE_EMAILS = [
+  "drew@jenniferann.org",
+  "susanne@jenniferann.org",
+];

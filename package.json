@@ -14,6 +14,7 @@
     "secrets:windows": "set /p BW_PASSWORD=Enter Bitwarden Password:&& (bw logout || VER>NUL) && npm run secrets:login",
     "secrets:login": "FOR /F %a IN ('bw login product@bitsofgood.org %BW_PASSWORD% --raw') DO SET BW_SESSION=%a && npm run secrets:get",
     "secrets:get": "bw sync && bw get item 59607d65-8de1-4105-8eaf-b11f0038670c | fx .notes > \".env\"",
+    "add-admin-emails": "tsx scripts/add-admin-emails.ts",
     "test": "jest --watchAll=false",
     "prepare": "husky || true"
   },
@@ -41,6 +42,7 @@
     "class-variance-authority": "^0.7.0",
     "classnames": "^2.5.1",
     "clsx": "^2.1.0",
+    "dotenv": "^16.4.5",
     "faker": "^5.5.3",
     "framer-motion": "^11.0.3",
     "fx": "^31.0.0",
@@ -49,7 +51,7 @@
     "markdown-it": "^14.0.0",
     "mongodb": "^5.9.0",
     "mongoose": "^8.1.2",
-    "next": "14.0.4",
+    "next": "^14.0.4",
     "next-auth": "^4.24.5",
     "postcss-cli": "^11.0.0",
     "react": "^18",
@@ -61,6 +63,7 @@
     "reusify": "^1.0.4",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.7.1",
     "uuid": "^9.0.1",
     "zod": "^3.22.4"
   },
