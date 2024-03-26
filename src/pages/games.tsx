@@ -16,6 +16,7 @@ import {
   useDisclosure,
   Text,
   Button,
+  PopoverCloseButton,
 } from "@chakra-ui/react";
 import { gameSchema, themeSchema } from "@/utils/types";
 import {
@@ -217,6 +218,7 @@ export default function Games() {
                 </Button>
               </PopoverTrigger>
               <PopoverContent mt="10px" w="750px" minH="800px">
+                <PopoverCloseButton />
                 <PopoverBody>
                   <FilterBody
                     setAcccessibility={setAccessibility}
