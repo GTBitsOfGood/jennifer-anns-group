@@ -10,21 +10,21 @@ import {
 import chakraTheme from "@/styles/chakraTheme";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import DeleteVideoTrailer from "../GameScreen/DeleteVideoTrailerComponent";
-import AddOrEditVideoTrailer from "../GameScreen/AddVideoTrailerComponent";
+import AddEditVideoTrailer from "../GameScreen/AddEditVideoTrailerComponent";
 import { ChangeEvent, Dispatch, useState } from "react";
 import ReactPlayer from "react-player/lazy";
 interface Props {
   mode: string;
   gameData: populatedGameWithId;
   setGameData?: Dispatch<populatedGameWithId>;
-  admin?: boolean;
+  authorized?: boolean;
 }
 
 export default function TabsComponent({
   mode,
   gameData,
   setGameData,
-  admin,
+  authorized,
 }: Props) {
   const [description, setDescription] = useState(gameData.description);
 
@@ -51,7 +51,7 @@ export default function TabsComponent({
             ) : null}
             {gameData.parentingGuide ? <Tab>Parenting Guide</Tab> : null}
             {gameData.lesson ? <Tab>Lesson Plan</Tab> : null}
-            {gameData.answerKey && admin ? <Tab>Answer Key</Tab> : null}
+            {gameData.answerKey && authorized ? <Tab>Answer Key</Tab> : null}
           </TabList>
           <TabPanels className="mb-12 mt-8 text-gray-500">
             <TabPanel p="0px">
@@ -85,7 +85,7 @@ export default function TabsComponent({
               ) : null}
               {mode === "edit" && (
                 <Flex className="flex-row">
-                  <AddOrEditVideoTrailer gameData={gameData} />
+                  <AddEditVideoTrailer gameData={gameData} />
                   {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
                     <DeleteVideoTrailer gameData={gameData} />
                   ) : null}

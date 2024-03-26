@@ -29,7 +29,7 @@ interface Props {
 }
 
 //TODO: Condense into both add and edit  video trailer components.
-export default function AddOrEditVideoTrailer({ gameData }: Props) {
+export default function AddEditVideoTrailer({ gameData }: Props) {
   const router = useRouter();
   const gameID = router.query.id;
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -38,13 +38,12 @@ export default function AddOrEditVideoTrailer({ gameData }: Props) {
   const [issue, setIssue] = useState("");
   const [addButton, setAddButton] = useState(true);
   useEffect(() => {
-    console.log(gameData.videoTrailer, "STUFF");
     if (gameData.videoTrailer === undefined || gameData.videoTrailer === "") {
       setAddButton(true);
     } else {
       setAddButton(false);
     }
-  }, [gameData]);
+  }, [gameData, isOpen]);
   useEffect(() => {
     setIssue("");
   }, [isOpen]);
