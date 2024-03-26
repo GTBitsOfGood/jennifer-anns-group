@@ -17,6 +17,7 @@ const pageRequiredAuthentication: Record<
   [Pages.LOGIN]: "unauthenticated",
   [Pages.SIGNUP]: "unauthenticated",
   [Pages.CREATEGAME]: "authenticated",
+  [Pages.EDITGAME]: "authenticated",
 };
 
 enum Label {
@@ -39,6 +40,7 @@ const pageRequiredLabels: Record<Pages, Array<Label>> = {
   [Pages.LOGIN]: [Label.NONE], // Only allow public users
   [Pages.SIGNUP]: [Label.NONE], // Only allow public users
   [Pages.CREATEGAME]: [Label.ADMINISTRATOR], // Only allow administrator role
+  [Pages.EDITGAME]: [Label.ADMINISTRATOR], // Only allow administrator role
 };
 
 const pageAccessHOC = <P extends object>(Component: React.FC<P>) => {

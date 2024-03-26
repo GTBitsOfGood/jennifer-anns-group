@@ -8,6 +8,8 @@ import React from "react";
 import DeleteGameComponent from "@/components/GameComponent/DeleteGameComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { useSession } from "next-auth/react";
+import pageAccessHOC from "@/components/HOC/PageAccess";
+import AddEditWebGLComponent from "@/components/GameComponent/AddEditWebGLComponent";
 
 const EditGamePage = () => {
   const router = useRouter();
@@ -16,46 +18,6 @@ const EditGamePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [name, setName] = useState("");
-
-  const idSchema = z.string().length(24);
-
-  const userDataSchema = userSchema
-    .extend({
-      _id: idSchema,
-    })
-    .omit({ hashedPassword: true });
-
-  const { data: session } = useSession();
-  const currentUser = session?.user;
-  const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
-
-  useEffect(() => {
-    if (!session) {
-      router.push("/");
-    }
-  }, [session]);
-
-  useEffect(() => {
-    if (currentUser) {
-      getUserData();
-    }
-  }, [currentUser]);
-
-  useEffect(() => {
-    if (userData && userData.label !== "administrator") {
-      router.push("/");
-    }
-  }, [userData]);
-
-  async function getUserData() {
-    try {
-      const response = await fetch(`/api/users/${currentUser?._id}`);
-      const data = await response.json();
-      setUserData(data);
-    } catch (error) {
-      console.error("Error getting user:", error);
-    }
-  }
 
   const getGame = async () => {
     try {
@@ -100,6 +62,7 @@ const EditGamePage = () => {
       themes: themeIds,
       description: gameData?.description,
       name: gameData?.name,
+      builds: gameData?.builds,
     };
 
     await fetch(`/api/games/${gameID}`, {
@@ -136,8 +99,11 @@ const EditGamePage = () => {
           onChange={changeName}
         />
       </div>
-      <div className="mx-auto flex w-[80vw] justify-end">
+      <div className="mx-auto flex w-[75vw] justify-end">
         <DeleteGameComponent gameName={gameData.name} />
+      </div>
+      <div className="mx-auto my-8 h-[75vh] w-[75vw]">
+        <AddEditWebGLComponent gameData={gameData} />
       </div>
       <TabsComponent
         mode="edit"
@@ -171,4 +137,4 @@ const EditGamePage = () => {
   );
 };
 
-export default EditGamePage;
+export default pageAccessHOC(EditGamePage);

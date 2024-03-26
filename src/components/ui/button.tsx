@@ -29,6 +29,8 @@ const buttonVariants = cva(
         mainorange:
           "border border-orange-primary transition-opacity border-[1px] bg-orange-primary text-white hover:opacity-80 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
         white: "text-blue-primary",
+        upload:
+          "bg-[#FAFBFC] border border-[#666666] text-slate-900 hover:opacity-80 dark:bg-slate-800 dark:text-slate-50 dark:hover:bg-slate-800/80",
       },
       size: {
         default: "h-10 px-4 py-2",
