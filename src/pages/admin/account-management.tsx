@@ -8,6 +8,8 @@ import { Box, Tooltip } from "@chakra-ui/react";
 import { ObjectId } from "mongodb";
 import { useEffect, useState } from "react";
 
+// allow enter on admin add
+
 export type Admin = IAdmin & { _id: ObjectId };
 
 const AccountManagementPage = () => {
