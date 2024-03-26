@@ -1,6 +1,11 @@
 import { ITheme } from "@/server/db/models/ThemeModel";
-import { Button } from "../ui/button";
-import { Dialog, DialogClose, DialogContent, DialogFooter } from "../ui/dialog";
+import { Button } from "../../ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+} from "../../ui/dialog";
 import { ITag } from "@/server/db/models/TagModel";
 import { DeleteTagInput } from "@/pages/api/tags";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
