@@ -3,7 +3,7 @@ import ThemeModel, { ITheme } from "../models/ThemeModel";
 import TagModel, { ITag } from "../models/TagModel";
 import connectMongoDB from "../mongodb";
 import { deleteBuild } from "./BuildAction";
-import mongoose, { FilterQuery, Aggregate } from "mongoose";
+import mongoose, { FilterQuery, Aggregate, Types } from "mongoose";
 import { z } from "zod";
 import { AllBuilds, ExtendId, editGameSchema } from "@/utils/types";
 import { GameQuery, GetGameQuerySchema } from "@/pages/api/games";
@@ -106,8 +106,55 @@ export async function editGame(allData: nextEditGame) {
   return newGame;
 }
 
-export type GetSelectedGamesOutput = ExtendId<
-  Omit<IGame, "builds"> & { builds: ExtendId<IBuild>[] }
+const oppositeMap: Record<
+  "accessibility" | "custom",
+  "accessibility" | "custom"
+> = {
+  accessibility: "custom",
+  custom: "accessibility",
+};
+
+export async function editGameTags(
+  gameId: Types.ObjectId,
+  gameTags: string[],
+  inputData: string[],
+  type: "accessibility" | "custom",
+) {
+  await connectMongoDB();
+  const oppositeGameTags = await TagModel.find(
+    {
+      _id: {
+        $in: gameTags ?? [],
+      },
+      type: oppositeMap[type],
+    },
+    {
+      _id: 1,
+    },
+  );
+
+  const newGame = await GameModel.findByIdAndUpdate(
+    gameId,
+    {
+      tags: [...oppositeGameTags.map((tag) => tag._id), ...inputData],
+    },
+    {
+      new: true,
+    },
+  );
+
+  if (!newGame) {
+    throw new GameNotFoundException();
+  }
+  return newGame;
+}
+
+export type GamesFilterOutput = ExtendId<
+  Omit<IGame, "builds" | "themes" | "tags"> & {
+    builds: ExtendId<IBuild>[];
+    themes: ExtendId<ITheme>[];
+    tags: ExtendId<ITag>[];
+  }
 >[];
 
 export async function getSelectedGames(
@@ -142,6 +189,8 @@ export async function getSelectedGames(
   return results;
 }
 
+export type GetSelectedGamesOutput = ReturnType<typeof getSelectedGames>;
+
 type QueryFieldHandlers<T> = {
   [K in keyof Omit<T, "page">]: (
     field: T[K],
@@ -153,10 +202,10 @@ type QueryFieldHandlers<T> = {
   }>;
 } & {
   page: (
-    field: number,
+    field: number | undefined,
     filterFieldsAnd: FilterQuery<IGame>,
     filterFieldsOr: FilterQuery<IGame>,
-  ) => Aggregate<{ games: GetSelectedGamesOutput; count: number }[]>;
+  ) => Aggregate<{ games: GamesFilterOutput; count: number }[]>;
 };
 
 const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
@@ -173,7 +222,7 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
       ...(orFilters.length > 0 ? [{ $or: orFilters }] : []),
     ];
     const aggregate = GameModel.aggregate<{
-      games: GetSelectedGamesOutput;
+      games: GamesFilterOutput;
       count: number;
     }>();
 
@@ -181,13 +230,32 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
       ...(allSteps.length > 0 && { $and: allSteps }),
     });
     aggregate.sort({ name: 1 });
-    aggregate.facet({
-      games: [
-        { $skip: (pageNum - 1) * RESULTS_PER_PAGE },
-        { $limit: RESULTS_PER_PAGE },
-      ],
-      count: [{ $count: "count" }],
+    aggregate.lookup({
+      from: "themes",
+      localField: "themes",
+      foreignField: "_id",
+      as: "themes",
     });
+    aggregate.lookup({
+      from: "tags",
+      localField: "tags",
+      foreignField: "_id",
+      as: "tags",
+    });
+    if (pageNum !== undefined) {
+      aggregate.facet({
+        games: [
+          { $skip: (pageNum - 1) * RESULTS_PER_PAGE },
+          { $limit: RESULTS_PER_PAGE },
+        ],
+        count: [{ $count: "count" }],
+      });
+    } else {
+      aggregate.facet({
+        games: [{ $skip: 0 }],
+        count: [{ $count: "count" }],
+      });
+    }
     aggregate.project({
       count: { $arrayElemAt: ["$count.count", 0] },
       games: 1,
@@ -297,8 +365,8 @@ export async function getGameById(id: string) {
   await connectMongoDB();
   try {
     const game = await GameModel.findById(id)
-      .populate<{ themes: ITheme[] }>("themes")
-      .populate<{ tags: ITag[] }>("tags");
+      .populate<{ themes: ExtendId<ITheme>[] }>("themes")
+      .populate<{ tags: ExtendId<ITag>[] }>("tags");
     return game;
   } catch (e) {
     throw e;

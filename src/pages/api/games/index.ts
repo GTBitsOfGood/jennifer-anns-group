@@ -1,15 +1,25 @@
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { z, RefinementCtx } from "zod";
 import {
+  GamesFilterOutput,
+  GetSelectedGamesOutput,
   createGame,
   getSelectedGames,
 } from "../../../server/db/actions/GameAction";
-import { AllBuilds, GameContentEnum, gameSchema } from "../../../utils/types";
+import {
+  AllBuilds,
+  ExtendId,
+  GameContentEnum,
+  gameSchema,
+} from "../../../utils/types";
 import { NextApiRequest, NextApiResponse } from "next";
 import {
   GameInvalidInputException,
   GameException,
 } from "../../../utils/exceptions/game";
+import { ITag } from "@/server/db/models/TagModel";
+import { ITheme } from "@/server/db/models/ThemeModel";
+import { IBuild, IGame } from "@/server/db/models/GameModel";
 
 export default async function handler(
   req: NextApiRequest,
@@ -27,6 +37,15 @@ export default async function handler(
   }
 }
 
+export type GetGamesOutput = Omit<Awaited<GetSelectedGamesOutput>, "games"> & {
+  games: (Omit<ExtendId<IGame>, "themes" | "tags" | "builds"> & {
+    builds: ExtendId<IBuild>[];
+    themes: ExtendId<ITheme>[];
+    accessibility: ExtendId<ITag>[];
+    custom: ExtendId<ITag>[];
+  })[];
+};
+
 async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     //TODO: Putback parsing
@@ -37,8 +56,18 @@ async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
         .status(HTTP_STATUS_CODE.BAD_REQUEST)
         .send(parsedQuery.error.format());
     }
-    const games = await getSelectedGames(parsedQuery.data);
-    return res.status(HTTP_STATUS_CODE.OK).send(games);
+    const result = await getSelectedGames(parsedQuery.data);
+    const { games } = result;
+    const tagSeparatedGames = games.map(({ tags, ...game }) => ({
+      ...game,
+      accessibility: tags?.filter((tag) => tag.type === "accessibility"),
+      custom: tags.filter((tag) => tag.type === "custom"),
+    }));
+
+    return res.status(HTTP_STATUS_CODE.OK).send({
+      ...result,
+      games: tagSeparatedGames,
+    });
   } catch (e: any) {
     return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
@@ -99,6 +128,6 @@ export const GetGameQuerySchema = z.object({
     .array(z.nativeEnum(GameContentEnum))
     .or(z.nativeEnum(GameContentEnum).transform(putSingleStringInArray)) //In this case where only thing is passed into gameContent.
     .optional(),
-  page: z.string().transform(convertINT).pipe(z.number().gte(1)),
+  page: z.string().transform(convertINT).pipe(z.number().gte(1)).optional(),
 });
 export type GameQuery = z.infer<typeof GetGameQuerySchema>;
