@@ -24,6 +24,7 @@ interface Props {
   mode: string;
   gameData: populatedGameWithId;
   setGameData?: Dispatch<populatedGameWithId>;
+  admin?: boolean;
 }
 
 const sortByTagType = (
@@ -38,7 +39,12 @@ const sortByTagType = (
   return 0;
 };
 
-export default function TagsComponent({ mode, gameData, setGameData }: Props) {
+export default function TagsComponent({
+  mode,
+  gameData,
+  setGameData,
+  admin,
+}: Props) {
   const [search, setSearch] = useState(false);
   const [themes, setThemes] = useState<z.infer<typeof themeDataSchema>[]>(
     gameData.themes,
@@ -87,6 +93,16 @@ export default function TagsComponent({ mode, gameData, setGameData }: Props) {
     <ChakraProvider theme={chakraTheme}>
       <div>
         <div className="m-auto flex w-5/6 flex-row flex-wrap pb-3 pt-6 font-inter text-base">
+          {gameData.videoTrailer ? <Tag>Video Trailer</Tag> : null}
+          {gameData.parentingGuide ? <Tag>Parenting Guide</Tag> : null}
+          {gameData.lesson ? <Tag>Lesson Plan</Tag> : null}
+          {gameData.answerKey && admin ? <Tag>Answer Key</Tag> : null}
+          {gameData.webGLBuild ? <Tag>WebGL</Tag> : null}
+          {gameData.builds
+            ? gameData.builds.map((build) => (
+                <Tag key={build.type}>{build.type}</Tag>
+              ))
+            : null}
           {themes
             ? themes.map((theme) => (
                 <Tag key={theme.name} bg="brand.400">
