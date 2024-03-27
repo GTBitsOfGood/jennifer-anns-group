@@ -22,8 +22,9 @@ const EditGamePage = () => {
   const getGame = async () => {
     try {
       const response = await fetch(`/api/games/${gameID}`);
-      if (!response.ok) {
+      if (!response.ok || response.status !== 200) {
         setError("Failed to fetch game");
+        router.push("/");
       }
       const data = await response.json();
       setGameData(data);
@@ -63,6 +64,7 @@ const EditGamePage = () => {
       description: gameData?.description,
       name: gameData?.name,
       builds: gameData?.builds,
+      videoTrailer: gameData?.videoTrailer,
     };
 
     await fetch(`/api/games/${gameID}`, {
@@ -109,12 +111,14 @@ const EditGamePage = () => {
         mode="edit"
         gameData={gameData}
         setGameData={setGameData}
+        authorized={true}
       />
       {gameData.tags && gameData.themes ? (
         <TagsComponent
           mode="edit"
           gameData={gameData}
           setGameData={setGameData}
+          admin={true}
         />
       ) : null}
       <div className="mx-auto mb-40 mt-24 flex w-[80vw] justify-end">
