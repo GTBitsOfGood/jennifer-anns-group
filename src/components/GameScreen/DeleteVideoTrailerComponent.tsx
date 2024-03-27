@@ -18,9 +18,10 @@ import { CloseIcon } from "@chakra-ui/icons";
 
 interface Props {
   gameData: populatedGameWithId;
+  setDeleted: (value: boolean) => void;
 }
 
-export default function DeleteVideoTrailer({ gameData }: Props) {
+export default function DeleteVideoTrailer({ gameData, setDeleted }: Props) {
   const router = useRouter();
   const gameID = router.query.id;
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -29,6 +30,7 @@ export default function DeleteVideoTrailer({ gameData }: Props) {
   async function deleteVideoTrailer() {
     //The themes is populated and cant be send to the endpoint
     gameData.videoTrailer = "";
+    setDeleted(true);
     router.push(`/games/${gameID}/edit`);
   }
 

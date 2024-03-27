@@ -26,10 +26,11 @@ const vimeoREGEX =
   /(http|https)?:\/\/(www\.|player\.)?vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|video\/|)(\d+)(?:|\/\?)/;
 interface Props {
   gameData: populatedGameWithId;
+  deleted: boolean;
 }
 
 //TODO: Condense into both add and edit  video trailer components.
-export default function AddEditVideoTrailer({ gameData }: Props) {
+export default function AddEditVideoTrailer({ gameData, deleted }: Props) {
   const router = useRouter();
   const gameID = router.query.id;
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -38,12 +39,13 @@ export default function AddEditVideoTrailer({ gameData }: Props) {
   const [issue, setIssue] = useState("");
   const [addButton, setAddButton] = useState(true);
   useEffect(() => {
+    console.log(gameData.videoTrailer, "videoTrailer");
     if (gameData.videoTrailer === undefined || gameData.videoTrailer === "") {
       setAddButton(true);
     } else {
       setAddButton(false);
     }
-  }, [gameData, isOpen]);
+  }, [gameData, isOpen, deleted]);
   useEffect(() => {
     setIssue("");
   }, [isOpen]);

@@ -145,7 +145,7 @@ const EditGamePage = () => {
         mode="edit"
         gameData={gameData}
         setGameData={setGameData}
-        admin={true}
+        authorized={true}
       />
       {gameData.tags && gameData.themes ? (
         <TagsComponent

@@ -27,7 +27,7 @@ export default function TabsComponent({
   authorized,
 }: Props) {
   const [description, setDescription] = useState(gameData.description);
-
+  const [deleted, setDeleted] = useState(false);
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
     setDescription(newValue);
@@ -67,31 +67,41 @@ export default function TabsComponent({
                 <p>{gameData.description}</p>
               )}
             </TabPanel>
-            <TabPanel className="flex flex-col justify-center">
-              {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
-                <div style={{ paddingTop: "56.25%", position: "relative" }}>
-                  <ReactPlayer
-                    url={gameData.videoTrailer}
-                    controls={true}
-                    width="100%"
-                    height="100%" //TODO: Make height dynamically rescale.
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                    }}
-                  />
-                </div>
-              ) : null}
-              {mode === "edit" && (
-                <Flex className="flex-row">
-                  <AddEditVideoTrailer gameData={gameData} />
-                  {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
-                    <DeleteVideoTrailer gameData={gameData} />
-                  ) : null}
-                </Flex>
-              )}
-            </TabPanel>
+            {(gameData.videoTrailer && gameData.videoTrailer !== "") ||
+            mode === "edit" ? (
+              <TabPanel className="flex flex-col justify-center">
+                {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
+                  <div style={{ paddingTop: "56.25%", position: "relative" }}>
+                    <ReactPlayer
+                      url={gameData.videoTrailer}
+                      controls={true}
+                      width="100%"
+                      height="100%" //TODO: Make height dynamically rescale.
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                      }}
+                    />
+                  </div>
+                ) : null}
+
+                {mode === "edit" && (
+                  <Flex className="flex-row">
+                    <AddEditVideoTrailer
+                      gameData={gameData}
+                      deleted={deleted}
+                    />
+                    {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
+                      <DeleteVideoTrailer
+                        gameData={gameData}
+                        setDeleted={setDeleted}
+                      />
+                    ) : null}
+                  </Flex>
+                )}
+              </TabPanel>
+            ) : null}
 
             {gameData.parentingGuide ? (
               <TabPanel>Parenting Guide</TabPanel>
