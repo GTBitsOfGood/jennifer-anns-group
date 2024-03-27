@@ -97,7 +97,11 @@ const GamePage = () => {
         </>
       )}
       <EmbeddedGame gameId={gameId as string} />
-      <TabsComponent mode="view" gameData={gameData} admin={visibleAnswer} />
+      <TabsComponent
+        mode="view"
+        gameData={gameData}
+        authorized={visibleAnswer}
+      />
       {loaded && userData.label !== "administrator" && (
         <NotesComponent gameId={gameId} userId={userId} />
       )}
