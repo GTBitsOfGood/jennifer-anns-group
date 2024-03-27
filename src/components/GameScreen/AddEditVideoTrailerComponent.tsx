@@ -39,7 +39,6 @@ export default function AddEditVideoTrailer({ gameData, deleted }: Props) {
   const [issue, setIssue] = useState("");
   const [addButton, setAddButton] = useState(true);
   useEffect(() => {
-    console.log(gameData.videoTrailer, "videoTrailer");
     if (gameData.videoTrailer === undefined || gameData.videoTrailer === "") {
       setAddButton(true);
     } else {

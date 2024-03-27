@@ -12,6 +12,7 @@ import { populatedGameWithId } from "@/server/db/models/GameModel";
 import DeleteVideoTrailer from "../GameScreen/DeleteVideoTrailerComponent";
 import AddEditVideoTrailer from "../GameScreen/AddEditVideoTrailerComponent";
 import { ChangeEvent, Dispatch, useState } from "react";
+import GameBuildList from "../GameComponent/GameBuildList";
 import ReactPlayer from "react-player/lazy";
 interface Props {
   mode: string;
@@ -52,6 +53,8 @@ export default function TabsComponent({
             {gameData.parentingGuide ? <Tab>Parenting Guide</Tab> : null}
             {gameData.lesson ? <Tab>Lesson Plan</Tab> : null}
             {gameData.answerKey && authorized ? <Tab>Answer Key</Tab> : null}
+            {((gameData?.builds && gameData.builds.length > 0) ||
+              mode === "edit") && <Tab>Game Builds</Tab>}
           </TabList>
           <TabPanels className="mb-12 mt-8 text-gray-500">
             <TabPanel p="0px">
@@ -102,11 +105,23 @@ export default function TabsComponent({
                 )}
               </TabPanel>
             ) : null}
-
             {gameData.parentingGuide ? (
               <TabPanel>Parenting Guide</TabPanel>
             ) : null}
             {gameData.lesson ? <TabPanel>Lesson Plan</TabPanel> : null}
+            {gameData.answerKey && authorized ? (
+              <TabPanel>Answer Key</TabPanel>
+            ) : null}
+            {((gameData?.builds && gameData.builds.length > 0) ||
+              mode === "edit") && (
+              <TabPanel p="0px">
+                <GameBuildList
+                  gameData={gameData}
+                  editing={mode === "edit"}
+                  setGameData={setGameData}
+                />
+              </TabPanel>
+            )}
           </TabPanels>
         </Tabs>
       </div>

@@ -42,7 +42,7 @@ export default function DeleteVideoTrailer({ gameData, setDeleted }: Props) {
           rightIcon={<CloseIcon color="deleteRed" boxSize="10px" />}
           bg="white"
           color="deleteRed"
-          className="w-183 mt-5 h-48 rounded-md border border-delete-red bg-white px-[17px] py-2 font-sans text-xl font-semibold text-delete-red"
+          className="w-183 h-46 mt-5 rounded-md border border-delete-red bg-white px-[17px] py-2 font-sans text-xl font-semibold text-delete-red"
         >
           Delete Trailer
         </Button>

@@ -153,7 +153,7 @@ type QueryFieldHandlers<T> = {
   }>;
 } & {
   page: (
-    field: number,
+    field: number | undefined,
     filterFieldsAnd: FilterQuery<IGame>,
     filterFieldsOr: FilterQuery<IGame>,
   ) => Aggregate<{ games: GetSelectedGamesOutput; count: number }[]>;
@@ -181,13 +181,21 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
       ...(allSteps.length > 0 && { $and: allSteps }),
     });
     aggregate.sort({ name: 1 });
-    aggregate.facet({
-      games: [
-        { $skip: (pageNum - 1) * RESULTS_PER_PAGE },
-        { $limit: RESULTS_PER_PAGE },
-      ],
-      count: [{ $count: "count" }],
-    });
+    if (pageNum !== undefined) {
+      aggregate.facet({
+        games: [
+          { $skip: (pageNum - 1) * RESULTS_PER_PAGE },
+          { $limit: RESULTS_PER_PAGE },
+        ],
+        count: [{ $count: "count" }],
+      });
+    } else {
+      aggregate.facet({
+        games: [{ $skip: 0 }],
+        count: [{ $count: "count" }],
+      });
+    }
+
     aggregate.project({
       count: { $arrayElemAt: ["$count.count", 0] },
       games: 1,
