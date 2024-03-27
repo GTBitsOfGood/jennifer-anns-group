@@ -159,10 +159,10 @@ export default function ContactComponent() {
                         />
                       </ModalHeader>
                       <ModalBody maxWidth="400">
-                        <span className="font-medium">
-                          Your message has been sent. Someone from out team will
+                        <div className="text-center font-medium">
+                          Your message has been sent. Someone from our team will
                           reply to your question shortly.
-                        </span>
+                        </div>
                       </ModalBody>
                     </ModalContent>
                   </Modal>
