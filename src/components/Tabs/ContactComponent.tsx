@@ -64,7 +64,7 @@ export default function ContactComponent({ gameName }: Props) {
         lastName: lastName,
         email: email,
         message: message,
-        gameName: gameName, //TODO: Replace with correct gameName
+        gameName: gameName,
       }),
     });
     onOpen();

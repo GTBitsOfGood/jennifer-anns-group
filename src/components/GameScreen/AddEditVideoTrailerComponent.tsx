@@ -29,7 +29,6 @@ interface Props {
   deleted: boolean;
 }
 
-//TODO: Condense into both add and edit  video trailer components.
 export default function AddEditVideoTrailer({ gameData, deleted }: Props) {
   const router = useRouter();
   const gameID = router.query.id;
