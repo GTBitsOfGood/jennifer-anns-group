@@ -152,6 +152,15 @@ export const adminSchema = z.object({
   email: z.string().email("Not a valid email"),
 });
 
+// Email Format
+export const emailSchema = z.object({
+  email: z.string().email(),
+  firstName: z.string(),
+  lastName: z.string(),
+  message: z.string(),
+  gameName: z.string(),
+});
+
 export type ExtendId<T extends any> = T & { _id: string };
 export type ExtendVersion<T extends any> = T & { __v: number };
 // For changing password

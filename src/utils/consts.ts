@@ -26,3 +26,7 @@ export const UNDELETABLE_EMAILS = [
   "drew@jenniferann.org",
   "susanne@jenniferann.org",
 ];
+//TODO: Change back to proper dev admin contact instead of the test one
+
+//export const DEV_ADMIN_CONTACT = "bogjenniferanns@gmail.com";
+export const DEV_ADMIN_CONTACT = "ankiththalanki2005@gmail.com";

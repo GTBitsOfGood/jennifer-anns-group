@@ -105,7 +105,7 @@ const GamePage = () => {
       {loaded && userData.label !== "administrator" && (
         <NotesComponent gameId={gameId} userId={userId} />
       )}
-      <ContactComponent />
+      <ContactComponent gameName={gameData.name} />
       <TagsComponent mode="view" gameData={gameData} admin={visibleAnswer} />
     </div>
   );

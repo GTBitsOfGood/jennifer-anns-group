@@ -23,7 +23,11 @@ import {
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { useState, useEffect } from "react";
-export default function ContactComponent() {
+interface Props {
+  gameName: string;
+}
+
+export default function ContactComponent({ gameName }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [firstName, setfirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -51,6 +55,19 @@ export default function ContactComponent() {
     setEmail("");
     setMessage("");
     onClose();
+  };
+  const onOpenFeatured = async () => {
+    const result = await fetch("/api/email", {
+      method: "POST",
+      body: JSON.stringify({
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        message: message,
+        gameName: gameName, //TODO: Replace with correct gameName
+      }),
+    });
+    onOpen();
   };
 
   return (
@@ -129,7 +146,7 @@ export default function ContactComponent() {
                     color="white"
                     bg={colors[`${valid}`]}
                     _hover={{ bg: colors[`${valid}`] }}
-                    onClick={valid ? onOpen : () => {}}
+                    onClick={valid ? onOpenFeatured : () => {}}
                     className="mt-8 rounded-md border border-transparent px-4 py-2 text-sm font-medium   focus:outline-none focus:ring-2"
                   >
                     Send Message
@@ -159,7 +176,7 @@ export default function ContactComponent() {
                         />
                       </ModalHeader>
                       <ModalBody maxWidth="400">
-                        <div className="text-center font-medium">
+                        <div className="text-center font-sans font-medium">
                           Your message has been sent. Someone from our team will
                           reply to your question shortly.
                         </div>
