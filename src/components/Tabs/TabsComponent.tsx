@@ -79,7 +79,7 @@ export default function TabsComponent({
                       url={gameData.videoTrailer}
                       controls={true}
                       width="100%"
-                      height="100%" //TODO: Make height dynamically rescale.
+                      height="100%"
                       style={{
                         position: "absolute",
                         top: 0,
