@@ -6,6 +6,7 @@ import {
 import { NextApiRequest, NextApiResponse } from "next";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import {
+  UserCredentialsIncorrectException,
   UserDoesNotExistException,
   UserException,
 } from "@/utils/exceptions/user";
@@ -72,7 +73,9 @@ async function editPasswordHandler(req: NextApiRequest, res: NextApiResponse) {
     const result = await editPassword(req.body, String(id));
     return res.status(HTTP_STATUS_CODE.OK).send({ result });
   } catch (e: any) {
-    if (e instanceof UserException) {
+    if (e instanceof UserCredentialsIncorrectException) {
+      return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).send(e.message);
+    } else if (e instanceof UserException) {
       return res.status(e.code).send(e.message);
     }
     return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
