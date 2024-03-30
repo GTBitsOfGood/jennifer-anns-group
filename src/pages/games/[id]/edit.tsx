@@ -1,15 +1,12 @@
 import { useRouter } from "next/router";
-import { ChangeEvent, useEffect, useState } from "react";
-import { tagSchema, themeSchema, userSchema } from "@/utils/types";
-import { z } from "zod";
+import { ChangeEvent, useState } from "react";
 import TagsComponent from "@/components/Tags/TagsComponent";
 import TabsComponent from "@/components/Tabs/TabsComponent";
 import React from "react";
-import DeleteGameComponent from "@/components/GameComponent/DeleteGameComponent";
+import DeleteGameComponent from "@/components/GameScreen/DeleteGameComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
-import { useSession } from "next-auth/react";
 import pageAccessHOC from "@/components/HOC/PageAccess";
-import AddEditWebGLComponent from "@/components/GameComponent/AddEditWebGLComponent";
+import AddEditWebGLComponent from "@/components/GameScreen/AddEditWebGLComponent";
 
 const EditGamePage = () => {
   const router = useRouter();

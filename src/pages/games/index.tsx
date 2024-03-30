@@ -24,18 +24,23 @@ import {
   TriangleUpIcon,
 } from "@chakra-ui/icons";
 import { Input } from "@chakra-ui/react";
-import FilterBody from "@/components/GameComponent/FilterBody";
+import FilterBody from "@/components/GameGallery/FilterBody";
 import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
-import ThemeSidebar from "@/components/GameComponent/ThemeSidebar";
-import SelectedFilters from "@/components/GameComponent/SelectedFilters";
-import GameCardView from "@/components/GameComponent/GameCardView";
+import ThemeSidebar from "@/components/GameGallery/ThemeSidebar";
+import SelectedFilters from "@/components/GameGallery/SelectedFilters";
+import GameCardView from "@/components/GameGallery/GameCardView";
+
+const idSchema = z.string().length(24);
+export const gameDataSchema = gameSchema.extend({
+  _id: idSchema,
+});
 
 export default function Games() {
   const { data: session } = useSession();
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
-  const [games, setGames] = useState<z.infer<typeof gameSchema>[]>([]);
+  const [games, setGames] = useState<z.infer<typeof gameDataSchema>[]>([]);
   const [themes, setThemes] = useState<string[]>([]);
   const [selectedTheme, setSelectedTheme] = useState("All Games");
   const [gameBuilds, setGameBuilds] = useState<string[]>([]);
