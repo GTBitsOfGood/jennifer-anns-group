@@ -13,6 +13,7 @@ import { IHomePage } from "@/server/db/models/HomePageModel";
 import MdEditor from "react-markdown-editor-lite";
 import MarkdownIt from "markdown-it";
 import Markdown from "react-markdown";
+import insert from "markdown-it-ins";
 import "react-markdown-editor-lite/lib/index.css";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,8 +21,10 @@ import axios from "axios";
 import { WarningTwoIcon } from "@chakra-ui/icons";
 import cx from "classnames";
 import EditGameBoyModal from "@/components/HomePage/EditGameBoyModal";
+import MarkdownRenderer from "@/components/MarkdownRenderer";
 
-const mdParser = new MarkdownIt();
+const mdPlugins = ["font-bold", "font-italic", "font-underline"];
+const mdParser = new MarkdownIt().use(insert);
 
 const Home = () => {
   const { data: session } = useSession();
@@ -132,6 +135,7 @@ const Home = () => {
                   </div>
                 </div>
                 <MdEditor
+                  plugins={mdPlugins}
                   renderHTML={(text) => mdParser.render(text)}
                   defaultValue={pageData.mdDescription}
                   onChange={(data) => {
@@ -191,9 +195,11 @@ const Home = () => {
                   <h1 className="mb-12 text-center text-3xl font-medium">
                     {pageData.mdTitle}
                   </h1>
-                  <Markdown className="mb-8 space-y-4 text-center text-lg text-gray-500">
-                    {pageData.mdDescription}
-                  </Markdown>
+                  <MarkdownRenderer
+                    className="mb-8 space-y-4 text-center text-lg text-gray-500"
+                    markdown={pageData.mdDescription}
+                    parse={(markdown) => mdParser.render(markdown)}
+                  />
                 </div>
               </div>
             )}
