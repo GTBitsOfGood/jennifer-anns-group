@@ -15,7 +15,6 @@ const EditGamePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [name, setName] = useState("");
-
   const getGame = async () => {
     try {
       const response = await fetch(`/api/games/${gameID}`);
