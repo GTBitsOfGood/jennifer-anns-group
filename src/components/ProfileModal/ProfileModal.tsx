@@ -69,7 +69,7 @@ export function ProfileModal(props: ProfileProps) {
     if (currentUser) {
       getUserData();
     }
-  }, [currentUser, userData?.label]);
+  }, [currentUser]);
 
   async function getUserData() {
     try {
