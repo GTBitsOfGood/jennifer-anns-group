@@ -44,7 +44,6 @@ export default function TabsComponent({
       });
     }
   };
-  console.log(gameData);
 
   return (
     <ChakraProvider theme={chakraTheme}>

@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import TagsComponent from "@/components/Tags/TagsComponent";
 import TabsComponent from "@/components/Tabs/TabsComponent";
 import React from "react";
@@ -11,18 +11,12 @@ import { useDisclosure } from "@chakra-ui/react";
 
 const EditGamePage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  console.log("hi");
-  console.log(isOpen);
   const router = useRouter();
   const gameID = router.query.id;
   const [gameData, setGameData] = useState<populatedGameWithId>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [name, setName] = useState("");
-
-  useEffect(() => {
-    console.log(isOpen);
-  }, [isOpen]);
 
   const getGame = async () => {
     try {

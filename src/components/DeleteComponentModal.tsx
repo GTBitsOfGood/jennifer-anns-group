@@ -12,8 +12,6 @@ import {
 import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
 import { useRef } from "react";
-import React, { useState } from "react";
-import axios from "axios";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 
 interface Props {
@@ -22,7 +20,6 @@ interface Props {
   onClose: () => void;
   gameName?: string;
   buildType?: string;
-  setAddOrEdit?: React.Dispatch<React.SetStateAction<"Add" | "Edit">>;
   gameData?: populatedGameWithId;
   setDeleted?: (value: boolean) => void;
 }
@@ -31,7 +28,6 @@ export default function DeleteComponentModal(props: Props) {
   const router = useRouter();
   const gameID = router.query.id;
   const cancelRef = useRef<HTMLButtonElement | null>(null);
-  const [deleting, setDeleting] = useState<boolean>(false);
 
   const deleteType = props.deleteType;
 
@@ -41,7 +37,6 @@ export default function DeleteComponentModal(props: Props) {
     parentingGuide: "this parenting guide",
     lessonPlan: "this lesson plan",
     trailer: "this trailer",
-    build: props.gameName + " " + props.buildType,
   };
 
   const subtitle: Record<string, string> = {
@@ -50,7 +45,6 @@ export default function DeleteComponentModal(props: Props) {
     parentingGuide: "a parenting guide",
     lessonPlan: "a lesson plan",
     trailer: "a trailer",
-    build: "a game build",
   };
 
   const button: Record<string, string> = {
@@ -59,38 +53,24 @@ export default function DeleteComponentModal(props: Props) {
     parentingGuide: "guide",
     lessonPlan: "plan",
     trailer: "trailer",
-    build: "build",
   };
 
-  // const deleteFunction: Record<string, Promise<void>> = {
-  //   game: deleteGame(),
-  //   answerKey: deleteAnswerKey(),
-  //   parentingGuide: deleteParentingGuide(),
-  //   lessonPlan: deleteLessonPlan(),
-  //   trailer: deleteTrailer(),
-  //   build: deleteBuild(),
-  // };
+  const deleteFunction: Record<string, () => Promise<void>> = {
+    game: deleteGame,
+    answerKey: deleteAnswerKey,
+    parentingGuide: deleteParentingGuide,
+    lessonPlan: deleteLessonPlan,
+    trailer: deleteTrailer,
+  };
 
   function handleDelete() {
-    deleteFunction[deleteType];
+    deleteFunction[deleteType]();
   }
 
-  const deleteFunction: Record<string, Promise<void>> = {
-    game: temp(),
-    answerKey: temp(),
-    parentingGuide: temp(),
-    lessonPlan: temp(),
-    trailer: temp(),
-    build: temp(),
-  };
-
-  async function temp() {}
-
   async function deleteGame() {
-    console.log("alsdkfjlaksjdf");
-    // fetch(`/api/games/${gameID}`, {
-    //   method: "DELETE",
-    // });
+    fetch(`/api/games/${gameID}`, {
+      method: "DELETE",
+    });
     router.push("/games");
   }
 
@@ -99,16 +79,6 @@ export default function DeleteComponentModal(props: Props) {
   async function deleteParentingGuide() {}
 
   async function deleteLessonPlan() {}
-
-  async function deleteBuild() {
-    if (props.setAddOrEdit) {
-      setDeleting(true);
-      await axios.delete(`/api/games/${gameID}/builds`);
-      props.setAddOrEdit("Add");
-      setDeleting(false);
-      props.onClose();
-    }
-  }
 
   async function deleteTrailer() {
     if (props.gameData && props.setDeleted) {
@@ -151,7 +121,7 @@ export default function DeleteComponentModal(props: Props) {
             </AlertDialogBody>
             <AlertDialogFooter p="0" justifyContent="center">
               <button
-                // onClick={handleDelete}
+                onClick={handleDelete}
                 className="mb-24 mr-[22px] h-[47px] w-[198px] rounded-[10px] bg-delete-red font-sans font-semibold text-white"
               >
                 Yes, delete {button[deleteType]}
