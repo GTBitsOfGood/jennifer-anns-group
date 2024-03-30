@@ -10,7 +10,7 @@ function HeroImage(props: PropsWithChildren<Props>) {
     <div className="flex h-dvh w-dvw flex-row bg-gradient-to-b from-[#fdd299] to-[#fc9000]">
       <div className="flex h-full w-[45%] max-w-[45%] flex-col items-center justify-center p-5">
         <div>
-          <h1 className="mb-6 w-[6em] font-open-sans-cond text-6xl font-extrabold uppercase text-white">
+          <h1 className="mb-6 w-[6em] text-center font-open-sans-cond text-6xl font-extrabold uppercase text-white">
             Jennifer Ann&apos;s Group
           </h1>
           <div className="flex h-[3rem] flex-row">

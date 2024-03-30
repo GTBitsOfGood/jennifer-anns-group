@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import TabsComponent from "../../components/Tabs/TabsComponent";
 import TagsComponent from "../../components/Tags/TagsComponent";
+import ContactComponent from "../../components/Tabs/ContactComponent";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { userSchema } from "@/utils/types";
@@ -15,9 +16,10 @@ const GamePage = () => {
   const [gameData, setGameData] = useState<populatedGameWithId>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const router = useRouter();
   const { data: session } = useSession();
   const idSchema = z.string().length(24);
+  const [visibleAnswer, setVisibleAnswer] = useState(false);
   const userDataSchema = userSchema
     .extend({
       _id: idSchema,
@@ -26,7 +28,13 @@ const GamePage = () => {
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
   const userId = currentUser?._id as string | undefined;
-
+  useEffect(() => {
+    if (userData && userData.label !== "student") {
+      setVisibleAnswer(true);
+    } else {
+      setVisibleAnswer(false);
+    }
+  }, [userData]);
   useEffect(() => {
     if (currentUser) {
       getUserData();
@@ -48,6 +56,7 @@ const GamePage = () => {
       const response = await fetch(`/api/games/${gameId}`);
       if (!response.ok) {
         setError("Failed to fetch game");
+        router.push("/");
       }
       const data = await response.json();
       setGameData(data);
@@ -88,13 +97,20 @@ const GamePage = () => {
         </>
       )}
       <EmbeddedGame gameId={gameId as string} />
-      <TabsComponent mode="view" gameData={gameData} />
+      <TabsComponent
+        mode="view"
+        gameData={gameData}
+        authorized={visibleAnswer}
+      />
       {loaded && userData.label !== "administrator" && (
         <NotesComponent gameId={gameId} userId={userId} />
       )}
-      <TagsComponent mode="view" gameData={gameData} />
+      <ContactComponent />
+      <TagsComponent mode="view" gameData={gameData} admin={visibleAnswer} />
     </div>
   );
 };
 
 export default GamePage;
+
+//Fix formatting of ContactComponent, and add that second screen once submitted.

@@ -90,19 +90,19 @@ const Header = () => {
   }
 
   return (
-    <div className="fixed left-0 top-0 flex w-full justify-center">
-      <div className="mx-auto flex h-16 w-10/12 items-center justify-between bg-white p-12">
+    <div className="flex w-full justify-center">
+      <div className="mx-auto flex h-16 w-[calc(100%-4rem)] max-w-7xl items-center justify-between bg-white p-12">
         <div className="flex items-center">
           <img className="w-50 h-auto" src="/logo_gray.svg" alt="Logo" />
           <div className="ml-6 font-open-sans text-xl font-semibold text-stone-900 opacity-70">
-            Jennifer Ann’s Group
+            Jennifer Ann&apos;s Group
           </div>
         </div>
         <div className="flex items-center">
           {tabData[userType].map((tabName, index) => (
             <div
               key={index}
-              className={`font-Outfit mr-8 cursor-pointer text-center text-sm ${
+              className={`font-Outfit ml-8 cursor-pointer text-center text-sm ${
                 selectedTab === index
                   ? "relative font-bold text-orange-primary"
                   : "font-normal text-stone-900 opacity-50"
