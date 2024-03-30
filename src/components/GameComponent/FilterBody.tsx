@@ -88,7 +88,7 @@ export default function FilterBody({
 
   return (
     <div>
-      <p className="mb-5 ml-16 mt-11	font-sans font-extrabold text-gray-500">
+      <p className="mb-5 ml-16 mt-[93px] font-sans font-extrabold text-gray-500">
         Game builds
       </p>
       <div className="mb-[52px] ml-[52px] mr-[52px]">
@@ -218,7 +218,7 @@ export default function FilterBody({
           }}
           className="font-sans font-semibold text-blue-primary"
         >
-          Cancel
+          Clear
         </button>
         <button
           onClick={applyFilters}

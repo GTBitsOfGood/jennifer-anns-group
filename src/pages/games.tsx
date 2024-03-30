@@ -217,8 +217,13 @@ export default function Games() {
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent mt="10px" w="750px" minH="800px">
-                <PopoverCloseButton />
+              <PopoverContent mt="10px" w="750px" minH="870px">
+                <PopoverCloseButton
+                  size="md"
+                  mr="52px"
+                  mt="38px"
+                  color="brand.600"
+                />
                 <PopoverBody>
                   <FilterBody
                     setAcccessibility={setAccessibility}
