@@ -39,7 +39,7 @@ const GamePage = () => {
     if (currentUser) {
       getUserData();
     }
-  }, []);
+  }, [currentUser]);
 
   async function getUserData() {
     try {
@@ -105,7 +105,7 @@ const GamePage = () => {
       {loaded && userData.label !== "administrator" && (
         <NotesComponent gameId={gameId} userId={userId} />
       )}
-      <ContactComponent />
+      {loaded && userData.label !== "administrator" && <ContactComponent />}
       <TagsComponent mode="view" gameData={gameData} admin={visibleAnswer} />
     </div>
   );
