@@ -147,7 +147,6 @@ export const userSchema = z.object({
 });
 
 export type ExtendId<T extends any> = T & { _id: string };
-export type ExtendVersion<T extends any> = T & { __v: number };
 // For changing password
 export const changePWSchema = z.object({
   oldpassword: z.string(),

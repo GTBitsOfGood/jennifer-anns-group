@@ -149,13 +149,14 @@ export async function editGameTags(
   return newGame;
 }
 
-export type GamesFilterOutput = ExtendId<
-  Omit<IGame, "builds" | "themes" | "tags"> & {
-    builds: ExtendId<IBuild>[];
-    themes: ExtendId<ITheme>[];
-    tags: ExtendId<ITag>[];
-  }
->[];
+export type GamesFilterOutput = (Omit<
+  ExtendId<IGame>,
+  "builds" | "themes" | "tags"
+> & {
+  builds?: ExtendId<IBuild>[];
+  themes?: ExtendId<ITheme>[];
+  tags?: ExtendId<ITag>[];
+})[];
 
 export async function getSelectedGames(
   query: z.infer<typeof GetGameQuerySchema>,

@@ -3,6 +3,7 @@ import { z, RefinementCtx } from "zod";
 import {
   GamesFilterOutput,
   GetSelectedGamesOutput,
+  RESULTS_PER_PAGE,
   createGame,
   getSelectedGames,
 } from "../../../server/db/actions/GameAction";
@@ -37,13 +38,17 @@ export default async function handler(
   }
 }
 
-export type GetGamesOutput = Omit<Awaited<GetSelectedGamesOutput>, "games"> & {
+export type GetGamesOutput = Omit<
+  Awaited<GetSelectedGamesOutput>,
+  "games" | "count"
+> & {
   games: (Omit<ExtendId<IGame>, "themes" | "tags" | "builds"> & {
     builds: ExtendId<IBuild>[];
     themes: ExtendId<ITheme>[];
     accessibility: ExtendId<ITag>[];
     custom: ExtendId<ITag>[];
   })[];
+  numPages: number;
 };
 
 async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -57,16 +62,17 @@ async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
         .send(parsedQuery.error.format());
     }
     const result = await getSelectedGames(parsedQuery.data);
-    const { games } = result;
+    const { count, games } = result;
+    const numPages = Math.ceil(count / RESULTS_PER_PAGE);
     const tagSeparatedGames = games.map(({ tags, ...game }) => ({
       ...game,
-      accessibility: tags?.filter((tag) => tag.type === "accessibility"),
-      custom: tags.filter((tag) => tag.type === "custom"),
+      accessibility: tags?.filter((tag) => tag.type === "accessibility") ?? [],
+      custom: tags?.filter((tag) => tag.type === "custom") ?? [],
     }));
 
     return res.status(HTTP_STATUS_CODE.OK).send({
-      ...result,
       games: tagSeparatedGames,
+      numPages,
     });
   } catch (e: any) {
     return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);

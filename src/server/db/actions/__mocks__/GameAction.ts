@@ -1,14 +1,14 @@
 import { IGame } from "../../models/GameModel";
 import { faker } from "@faker-js/faker";
-import { NonWebGLBuilds, ExtendId, ExtendVersion } from "@/utils/types";
+import { NonWebGLBuilds, ExtendId } from "@/utils/types";
 import mongoose from "mongoose";
+import { GamesFilterOutput } from "../GameAction";
 let salt = 0;
-function createRandomGame(): ExtendVersion<ExtendId<IGame>> {
+function createRandomGame(): GamesFilterOutput[number] {
   const appTypeValues = Object.values(NonWebGLBuilds);
   const numBuilds = faker.number.int({ min: 0, max: appTypeValues.length });
   salt++;
   return {
-    __v: 0,
     _id: new mongoose.Types.ObjectId().toString(),
     themes: [],
     tags: [],
