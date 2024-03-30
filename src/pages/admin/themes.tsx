@@ -9,6 +9,7 @@ import DeleteModal from "@/components/ThemeTag/DeleteModal";
 import { useState } from "react";
 import { ExtendId } from "@/utils/types";
 import { Button } from "@/components/ui/button";
+import pageAccessHOC from "@/components/HOC/PageAccess";
 
 type SelectedDeleteSubject = {
   subjectType: "theme" | "tag";
@@ -204,4 +205,4 @@ function Themes() {
   );
 }
 
-export default Themes;
+export default pageAccessHOC(Themes);

@@ -60,10 +60,16 @@ const Header = () => {
       getUserData();
     }
     const pathname = router.pathname;
-    const tabNames = Object.keys(tabLinks);
-    const index = tabNames.findIndex((name) => tabLinks[name] === pathname);
+    const index = userData?.label
+      ? tabData[userLabelToType[userData.label]].findIndex(
+          (name) => tabLinks[name] === pathname,
+        )
+      : -1;
     setSelectedTab(index !== -1 ? index : 0);
-  }, [currentUser, router.pathname]);
+    if (index == -1) {
+      router.push("/");
+    }
+  }, [router.pathname, userData]);
 
   async function getUserData() {
     try {
