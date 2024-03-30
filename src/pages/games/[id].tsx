@@ -9,7 +9,7 @@ import { userSchema } from "@/utils/types";
 import EmbeddedGame from "@/components/EmbeddedGame";
 import NotesComponent from "@/components/Tabs/NotesComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
-import AdminEditButton from "@/components/GameComponent/AdminEditButton";
+import AdminEditButton from "@/components/GameScreen/AdminEditButton";
 
 const GamePage = () => {
   const gameId = useRouter().query.id as string;
