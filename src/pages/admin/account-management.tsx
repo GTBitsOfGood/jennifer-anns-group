@@ -1,3 +1,4 @@
+import pageAccessHOC from "@/components/HOC/PageAccess";
 import DeleteModal from "@/components/AccountManagement/DeleteModal";
 import { Button } from "@/components/ui/button";
 import CrossIcon from "@/components/ui/icons/crossicon";
@@ -61,9 +62,9 @@ const AccountManagementPage = () => {
   return (
     <div>
       <div className="mb-28 mt-10">
-        <div className="text-center text-5xl font-semibold text-black">
+        <h1 className="mb-16 mt-10 text-center font-sans text-6xl font-semibold">
           Account Management
-        </div>
+        </h1>
         <div className="mt-24 flex flex-col px-28">
           <div className="text-2xl font-semibold text-black">
             Add New Account
@@ -152,4 +153,4 @@ const AccountManagementPage = () => {
   );
 };
 
-export default AccountManagementPage;
+export default pageAccessHOC(AccountManagementPage);

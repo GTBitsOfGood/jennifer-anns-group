@@ -17,6 +17,7 @@ import axios from "axios";
 import { WarningTwoIcon } from "@chakra-ui/icons";
 import cx from "classnames";
 import EditGameBoyModal from "@/components/HomePage/EditGameBoyModal";
+import GameBoy from "@/components/HomePage/GameBoy";
 
 const mdParser = new MarkdownIt();
 
@@ -208,7 +209,8 @@ const Home = () => {
 
               return (
                 <div key={index} className="max-w-xs flex-1">
-                  <img src={`/gameboy.png`} alt="gameboy" />
+                  {/* replace "/imgpreviewexample.jpeg" with image preview once implemented */}
+                  <GameBoy image="/imgpreviewexample.jpeg" />
                   <p className="mt-12 text-center text-gray-500">
                     {gameBoy.description}
                   </p>
