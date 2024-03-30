@@ -1,14 +1,27 @@
 import { Card, Image, CardBody, Stack } from "@chakra-ui/react";
-import { gameSchema } from "@/utils/types";
+import { gameDataSchema } from "@/pages/games";
 import z from "zod";
+import { useRouter } from "next/router";
 
 interface Props {
-  game: z.infer<typeof gameSchema>;
+  game: z.infer<typeof gameDataSchema>;
 }
 
 export default function GameCard({ game }: Props) {
+  const router = useRouter();
+
+  const goToGame = () => {
+    router.push(`/games/${game._id}`);
+  };
+
   return (
-    <Card borderRadius="8px" width="312px" height="380px">
+    <Card
+      onClick={goToGame}
+      cursor="pointer"
+      borderRadius="8px"
+      width="312px"
+      height="380px"
+    >
       <CardBody p="0px">
         <Image
           borderTopLeftRadius="8px"
