@@ -12,26 +12,25 @@ import {
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
-import { useRef } from "react";
+import { useRef, Dispatch } from "react";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { CloseIcon } from "@chakra-ui/icons";
+import { setFips } from "crypto";
 
 interface Props {
   gameData: populatedGameWithId;
-  setDeleted: (value: boolean) => void;
+  setGameData: Dispatch<populatedGameWithId>;
 }
 
-export default function DeleteVideoTrailer({ gameData, setDeleted }: Props) {
+export default function DeleteVideoTrailer({ gameData, setGameData }: Props) {
   const router = useRouter();
   const gameID = router.query.id;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement | null>(null);
 
   async function deleteVideoTrailer() {
-    //The themes is populated and cant be send to the endpoint
-    gameData.videoTrailer = "";
-    setDeleted(true);
-    router.push(`/games/${gameID}/edit`);
+    setGameData({ ...gameData, videoTrailer: "" });
+    onClose();
   }
 
   return (
