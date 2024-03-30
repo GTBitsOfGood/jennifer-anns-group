@@ -120,7 +120,7 @@ function EditPopover(props: Props) {
           <Pencil className="h-4 w-4 text-blue-primary" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[12em]">
+      <PopoverContent className="w-[12em]" align="start">
         <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-1">
             {nestedSource.map((d) => {

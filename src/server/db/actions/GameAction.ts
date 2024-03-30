@@ -184,9 +184,6 @@ export async function getSelectedGames(
     initialFilterOr,
   );
   const results = (await aggregate.exec())[0];
-  if (results.games.length == 0) {
-    throw new GameNotFoundException("No Games found at this page");
-  }
   return results;
 }
 
@@ -222,6 +219,7 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
       ...andFilters,
       ...(orFilters.length > 0 ? [{ $or: orFilters }] : []),
     ];
+
     const aggregate = GameModel.aggregate<{
       games: GamesFilterOutput;
       count: number;
@@ -265,15 +263,17 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
     return aggregate;
   },
   theme: async (theme, filterFieldsAnd, filterFieldsOr) => {
-    const foundTheme = await ThemeModel.findOne({
-      name: theme,
+    const foundThemes = await ThemeModel.find({
+      name: {
+        $in: theme,
+      },
     });
-    if (!foundTheme) {
-      throw new ThemeNotFoundException(
-        `No theme with the name ${theme} exists.`,
-      );
+    if (foundThemes.length !== theme?.length) {
+      throw new ThemeNotFoundException("One or more themes are invalid.");
     }
-    filterFieldsAnd.themes = { $in: [foundTheme._id] };
+    filterFieldsAnd.themes = {
+      $in: foundThemes.map((foundTheme) => foundTheme._id),
+    };
     return { filterFieldsAnd: filterFieldsAnd, filterFieldsOr: filterFieldsOr };
   },
   name: async (name, filterFieldsAnd, filterFieldsOr) => {

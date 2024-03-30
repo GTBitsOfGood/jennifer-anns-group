@@ -1,11 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
 import { DataTable } from "./Table/data-table";
 import { columns } from "./Table/columns";
 import { useCallback, useState } from "react";
 import { GameQuery, GetGamesOutput } from "@/pages/api/games";
-import { Spinner } from "@chakra-ui/react";
 import {
   Pagination,
   PaginationContent,
@@ -15,8 +13,11 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "../ui/pagination";
+import { Spinner } from "@chakra-ui/react";
+import FilterPopover from "./FilterPopover";
 
-type PageRequiredGameQuery = GameQuery & Required<Pick<GameQuery, "page">>;
+export type PageRequiredGameQuery = GameQuery &
+  Required<Pick<GameQuery, "page">>;
 type IncDecInput = { type: "inc" | "dec" };
 type DirectInput = { desiredPage: number };
 type PageChangeHandlerInput = IncDecInput | DirectInput;
@@ -80,8 +81,22 @@ function GamesSection() {
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex flex-row content-start gap-2">
-        <Input placeholder="Filter by name" />
-        <Button variant="outline2">Filter</Button>
+        <Input
+          placeholder="Filter by name"
+          onChange={(e) => {
+            const { name, ...rest } = filters;
+            const value = e.target.value;
+            if (value.length === 0) {
+              setFilters(rest);
+            }
+            if (value.length < 3 || value.length > 50) return;
+            setFilters({
+              ...rest,
+              name: e.target.value,
+            });
+          }}
+        />
+        <FilterPopover filters={filters} setFilters={setFilters} />
       </div>
       <div className="w-full">
         {games ? <DataTable columns={columns} data={games} /> : <Spinner />}
@@ -155,7 +170,6 @@ function GamesSection() {
           </PaginationContent>
         </Pagination>
       ) : null}
-      {/* <div></div> */}
     </div>
   );
 }

@@ -53,7 +53,8 @@ export type GetGamesOutput = Omit<
 
 async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const parsedQuery = GetGameQuerySchema.safeParse(req.query);
+    //TODO: Putback parsing
+    const parsedQuery = GetGameQuerySchema.safeParse(req.query); //JSON.parse not necessary
     if (!parsedQuery.success) {
       //Convert to current format.
       return res
@@ -74,6 +75,7 @@ async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
       numPages,
     });
   } catch (e: any) {
+    console.error(e);
     return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
   }
 }
@@ -116,7 +118,10 @@ const putSingleStringInArray = (val: string) => {
 //Query parameters can pass in a single value but need to be an array, so moddifying it to expect that.
 export const GetGameQuerySchema = z.object({
   name: z.string().min(3).max(50).optional(),
-  theme: z.string().optional(),
+  theme: z
+    .array(z.string())
+    .or(z.string().transform(putSingleStringInArray))
+    .optional(),
   tags: z
     .array(z.string())
     .or(z.string().transform(putSingleStringInArray))
