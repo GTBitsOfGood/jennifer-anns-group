@@ -6,7 +6,7 @@ import { Upload } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TextArea } from "@/components/ui/textarea";
-import { AlertTriangleIcon, MoveLeft, Plus } from "lucide-react";
+import { AlertTriangleIcon, MoveLeft, Plus, X } from "lucide-react";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
@@ -235,8 +235,28 @@ function CreateGame() {
       imagePreviewFile.type !== "image/jpeg"
     ) {
       setImagePreviewError("Invalid Image: Only PNG, JPG, or JPEG permitted.");
+      return;
     }
-
+    //Load image and ensure it has the proper dimensions.
+    const img = new Image();
+    img.src = URL.createObjectURL(imagePreviewFile);
+    img.onload = () => {
+      const naturalWidth = img.naturalWidth;
+      const naturalHeight = img.naturalHeight;
+      console.log(naturalWidth, naturalHeight);
+      URL.revokeObjectURL(img.src);
+      if (naturalWidth !== 630 || naturalHeight !== 500) {
+        setImagePreviewError(
+          "Image must have a width of 630px and a height of 500px",
+        );
+        return;
+      }
+    };
+    img.onerror = () => {
+      setImagePreviewError("Image failed to load");
+      return;
+    };
+    setImagePreviewError(null);
     const formData = new FormData(e.currentTarget);
     const input = {
       name: formData.get(NAME_FORM_KEY),
@@ -277,7 +297,6 @@ function CreateGame() {
       }
     } else {
       const errors = parse.error.formErrors.fieldErrors;
-      console.log(errors, "ERRORS");
       setValidationErrors({
         name: errors.name?.at(0),
         videoTrailer: errors.videoTrailer?.at(0),
@@ -375,31 +394,49 @@ function CreateGame() {
             {validationErrors.name}
           </p>
         </div>
+
         <div className="relative flex w-full flex-col gap-3 md:w-2/5">
           <label className="text-xl font-semibold">
             Image Preview
             <span className="text-orange-primary">*</span>
           </label>
-          <Button
-            variant="upload"
-            className={cn(
-              imagePreviewError
-                ? "border-red-500 focus-visible:ring-red-500"
-                : "",
-              "flex h-12 w-32 flex-row gap-3 self-start",
-            )}
-            //className="flex h-12 w-32 flex-row gap-3 self-start"
-            type="button"
-            onClick={() => {
-              if (hiddenImagePreviewRef.current !== null) {
-                hiddenImagePreviewRef.current.click();
-              }
-            }}
-          >
-            <Upload className="h-6 w-6" />
-            <p>Upload</p>
-          </Button>
-
+          <div className="flex gap-6">
+            <Button
+              variant="upload"
+              className={cn(
+                imagePreviewError
+                  ? "border-red-500 focus-visible:ring-red-500"
+                  : "",
+                "flex h-12 w-32 flex-row gap-3 self-start",
+              )}
+              //className="flex h-12 w-32 flex-row gap-3 self-start"
+              type="button"
+              onClick={() => {
+                if (hiddenImagePreviewRef.current !== null) {
+                  hiddenImagePreviewRef.current.click();
+                }
+              }}
+            >
+              <Upload className="h-6 w-6" />
+              <p>Upload</p>
+            </Button>
+            {imagePreviewFile ? (
+              <div className="flex flex-row items-center gap-3">
+                <p>{imagePreviewFile.name}</p>
+                <X
+                  className="cursor-pointer text-orange-primary"
+                  type="button"
+                  size={18}
+                  onClick={() => {
+                    setImagePreviewFile(null);
+                  }}
+                />
+              </div>
+            ) : null}
+          </div>
+          <p className="absolute bottom-[-2em] text-xs text-red-500">
+            {imagePreviewError}
+          </p>
           <Input
             type="file"
             ref={hiddenImagePreviewRef}
