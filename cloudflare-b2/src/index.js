@@ -168,6 +168,14 @@ export default {
 
     // NOTE: Need to change CORS rules before deploying
     newHeaders.set("Access-Control-Allow-Origin", "http://localhost:3000");
+    newHeaders.set(
+      "Access-Control-Allow-Origin",
+      "https://jennifer-anns.netlify.app",
+    );
+    newHeaders.set(
+      "Access-Control-Allow-Origin",
+      "https://main--jennifer-anns.netlify.app",
+    );
     newHeaders.set("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS");
     newHeaders.set("Access-Control-Allow-Headers", "*");
 
