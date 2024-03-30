@@ -19,21 +19,22 @@ const AccountManagementPage = () => {
     null,
   );
 
+  const fetchData = async () => {
+    try {
+      const promise = await fetch("../api/admin");
+      const data = await promise.json();
+      const removableAdmins = data.filter(
+        (admin: Admin) => !UNDELETABLE_EMAILS.includes(admin.email),
+      );
+      setAdmins(removableAdmins);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const promise = await fetch("../api/admin");
-        const data = await promise.json();
-        const removableAdmins = data.filter(
-          (admin: Admin) => !UNDELETABLE_EMAILS.includes(admin.email),
-        );
-        setAdmins(removableAdmins);
-      } catch (e) {
-        console.log(e);
-      }
-    };
     fetchData();
-  }, [admins]);
+  }, []);
 
   const handleAddAccount = async () => {
     try {
@@ -45,6 +46,7 @@ const AccountManagementPage = () => {
         body: JSON.stringify({ email: newEmail }),
       });
       if (response.ok) {
+        fetchData();
         setNewEmail("");
         setEmailError("");
       } else {

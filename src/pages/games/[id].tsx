@@ -39,7 +39,7 @@ const GamePage = () => {
     if (currentUser) {
       getUserData();
     }
-  }, [currentUser, getUserData]);
+  }, []);
 
   async function getUserData() {
     try {
