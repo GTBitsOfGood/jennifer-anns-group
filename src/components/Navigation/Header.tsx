@@ -91,7 +91,7 @@ const Header = () => {
 
   return (
     <div className="flex w-full justify-center">
-      <div className="mx-auto flex h-16 w-[calc(100%-4rem)] max-w-7xl items-center justify-between bg-white p-12">
+      <div className="mx-auto flex h-16 w-[calc(100%-4rem)] max-w-[90%] items-center justify-between bg-white p-12">
         <div className="flex items-center">
           <img className="w-50 h-auto" src="/logo_gray.svg" alt="Logo" />
           <div className="ml-6 font-open-sans text-xl font-semibold text-stone-900 opacity-70">
@@ -102,7 +102,7 @@ const Header = () => {
           {tabData[userType].map((tabName, index) => (
             <div
               key={index}
-              className={`font-Outfit ml-8 cursor-pointer text-center text-sm ${
+              className={`ml-8 cursor-pointer text-center font-sans text-sm ${
                 selectedTab === index
                   ? "relative font-bold text-orange-primary"
                   : "font-normal text-stone-900 opacity-50"
@@ -122,7 +122,7 @@ const Header = () => {
               </div>
             </div>
           ))}
-          <div className="ml-10 px-4 py-2">
+          <div className="ml-10 px-4 py-2 font-sans">
             {userType === UserType.Public ? (
               <Link href="/login">
                 <Button variant="mainorange">Log in</Button>
@@ -135,7 +135,7 @@ const Header = () => {
             className="cursor-pointer rounded-md border border-gray-100 bg-white px-4 py-2 shadow"
             onClick={handleSignUpLogOut}
           >
-            <div className="font-Outfit text-center text-sm font-normal text-neutral-600">
+            <div className="text-center font-sans text-sm font-normal text-neutral-600">
               {userType === UserType.Public ? "Sign up" : "Log out"}
             </div>
           </div>

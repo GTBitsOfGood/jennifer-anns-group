@@ -53,150 +53,152 @@ function Themes() {
   });
 
   return (
-    <div className="mt-20 flex flex-col items-center gap-10 px-[10em] pt-8">
-      <h1 className="text-4xl font-semibold">Themes and Tags</h1>
-      <div className="w-full">
-        <div className="flex flex-row justify-between">
-          <h3 className="text-xl font-semibold">Themes</h3>
-          <Button
-            variant="primary"
-            className="h-fit cursor-pointer gap-1 rounded-full px-3 py-2 text-xs"
-            onClick={() => {
-              setSelectedAddSubject("theme");
-              setAddModalDisclosure(true);
-            }}
-            asChild
-          >
-            <div>
-              <Plus size={16} />
-              <p>New theme</p>
-            </div>
-          </Button>
-        </div>
-        <div className="flex flex-row flex-wrap gap-2">
-          {themes?.map((theme) => {
-            return (
-              <Tag
-                key={theme._id}
-                variant="theme"
-                className="group hover:cursor-pointer"
-                onClick={() => {
-                  setSelectedDeleteSubject({
-                    subject: theme,
-                    subjectType: "theme",
-                  });
-                  setDeleteModalDisclosure(true);
-                }}
-              >
-                <div className="flex flex-row items-center gap-2">
-                  {theme.name}
-                  <div className="hidden group-hover:block">
-                    <X size={18} />
+    <div>
+      <div className="mb-16 mt-20 flex flex-col items-center gap-10 px-[10em] pt-8">
+        <h1 className="text-4xl font-semibold">Themes and Tags</h1>
+        <div className="w-full">
+          <div className="flex flex-row justify-between">
+            <h3 className="text-xl font-semibold">Themes</h3>
+            <Button
+              variant="primary"
+              className="h-fit cursor-pointer gap-1 rounded-full px-3 py-2 text-xs"
+              onClick={() => {
+                setSelectedAddSubject("theme");
+                setAddModalDisclosure(true);
+              }}
+              asChild
+            >
+              <div>
+                <Plus size={16} />
+                <p>New theme</p>
+              </div>
+            </Button>
+          </div>
+          <div className="flex flex-row flex-wrap gap-2">
+            {themes?.map((theme) => {
+              return (
+                <Tag
+                  key={theme._id}
+                  variant="theme"
+                  className="group hover:cursor-pointer"
+                  onClick={() => {
+                    setSelectedDeleteSubject({
+                      subject: theme,
+                      subjectType: "theme",
+                    });
+                    setDeleteModalDisclosure(true);
+                  }}
+                >
+                  <div className="flex flex-row items-center gap-2">
+                    {theme.name}
+                    <div className="hidden group-hover:block">
+                      <X size={18} />
+                    </div>
                   </div>
-                </div>
-              </Tag>
-            );
-          })}
+                </Tag>
+              );
+            })}
+          </div>
         </div>
-      </div>
-      <div className="w-full">
-        <div className="flex flex-row justify-between">
-          <h3 className="text-xl font-semibold">Accessibility</h3>
-          <Button
-            variant="primary"
-            className="h-fit cursor-pointer gap-1 rounded-full px-3 py-2 text-xs"
-            onClick={() => {
-              setSelectedAddSubject("accessibility");
-              setAddModalDisclosure(true);
-            }}
-            asChild
-          >
-            <div>
-              <Plus size={16} />
-              <p>New accessibility</p>
-            </div>
-          </Button>
-        </div>
-        <div className="flex flex-row flex-wrap gap-2">
-          {tags?.accessibility.map((tag) => {
-            return (
-              <Tag
-                key={tag._id}
-                variant="accessibility"
-                className="group hover:cursor-pointer"
-                onClick={() => {
-                  setSelectedDeleteSubject({
-                    subject: tag,
-                    subjectType: "tag",
-                  });
-                  setDeleteModalDisclosure(true);
-                }}
-              >
-                <div className="flex flex-row items-center gap-2">
-                  {tag.name}
-                  <div className="hidden group-hover:block">
-                    <X size={18} />
+        <div className="w-full">
+          <div className="flex flex-row justify-between">
+            <h3 className="text-xl font-semibold">Accessibility</h3>
+            <Button
+              variant="primary"
+              className="h-fit cursor-pointer gap-1 rounded-full px-3 py-2 text-xs"
+              onClick={() => {
+                setSelectedAddSubject("accessibility");
+                setAddModalDisclosure(true);
+              }}
+              asChild
+            >
+              <div>
+                <Plus size={16} />
+                <p>New accessibility</p>
+              </div>
+            </Button>
+          </div>
+          <div className="flex flex-row flex-wrap gap-2">
+            {tags?.accessibility.map((tag) => {
+              return (
+                <Tag
+                  key={tag._id}
+                  variant="accessibility"
+                  className="group hover:cursor-pointer"
+                  onClick={() => {
+                    setSelectedDeleteSubject({
+                      subject: tag,
+                      subjectType: "tag",
+                    });
+                    setDeleteModalDisclosure(true);
+                  }}
+                >
+                  <div className="flex flex-row items-center gap-2">
+                    {tag.name}
+                    <div className="hidden group-hover:block">
+                      <X size={18} />
+                    </div>
                   </div>
-                </div>
-              </Tag>
-            );
-          })}
+                </Tag>
+              );
+            })}
+          </div>
         </div>
-      </div>
-      <div className="w-full">
-        <div className="flex flex-row flex-wrap justify-between">
-          <h3 className="text-xl font-semibold">Tags</h3>
-          <Button
-            variant="primary"
-            className="h-fit cursor-pointer gap-1 rounded-full px-3 py-2 text-xs"
-            onClick={() => {
-              setSelectedAddSubject("tag");
-              setAddModalDisclosure(true);
-            }}
-            asChild
-          >
-            <div>
-              <Plus size={16} />
-              <p>New tag</p>
-            </div>
-          </Button>
-        </div>
-        <div className="flex flex-row gap-2">
-          {tags?.custom.map((tag) => {
-            return (
-              <Tag
-                key={tag._id}
-                variant="custom"
-                className="group hover:cursor-pointer"
-                onClick={() => {
-                  setSelectedDeleteSubject({
-                    subject: tag,
-                    subjectType: "tag",
-                  });
-                  setDeleteModalDisclosure(true);
-                }}
-              >
-                <div className="flex flex-row items-center gap-2">
-                  {tag.name}
-                  <div className="hidden group-hover:block">
-                    <X size={18} />
+        <div className="w-full">
+          <div className="flex flex-row flex-wrap justify-between">
+            <h3 className="text-xl font-semibold">Tags</h3>
+            <Button
+              variant="primary"
+              className="h-fit cursor-pointer gap-1 rounded-full px-3 py-2 text-xs"
+              onClick={() => {
+                setSelectedAddSubject("tag");
+                setAddModalDisclosure(true);
+              }}
+              asChild
+            >
+              <div>
+                <Plus size={16} />
+                <p>New tag</p>
+              </div>
+            </Button>
+          </div>
+          <div className="flex flex-row gap-2">
+            {tags?.custom.map((tag) => {
+              return (
+                <Tag
+                  key={tag._id}
+                  variant="custom"
+                  className="group hover:cursor-pointer"
+                  onClick={() => {
+                    setSelectedDeleteSubject({
+                      subject: tag,
+                      subjectType: "tag",
+                    });
+                    setDeleteModalDisclosure(true);
+                  }}
+                >
+                  <div className="flex flex-row items-center gap-2">
+                    {tag.name}
+                    <div className="hidden group-hover:block">
+                      <X size={18} />
+                    </div>
                   </div>
-                </div>
-              </Tag>
-            );
-          })}
+                </Tag>
+              );
+            })}
+          </div>
+          <AddModal
+            open={addModalDisclosure}
+            setOpen={setAddModalDisclosure}
+            subject={selectedAddSubject}
+          />
+          <DeleteModal
+            open={deleteModalDisclosure}
+            setOpen={setDeleteModalDisclosure}
+            subject={subject}
+            subjectType={subjectType}
+          />
         </div>
-        <AddModal
-          open={addModalDisclosure}
-          setOpen={setAddModalDisclosure}
-          subject={selectedAddSubject}
-        />
-        <DeleteModal
-          open={deleteModalDisclosure}
-          setOpen={setDeleteModalDisclosure}
-          subject={subject}
-          subjectType={subjectType}
-        />
       </div>
     </div>
   );

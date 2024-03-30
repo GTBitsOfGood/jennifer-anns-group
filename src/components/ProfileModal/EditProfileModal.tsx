@@ -85,7 +85,7 @@ function EditProfileModal(props: EditProps) {
   }
 
   return (
-    <form onSubmit={handleProfileFormSubmit}>
+    <form onSubmit={handleProfileFormSubmit} className="font-sans">
       <div className="-my-2 grid grid-cols-8 gap-3 py-4">
         <div className="col-span-4 items-center">
           <Label

@@ -1,5 +1,3 @@
-import { Footer } from "@/components/Navigation/Footer";
-import Header from "@/components/Navigation/Header";
 import { userDataSchema } from "@/components/ProfileModal/ProfileModal";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -162,13 +160,8 @@ export default function Games() {
   };
 
   return (
-    <ChakraProvider theme={chakraTheme}>
-      <div>
-        <Header
-          label={userData?.label}
-          userData={userData}
-          setUserData={setUserData}
-        />
+    <div>
+      <ChakraProvider theme={chakraTheme}>
         <br></br>
 
         <h1 className="mb-16 mt-10 text-center font-sans text-6xl font-semibold">
@@ -266,9 +259,7 @@ export default function Games() {
             <GameCardView empty={empty} games={games} />
           </div>
         </div>
-
-        <Footer />
-      </div>
-    </ChakraProvider>
+      </ChakraProvider>
+    </div>
   );
 }
