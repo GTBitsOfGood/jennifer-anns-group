@@ -6,6 +6,8 @@ import {
   TabPanel,
   ChakraProvider,
   Flex,
+  Button,
+  useDisclosure,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
@@ -14,6 +16,8 @@ import AddEditVideoTrailer from "../GameScreen/AddEditVideoTrailerComponent";
 import { ChangeEvent, Dispatch, useState } from "react";
 import GameBuildList from "../GameComponent/GameBuildList";
 import ReactPlayer from "react-player/lazy";
+import DeleteComponentModal from "../DeleteComponentModal";
+import { CloseIcon } from "@chakra-ui/icons";
 interface Props {
   mode: string;
   gameData: populatedGameWithId;
@@ -27,6 +31,7 @@ export default function TabsComponent({
   setGameData,
   authorized,
 }: Props) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [description, setDescription] = useState(gameData.description);
   const [deleted, setDeleted] = useState(false);
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -39,6 +44,7 @@ export default function TabsComponent({
       });
     }
   };
+  console.log(gameData);
 
   return (
     <ChakraProvider theme={chakraTheme}>
@@ -96,10 +102,26 @@ export default function TabsComponent({
                       deleted={deleted}
                     />
                     {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
-                      <DeleteVideoTrailer
-                        gameData={gameData}
-                        setDeleted={setDeleted}
-                      />
+                      <div>
+                        <Button
+                          onClick={onOpen}
+                          rightIcon={
+                            <CloseIcon color="deleteRed" boxSize="10px" />
+                          }
+                          bg="white"
+                          color="deleteRed"
+                          className="w-183 h-46 mt-5 rounded-md border border-delete-red bg-white px-[17px] py-2 font-sans text-xl font-semibold text-delete-red"
+                        >
+                          Delete Trailer
+                        </Button>
+                        <DeleteComponentModal
+                          deleteType="trailer"
+                          isOpen={isOpen}
+                          onClose={onClose}
+                          gameData={gameData}
+                          setDeleted={setDeleted}
+                        />
+                      </div>
                     ) : null}
                   </Flex>
                 )}

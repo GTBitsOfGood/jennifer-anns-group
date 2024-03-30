@@ -10,12 +10,10 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "../ui/label";
 import { AlertTriangleIcon, Pencil, Plus, X } from "lucide-react";
-
 import { useState } from "react";
-
 import axios from "axios";
 import { useRouter } from "next/router";
-import DeleteWebGLBuild from "./DeleteWebGLBuild";
+import DeleteComponentModal from "../DeleteComponentModal";
 
 // there's probably a better place to put these
 export type BuildFileType = "data" | "framework" | "loader" | "code";
@@ -402,7 +400,9 @@ function AddEditWebGLComponent(props: Props) {
           </DialogContent>
         </Dialog>
       </div>
-      {addOrEdit === "Edit" && <DeleteWebGLBuild setAddOrEdit={setAddOrEdit} />}
+      {addOrEdit === "Edit" && (
+        <DeleteComponentModal deleteType="build" setAddOrEdit={setAddOrEdit} />
+      )}
     </div>
   );
 }
