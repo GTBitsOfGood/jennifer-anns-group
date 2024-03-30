@@ -1,3 +1,4 @@
+import pageAccessHOC from "@/components/HOC/PageAccess";
 import DeleteModal from "@/components/AccountManagement/DeleteModal";
 import { Button } from "@/components/ui/button";
 import CrossIcon from "@/components/ui/icons/crossicon";
@@ -19,21 +20,22 @@ const AccountManagementPage = () => {
     null,
   );
 
+  const fetchData = async () => {
+    try {
+      const promise = await fetch("../api/admin");
+      const data = await promise.json();
+      const removableAdmins = data.filter(
+        (admin: Admin) => !UNDELETABLE_EMAILS.includes(admin.email),
+      );
+      setAdmins(removableAdmins);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const promise = await fetch("../api/admin");
-        const data = await promise.json();
-        const removableAdmins = data.filter(
-          (admin: Admin) => !UNDELETABLE_EMAILS.includes(admin.email),
-        );
-        setAdmins(removableAdmins);
-      } catch (e) {
-        console.log(e);
-      }
-    };
     fetchData();
-  }, [admins]);
+  }, []);
 
   const handleAddAccount = async () => {
     try {
@@ -45,6 +47,7 @@ const AccountManagementPage = () => {
         body: JSON.stringify({ email: newEmail }),
       });
       if (response.ok) {
+        fetchData();
         setNewEmail("");
         setEmailError("");
       } else {
@@ -150,4 +153,4 @@ const AccountManagementPage = () => {
   );
 };
 
-export default AccountManagementPage;
+export default pageAccessHOC(AccountManagementPage);
