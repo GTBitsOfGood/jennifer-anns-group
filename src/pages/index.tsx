@@ -207,16 +207,15 @@ const Home = () => {
                 return <></>;
               }
 
-                return (
-                  <div key={index} className="max-w-xs flex-1">
-                    {/* replace "/imgpreviewexample.jpeg" with image preview once implemented */}
-                    <GameBoy image="/imgpreviewexample.jpeg" />
-                    <p className="mt-12 text-center text-gray-500">
-                      {gameBoy.description}
-                    </p>
-                  </div>
-                );
-              })}
+              return (
+                <div key={index} className="max-w-xs flex-1">
+                  {/* replace "/imgpreviewexample.jpeg" with image preview once implemented */}
+                  <GameBoy image="/imgpreviewexample.jpeg" />
+                  <p className="mt-12 text-center text-gray-500">
+                    {gameBoy.description}
+                  </p>
+                </div>
+              );
             })}
           </div>
         </div>
@@ -239,7 +238,6 @@ const Home = () => {
                   Jennifer Ann&apos;s Group&apos;s discord!
                 </Link>
               </p>
-
             </div>
           </div>
         </div>
