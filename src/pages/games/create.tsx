@@ -2,13 +2,13 @@ import React from "react";
 import pageAccessHOC from "@/components/HOC/PageAccess";
 import { z } from "zod";
 import cn from "classnames";
-
+import { Upload } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TextArea } from "@/components/ui/textarea";
 import { AlertTriangleIcon, MoveLeft, Plus } from "lucide-react";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import ThemeSelect from "@/components/Themes/ThemeSelect";
 import TagSelect from "@/components/Tags/TagSelect";
@@ -102,7 +102,7 @@ async function uploadBuildFiles(gameId: string, files: Map<string, File>) {
 
 function CreateGame() {
   const router = useRouter();
-
+  const hiddenImagePreviewRef = useRef<HTMLInputElement>(null);
   const [themes, setThemes] = useState<ExtendId<ITheme>[]>([]);
   const [selectedThemes, setSelectedThemes] = useState<ExtendId<ITheme>[]>([]);
 
@@ -127,6 +127,10 @@ function CreateGame() {
   const [codeFile, setCodeFile] = useState<null | File>(null);
   const [frameworkFile, setFrameworkFile] = useState<null | File>(null);
 
+  const [imagePreviewFile, setImagePreviewFile] = useState<null | File>(null);
+  const [imagePreviewError, setImagePreviewError] = useState<null | string>(
+    null,
+  );
   const [fileValidationError, setFileValidationError] =
     useState<boolean>(false);
 
@@ -221,6 +225,18 @@ function CreateGame() {
         setFileValidationError(false);
       }
     }
+    if (imagePreviewFile === null) {
+      setImagePreviewError("No image uploaded");
+      return;
+    }
+    if (
+      imagePreviewFile.type !== "image/png" &&
+      imagePreviewFile.type !== "image/jpg" &&
+      imagePreviewFile.type !== "image/jpeg"
+    ) {
+      setImagePreviewError("Invalid Image: Only PNG, JPG, or JPEG permitted.");
+    }
+
     const formData = new FormData(e.currentTarget);
     const input = {
       name: formData.get(NAME_FORM_KEY),
@@ -261,6 +277,7 @@ function CreateGame() {
       }
     } else {
       const errors = parse.error.formErrors.fieldErrors;
+      console.log(errors, "ERRORS");
       setValidationErrors({
         name: errors.name?.at(0),
         videoTrailer: errors.videoTrailer?.at(0),
@@ -358,7 +375,46 @@ function CreateGame() {
             {validationErrors.name}
           </p>
         </div>
+        <div className="relative flex w-full flex-col gap-3 md:w-2/5">
+          <label className="text-xl font-semibold">
+            Image Preview
+            <span className="text-orange-primary">*</span>
+          </label>
+          <Button
+            variant="upload"
+            className={cn(
+              imagePreviewError
+                ? "border-red-500 focus-visible:ring-red-500"
+                : "",
+              "flex h-12 w-32 flex-row gap-3 self-start",
+            )}
+            //className="flex h-12 w-32 flex-row gap-3 self-start"
+            type="button"
+            onClick={() => {
+              if (hiddenImagePreviewRef.current !== null) {
+                hiddenImagePreviewRef.current.click();
+              }
+            }}
+          >
+            <Upload className="h-6 w-6" />
+            <p>Upload</p>
+          </Button>
 
+          <Input
+            type="file"
+            ref={hiddenImagePreviewRef}
+            accept=".jpg,.jpeg,.png"
+            className="hidden"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              if (
+                event.target.files === null ||
+                event.target.files.length === 0
+              )
+                return;
+              setImagePreviewFile(event.target.files[0]);
+            }}
+          ></Input>
+        </div>
         <div className="relative flex w-full flex-col gap-3 md:w-2/3">
           <label className="text-xl font-semibold">
             Game Build

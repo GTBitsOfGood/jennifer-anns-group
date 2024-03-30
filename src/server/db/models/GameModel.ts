@@ -37,6 +37,7 @@ const GameSchema = new Schema<IGame>({
     required: false,
   },
   description: { type: String, required: true },
+  image: { type: String, required: true },
   webGLBuild: { type: Boolean, default: false },
   builds: { type: [BuildSchema], default: [] },
   lesson: { type: String },
