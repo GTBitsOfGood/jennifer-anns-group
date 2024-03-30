@@ -12,7 +12,7 @@ import { populatedGameWithId } from "@/server/db/models/GameModel";
 import DeleteVideoTrailer from "../GameScreen/DeleteVideoTrailerComponent";
 import AddEditVideoTrailer from "../GameScreen/AddEditVideoTrailerComponent";
 import { ChangeEvent, Dispatch, useState } from "react";
-import GameBuildList from "../GameComponent/GameBuildList";
+import GameBuildList from "../GameGallery/GameBuildList";
 import ReactPlayer from "react-player/lazy";
 interface Props {
   mode: string;

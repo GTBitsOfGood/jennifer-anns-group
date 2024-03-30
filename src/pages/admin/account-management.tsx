@@ -1,5 +1,5 @@
 import pageAccessHOC from "@/components/HOC/PageAccess";
-import DeleteModal from "@/components/account-management/DeleteModal";
+import DeleteModal from "@/components/AccountManagement/DeleteModal";
 import { Button } from "@/components/ui/button";
 import CrossIcon from "@/components/ui/icons/crossicon";
 import WarningIcon from "@/components/ui/icons/warningicon";
