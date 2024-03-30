@@ -11,7 +11,6 @@ import {
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
-import DeleteVideoTrailer from "../GameScreen/DeleteVideoTrailerComponent";
 import AddEditVideoTrailer from "../GameScreen/AddEditVideoTrailerComponent";
 import { ChangeEvent, Dispatch, useState } from "react";
 import GameBuildList from "../GameComponent/GameBuildList";
