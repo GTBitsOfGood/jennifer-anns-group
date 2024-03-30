@@ -166,16 +166,17 @@ export default {
     const response = await fetch(signedRequest);
     let newHeaders = new Headers(response.headers);
 
-    // NOTE: Need to change CORS rules before deploying
-    newHeaders.set("Access-Control-Allow-Origin", "http://localhost:3000");
-    newHeaders.set(
-      "Access-Control-Allow-Origin",
+    // get origin url
+    const origin = request.headers.get("origin");
+    const allowedOrigins = [
+      "http://localhost:3000",
       "https://jennifer-anns.netlify.app",
-    );
-    newHeaders.set(
-      "Access-Control-Allow-Origin",
       "https://main--jennifer-anns.netlify.app",
-    );
+    ];
+
+    if (allowedOrigins.includes(origin)) {
+      newHeaders.set("Access-Control-Allow-Origin", origin);
+    }
     newHeaders.set("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS");
     newHeaders.set("Access-Control-Allow-Headers", "*");
 
