@@ -55,8 +55,10 @@ function Themes() {
 
   return (
     <div>
-      <div className="mb-16 mt-20 flex flex-col items-center gap-10 px-[10em] pt-8">
-        <h1 className="text-4xl font-semibold">Themes and Tags</h1>
+      <div className="mb-16 flex flex-col items-center gap-10 px-[10em] pt-8">
+        <h1 className="mb-16 mt-10 text-center font-sans text-6xl font-semibold">
+          Themes and Tags
+        </h1>
         <div className="w-full">
           <div className="flex flex-row justify-between">
             <h3 className="text-xl font-semibold">Themes</h3>
