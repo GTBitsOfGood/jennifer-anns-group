@@ -334,7 +334,7 @@ function CreateGame() {
             className="h-12 w-12 text-blue-primary"
           />
         </div>
-        <h1 className="col-start-2 col-end-6 text-center text-5xl font-semibold">
+        <h1 className="col-start-2 col-end-6 text-center text-6xl font-semibold">
           Create a Game
         </h1>
       </div>
