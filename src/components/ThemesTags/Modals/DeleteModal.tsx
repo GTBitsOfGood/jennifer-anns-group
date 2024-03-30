@@ -58,21 +58,21 @@ function DeleteModal({ open, setOpen, subject, subjectType }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        className="flex flex-col items-center gap-8 border-4 border-blue-primary"
-        showClose={false}
+        className="flex flex-col items-center gap-14 border-4 border-blue-primary px-16 pb-20 pt-24"
+        isDelete={true}
       >
-        <div className="flex w-full flex-col items-center gap-4">
-          <h2 className="text-center text-xl font-semibold text-blue-primary">
-            Are you sure you want to delete *{subject.name}*?
+        <div className="flex flex-col items-center gap-8">
+          <h2 className="text-center text-2xl font-semibold text-blue-primary">
+            Are you sure you want to <br></br>delete *{subject.name}*?
           </h2>
-          <p>{`Deleting a ${subjectType} is final and cannot be undone.`}</p>
+          <p>{`Deleting a game ${subjectType} is final and cannot be undone.`}</p>
         </div>
-        <DialogFooter className="flex w-full flex-row gap-2 sm:justify-around">
+        <DialogFooter className="flex w-full flex-row flex-wrap justify-center gap-8">
           <Button
             variant="primary"
             type="submit"
             form="form"
-            className="w-full bg-red-700 hover:bg-red-800"
+            className="w-48 bg-red-700 hover:bg-red-800"
             onClick={() => {
               mutateMap[subjectType](
                 { _id: subject._id },
@@ -80,10 +80,10 @@ function DeleteModal({ open, setOpen, subject, subjectType }: Props) {
               );
             }}
           >
-            Apply
+            Yes, delete
           </Button>
           <DialogClose asChild>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-48">
               No, return
             </Button>
           </DialogClose>

@@ -16,5 +16,6 @@ if [ ! -f "./.env" ]; then
 
   echo "Secrets successfully retrieved."
 fi
-
+echo "Checking if primary admin emails exist"
+npm run add-admin-emails
 npm run dev

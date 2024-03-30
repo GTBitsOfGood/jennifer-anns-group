@@ -53,8 +53,7 @@ export type GetGamesOutput = Omit<
 
 async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    //TODO: Putback parsing
-    const parsedQuery = GetGameQuerySchema.safeParse(req.query); //JSON.parse not necessary
+    const parsedQuery = GetGameQuerySchema.safeParse(req.query);
     if (!parsedQuery.success) {
       //Convert to current format.
       return res

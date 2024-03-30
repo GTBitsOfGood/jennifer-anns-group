@@ -9,17 +9,22 @@ import {
 import chakraTheme from "@/styles/chakraTheme";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { ChangeEvent, Dispatch, useState } from "react";
-import GameBuildList from "../GameComponent/GameBuildList";
-
+import GameBuildList from "../GameGallery/GameBuildList";
+import VideoComponent from "./VideoComponent";
 interface Props {
   mode: string;
   gameData: populatedGameWithId;
   setGameData?: Dispatch<populatedGameWithId>;
+  authorized?: boolean;
 }
 
-export default function TabsComponent({ mode, gameData, setGameData }: Props) {
+export default function TabsComponent({
+  mode,
+  gameData,
+  setGameData,
+  authorized,
+}: Props) {
   const [description, setDescription] = useState(gameData.description);
-
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
     setDescription(newValue);
@@ -37,8 +42,13 @@ export default function TabsComponent({ mode, gameData, setGameData }: Props) {
         <Tabs colorScheme="brand" className="m-auto w-5/6 font-sans">
           <TabList>
             <Tab>Description</Tab>
+            {(gameData.videoTrailer && gameData.videoTrailer !== "") ||
+            mode === "edit" ? (
+              <Tab>Trailer</Tab>
+            ) : null}
             {gameData.parentingGuide ? <Tab>Parenting Guide</Tab> : null}
             {gameData.lesson ? <Tab>Lesson Plan</Tab> : null}
+            {gameData.answerKey && authorized ? <Tab>Answer Key</Tab> : null}
             {((gameData?.builds && gameData.builds.length > 0) ||
               mode === "edit") && <Tab>Game Builds</Tab>}
           </TabList>
@@ -56,10 +66,23 @@ export default function TabsComponent({ mode, gameData, setGameData }: Props) {
                 <p>{gameData.description}</p>
               )}
             </TabPanel>
+            {(gameData.videoTrailer && gameData.videoTrailer !== "") ||
+            mode === "edit" ? (
+              <TabPanel>
+                <VideoComponent
+                  gameData={gameData}
+                  edit={mode === "edit"}
+                  setGameData={setGameData}
+                />
+              </TabPanel>
+            ) : null}
             {gameData.parentingGuide ? (
               <TabPanel>Parenting Guide</TabPanel>
             ) : null}
             {gameData.lesson ? <TabPanel>Lesson Plan</TabPanel> : null}
+            {gameData.answerKey && authorized ? (
+              <TabPanel>Answer Key</TabPanel>
+            ) : null}
             {((gameData?.builds && gameData.builds.length > 0) ||
               mode === "edit") && (
               <TabPanel p="0px">

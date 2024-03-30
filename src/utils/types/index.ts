@@ -120,7 +120,7 @@ export const editGameSchema = z.object({
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
   answerKey: z.string().url().optional(),
-  videoTrailer: z.string().url().optional(),
+  videoTrailer: z.string().url().or(z.literal("")).optional(),
 });
 
 // Notes
@@ -129,6 +129,7 @@ export const noteSchema = z.object({
   description: z.string(),
   gameId: z.string().refine(verifyObjectId).optional(),
 });
+
 export enum UserLabel {
   Educator = "educator",
   Student = "student",
@@ -144,6 +145,11 @@ export const userSchema = z.object({
   lastName: z.string(),
   notes: z.array(noteSchema),
   label: z.nativeEnum(UserLabel),
+});
+
+// Admin
+export const adminSchema = z.object({
+  email: z.string().email("Not a valid email"),
 });
 
 export type ExtendId<T extends any> = T & { _id: string };
