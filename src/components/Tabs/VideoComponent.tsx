@@ -1,9 +1,11 @@
 import ReactPlayer from "react-player/lazy";
-import { Flex } from "@chakra-ui/react";
-import DeleteVideoTrailer from "../GameScreen/DeleteVideoTrailerComponent";
+import { Flex, Button, useDisclosure } from "@chakra-ui/react";
+import DeleteComponentModal from "@/components/DeleteComponentModal";
 import AddEditVideoTrailer from "../GameScreen/AddEditVideoTrailerComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { Dispatch } from "react";
+import { CloseIcon } from "@chakra-ui/icons";
+
 interface Props {
   gameData: populatedGameWithId;
   setGameData?: Dispatch<populatedGameWithId>;
@@ -11,6 +13,7 @@ interface Props {
 }
 
 export default function VideoComponent({ gameData, edit, setGameData }: Props) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <div className="flex flex-col justify-center">
       {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
@@ -33,7 +36,24 @@ export default function VideoComponent({ gameData, edit, setGameData }: Props) {
         <Flex className="flex-row">
           <AddEditVideoTrailer gameData={gameData} setGameData={setGameData} />
           {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
-            <DeleteVideoTrailer gameData={gameData} setGameData={setGameData} />
+            <div>
+              <Button
+                onClick={onOpen}
+                rightIcon={<CloseIcon color="deleteRed" boxSize="10px" />}
+                bg="white"
+                color="deleteRed"
+                className="w-183 h-46 mt-5 rounded-md border border-delete-red bg-white px-[17px] py-2 font-sans text-xl font-semibold text-delete-red"
+              >
+                Delete Trailer
+              </Button>
+              <DeleteComponentModal
+                deleteType="trailer"
+                isOpen={isOpen}
+                onClose={onClose}
+                gameData={gameData}
+                setGameData={setGameData}
+              />
+            </div>
           ) : null}
         </Flex>
       )}
