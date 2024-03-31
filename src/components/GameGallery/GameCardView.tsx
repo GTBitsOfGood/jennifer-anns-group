@@ -1,10 +1,10 @@
-import { gameSchema } from "@/utils/types";
 import { z } from "zod";
 import GameCard from "./GameCard";
+import { gameDataSchema } from "@/pages/games";
 
 interface Props {
   empty: boolean;
-  games: z.infer<typeof gameSchema>[];
+  games: z.infer<typeof gameDataSchema>[];
 }
 
 export default function GameCardView({ empty, games }: Props) {
