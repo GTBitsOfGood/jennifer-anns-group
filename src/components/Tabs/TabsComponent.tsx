@@ -94,7 +94,7 @@ export default function TabsComponent({
               <TabPanel>
                 <VideoComponent
                   gameData={gameData}
-                  edit={false}
+                  edit={mode === "edit"}
                   setGameData={setGameData}
                 />
               </TabPanel>
@@ -110,7 +110,7 @@ export default function TabsComponent({
               <TabPanel>
                 <GameBuildList
                   gameData={gameData}
-                  editing={false}
+                  editing={mode === "edit"}
                   setGameData={setGameData}
                 />
               </TabPanel>
