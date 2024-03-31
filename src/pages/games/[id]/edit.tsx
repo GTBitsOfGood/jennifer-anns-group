@@ -3,7 +3,6 @@ import { ChangeEvent, useState } from "react";
 import TagsComponent from "@/components/Tags/TagsComponent";
 import TabsComponent from "@/components/Tabs/TabsComponent";
 import React from "react";
-import DeleteGameComponent from "@/components/GameScreen/DeleteGameComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import pageAccessHOC from "@/components/HOC/PageAccess";
 import AddEditWebGLComponent from "@/components/GameScreen/AddEditWebGLComponent";
@@ -111,7 +110,8 @@ const EditGamePage = () => {
           deleteType="game"
           isOpen={isOpen}
           onClose={onClose}
-          gameName={gameData.name}
+          gameData={gameData}
+          setGameData={setGameData}
         />
       </div>
       <div className="mx-auto my-8 h-[75vh] w-[75vw]">

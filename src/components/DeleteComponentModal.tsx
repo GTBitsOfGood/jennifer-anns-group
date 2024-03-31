@@ -11,17 +11,15 @@ import {
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
-import { useRef } from "react";
+import { useRef, Dispatch } from "react";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 
 interface Props {
   deleteType: string;
   isOpen: boolean;
   onClose: () => void;
-  gameName?: string;
-  buildType?: string;
-  gameData?: populatedGameWithId;
-  setDeleted?: (value: boolean) => void;
+  gameData: populatedGameWithId;
+  setGameData: Dispatch<populatedGameWithId>;
 }
 
 export default function DeleteComponentModal(props: Props) {
@@ -32,7 +30,7 @@ export default function DeleteComponentModal(props: Props) {
   const deleteType = props.deleteType;
 
   const title: Record<string, string> = {
-    game: props.gameName ? props.gameName : "",
+    game: props.gameData.name ? props.gameData.name : "",
     answerKey: "this answer key",
     parentingGuide: "this parenting guide",
     lessonPlan: "this lesson plan",
@@ -81,10 +79,9 @@ export default function DeleteComponentModal(props: Props) {
   async function deleteLessonPlan() {}
 
   async function deleteTrailer() {
-    if (props.gameData && props.setDeleted) {
-      props.gameData.videoTrailer = "";
-      props.setDeleted(true);
-      router.push(`/games/${gameID}/edit`);
+    if (props.gameData) {
+      props.setGameData({ ...props.gameData, videoTrailer: "" });
+      props.onClose();
     }
   }
 
