@@ -5,18 +5,12 @@ import {
   Tab,
   TabPanel,
   ChakraProvider,
-  Flex,
-  Button,
-  useDisclosure,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
-import AddEditVideoTrailer from "../GameScreen/AddEditVideoTrailerComponent";
 import { ChangeEvent, Dispatch, useState } from "react";
 import GameBuildList from "../GameGallery/GameBuildList";
 import VideoComponent from "./VideoComponent";
-import DeleteComponentModal from "../DeleteComponentModal";
-import { CloseIcon } from "@chakra-ui/icons";
 interface Props {
   mode: string;
   gameData: populatedGameWithId;
@@ -30,7 +24,6 @@ export default function TabsComponent({
   setGameData,
   authorized,
 }: Props) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [description, setDescription] = useState(gameData.description);
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
