@@ -14,7 +14,7 @@
     "secrets:windows": "set /p BW_PASSWORD=Enter Bitwarden Password:&& (bw logout || VER>NUL) && npm run secrets:login",
     "secrets:login": "FOR /F %a IN ('bw login product@bitsofgood.org %BW_PASSWORD% --raw') DO SET BW_SESSION=%a && npm run secrets:get",
     "secrets:get": "bw sync && bw get item 59607d65-8de1-4105-8eaf-b11f0038670c | fx .notes > \".env\"",
-    "add-admin-emails": "tsx scripts/add-admin-emails.ts",
+    "add-initial-data": "tsx scripts/add-initial-data.ts",
     "test": "jest --watchAll=false",
     "prepare": "husky || true"
   },
@@ -59,6 +59,7 @@
     "react-markdown": "^9.0.1",
     "react-markdown-editor-lite": "^1.3.4",
     "react-pdf": "^7.7.0",
+    "react-router-dom": "^6.22.3",
     "react-player": "^2.15.1",
     "react-unity-webgl": "^9.5.0",
     "reusify": "^1.0.4",

@@ -3,9 +3,10 @@ import { ChangeEvent, useState } from "react";
 import TagsComponent from "@/components/Tags/TagsComponent";
 import TabsComponent from "@/components/Tabs/TabsComponent";
 import React from "react";
+import DeleteGameComponent from "@/components/GameScreen/DeleteGameComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import pageAccessHOC from "@/components/HOC/PageAccess";
-import AddEditWebGLComponent from "@/components/GameComponent/AddEditWebGLComponent";
+import AddEditWebGLComponent from "@/components/GameScreen/AddEditWebGLComponent";
 import DeleteComponentModal from "@/components/DeleteComponentModal";
 import { useDisclosure } from "@chakra-ui/react";
 
@@ -17,7 +18,6 @@ const EditGamePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [name, setName] = useState("");
-
   const getGame = async () => {
     try {
       const response = await fetch(`/api/games/${gameID}`);

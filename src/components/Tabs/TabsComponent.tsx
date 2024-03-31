@@ -13,8 +13,8 @@ import chakraTheme from "@/styles/chakraTheme";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import AddEditVideoTrailer from "../GameScreen/AddEditVideoTrailerComponent";
 import { ChangeEvent, Dispatch, useState } from "react";
-import GameBuildList from "../GameComponent/GameBuildList";
-import ReactPlayer from "react-player/lazy";
+import GameBuildList from "../GameGallery/GameBuildList";
+import VideoComponent from "./VideoComponent";
 import DeleteComponentModal from "../DeleteComponentModal";
 import { CloseIcon } from "@chakra-ui/icons";
 interface Props {
@@ -32,7 +32,6 @@ export default function TabsComponent({
 }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [description, setDescription] = useState(gameData.description);
-  const [deleted, setDeleted] = useState(false);
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
     setDescription(newValue);
@@ -76,53 +75,12 @@ export default function TabsComponent({
             </TabPanel>
             {(gameData.videoTrailer && gameData.videoTrailer !== "") ||
             mode === "edit" ? (
-              <TabPanel className="flex flex-col justify-center">
-                {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
-                  <div style={{ paddingTop: "56.25%", position: "relative" }}>
-                    <ReactPlayer
-                      url={gameData.videoTrailer}
-                      controls={true}
-                      width="100%"
-                      height="100%" //TODO: Make height dynamically rescale.
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                      }}
-                    />
-                  </div>
-                ) : null}
-
-                {mode === "edit" && (
-                  <Flex className="flex-row">
-                    <AddEditVideoTrailer
-                      gameData={gameData}
-                      deleted={deleted}
-                    />
-                    {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
-                      <div>
-                        <Button
-                          onClick={onOpen}
-                          rightIcon={
-                            <CloseIcon color="deleteRed" boxSize="10px" />
-                          }
-                          bg="white"
-                          color="deleteRed"
-                          className="w-183 h-46 mt-5 rounded-md border border-delete-red bg-white px-[17px] py-2 font-sans text-xl font-semibold text-delete-red"
-                        >
-                          Delete Trailer
-                        </Button>
-                        <DeleteComponentModal
-                          deleteType="trailer"
-                          isOpen={isOpen}
-                          onClose={onClose}
-                          gameData={gameData}
-                          setDeleted={setDeleted}
-                        />
-                      </div>
-                    ) : null}
-                  </Flex>
-                )}
+              <TabPanel>
+                <VideoComponent
+                  gameData={gameData}
+                  edit={mode === "edit"}
+                  setGameData={setGameData}
+                />
               </TabPanel>
             ) : null}
             {gameData.parentingGuide ? (
