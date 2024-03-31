@@ -112,7 +112,7 @@ export default function DeleteComponentModal(props: Props) {
               </div>
             </AlertDialogHeader>
             <AlertDialogBody p="0" mt="50px">
-              <div className="text-center font-sans text-base font-normal">
+              <div className="mb-10 text-center font-sans text-base font-normal">
                 Deleting {subtitle[deleteType]} is final and cannot be undone.
               </div>
             </AlertDialogBody>
