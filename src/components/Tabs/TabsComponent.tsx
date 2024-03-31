@@ -41,23 +41,45 @@ export default function TabsComponent({
       <div>
         <Tabs colorScheme="brand" className="m-auto w-5/6 font-sans">
           <TabList>
-            <Tab>Description</Tab>
-            {(gameData.videoTrailer && gameData.videoTrailer !== "") ||
-            mode === "edit" ? (
-              <Tab>Trailer</Tab>
-            ) : null}
-            {gameData.parentingGuide ? <Tab>Parenting Guide</Tab> : null}
-            {gameData.lesson ? <Tab>Lesson Plan</Tab> : null}
-            {gameData.answerKey && authorized ? <Tab>Answer Key</Tab> : null}
-            {((gameData?.builds && gameData.builds.length > 0) ||
-              mode === "edit") && <Tab>Game Builds</Tab>}
+            {mode === "view" ? (
+              <>
+                {/** tabs in view mode only visible if value exists */}
+                <Tab>Description</Tab>
+                {gameData.videoTrailer && gameData.videoTrailer !== "" && (
+                  <Tab>Trailer</Tab>
+                )}
+                {gameData.lesson && gameData.lesson !== "" && (
+                  <Tab>Lesson Plan</Tab>
+                )}
+                {gameData.parentingGuide && gameData.parentingGuide !== "" && (
+                  <Tab>Parenting Guide</Tab>
+                )}
+                {gameData.answerKey &&
+                  gameData.answerKey !== "" &&
+                  authorized && <Tab>Answer Key</Tab>}
+                {gameData?.builds && gameData.builds.length > 0 && (
+                  <Tab>Game Builds</Tab>
+                )}
+              </>
+            ) : (
+              <>
+                {/** mode === "edit" all tabs are visible */}
+                <Tab>Description</Tab>
+                <Tab>Trailer</Tab>
+                <Tab>Lesson Plan</Tab>
+                <Tab>Parenting Guide</Tab>
+                <Tab>Answer Key</Tab>
+                <Tab>Game Builds</Tab>
+              </>
+            )}
           </TabList>
           <TabPanels className="mb-12 mt-8 text-gray-500">
+            {/** description tab display depends on edit or view mode */}
             <TabPanel p="0px">
               {mode === "edit" ? (
                 <div className="rounded-[20px] border border-solid border-grey bg-input-bg">
                   <textarea
-                    className="h-52 w-full !resize-none rounded-[20px] border border-[20px] border-solid border-transparent bg-input-bg font-sans !outline-none"
+                    className="h-52 w-full !resize-none rounded-[20px] border-[20px] border-solid border-transparent bg-input-bg font-sans !outline-none"
                     value={description}
                     onChange={handleChange}
                   />
@@ -66,29 +88,29 @@ export default function TabsComponent({
                 <p>{gameData.description}</p>
               )}
             </TabPanel>
-            {(gameData.videoTrailer && gameData.videoTrailer !== "") ||
-            mode === "edit" ? (
+            {/** other tabs render if field exists or in edit mode */}
+            {((gameData.videoTrailer && gameData.videoTrailer !== "") ||
+              mode === "edit") && (
               <TabPanel>
                 <VideoComponent
                   gameData={gameData}
-                  edit={mode === "edit"}
+                  edit={false}
                   setGameData={setGameData}
                 />
               </TabPanel>
-            ) : null}
-            {gameData.parentingGuide ? (
-              <TabPanel>Parenting Guide</TabPanel>
-            ) : null}
-            {gameData.lesson ? <TabPanel>Lesson Plan</TabPanel> : null}
-            {gameData.answerKey && authorized ? (
-              <TabPanel>Answer Key</TabPanel>
-            ) : null}
+            )}
+            {((gameData.lesson && gameData.lesson !== "") ||
+              mode === "edit") && <TabPanel>Lesson Plan</TabPanel>}
+            {((gameData.parentingGuide && gameData.parentingGuide !== "") ||
+              mode === "edit") && <TabPanel>Parenting Guide</TabPanel>}
+            {((gameData.answerKey && gameData.answerKey !== "" && authorized) ||
+              mode === "edit") && <TabPanel>Answer Key</TabPanel>}
             {((gameData?.builds && gameData.builds.length > 0) ||
               mode === "edit") && (
-              <TabPanel p="0px">
+              <TabPanel>
                 <GameBuildList
                   gameData={gameData}
-                  editing={mode === "edit"}
+                  editing={false}
                   setGameData={setGameData}
                 />
               </TabPanel>
