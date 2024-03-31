@@ -14,7 +14,7 @@ type ViewProps = {
 function ViewProfileModal(props: ViewProps) {
   return (
     <>
-      <div className="-my-2 grid grid-cols-8 gap-3 py-4">
+      <div className="-my-2 grid grid-cols-8 gap-3 py-4 font-sans">
         <div className="col-span-4 items-center">
           <Label className="text-right text-lg font-normal">First Name</Label>
 

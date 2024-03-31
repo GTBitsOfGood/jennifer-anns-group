@@ -23,6 +23,9 @@ export const Footer = () => {
             ></img>
             <div className="flex flex-col items-start justify-center gap-2">
               <div className="font-dm-sans text-sm font-normal text-slate-500">
+                Jennifer Ann&apos;s Group&reg;
+              </div>
+              <div className="font-dm-sans text-sm font-normal text-slate-500">
                 #stopTDV
               </div>
               <div className="font-dm-sans text-sm font-normal text-slate-500">
