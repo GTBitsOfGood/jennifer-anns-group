@@ -208,6 +208,7 @@ function CreateGame() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setSubmitting(true);
     if (uploadedWebGL) {
       if (
         loaderFile === null ||
@@ -216,6 +217,7 @@ function CreateGame() {
         frameworkFile === null
       ) {
         setFileValidationError(true);
+        setSubmitting(false);
         return;
       } else {
         setFileValidationError(false);
@@ -231,6 +233,7 @@ function CreateGame() {
       tags: [...selectedAccessibilityTags, ...selectedCustomTags].map(
         (tag) => tag._id,
       ),
+      preview: true,
     };
     const parse = gameSchema.safeParse(input);
 
@@ -250,16 +253,18 @@ function CreateGame() {
       try {
         const response = await createGame(parse.data);
         if (response) {
+          const data = await response.json();
           if (uploadedWebGL) {
-            const data = await response.json();
             await handleWebGLSubmit(data._id);
           }
+          router.replace(`/games/${data._id}/preview`);
         }
-        router.replace("/games");
       } catch (error) {
+        setSubmitting(false);
         console.error("Error creating game:", error);
       }
     } else {
+      setSubmitting(false);
       const errors = parse.error.formErrors.fieldErrors;
       setValidationErrors({
         name: errors.name?.at(0),
@@ -312,7 +317,6 @@ function CreateGame() {
     ]);
 
     try {
-      setSubmitting(true);
       await uploadBuildFiles(gameId, files);
       setSubmitting(false);
 
@@ -468,7 +472,7 @@ function CreateGame() {
             className="px-6 py-6 text-2xl font-semibold"
             disabled={submitting}
           >
-            {submitting ? "Uploading..." : "Publish"}
+            {submitting ? "Uploading..." : "Preview"}
           </Button>
         </div>
       </form>

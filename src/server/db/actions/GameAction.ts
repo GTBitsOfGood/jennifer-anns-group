@@ -299,6 +299,13 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
       filterFieldsOr: filterFieldsOr,
     };
   },
+  preview: async (previewVal, filterFieldsAnd, filterFieldsOr) => {
+    filterFieldsAnd.preview = false;
+    return {
+      filterFieldsAnd: filterFieldsAnd,
+      filterFieldsOr: filterFieldsOr,
+    };
+  },
 };
 
 export async function getGameById(id: string) {

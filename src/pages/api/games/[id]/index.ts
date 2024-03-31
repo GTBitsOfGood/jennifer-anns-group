@@ -78,11 +78,14 @@ async function editGameHandler(req: NextApiRequest, res: NextApiResponse) {
       throw new GameInvalidInputException();
     }
 
+    console.log("hi", JSON.parse(req.body));
     const updateData = editGameSchema.safeParse(JSON.parse(req.body));
+    console.log("hi");
+
+    console.log(updateData);
     if (!updateData.success) {
       throw new GameInvalidInputException();
     }
-
     const editedGame = await editGame({ id: gameId, data: updateData.data });
     return res.status(HTTP_STATUS_CODE.OK).send(editedGame);
   } catch (e: any) {
