@@ -243,6 +243,7 @@ function CreateGame() {
         !uploadedWebGL
       ) {
         alert("Please add at least one Game Build.");
+        setSubmitting(false);
         return;
       }
       setValidationErrors({

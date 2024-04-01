@@ -7,8 +7,8 @@ interface AdminEditButtonProps {
 
 export default function AdminEditButton({ gameId }: AdminEditButtonProps) {
   return (
-    <Link href={`/games/${gameId}/edit`}>
-      <div className="mx-auto flex w-[80vw] justify-end">
+    <div className="mx-auto flex w-[80vw] justify-end">
+      <Link href={`/games/${gameId}/edit`}>
         <button className="rounded-full bg-input-border">
           <div className="flex flex-row py-2 pl-3.5 pr-4">
             <Image
@@ -22,7 +22,7 @@ export default function AdminEditButton({ gameId }: AdminEditButtonProps) {
             </p>
           </div>
         </button>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 }

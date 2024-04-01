@@ -49,6 +49,8 @@ const GamePreviewPage = () => {
 
   const [deleting, setDeleting] = useState<boolean>(false);
 
+  const [preventRouteChange, setPreventRouteChange] = useState<boolean>(true);
+
   useEffect(() => {
     if (userData && userData.label !== "student") {
       setVisibleAnswer(true);
@@ -87,23 +89,27 @@ const GamePreviewPage = () => {
     }
   };
 
-  if (gameId && loading) {
-    getGame();
-  }
+  useEffect(() => {
+    if (gameId && loading) {
+      getGame();
+    }
+  }, [gameId, loading]);
 
-  if (error) {
-    return <div>{error}</div>;
-  }
+  // useEffect(() => {
+  //   const preventUnload = (event: BeforeUnloadEvent) => {
+  //     window.removeEventListener("beforeunload", preventUnload);
+  //     event.preventDefault();
+  //     event.returnValue = "ss";
+  //     return "ss";
+  //   };
+  //   window.addEventListener("beforeunload", preventUnload);
 
-  if (loading) {
-    return <></>;
-  }
+  //   return () => {
+  //     window.removeEventListener("beforeunload", preventUnload);
+  //   };
+  // }, []);
 
-  if (!gameData) {
-    return <div>Game does not exist</div>;
-  }
-
-  const loaded = userData && userId;
+  const [nextUrl, setNextUrl] = useState<string | null>(null);
 
   const publishGame = async () => {
     try {
@@ -132,6 +138,7 @@ const GamePreviewPage = () => {
       if (!response.ok) {
         setError("Failed to publish game.");
       } else {
+        setPreventRouteChange(false);
         router.replace(`/games/${gameId}`);
       }
     } catch (error) {
@@ -146,16 +153,70 @@ const GamePreviewPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        keepalive: true,
       });
-
+      setPreventRouteChange(false);
       if (!response.ok) {
         setError("Failed to delete game.");
       } else {
-        router.replace("/games");
+        console.log("url", nextUrl);
+
+        router.replace(nextUrl!);
       }
     } catch (error) {
       console.error("Error deleting game:", error);
     }
+  };
+
+  useEffect(() => {
+    // const routeChangeStart = (url: string) => {
+    //   setNextUrl(url);
+    //   if (preventRouteChange) {
+    //     router.events.emit("routeChangeError");
+    //     onOpen();
+    //     throw "Abort route change. Please ignore this error.";
+    //   }
+    //   // router.replace(`/games/${gameId}/preview`);
+    // };
+
+    const beforeunload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+
+    const onunload = () => {
+      void handleCancel();
+    };
+
+    window.addEventListener("beforeunload", beforeunload);
+    window.addEventListener("unload", onunload, false);
+
+    // router.events.on("routeChangeStart", routeChangeStart);
+
+    return () => {
+      window.removeEventListener("beforeunload", beforeunload);
+      window.addEventListener("unload", onunload);
+      // router.events.off("routeChangeStart", routeChangeStart);
+    };
+  }, []);
+
+  if (error) {
+    return <div>Error finding game.</div>;
+  }
+
+  if (loading) {
+    return <></>;
+  }
+
+  if (!gameData) {
+    return <div>Game does not exist</div>;
+  }
+
+  const loaded = userData && userId;
+
+  const handleMainCancel = () => {
+    setPreventRouteChange(false);
+    setNextUrl("/games");
+    onOpen();
   };
 
   return (
@@ -190,7 +251,7 @@ const GamePreviewPage = () => {
             <div>
               <Button
                 type="button"
-                onClick={onOpen}
+                onClick={handleMainCancel}
                 variant="outline2"
                 className="px-6 py-6 text-2xl font-semibold"
               >
