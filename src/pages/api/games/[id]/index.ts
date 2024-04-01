@@ -77,12 +77,7 @@ async function editGameHandler(req: NextApiRequest, res: NextApiResponse) {
     if (!gameId || !mongoose.isValidObjectId(gameId)) {
       throw new GameInvalidInputException();
     }
-
-    console.log("hi", JSON.parse(req.body));
     const updateData = editGameSchema.safeParse(JSON.parse(req.body));
-    console.log("hi");
-
-    console.log(updateData);
     if (!updateData.success) {
       throw new GameInvalidInputException();
     }

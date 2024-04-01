@@ -49,7 +49,7 @@ const GamePreviewPage = () => {
 
   const [deleting, setDeleting] = useState<boolean>(false);
 
-  const [preventRouteChange, setPreventRouteChange] = useState<boolean>(true);
+  const deleteOnRouteChange = useRef<boolean>(true);
 
   useEffect(() => {
     if (userData && userData.label !== "student") {
@@ -95,21 +95,7 @@ const GamePreviewPage = () => {
     }
   }, [gameId, loading]);
 
-  // useEffect(() => {
-  //   const preventUnload = (event: BeforeUnloadEvent) => {
-  //     window.removeEventListener("beforeunload", preventUnload);
-  //     event.preventDefault();
-  //     event.returnValue = "ss";
-  //     return "ss";
-  //   };
-  //   window.addEventListener("beforeunload", preventUnload);
-
-  //   return () => {
-  //     window.removeEventListener("beforeunload", preventUnload);
-  //   };
-  // }, []);
-
-  const [nextUrl, setNextUrl] = useState<string | null>(null);
+  // const [nextUrl, setNextUrl] = useState<string | null>(null);
 
   const publishGame = async () => {
     try {
@@ -138,7 +124,7 @@ const GamePreviewPage = () => {
       if (!response.ok) {
         setError("Failed to publish game.");
       } else {
-        setPreventRouteChange(false);
+        deleteOnRouteChange.current = false;
         router.replace(`/games/${gameId}`);
       }
     } catch (error) {
@@ -153,15 +139,10 @@ const GamePreviewPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        keepalive: true,
+        keepalive: deleteOnRouteChange.current,
       });
-      setPreventRouteChange(false);
       if (!response.ok) {
         setError("Failed to delete game.");
-      } else {
-        console.log("url", nextUrl);
-
-        router.replace(nextUrl!);
       }
     } catch (error) {
       console.error("Error deleting game:", error);
@@ -169,15 +150,17 @@ const GamePreviewPage = () => {
   };
 
   useEffect(() => {
-    // const routeChangeStart = (url: string) => {
-    //   setNextUrl(url);
-    //   if (preventRouteChange) {
-    //     router.events.emit("routeChangeError");
-    //     onOpen();
-    //     throw "Abort route change. Please ignore this error.";
-    //   }
-    //   // router.replace(`/games/${gameId}/preview`);
-    // };
+    const routeChangeStart = (url: string) => {
+      // setNextUrl(url);
+      // if (preventRouteChange) {
+      //   router.events.emit("routeChangeError");
+      //   onOpen();
+      //   throw "Abort route change. Please ignore this error.";
+      // }
+      // router.replace(`/games/${gameId}/preview`);
+      if (deleteOnRouteChange.current) handleCancel();
+      router.events.off("routeChangeStart", routeChangeStart);
+    };
 
     const beforeunload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
@@ -188,14 +171,14 @@ const GamePreviewPage = () => {
     };
 
     window.addEventListener("beforeunload", beforeunload);
-    window.addEventListener("unload", onunload, false);
+    window.addEventListener("unload", onunload);
 
-    // router.events.on("routeChangeStart", routeChangeStart);
+    router.events.on("routeChangeStart", routeChangeStart);
 
     return () => {
       window.removeEventListener("beforeunload", beforeunload);
       window.addEventListener("unload", onunload);
-      // router.events.off("routeChangeStart", routeChangeStart);
+      router.events.off("routeChangeStart", routeChangeStart);
     };
   }, []);
 
@@ -214,8 +197,6 @@ const GamePreviewPage = () => {
   const loaded = userData && userId;
 
   const handleMainCancel = () => {
-    setPreventRouteChange(false);
-    setNextUrl("/games");
     onOpen();
   };
 
@@ -295,7 +276,7 @@ const GamePreviewPage = () => {
                   <AlertDialogFooter p="0" justifyContent="center">
                     <div className="mt-4 flex flex-row items-center gap-4">
                       <button
-                        onClick={handleCancel}
+                        onClick={() => router.replace("/games")}
                         className="rounded-xl bg-delete-red px-6 py-3 font-sans font-semibold text-white"
                         disabled={deleting}
                       >
