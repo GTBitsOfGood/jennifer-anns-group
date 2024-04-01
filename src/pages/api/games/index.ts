@@ -115,7 +115,7 @@ const putSingleStringInArray = (val: string) => {
   return [val];
 };
 
-//Query parameters can pass in a single value but need to be an array, so moddifying it to expect that.
+//Query parameters can pass in a single value but need to be an array, so modifying it to expect that.
 export const GetGameQuerySchema = z.object({
   name: z.string().min(3).max(50).optional(),
   theme: z

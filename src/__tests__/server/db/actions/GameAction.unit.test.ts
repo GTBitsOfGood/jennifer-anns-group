@@ -74,11 +74,10 @@ describe("MongodDB Game - Unit Test", () => {
   });
 
   describe("getSelectedGames", () => {
-    test("[pagination] page out of range: expect exception", async () => {
+    test("[pagination] page out of range: expect no games", async () => {
       const numPages = Math.ceil(NUM_GAMES / RESULTS_PER_PAGE);
-      await expect(getSelectedGames({ page: numPages + 1 })).rejects.toThrow(
-        GameNotFoundException,
-      );
+      const result = await getSelectedGames({ page: numPages + 1 });
+      await expect(result.games).toEqual([]);
     });
     test("[pagination] no repeats in paginated results: expect success", async () => {
       const numPages = Math.ceil(NUM_GAMES / RESULTS_PER_PAGE);
@@ -136,15 +135,15 @@ describe("MongodDB Game - Unit Test", () => {
     test("[theme] nonexistent theme: expect exception", async () => {
       const theme = faker.string.numeric({ length: 40 });
 
-      await expect(getSelectedGames({ page: 1, theme: theme })).rejects.toThrow(
-        ThemeNotFoundException,
-      );
+      await expect(
+        getSelectedGames({ page: 1, theme: [theme] }),
+      ).rejects.toThrow(ThemeNotFoundException);
     });
     test("[theme] in-out groups: expect success", async () => {
       const theme = faker.helpers.arrayElement(themeInputs);
       let query: GameQuery = {
         page: 1,
-        theme: theme.name,
+        theme: [theme.name],
       };
       let games: GamesFilterOutput = [];
       const numPages = Math.ceil(theme.games.length / RESULTS_PER_PAGE);
@@ -192,7 +191,7 @@ describe("MongodDB Game - Unit Test", () => {
         page: 1,
         tags: [randomCustomTag.name],
         accessibility: [randomAccessibilityTag.name],
-        theme: randomTheme.name,
+        theme: [randomTheme.name],
         name: faker.string.alpha({ length: 1 }),
         gameBuilds: [AllBuilds.webgl, AllBuilds.amazon],
         gameContent: [GameContentEnum.parentingGuide],
@@ -202,7 +201,7 @@ describe("MongodDB Game - Unit Test", () => {
         ...query,
         tags: [randomCustomTag._id.toString()],
         accessibility: [randomAccessibilityTag._id.toString()],
-        theme: randomTheme._id.toString(),
+        theme: [randomTheme._id.toString()],
       };
       const expected = filterGeneratedGames(generatedGames, modifiedQuery);
 
@@ -250,7 +249,9 @@ describe("MongodDB Game - Unit Test", () => {
     tags: (games, customTags, _) => {
       const filteredGames = games.filter((game) => {
         if (game.tags !== undefined) {
-          const result = customTags.every((tag) => game.tags!.includes(tag));
+          const result = customTags.every((tag) =>
+            game.tags!.map((tag) => tag.name).includes(tag),
+          );
           return result;
         }
         return false;
@@ -259,11 +260,15 @@ describe("MongodDB Game - Unit Test", () => {
     },
     accessibility: (games, accessibilityTags, _) =>
       games.filter((game) =>
-        accessibilityTags.every((tag) => game.tags?.includes(tag)),
+        accessibilityTags.every((tag) =>
+          game.tags!.map((tag) => tag.name).includes(tag),
+        ),
       ),
-    theme: (games, theme, _) =>
+    theme: (games, themes, _) =>
       games.filter((game) =>
-        game.themes?.map((theme) => theme.name).includes(theme),
+        themes.every((theme) =>
+          game.themes?.map((theme) => theme.name).includes(theme),
+        ),
       ),
     gameBuilds: (games, gameBuilds, _) =>
       games.filter((game) => {
