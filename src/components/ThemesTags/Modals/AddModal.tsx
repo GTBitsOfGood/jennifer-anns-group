@@ -10,16 +10,10 @@ import {
 import { Label } from "../../ui/label";
 import { Input } from "../../ui/input";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { IGame } from "@/server/db/models/GameModel";
 import { useCallback, useState } from "react";
 import { z } from "zod";
 import { CreateThemeInput } from "@/pages/api/themes";
 import { CreateTagInput } from "@/pages/api/tags";
-import { ExtendId } from "@/utils/types";
-import {
-  GamesFilterOutput,
-  GetSelectedGamesOutput,
-} from "@/server/db/actions/GameAction";
 import { GetGamesOutput } from "@/pages/api/games";
 
 const FORM_GAMES_KEY = "games";
@@ -132,7 +126,7 @@ function AddModal({ subject, open, setOpen }: Props) {
         <div className="w-full">
           <form
             id="form"
-            className="flex flex-col gap-4"
+            className="m-4 flex flex-col gap-4"
             onSubmit={handleSubmit}
           >
             <div className="relative">
@@ -183,12 +177,17 @@ function AddModal({ subject, open, setOpen }: Props) {
           <DialogClose>
             <Button
               variant="ghost"
-              className="text-blue-primary hover:text-blue-primary"
+              className="h-12 w-28 text-blue-primary hover:text-blue-primary"
             >
               Cancel
             </Button>
           </DialogClose>
-          <Button variant="primary" type="submit" form="form">
+          <Button
+            variant="primary"
+            className="h-12 w-28"
+            type="submit"
+            form="form"
+          >
             Apply
           </Button>
         </DialogFooter>

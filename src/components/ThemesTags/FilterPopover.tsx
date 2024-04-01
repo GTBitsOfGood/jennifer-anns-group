@@ -76,10 +76,10 @@ function FilterPopover(props: Props) {
         <Button variant="outline2">Filter</Button>
       </PopoverTrigger>
       <PopoverContent className="w-[40em]" align="start">
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <form className="m-4 flex flex-col gap-4" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <p className="font-semibold text-[#6D758F]">Themes</p>
+              <p className="mb-2 mt-2 font-semibold text-[#6D758F]">Themes</p>
               <div className="flex flex-row flex-wrap gap-2">
                 {themes?.map((theme) => {
                   return (
@@ -104,7 +104,9 @@ function FilterPopover(props: Props) {
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <p className="font-semibold text-[#6D758F]">Accessibility</p>
+              <p className="mb-2 mt-2 font-semibold text-[#6D758F]">
+                Accessibility
+              </p>
               <div className="flex flex-row flex-wrap gap-2">
                 {tags?.accessibility.map((tag) => {
                   return (
@@ -129,7 +131,7 @@ function FilterPopover(props: Props) {
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <p className="font-semibold text-[#6D758F]">Tags</p>
+              <p className="mb-2 mt-2 font-semibold text-[#6D758F]">Tags</p>
               <div className="flex flex-row flex-wrap gap-2">
                 {tags?.custom.map((tag) => {
                   return (
@@ -157,7 +159,7 @@ function FilterPopover(props: Props) {
           <div className="flex flex-row items-center justify-between">
             <Button
               variant="ghost"
-              className="w-18 h-6 text-blue-primary hover:text-blue-primary"
+              className="h-12 w-28 text-blue-primary hover:text-blue-primary"
               onClick={() => {
                 const { theme, accessibility, tags, ...original } = filters;
                 setFilters(original);
@@ -166,7 +168,7 @@ function FilterPopover(props: Props) {
             >
               Clear
             </Button>
-            <Button variant="primary" className="w-18 h-6" type="submit">
+            <Button variant="primary" className="h-12 w-28" type="submit">
               Apply
             </Button>
           </div>
