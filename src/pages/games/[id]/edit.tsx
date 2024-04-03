@@ -8,6 +8,7 @@ import pageAccessHOC from "@/components/HOC/PageAccess";
 import AddEditWebGLComponent from "@/components/GameScreen/AddEditWebGLComponent";
 import DeleteComponentModal from "@/components/DeleteComponentModal";
 import { useDisclosure } from "@chakra-ui/react";
+import DiscardChanges from "@/components/GameScreen/DiscardChanges";
 
 const EditGamePage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -42,10 +43,6 @@ const EditGamePage = () => {
         name: newValue,
       });
     }
-  };
-
-  const discardChanges = async () => {
-    router.push(`/games/${gameID}`);
   };
 
   const saveChanges = async () => {
@@ -132,13 +129,8 @@ const EditGamePage = () => {
         />
       ) : null}
       <div className="mx-auto mb-40 mt-24 flex w-[80vw] justify-end">
-        <div className="absolute">
-          <button
-            onClick={discardChanges}
-            className="rounded-xl bg-input-border px-6 py-3 font-sans text-2xl font-medium text-blue-primary"
-          >
-            Discard changes
-          </button>
+        <div className="absolute flex flex-row">
+          <DiscardChanges gameID={gameID} />
           <button
             onClick={saveChanges}
             className="ml-8 rounded-xl bg-blue-primary px-6 py-3 font-sans text-2xl font-medium text-white"

@@ -52,7 +52,7 @@ export default function FilterBody({
   );
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedGameContent, setSelectedGameContent] = useState<string[]>([]);
-  const { value, onChange } = useCheckboxGroup();
+  const { value, setValue, onChange } = useCheckboxGroup();
 
   useEffect(() => {
     getAllTags();
@@ -84,6 +84,17 @@ export default function FilterBody({
     setGameContent(selectedGameContent);
     setFiltersApplied(true);
     onClose();
+  }
+
+  function clearSelections() {
+    setSelectedGameBuilds([]);
+    setSelectedAccessibility([]);
+    setSelectedTags([]);
+    console.log("hi");
+    setValue([]);
+    console.log(value);
+    console.log(selectedGameContent);
+    setSelectedGameContent([]);
   }
 
   return (
@@ -126,6 +137,7 @@ export default function FilterBody({
       <CheckboxGroup>
         <VStack align="start" ml="52px" mb="52px">
           {gameContentOptions.map((content) => {
+            console.log(content + " " + value.includes(content));
             return (
               <Checkbox
                 key={content}
@@ -213,9 +225,7 @@ export default function FilterBody({
 
       <div className=" mb-[60px] ml-[52px] mr-[52px] flex flex-row justify-between">
         <button
-          onClick={() => {
-            onClose();
-          }}
+          onClick={clearSelections}
           className="font-sans font-semibold text-blue-primary"
         >
           Clear
