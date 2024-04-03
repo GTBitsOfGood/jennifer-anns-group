@@ -15,8 +15,6 @@ import {
   GetGameContextOutput,
   GetGameContextThemesOutput,
 } from "@/pages/api/games/[id]/themes";
-import { ITag } from "@/server/db/models/TagModel";
-import { ITheme } from "@/server/db/models/ThemeModel";
 import { Spinner } from "@chakra-ui/react";
 import { PopoverClose } from "@radix-ui/react-popover";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";

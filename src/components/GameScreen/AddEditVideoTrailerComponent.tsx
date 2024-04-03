@@ -78,13 +78,7 @@ export default function AddEditVideoTrailer({ gameData, setGameData }: Props) {
       <div>
         {addButton ? (
           <Button
-            rightIcon={
-              <Icon
-                as={Image}
-                src={"/octicon_upload-24upload.svg"}
-                boxSize="20px"
-              />
-            }
+            rightIcon={<Icon as={Image} src={"/link.svg"} boxSize="20px" />}
             onClick={onOpen}
             bg="white"
             className="w-151 h-46 m-5 rounded-md border border-black px-[17px] py-2 font-sans text-xl font-semibold text-black"

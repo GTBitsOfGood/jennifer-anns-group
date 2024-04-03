@@ -195,7 +195,7 @@ function CreateGame() {
       } else if (response.status === HTTP_STATUS_CODE.BAD_REQUEST) {
         setValidationErrors((prevValidationErrors) => ({
           ...prevValidationErrors,
-          name: "Game with this title already exists",
+          name: "Game with this title already exists.",
         }));
       } else {
         console.error("Error creating game");
@@ -218,7 +218,7 @@ function CreateGame() {
         frameworkFile === null
       ) {
         setFileValidationError(
-          "All files must be uploaded for the WebGL Build!",
+          "All files must be uploaded for the WebGL Build.",
         );
         setSubmitting(false);
         return;
@@ -259,7 +259,6 @@ function CreateGame() {
 
       try {
         const response = await createGame(parse.data);
-        console.log(response);
         if (response?.ok) {
           const data = await response.json();
           if (uploadedWebGL) {
@@ -269,7 +268,6 @@ function CreateGame() {
           router.replace(`/games/${data._id}/preview`);
         } else {
           setSubmitting(false);
-          setFileValidationError("Error creating game. Please try again.");
         }
       } catch (error) {
         setSubmitting(false);
@@ -468,9 +466,12 @@ function CreateGame() {
             <div className="flex h-14 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
               <AlertTriangleIcon className="h-5 w-5" />
               <p>
-                {!validationErrors.videoTrailer
-                  ? "All required fields need to be filled."
-                  : "Please enter a valid URL for the Video Trailer."}
+                {validationErrors.name ===
+                "Game with this title already exists."
+                  ? "Game with this title already exists."
+                  : validationErrors.videoTrailer
+                    ? "Please enter a valid URL for the Video Trailer."
+                    : "All required fields need to be filled."}
               </p>
             </div>
           )}

@@ -158,104 +158,99 @@ export default function Games() {
   };
 
   return (
-    <div>
-      <ChakraProvider theme={chakraTheme}>
-        <h1 className="mb-16 mt-10 text-center font-sans text-6xl font-semibold">
-          Game Gallery
-        </h1>
-
-        <div className="m-auto mb-11 flex w-[80vw] flex-row justify-between">
-          <div className="flex flex-row">
-            <InputGroup w="200px">
-              <InputLeftElement pointerEvents="none">
-                <Search2Icon color="gray.500" />
-              </InputLeftElement>
-              <Input
-                height="36px"
-                onChange={handleInputChange}
-                borderColor="gray.500"
-                bg="gray.50"
-                color="gray.500"
-                placeholder="Filter by name"
-                minW="200px"
-              />
-            </InputGroup>
-            <Popover
-              placement="bottom-start"
-              onOpen={onOpen}
-              onClose={onClose}
-              isOpen={isOpen}
-            >
-              <PopoverTrigger>
-                <Button
-                  borderRadius="100px"
-                  bg="brand.800"
-                  _hover={{ bg: "brand.800" }}
-                  minW="96px"
-                  height="36px"
-                  className="ml-5 mr-5 flex flex-row items-center justify-center space-x-1 border border-[#A9CBEB]"
-                >
-                  <Text className="select-none font-inter text-sm font-bold text-[#2352A0]">
-                    Filter
-                  </Text>
-                  {isOpen ? (
-                    <TriangleUpIcon color="brand.600" height="9px" />
-                  ) : (
-                    <TriangleDownIcon color="brand.600" height="9px" />
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent mt="10px" w="750px" minH="800px">
-                <PopoverBody>
-                  <FilterBody
-                    setAcccessibility={setAccessibility}
-                    setGameBuilds={setGameBuilds}
-                    setGameContent={setGameContent}
-                    setTags={setTags}
-                    setFiltersApplied={setFiltersApplied}
-                    userLabel={userData?.label}
-                    onClose={onClose}
-                  />
-                </PopoverBody>
-              </PopoverContent>
-            </Popover>
-            <div className="flex flex-row flex-wrap">
-              <SelectedFilters
-                gameBuilds={gameBuilds}
-                gameContent={gameContent}
-                accessibility={accessibility}
-                tags={tags}
-              />
-            </div>
-          </div>
-          {userData?.label === "administrator" ? (
-            <button
-              onClick={() => {
-                router.push("/games/create");
-              }}
-              className="ml-5 h-10 min-w-[150px] rounded-md bg-blue-primary	font-sans font-semibold text-[#FAFBFC]"
-            >
-              Create Game
-            </button>
-          ) : null}
-        </div>
-
-        <div className="m-auto ml-[10vw] w-[80vw]">
-          <Divider borderColor="brand.700" borderWidth="1px" />
-        </div>
-
-        <div className="m-auto flex flex-row justify-center">
-          <div className="m-auto mt-[60px] flex w-[85vw] flex-row">
-            <ThemeSidebar
-              themes={themes}
-              selectedTheme={selectedTheme}
-              setSelectedTheme={setSelectedTheme}
-              setFiltersApplied={setFiltersApplied}
+    <ChakraProvider theme={chakraTheme}>
+      <h1 className="mb-16 mt-10 text-center font-sans text-6xl font-semibold">
+        Game Gallery
+      </h1>
+      <div className="m-auto mb-11 flex w-[85vw] flex-row justify-between">
+        <div className="flex flex-row">
+          <InputGroup w="200px">
+            <InputLeftElement pointerEvents="none">
+              <Search2Icon color="gray.500" />
+            </InputLeftElement>
+            <Input
+              height="36px"
+              onChange={handleInputChange}
+              borderColor="gray.500"
+              bg="gray.50"
+              color="gray.500"
+              placeholder="Filter by name"
+              minW="200px"
             />
-            <GameCardView games={games} />
+          </InputGroup>
+          <Popover
+            placement="bottom-start"
+            onOpen={onOpen}
+            onClose={onClose}
+            isOpen={isOpen}
+          >
+            <PopoverTrigger>
+              <Button
+                borderRadius="100px"
+                bg="brand.800"
+                _hover={{ bg: "brand.800" }}
+                minW="96px"
+                height="36px"
+                className="ml-5 mr-5 flex flex-row items-center justify-center space-x-1 border border-[#A9CBEB]"
+              >
+                <Text className="select-none font-inter text-sm font-bold text-[#2352A0]">
+                  Filter
+                </Text>
+                {isOpen ? (
+                  <TriangleUpIcon color="brand.600" height="9px" />
+                ) : (
+                  <TriangleDownIcon color="brand.600" height="9px" />
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent mt="10px" w="750px" minH="800px">
+              <PopoverBody>
+                <FilterBody
+                  setAcccessibility={setAccessibility}
+                  setGameBuilds={setGameBuilds}
+                  setGameContent={setGameContent}
+                  setTags={setTags}
+                  setFiltersApplied={setFiltersApplied}
+                  userLabel={userData?.label}
+                  onClose={onClose}
+                />
+              </PopoverBody>
+            </PopoverContent>
+          </Popover>
+          <div className="flex flex-row flex-wrap">
+            <SelectedFilters
+              gameBuilds={gameBuilds}
+              gameContent={gameContent}
+              accessibility={accessibility}
+              tags={tags}
+            />
           </div>
         </div>
-      </ChakraProvider>
-    </div>
+        {userData?.label === "administrator" ? (
+          <button
+            onClick={() => {
+              router.push("/games/create");
+            }}
+            className="ml-5 h-10 min-w-[150px] rounded-md bg-blue-primary	font-sans font-semibold text-[#FAFBFC]"
+          >
+            Create Game
+          </button>
+        ) : null}
+      </div>
+
+      <div className="m-auto w-[85vw]">
+        <Divider borderColor="brand.700" borderWidth="1px" />
+      </div>
+
+      <div className="m-auto mt-[60px] flex w-[85vw] flex-row justify-center">
+        <ThemeSidebar
+          themes={themes}
+          selectedTheme={selectedTheme}
+          setSelectedTheme={setSelectedTheme}
+          setFiltersApplied={setFiltersApplied}
+        />
+        <GameCardView games={games} />
+      </div>
+    </ChakraProvider>
   );
 }
