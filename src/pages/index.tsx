@@ -21,7 +21,7 @@ import EditGameBoyModal from "@/components/HomePage/EditGameBoyModal";
 import GameBoy from "@/components/HomePage/GameBoy";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 
-const mdPlugins = ["font-bold", "font-italic", "font-underline"];
+// const mdPlugins = ["font-bold", "font-italic", "font-underline"];
 const mdParser = new MarkdownIt().use(insert);
 
 const Home = () => {
@@ -127,7 +127,7 @@ const Home = () => {
                 </div>
               </div>
               <MdEditor
-                plugins={mdPlugins}
+                // plugins={mdPlugins}
                 renderHTML={(text) => mdParser.render(text)}
                 defaultValue={pageData.mdDescription}
                 onChange={(data) => {
@@ -188,7 +188,6 @@ const Home = () => {
                   {pageData.mdTitle}
                 </h1>
                 <MarkdownRenderer
-                  className="mb-8 space-y-4 text-center text-lg text-gray-500"
                   markdown={pageData.mdDescription}
                   parse={(markdown) => mdParser.render(markdown)}
                 />

@@ -5,16 +5,14 @@ const htmlToReactParser = HtmlToReact.Parser();
 interface MarkdownRendererProps {
   markdown: string;
   parse: (markdown: string) => string;
-  className: string;
 }
 
 export default function MarkdownRenderer({
   markdown,
   parse,
-  className,
 }: MarkdownRendererProps) {
   const html = parse(markdown);
   const reactElement = htmlToReactParser.parse(html);
 
-  return <div className={className}>{reactElement}</div>;
+  return <div className="prose prose-p:text-gray-500">{reactElement}</div>;
 }
