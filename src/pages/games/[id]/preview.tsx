@@ -203,7 +203,10 @@ const GamePreviewPage = () => {
   return (
     <div>
       <div className="flex h-10 w-full items-center justify-center bg-blue-bg font-sans font-bold">
-        <p>🔍 You are in preview mode.</p>
+        <p>
+          🔍 You are in preview mode. Leaving this page will delete the game
+          preview.
+        </p>
       </div>
       <h1 className="mt-[32px] text-center font-sans text-[56px] font-semibold">
         {gameData.name}
