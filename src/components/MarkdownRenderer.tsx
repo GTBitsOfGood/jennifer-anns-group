@@ -14,5 +14,5 @@ export default function MarkdownRenderer({
   const html = parse(markdown);
   const reactElement = htmlToReactParser.parse(html);
 
-  return <div className="prose prose-p:text-gray-500">{reactElement}</div>;
+  return <div className="prose">{reactElement}</div>;
 }
