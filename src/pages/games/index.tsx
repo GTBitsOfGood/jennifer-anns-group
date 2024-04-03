@@ -1,5 +1,3 @@
-import { Footer } from "@/components/Navigation/Footer";
-import Header from "@/components/Navigation/Header";
 import { userDataSchema } from "@/components/ProfileModal/ProfileModal";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -25,18 +23,23 @@ import {
   TriangleUpIcon,
 } from "@chakra-ui/icons";
 import { Input } from "@chakra-ui/react";
-import FilterBody from "@/components/GameComponent/FilterBody";
+import FilterBody from "@/components/GameGallery/FilterBody";
 import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
-import ThemeSidebar from "@/components/GameComponent/ThemeSidebar";
-import SelectedFilters from "@/components/GameComponent/SelectedFilters";
-import GameCardView from "@/components/GameComponent/GameCardView";
+import ThemeSidebar from "@/components/GameGallery/ThemeSidebar";
+import SelectedFilters from "@/components/GameGallery/SelectedFilters";
+import GameCardView from "@/components/GameGallery/GameCardView";
+
+const idSchema = z.string().length(24);
+export const gameDataSchema = gameSchema.extend({
+  _id: idSchema,
+});
 
 export default function Games() {
   const { data: session } = useSession();
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
-  const [games, setGames] = useState<z.infer<typeof gameSchema>[]>([]);
+  const [games, setGames] = useState<z.infer<typeof gameDataSchema>[]>([]);
   const [themes, setThemes] = useState<string[]>([]);
   const [selectedTheme, setSelectedTheme] = useState("All Games");
   const [gameBuilds, setGameBuilds] = useState<string[]>([]);
@@ -45,7 +48,6 @@ export default function Games() {
   const [tags, setTags] = useState<string[]>([]);
   const [name, setName] = useState("");
   const router = useRouter();
-  const [empty, setEmpty] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const gameBuildsMap: Record<string, string> = {
@@ -116,16 +118,8 @@ export default function Games() {
 
     try {
       const response = await fetch(`/api/games/?${queryString}`);
-      if (response.ok) {
-        const data = await response.json();
-        setGames(data.games);
-        setEmpty(false);
-      } else {
-        const message = await response.text();
-        if (message === "No Games found at this page") {
-          setEmpty(true);
-        }
-      }
+      const data = await response.json();
+      setGames(data.games);
     } catch (e: any) {
       console.log(e.message);
     }
@@ -163,15 +157,8 @@ export default function Games() {
   };
 
   return (
-    <ChakraProvider theme={chakraTheme}>
-      <div>
-        <Header
-          label={userData?.label}
-          userData={userData}
-          setUserData={setUserData}
-        />
-        <br></br>
-
+    <div>
+      <ChakraProvider theme={chakraTheme}>
         <h1 className="mb-16 mt-10 text-center font-sans text-6xl font-semibold">
           Game Gallery
         </h1>
@@ -270,12 +257,10 @@ export default function Games() {
               setSelectedTheme={setSelectedTheme}
               setFiltersApplied={setFiltersApplied}
             />
-            <GameCardView empty={empty} games={games} />
+            <GameCardView games={games} />
           </div>
         </div>
-
-        <Footer />
-      </div>
-    </ChakraProvider>
+      </ChakraProvider>
+    </div>
   );
 }
