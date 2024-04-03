@@ -12,6 +12,7 @@ import {
   GameException,
 } from "@/utils/exceptions/game";
 import mongoose from "mongoose";
+import { z } from "zod";
 
 export default async function handler(
   req: NextApiRequest,
@@ -75,6 +76,7 @@ async function deleteGameHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
+export type EditGameInput = z.infer<typeof editGameSchema>;
 async function editGameHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const gameId = req.query.id as string;
