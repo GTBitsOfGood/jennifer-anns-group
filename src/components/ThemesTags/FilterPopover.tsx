@@ -94,7 +94,7 @@ function FilterPopover(props: Props) {
                       />
                       <Label
                         htmlFor={theme._id}
-                        className="m-0.5 rounded-full bg-[#F6F6F6] px-4 py-1.5 font-normal hover:cursor-pointer peer-checked:bg-[#A9CBEB]"
+                        className="mb-0.5 mt-0.5 rounded-full bg-[#F6F6F6] px-4 py-1.5 font-normal hover:cursor-pointer peer-checked:bg-[#A9CBEB]"
                       >
                         {theme.name}
                       </Label>
@@ -121,7 +121,7 @@ function FilterPopover(props: Props) {
                       />
                       <Label
                         htmlFor={tag._id}
-                        className="m-0.5 rounded-full bg-[#F6F6F6] px-4 py-1.5 font-normal hover:cursor-pointer peer-checked:bg-[#FFE5C6]"
+                        className="mb-0.5 mt-0.5 rounded-full bg-[#F6F6F6] px-4 py-1.5 font-normal hover:cursor-pointer peer-checked:bg-[#FFE5C6]"
                       >
                         {tag.name}
                       </Label>
@@ -146,7 +146,7 @@ function FilterPopover(props: Props) {
                       />
                       <Label
                         htmlFor={tag._id}
-                        className="m-0.5 rounded-full bg-[#F6F6F6] px-4 py-1.5 font-normal hover:cursor-pointer peer-checked:bg-[#E2DED5]"
+                        className="mb-0.5 mt-0.5 rounded-full bg-[#F6F6F6] px-4 py-1.5 font-normal hover:cursor-pointer peer-checked:bg-[#E2DED5]"
                       >
                         {tag.name}
                       </Label>
