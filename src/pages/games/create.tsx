@@ -270,7 +270,6 @@ function CreateGame() {
       }
     } else {
       const errors = parse.error.formErrors.fieldErrors;
-      console.log(errors);
       setValidationErrors({
         name: errors.name?.at(0),
         videoTrailer: errors.videoTrailer?.at(0),
