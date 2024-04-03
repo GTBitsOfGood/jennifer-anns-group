@@ -259,13 +259,17 @@ function CreateGame() {
 
       try {
         const response = await createGame(parse.data);
-        if (response) {
+        console.log(response);
+        if (response?.ok) {
           const data = await response.json();
           if (uploadedWebGL) {
             const webGLSubmit = await handleWebGLSubmit(data._id);
             if (!webGLSubmit) return;
           }
           router.replace(`/games/${data._id}/preview`);
+        } else {
+          setSubmitting(false);
+          setFileValidationError("Error creating game. Please try again.");
         }
       } catch (error) {
         setSubmitting(false);
