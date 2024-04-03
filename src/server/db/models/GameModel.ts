@@ -22,29 +22,32 @@ const BuildSchema = new Schema<IBuild>({
   instructions: { type: String },
 });
 
-const GameSchema = new Schema<IGame>({
-  name: { type: String, required: true, unique: true },
-  themes: {
-    type: [Schema.Types.ObjectId],
-    ref: "Theme",
-    default: [],
-    required: false,
+const GameSchema = new Schema<IGame>(
+  {
+    name: { type: String, required: true, unique: true },
+    themes: {
+      type: [Schema.Types.ObjectId],
+      ref: "Theme",
+      default: [],
+      required: false,
+    },
+    tags: {
+      type: [Schema.Types.ObjectId],
+      ref: "Tag",
+      default: [],
+      required: false,
+    },
+    description: { type: String, required: true },
+    webGLBuild: { type: Boolean, default: false },
+    builds: { type: [BuildSchema], default: [] },
+    lesson: { type: String },
+    parentingGuide: { type: String },
+    answerKey: { type: String },
+    videoTrailer: { type: String },
+    preview: { type: Boolean, required: true },
   },
-  tags: {
-    type: [Schema.Types.ObjectId],
-    ref: "Tag",
-    default: [],
-    required: false,
-  },
-  description: { type: String, required: true },
-  webGLBuild: { type: Boolean, default: false },
-  builds: { type: [BuildSchema], default: [] },
-  lesson: { type: String },
-  parentingGuide: { type: String },
-  answerKey: { type: String },
-  videoTrailer: { type: String },
-  preview: { type: Boolean, required: true },
-});
+  { versionKey: false },
+);
 
 const GameModel =
   (mongoose.models.Game as mongoose.Model<IGame>) ??

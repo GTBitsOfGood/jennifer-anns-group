@@ -3,14 +3,13 @@ import GameCard from "./GameCard";
 import { gameDataSchema } from "@/pages/games";
 
 interface Props {
-  empty: boolean;
   games: z.infer<typeof gameDataSchema>[];
 }
 
-export default function GameCardView({ empty, games }: Props) {
+export default function GameCardView({ games }: Props) {
   return (
     <div className="ml-6 flex w-full flex-row flex-wrap">
-      {!empty ? (
+      {games.length > 0 ? (
         games.map((game) => {
           return (
             <div key={game.name} className="mb-6 ml-6">

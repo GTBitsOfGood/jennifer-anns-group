@@ -222,7 +222,7 @@ export default function FilterBody({
         </button>
         <button
           onClick={applyFilters}
-          className="h-12 w-[120px] rounded-md bg-blue-primary font-sans font-semibold text-white"
+          className="h-12 w-28 rounded-md bg-blue-primary font-sans font-semibold text-white"
         >
           Apply
         </button>

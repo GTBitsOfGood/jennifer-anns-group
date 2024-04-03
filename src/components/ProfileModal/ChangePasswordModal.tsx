@@ -16,6 +16,7 @@ import {
   EditUserParams,
   EditUserReturnValue,
 } from "./ProfileModal";
+import WarningIcon from "../ui/icons/warningicon";
 
 type ChangePWProps = {
   setProfileState: React.Dispatch<React.SetStateAction<ProfileState>>;
@@ -87,7 +88,11 @@ function ChangePasswordModal(props: ChangePWProps) {
     } else {
       const errors = parse.error.formErrors.fieldErrors;
       if (errors.password) {
-        setErrorMessage("password", errors.password[0]);
+        if (input.password == "") {
+          setErrorMessage("password", "New password cannot be empty");
+        } else {
+          setErrorMessage("password", errors.password[0]);
+        }
       } else {
         resetErrorMessage("password");
       }
@@ -119,10 +124,10 @@ function ChangePasswordModal(props: ChangePWProps) {
               "border-red-500": invalidFields.oldPassword !== "",
             })}
           />
-
-          <p className="mt-1 text-xs text-red-500">
-            {invalidFields.oldPassword}
-          </p>
+          <div className="mt-1 flex gap-1">
+            {invalidFields.oldPassword && <WarningIcon />}
+            <p className="text-xs text-red-500">{invalidFields.oldPassword}</p>
+          </div>
         </div>
         <div className="col-span-8 items-center">
           <Label
@@ -142,7 +147,10 @@ function ChangePasswordModal(props: ChangePWProps) {
               "border-red-500": invalidFields.password !== "",
             })}
           />
-          <p className="mt-1 text-xs text-red-500">{invalidFields.password}</p>
+          <div className="mt-1 flex gap-1">
+            {invalidFields.password && <WarningIcon />}
+            <p className="text-xs text-red-500">{invalidFields.password}</p>
+          </div>
         </div>
         <div className="col-span-8 items-center">
           <Label
@@ -162,9 +170,12 @@ function ChangePasswordModal(props: ChangePWProps) {
               "border-red-500": invalidFields.passwordConfirm !== "",
             })}
           />
-          <p className="mt-1 text-xs text-red-500">
-            {invalidFields.passwordConfirm}
-          </p>
+          <div className="mt-1 flex gap-1">
+            {invalidFields.passwordConfirm && <WarningIcon />}
+            <p className="text-xs text-red-500">
+              {invalidFields.passwordConfirm}
+            </p>
+          </div>
         </div>
       </div>
 

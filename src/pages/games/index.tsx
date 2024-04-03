@@ -47,7 +47,6 @@ export default function Games() {
   const [tags, setTags] = useState<string[]>([]);
   const [name, setName] = useState("");
   const router = useRouter();
-  const [empty, setEmpty] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const gameBuildsMap: Record<string, string> = {
@@ -120,16 +119,8 @@ export default function Games() {
 
     try {
       const response = await fetch(`/api/games/?${queryString}`);
-      if (response.ok) {
-        const data = await response.json();
-        setGames(data.games);
-        setEmpty(false);
-      } else {
-        const message = await response.text();
-        if (message === "No Games found at this page") {
-          setEmpty(true);
-        }
-      }
+      const data = await response.json();
+      setGames(data.games);
     } catch (e: any) {
       console.log(e.message);
     }
@@ -261,7 +252,7 @@ export default function Games() {
               setSelectedTheme={setSelectedTheme}
               setFiltersApplied={setFiltersApplied}
             />
-            <GameCardView empty={empty} games={games} />
+            <GameCardView games={games} />
           </div>
         </div>
       </ChakraProvider>
