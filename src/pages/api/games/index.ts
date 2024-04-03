@@ -75,8 +75,9 @@ async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
       numPages,
     });
   } catch (e: any) {
-    console.error(e);
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
   }
 }
 
@@ -93,9 +94,11 @@ async function postGameHandler(req: NextApiRequest, res: NextApiResponse) {
     });
   } catch (e: any) {
     if (e instanceof GameException) {
-      return res.status(e.code).send(e.message);
+      return res.status(e.code).send({ error: e.message });
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
   }
 }
 

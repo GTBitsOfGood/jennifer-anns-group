@@ -44,9 +44,11 @@ async function createBuildHandler(req: any, res: NextApiResponse) {
       .send({ uploadUrl, uploadAuthToken });
   } catch (e: any) {
     if (e instanceof GameException) {
-      return res.status(e.code).send(e.message);
+      return res.status(e.code).send({ error: e.message });
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
   }
 }
 
@@ -72,9 +74,11 @@ async function deleteBuildHandler(req: any, res: NextApiResponse) {
     return res.status(HTTP_STATUS_CODE.OK).send(deletedBuild);
   } catch (e: any) {
     if (e instanceof GameException) {
-      return res.status(e.code).send(e.message);
+      return res.status(e.code).send({ error: e.message });
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
   }
 }
 
@@ -100,8 +104,10 @@ async function editBuildHandler(req: any, res: NextApiResponse) {
       .send({ uploadUrl, uploadAuthToken });
   } catch (e: any) {
     if (e instanceof GameException) {
-      return res.status(e.code).send(e.message);
+      return res.status(e.code).send({ error: e.message });
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
   }
 }

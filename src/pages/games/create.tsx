@@ -260,9 +260,9 @@ function CreateGame() {
             const data = await response.json();
             const webGLSubmit = await handleWebGLSubmit(data._id);
             if (!webGLSubmit) return;
+            router.replace("/games");
           }
         }
-        router.replace("/games");
       } catch (error) {
         console.error("Error creating game:", error);
       }
