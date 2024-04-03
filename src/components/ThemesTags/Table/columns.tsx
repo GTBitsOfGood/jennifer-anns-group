@@ -35,10 +35,10 @@ export const columns: ColumnDef<
     cell: ({ row }) => {
       return (
         <div className="flex flex-row items-center gap-2">
-          <div className="flex flex-row">
+          <div className="flex flex-row flex-wrap">
             {row.original.themes.map((theme) => {
               return (
-                <Tag key={theme._id} variant="theme" className="group">
+                <Tag key={theme._id} variant="theme" className="group m-0.5">
                   {theme.name}
                 </Tag>
               );
@@ -55,13 +55,13 @@ export const columns: ColumnDef<
     cell: ({ row }) => {
       return (
         <div className="flex flex-row items-center gap-2">
-          <div className="flex flex-row">
+          <div className="flex flex-row flex-wrap">
             {row.original.accessibility.map((accessibilityTag) => {
               return (
                 <Tag
                   key={accessibilityTag._id}
                   variant="accessibility"
-                  className="group"
+                  className="group m-0.5"
                 >
                   {accessibilityTag.name}
                 </Tag>
@@ -79,10 +79,14 @@ export const columns: ColumnDef<
     cell: ({ row }) => {
       return (
         <div className="flex flex-row items-center gap-2">
-          <div className="flex flex-row">
+          <div className="flex flex-row flex-wrap">
             {row.original.custom.map((customTag) => {
               return (
-                <Tag key={customTag._id} variant="custom" className="group">
+                <Tag
+                  key={customTag._id}
+                  variant="custom"
+                  className="group m-0.5"
+                >
                   {customTag.name}
                 </Tag>
               );
