@@ -21,10 +21,11 @@ export class UserDoesNotExistException extends UserException {
 }
 
 export class UserCredentialsIncorrectException extends UserException {
-  constructor(message = "Incorrect credentials") {
+  constructor(message = "Old password is incorrect") {
     super(message, HTTP_STATUS_CODE.BAD_REQUEST);
   }
 }
+
 export class GenericUserErrorException extends UserException {
   constructor(message = "An error has occurred") {
     super(message, HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
