@@ -65,30 +65,31 @@ function ThemesTagsSection() {
             </div>
           </Button>
         </div>
-        <div className="flex flex-row flex-wrap gap-2">
-          {themes?.map((theme) => {
-            return (
-              <Tag
-                key={theme._id}
-                variant="theme"
-                className="group hover:cursor-pointer"
-                onClick={() => {
-                  setSelectedDeleteSubject({
-                    subject: theme,
-                    subjectType: "theme",
-                  });
-                  setDeleteModalDisclosure(true);
-                }}
-              >
-                <div className="flex flex-row items-center gap-2">
-                  {theme.name}
-                  <div className="hidden group-hover:block">
-                    <X size={18} />
+        <div className="flex flex-row">
+          <div className="peer mt-2 flex flex-row flex-wrap gap-2">
+            {themes?.map((theme) => {
+              return (
+                <Tag key={theme._id} variant="theme" className="group">
+                  <div className="flex flex-row items-center gap-2">
+                    {theme.name}
+                    <div className="hidden hover:cursor-pointer group-hover:block">
+                      <X
+                        size={18}
+                        onClick={() => {
+                          setSelectedDeleteSubject({
+                            subject: theme,
+                            subjectType: "theme",
+                          });
+                          setDeleteModalDisclosure(true);
+                        }}
+                      />
+                    </div>
                   </div>
-                </div>
-              </Tag>
-            );
-          })}
+                </Tag>
+              );
+            })}
+          </div>
+          <div className="w-12 peer-hover:hidden"></div>
         </div>
       </div>
       <div className="w-full">
@@ -109,30 +110,33 @@ function ThemesTagsSection() {
             </div>
           </Button>
         </div>
-        <div className="flex flex-row flex-wrap gap-2">
-          {tags?.accessibility.map((tag) => {
-            return (
-              <Tag
-                key={tag._id}
-                variant="accessibility"
-                className="group hover:cursor-pointer"
-                onClick={() => {
-                  setSelectedDeleteSubject({
-                    subject: tag,
-                    subjectType: "tag",
-                  });
-                  setDeleteModalDisclosure(true);
-                }}
-              >
-                <div className="flex flex-row items-center gap-2">
-                  {tag.name}
-                  <div className="hidden group-hover:block">
-                    <X size={18} />
+        <div className="flex flex-row">
+          <div className="peer mt-2 flex flex-row flex-wrap gap-2">
+            {tags?.accessibility.map((tag) => {
+              return (
+                <Tag
+                  key={tag._id}
+                  variant="accessibility"
+                  className="group hover:cursor-pointer"
+                  onClick={() => {
+                    setSelectedDeleteSubject({
+                      subject: tag,
+                      subjectType: "tag",
+                    });
+                    setDeleteModalDisclosure(true);
+                  }}
+                >
+                  <div className="flex flex-row items-center gap-2">
+                    {tag.name}
+                    <div className="hidden group-hover:block">
+                      <X size={18} />
+                    </div>
                   </div>
-                </div>
-              </Tag>
-            );
-          })}
+                </Tag>
+              );
+            })}
+          </div>
+          <div className="w-12 peer-hover:hidden"></div>
         </div>
       </div>
       <div className="w-full">
@@ -153,30 +157,33 @@ function ThemesTagsSection() {
             </div>
           </Button>
         </div>
-        <div className="flex flex-row gap-2">
-          {tags?.custom.map((tag) => {
-            return (
-              <Tag
-                key={tag._id}
-                variant="custom"
-                className="group hover:cursor-pointer"
-                onClick={() => {
-                  setSelectedDeleteSubject({
-                    subject: tag,
-                    subjectType: "tag",
-                  });
-                  setDeleteModalDisclosure(true);
-                }}
-              >
-                <div className="flex flex-row items-center gap-2">
-                  {tag.name}
-                  <div className="hidden group-hover:block">
-                    <X size={18} />
+        <div className="flex flex-row">
+          <div className="peer mt-2 flex flex-row flex-wrap gap-2">
+            {tags?.custom.map((tag) => {
+              return (
+                <Tag
+                  key={tag._id}
+                  variant="custom"
+                  className="group hover:cursor-pointer"
+                  onClick={() => {
+                    setSelectedDeleteSubject({
+                      subject: tag,
+                      subjectType: "tag",
+                    });
+                    setDeleteModalDisclosure(true);
+                  }}
+                >
+                  <div className="flex flex-row items-center gap-2">
+                    {tag.name}
+                    <div className="hidden group-hover:block">
+                      <X size={18} />
+                    </div>
                   </div>
-                </div>
-              </Tag>
-            );
-          })}
+                </Tag>
+              );
+            })}
+          </div>
+          <div className="w-12 peer-hover:hidden"></div>
         </div>
         <AddModal
           open={addModalDisclosure}

@@ -89,6 +89,10 @@ export default function TagsComponent({
     }
   }
 
+  const capitalizeFirstLetter = (word: string) => {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  };
+
   return (
     <ChakraProvider theme={chakraTheme}>
       <div>
@@ -100,7 +104,7 @@ export default function TagsComponent({
           {gameData.webGLBuild ? <Tag>WebGL</Tag> : null}
           {gameData.builds
             ? gameData.builds.map((build) => (
-                <Tag key={build.type}>{build.type}</Tag>
+                <Tag key={build.type}>{capitalizeFirstLetter(build.type)}</Tag>
               ))
             : null}
           {themes
@@ -120,9 +124,7 @@ export default function TagsComponent({
                   bg={tag.type === "accessibility" ? "brand.300" : "brand.500"}
                 >
                   {tag.name}
-                  {mode === "edit" &&
-                  tag.name !== "Parenting Guide" &&
-                  tag.name !== "Lesson Plan" ? (
+                  {mode === "edit" ? (
                     <TagCloseButton onClick={() => removeTag(tag)} />
                   ) : null}
                 </Tag>
