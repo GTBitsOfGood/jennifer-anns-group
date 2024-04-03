@@ -1,15 +1,6 @@
 import { IBuild, IGame } from "@/server/db/models/GameModel";
 import { ExtendId } from "@/utils/types";
 import { ColumnDef } from "@tanstack/react-table";
-import { Pencil } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-
-import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
 import EditPopover from "./EditPopover";
 import { ITheme } from "@/server/db/models/ThemeModel";
 import { ITag } from "@/server/db/models/TagModel";
@@ -43,8 +34,8 @@ export const columns: ColumnDef<
                 </Tag>
               );
             })}
+            <EditPopover gameId={row.original._id} contentType="theme" />
           </div>
-          <EditPopover gameId={row.original._id} contentType="theme" />
         </div>
       );
     },
@@ -67,8 +58,11 @@ export const columns: ColumnDef<
                 </Tag>
               );
             })}
+            <EditPopover
+              gameId={row.original._id}
+              contentType="accessibility"
+            />
           </div>
-          <EditPopover gameId={row.original._id} contentType="accessibility" />
         </div>
       );
     },
@@ -91,8 +85,8 @@ export const columns: ColumnDef<
                 </Tag>
               );
             })}
+            <EditPopover gameId={row.original._id} contentType="custom" />
           </div>
-          <EditPopover gameId={row.original._id} contentType="custom" />
         </div>
       );
     },

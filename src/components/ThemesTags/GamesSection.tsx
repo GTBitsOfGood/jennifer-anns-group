@@ -82,6 +82,7 @@ function GamesSection() {
     <div className="flex w-full flex-col gap-4">
       <div className="flex flex-row content-start gap-2">
         <Input
+          className="w-40"
           placeholder="Filter by name"
           onChange={(e) => {
             const { name, ...rest } = filters;
