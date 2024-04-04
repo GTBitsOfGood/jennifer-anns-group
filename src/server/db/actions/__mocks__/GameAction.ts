@@ -27,6 +27,7 @@ function createRandomGame(): GamesFilterOutput[number] {
         instructions: faker.lorem.paragraph(),
       };
     }),
+    preview: faker.datatype.boolean(),
   };
 }
 export const randomGames = (num: number) => {

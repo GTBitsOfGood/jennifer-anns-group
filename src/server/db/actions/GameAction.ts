@@ -361,7 +361,7 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
     };
   },
   preview: async (previewVal, filterFieldsAnd, filterFieldsOr) => {
-    filterFieldsAnd.preview = false;
+    filterFieldsAnd.preview = previewVal;
     return {
       filterFieldsAnd: filterFieldsAnd,
       filterFieldsOr: filterFieldsOr,
