@@ -287,6 +287,8 @@ describe("MongodDB Game - Unit Test", () => {
       }),
     gameContent: (games, gameContent, _) =>
       games.filter((game) => gameContent.every((document) => document in game)),
+    preview: (games, preview, _) =>
+      games.filter((game) => game.preview === preview),
   };
 
   function filterGeneratedGames(
