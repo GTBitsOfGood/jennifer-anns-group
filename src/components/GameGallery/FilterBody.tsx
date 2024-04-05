@@ -134,7 +134,6 @@ export default function FilterBody({
       <CheckboxGroup>
         <VStack align="start" ml="52px" mb="52px">
           {gameContentOptions.map((content) => {
-            console.log(content + " " + value.includes(content));
             return (
               <Checkbox
                 key={content}

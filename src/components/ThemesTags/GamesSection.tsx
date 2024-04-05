@@ -151,7 +151,6 @@ function GamesSection() {
               <PaginationPrevious disabled={filters.page === 1} />
             </PaginationItem>
             {items.map((page, index) => {
-              console.log(page);
               if (typeof page === "string") {
                 return (
                   <PaginationItem key={index}>

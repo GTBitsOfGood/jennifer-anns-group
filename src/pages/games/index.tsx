@@ -83,10 +83,6 @@ export default function Games() {
     }
   }
 
-  useEffect(() => {
-    console.log(numPages);
-  }, [numPages]);
-
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
     setFiltersApplied(true);
