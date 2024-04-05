@@ -90,6 +90,11 @@ export const tagSchema = z.object({
 export const gameSchema = z.object({
   //Make sure to modify gameSchema endpoints, as well as editGameSchema I suppose.
   name: z.string().min(3, "Title must be at least 3 characters").max(50),
+  lowercaseName: z //Field needs to be included for type, set to optional as frontend won't have it.
+    .string()
+    .min(3, "Lowercase Title must be at least 3 characters")
+    .max(50)
+    .optional(),
   themes: z.array(z.string().refine(verifyObjectId)).optional(),
   tags: z.array(z.string().refine(verifyObjectId)).optional(),
   webGLBuild: z.boolean().optional(),
@@ -152,6 +157,7 @@ export const userSchema = z.object({
 // Admin
 export const adminSchema = z.object({
   email: z.string().email("Not a valid email"),
+  lowercaseEmail: z.string().email("Not a valid email").optional(),
 });
 
 export type ExtendId<T extends any> = T & { _id: string };
