@@ -19,10 +19,12 @@ export const columns: ColumnDef<
   {
     accessorKey: "name",
     header: "Game Title",
+    meta: "w-1/6",
   },
   {
     id: "themes",
     header: "Themes",
+    meta: "w-1/4",
     cell: ({ row }) => {
       return (
         <div className="flex flex-row items-center gap-2">
@@ -43,6 +45,7 @@ export const columns: ColumnDef<
   {
     id: "accessibility",
     header: "Accessibility",
+    meta: "w-1/4",
     cell: ({ row }) => {
       return (
         <div className="flex flex-row items-center gap-2">
@@ -70,6 +73,7 @@ export const columns: ColumnDef<
   {
     id: "custom",
     header: "Tags",
+    meta: "w-1/3",
     cell: ({ row }) => {
       return (
         <div className="flex flex-row items-center gap-2">

@@ -19,9 +19,9 @@ import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
 import { useRef, useState, useEffect, Dispatch } from "react";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
-const youtubeREGEX =
+export const youtubeREGEX =
   /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|live\/|v\/)?)([\w\-]+)(\S+)?$/;
-const vimeoREGEX =
+export const vimeoREGEX =
   /(http|https)?:\/\/(www\.|player\.)?vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|video\/|)(\d+)(?:|\/\?)/;
 interface Props {
   gameData: populatedGameWithId;
@@ -56,7 +56,7 @@ export default function AddEditVideoTrailer({ gameData, setGameData }: Props) {
       setGameData({ ...gameData, videoTrailer: url });
       onClose();
     } else {
-      setIssue("Invalid URL (Only Youtube and Vimeo videos allowed)");
+      setIssue("Invalid URL (Only Youtube and Vimeo videos supported)");
     }
   }
   async function editVideoTrailer() {
@@ -69,7 +69,7 @@ export default function AddEditVideoTrailer({ gameData, setGameData }: Props) {
       onClose();
       router.push(`/games/${gameID}/edit`);
     } else {
-      setIssue("Invalid URL (Only Youtube and Vimeo videos allowed)");
+      setIssue("Invalid URL (Only Youtube and Vimeo videos supported)");
     }
   }
 

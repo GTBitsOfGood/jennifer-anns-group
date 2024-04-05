@@ -226,7 +226,6 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
       ...andFilters,
       ...(orFilters.length > 0 ? [{ $or: orFilters }] : []),
     ];
-    console.log("allSteps", allSteps);
 
     const aggregate = GameModel.aggregate<{
       games: GamesFilterOutput;
