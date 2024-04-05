@@ -182,7 +182,7 @@ export async function getSelectedGames(
   // only return published games
   initialFilterAnd = {
     ...initialFilterAnd,
-    preview: { $exists: false },
+    preview: false,
   };
   // run aggregate query and pagination
   const aggregate = QUERY_FIELD_HANDLER_MAP["page"](
@@ -226,6 +226,7 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
       ...andFilters,
       ...(orFilters.length > 0 ? [{ $or: orFilters }] : []),
     ];
+    console.log("allSteps", allSteps);
 
     const aggregate = GameModel.aggregate<{
       games: GamesFilterOutput;
