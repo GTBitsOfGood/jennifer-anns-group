@@ -1,12 +1,122 @@
 import { z } from "zod";
 import GameCard from "./GameCard";
-import { gameDataSchema } from "@/pages/games";
+import { gameSchema } from "@/utils/types";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+
+const idSchema = z.string().length(24);
+export const gameDataSchema = gameSchema.extend({
+  _id: idSchema,
+});
 
 interface Props {
-  games: z.infer<typeof gameDataSchema>[];
+  filtersApplied: boolean;
+  setFiltersApplied: Dispatch<SetStateAction<boolean>>;
+  gameBuilds: string[];
+  gameContent: string[];
+  accessibility: string[];
+  tags: string[];
+  name: string;
+  selectedTheme: string;
+  currPage: number;
+  setCurrPage: Dispatch<SetStateAction<number>>;
+  numPages: number;
+  setNumPages: Dispatch<SetStateAction<number>>;
 }
 
-export default function GameCardView({ games }: Props) {
+export default function GameCardView({
+  filtersApplied,
+  setFiltersApplied,
+  gameBuilds,
+  gameContent,
+  accessibility,
+  tags,
+  name,
+  selectedTheme,
+  currPage,
+  setCurrPage,
+  numPages,
+  setNumPages,
+}: Props) {
+  const [games, setGames] = useState<z.infer<typeof gameDataSchema>[]>([]);
+  const gameBuildsMap: Record<string, string> = {
+    Amazon: "amazon",
+    Android: "android",
+    "App Store": "appstore",
+    Linux: "linux",
+    Mac: "mac",
+    WebGL: "webgl",
+    Windows: "windows",
+  };
+  const gameContentMap: Record<string, string> = {
+    "Parenting guide": "parentingGuide",
+    "Lesson plan": "lessonPlan",
+    "Video trailer": "videoTrailer",
+    "Answer key": "answerKey",
+  };
+
+  useEffect(() => {
+    getGames();
+  }, []);
+
+  useEffect(() => {
+    if (filtersApplied) {
+      getGames();
+      setFiltersApplied(false);
+    }
+  }, [filtersApplied]);
+
+  useEffect(() => {
+    getGames();
+  }, [currPage]);
+
+  async function getGames() {
+    const params = new URLSearchParams();
+    params.append("page", currPage.toString());
+
+    if (gameBuilds.length > 0) {
+      gameBuilds.forEach((gb) => {
+        params.append("gameBuilds", gameBuildsMap[gb]);
+      });
+    }
+
+    if (gameContent.length > 0) {
+      gameContent.forEach((gc) => {
+        params.append("gameContent", gameContentMap[gc]);
+      });
+    }
+
+    if (accessibility.length > 0) {
+      accessibility.forEach((acc) => {
+        params.append("accessibility", acc);
+      });
+    }
+
+    if (tags.length > 0) {
+      tags.forEach((tag) => {
+        params.append("tags", tag);
+      });
+    }
+
+    if (name.length >= 3) {
+      params.append("name", name);
+    }
+
+    if (selectedTheme !== "All Games") {
+      params.append("theme", selectedTheme);
+    }
+
+    const queryString = params.toString();
+
+    try {
+      const response = await fetch(`/api/games/?${queryString}`);
+      const data = await response.json();
+      setGames(data.games);
+      setNumPages(data.numPages);
+    } catch (e: any) {
+      console.log(e.message);
+    }
+  }
+
   return (
     <div className="ml-6 flex w-full flex-row flex-wrap">
       {games.length > 0 ? (

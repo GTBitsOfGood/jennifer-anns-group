@@ -16,7 +16,7 @@ import {
   Button,
   PopoverCloseButton,
 } from "@chakra-ui/react";
-import { gameSchema, themeSchema } from "@/utils/types";
+import { themeSchema } from "@/utils/types";
 import {
   Search2Icon,
   TriangleDownIcon,
@@ -29,17 +29,12 @@ import { useRouter } from "next/router";
 import ThemeSidebar from "@/components/GameGallery/ThemeSidebar";
 import SelectedFilters from "@/components/GameGallery/SelectedFilters";
 import GameCardView from "@/components/GameGallery/GameCardView";
-
-const idSchema = z.string().length(24);
-export const gameDataSchema = gameSchema.extend({
-  _id: idSchema,
-});
+import GamesPagination from "@/components/GameGallery/GamesPagination";
 
 export default function Games() {
   const { data: session } = useSession();
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
-  const [games, setGames] = useState<z.infer<typeof gameDataSchema>[]>([]);
   const [themes, setThemes] = useState<string[]>([]);
   const [selectedTheme, setSelectedTheme] = useState("All Games");
   const [gameBuilds, setGameBuilds] = useState<string[]>([]);
@@ -50,80 +45,13 @@ export default function Games() {
   const router = useRouter();
   const [filtersApplied, setFiltersApplied] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const gameBuildsMap: Record<string, string> = {
-    Amazon: "amazon",
-    Android: "android",
-    "App Store": "appstore",
-    Linux: "linux",
-    Mac: "mac",
-    WebGL: "webgl",
-    Windows: "windows",
-  };
-  const gameContentMap: Record<string, string> = {
-    "Parenting guide": "parentingGuide",
-    "Lesson plan": "lessonPlan",
-    "Video trailer": "videoTrailer",
-    "Answer key": "answerKey",
-  };
+
+  const [currPage, setCurrPage] = useState(1);
+  const [numPages, setNumPages] = useState(0);
 
   useEffect(() => {
-    getGames();
     getThemes();
   }, []);
-
-  useEffect(() => {
-    if (filtersApplied) {
-      getGames();
-      setFiltersApplied(false);
-    }
-  }, [filtersApplied]);
-
-  async function getGames() {
-    const params = new URLSearchParams();
-    params.append("page", "1");
-
-    if (gameBuilds.length > 0) {
-      gameBuilds.forEach((gb) => {
-        params.append("gameBuilds", gameBuildsMap[gb]);
-      });
-    }
-
-    if (gameContent.length > 0) {
-      gameContent.forEach((gc) => {
-        params.append("gameContent", gameContentMap[gc]);
-      });
-    }
-
-    if (accessibility.length > 0) {
-      accessibility.forEach((acc) => {
-        params.append("accessibility", acc);
-      });
-    }
-
-    if (tags.length > 0) {
-      tags.forEach((tag) => {
-        params.append("tags", tag);
-      });
-    }
-
-    if (name.length >= 3) {
-      params.append("name", name);
-    }
-
-    if (selectedTheme !== "All Games") {
-      params.append("theme", selectedTheme);
-    }
-
-    const queryString = params.toString();
-
-    try {
-      const response = await fetch(`/api/games/?${queryString}`);
-      const data = await response.json();
-      setGames(data.games);
-    } catch (e: any) {
-      console.log(e.message);
-    }
-  }
 
   async function getThemes() {
     const response = await fetch(`/api/themes`);
@@ -167,7 +95,10 @@ export default function Games() {
           <div className="flex flex-row">
             <InputGroup w="200px">
               <InputLeftElement pointerEvents="none">
-                <Search2Icon color="gray.500" />
+                <Search2Icon
+                  style={{ transform: "translateY(-2px)" }}
+                  color="gray.500"
+                />
               </InputLeftElement>
               <Input
                 height="36px"
@@ -249,15 +180,38 @@ export default function Games() {
           <Divider borderColor="brand.700" borderWidth="1px" />
         </div>
 
-        <div className="m-auto flex flex-row justify-center">
-          <div className="m-auto mt-[60px] flex w-[85vw] flex-row">
-            <ThemeSidebar
-              themes={themes}
-              selectedTheme={selectedTheme}
-              setSelectedTheme={setSelectedTheme}
-              setFiltersApplied={setFiltersApplied}
+        <div>
+          <div className="m-auto flex flex-row justify-center">
+            <div className="m-auto mt-[60px] flex w-[85vw] flex-row">
+              <ThemeSidebar
+                themes={themes}
+                selectedTheme={selectedTheme}
+                setSelectedTheme={setSelectedTheme}
+                setFiltersApplied={setFiltersApplied}
+              />
+              <GameCardView
+                filtersApplied={filtersApplied}
+                setFiltersApplied={setFiltersApplied}
+                gameBuilds={gameBuilds}
+                gameContent={gameContent}
+                accessibility={accessibility}
+                tags={tags}
+                name={name}
+                selectedTheme={selectedTheme}
+                currPage={currPage}
+                setCurrPage={setCurrPage}
+                numPages={numPages}
+                setNumPages={setNumPages}
+              />
+            </div>
+          </div>
+          <div className="mb-32 mt-20">
+            <GamesPagination
+              currPage={currPage}
+              setCurrPage={setCurrPage}
+              numPages={numPages}
+              setNumPages={setNumPages}
             />
-            <GameCardView games={games} />
           </div>
         </div>
       </ChakraProvider>

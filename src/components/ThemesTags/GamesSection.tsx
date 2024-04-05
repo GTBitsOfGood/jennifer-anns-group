@@ -22,8 +22,6 @@ type IncDecInput = { type: "inc" | "dec" };
 type DirectInput = { desiredPage: number };
 type PageChangeHandlerInput = IncDecInput | DirectInput;
 
-const VISIBLE_NUM_PAGES_ONE_SIDE = 2;
-
 function generateQueryUrl(filters: GameQuery) {
   let gamesUrl = "/api/games";
   const searchParams: string[] = [];
@@ -117,8 +115,6 @@ function GamesSection() {
       ];
     };
 
-  const pageArr = Array.from({ length: numPages! }).map((_, i) => i + 1);
-
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex flex-row content-start gap-2">
@@ -179,66 +175,6 @@ function GamesSection() {
                 );
               }
             })}
-            {/* {pageArr
-              .filter((pageNum) => {
-                return (
-                  pageNum >=
-                    Math.max(
-                      1,
-                      filters.page - VISIBLE_NUM_PAGES_ONE_SIDE + 1,
-                    ) &&
-                  pageNum <
-                    Math.max(1, filters.page - VISIBLE_NUM_PAGES_ONE_SIDE + 1) +
-                      2
-                );
-              })
-              .map((pageNum) => {
-                return (
-                  <PaginationItem
-                    key={pageNum}
-                    onClick={() =>
-                      handlePageChange({
-                        desiredPage: pageNum,
-                      })
-                    }
-                  >
-                    <PaginationLink isActive={pageNum === filters.page}>
-                      {pageNum}
-                    </PaginationLink>
-                  </PaginationItem>
-                );
-              })}
-            {numPages! - 3 > filters.page ? (
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-            ) : null}
-            {pageArr
-              .filter((pageNum) => {
-                return false;
-                // pageNum >= filters.page &&
-                // pageNum <=
-                //   Math.min(
-                //     numPages!,
-                //     filters.page + VISIBLE_NUM_PAGES_ONE_SIDE,
-                //   )
-              })
-              .map((pageNum) => {
-                return (
-                  <PaginationItem
-                    key={pageNum}
-                    onClick={() =>
-                      handlePageChange({
-                        desiredPage: pageNum,
-                      })
-                    }
-                  >
-                    <PaginationLink isActive={pageNum === filters.page}>
-                      {pageNum}
-                    </PaginationLink>
-                  </PaginationItem>
-                );
-              })} */}
             <PaginationItem
               onClick={() =>
                 handlePageChange({
