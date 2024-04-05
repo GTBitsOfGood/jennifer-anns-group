@@ -261,7 +261,7 @@ function CreateGame() {
       videoTrailer: formData.get(TRAILER_FORM_KEY),
       description: formData.get(DESCR_FORM_KEY),
       builds: builds,
-      image: "/image-630x500", //When backblaze is integrated, will be the link from the backblaze stored image.
+      image: "https://picsum.photos/630/500", //When backblaze is integrated, will be the link from the backblaze stored image.
       themes: selectedThemes.map((theme) => theme._id),
       tags: [...selectedAccessibilityTags, ...selectedCustomTags].map(
         (tag) => tag._id,
