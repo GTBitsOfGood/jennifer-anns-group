@@ -2,6 +2,7 @@ import { z } from "zod";
 import GameCard from "./GameCard";
 import { gameSchema } from "@/utils/types";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { PageRequiredGameQuery } from "../ThemesTags/GamesSection";
 
 const idSchema = z.string().length(24);
 export const gameDataSchema = gameSchema.extend({
@@ -18,9 +19,9 @@ interface Props {
   name: string;
   selectedTheme: string;
   currPage: number;
-  setCurrPage: Dispatch<SetStateAction<number>>;
-  numPages: number;
   setNumPages: Dispatch<SetStateAction<number>>;
+  filters: PageRequiredGameQuery;
+  setFilters: Dispatch<SetStateAction<PageRequiredGameQuery>>;
 }
 
 export default function GameCardView({
@@ -33,9 +34,9 @@ export default function GameCardView({
   name,
   selectedTheme,
   currPage,
-  setCurrPage,
-  numPages,
   setNumPages,
+  filters,
+  setFilters,
 }: Props) {
   const [games, setGames] = useState<z.infer<typeof gameDataSchema>[]>([]);
   const gameBuildsMap: Record<string, string> = {
@@ -60,6 +61,7 @@ export default function GameCardView({
 
   useEffect(() => {
     if (filtersApplied) {
+      setFilters({ ...filters, page: 1 });
       getGames();
       setFiltersApplied(false);
     }
@@ -129,7 +131,7 @@ export default function GameCardView({
         })
       ) : (
         <div className="flex w-full flex-row justify-center">
-          <p className="mt-40 w-[360px]	text-center font-sans text-[34px] font-medium text-blue-primary">
+          <p className="mb-[50vh] mt-40 w-[360px]	text-center font-sans text-[34px] font-medium text-blue-primary">
             Oops! No games match this search
           </p>
         </div>

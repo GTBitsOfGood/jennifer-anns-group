@@ -21,22 +21,19 @@ type DirectInput = { desiredPage: number };
 type PageChangeHandlerInput = IncDecInput | DirectInput;
 
 interface Props {
-  currPage: number;
   setCurrPage: Dispatch<SetStateAction<number>>;
   numPages: number;
-  setNumPages: Dispatch<SetStateAction<number>>;
+  filters: PageRequiredGameQuery;
+  setFilters: Dispatch<SetStateAction<PageRequiredGameQuery>>;
 }
 
 export default function GamesPagination({
-  currPage,
   setCurrPage,
   numPages,
-  setNumPages,
+  filters,
+  setFilters,
 }: Props) {
   const [items, setItems] = useState<Array<string | number>>([]);
-  const [filters, setFilters] = useState<PageRequiredGameQuery>({
-    page: 1,
-  });
 
   const handlePageChange = useCallback(
     (input: PageChangeHandlerInput) => {

@@ -30,6 +30,7 @@ import ThemeSidebar from "@/components/GameGallery/ThemeSidebar";
 import SelectedFilters from "@/components/GameGallery/SelectedFilters";
 import GameCardView from "@/components/GameGallery/GameCardView";
 import GamesPagination from "@/components/GameGallery/GamesPagination";
+import { PageRequiredGameQuery } from "@/components/ThemesTags/GamesSection";
 
 export default function Games() {
   const { data: session } = useSession();
@@ -48,6 +49,9 @@ export default function Games() {
 
   const [currPage, setCurrPage] = useState(1);
   const [numPages, setNumPages] = useState(0);
+  const [filters, setFilters] = useState<PageRequiredGameQuery>({
+    page: 1,
+  });
 
   useEffect(() => {
     getThemes();
@@ -78,6 +82,10 @@ export default function Games() {
       console.error("Error getting user:", error);
     }
   }
+
+  useEffect(() => {
+    console.log(numPages);
+  }, [numPages]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
@@ -199,20 +207,22 @@ export default function Games() {
                 name={name}
                 selectedTheme={selectedTheme}
                 currPage={currPage}
-                setCurrPage={setCurrPage}
-                numPages={numPages}
                 setNumPages={setNumPages}
+                filters={filters}
+                setFilters={setFilters}
               />
             </div>
           </div>
-          <div className="mb-32 mt-20">
-            <GamesPagination
-              currPage={currPage}
-              setCurrPage={setCurrPage}
-              numPages={numPages}
-              setNumPages={setNumPages}
-            />
-          </div>
+          {numPages ? (
+            <div className="mb-32 mt-20">
+              <GamesPagination
+                setCurrPage={setCurrPage}
+                numPages={numPages}
+                filters={filters}
+                setFilters={setFilters}
+              />
+            </div>
+          ) : null}
         </div>
       </ChakraProvider>
     </div>

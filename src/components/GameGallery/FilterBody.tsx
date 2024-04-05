@@ -90,10 +90,7 @@ export default function FilterBody({
     setSelectedGameBuilds([]);
     setSelectedAccessibility([]);
     setSelectedTags([]);
-    console.log("hi");
     setValue([]);
-    console.log(value);
-    console.log(selectedGameContent);
     setSelectedGameContent([]);
   }
 
