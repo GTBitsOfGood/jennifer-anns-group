@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Input } from "../ui/input";
 import { DataTable } from "./Table/data-table";
 import { columns } from "./Table/columns";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { GameQuery, GetGamesOutput } from "@/pages/api/games";
 import {
   Pagination,
@@ -22,7 +22,7 @@ type IncDecInput = { type: "inc" | "dec" };
 type DirectInput = { desiredPage: number };
 type PageChangeHandlerInput = IncDecInput | DirectInput;
 
-const VISIBLE_NUM_PAGES_ONE_SIDE = 1;
+const VISIBLE_NUM_PAGES_ONE_SIDE = 2;
 
 function generateQueryUrl(filters: GameQuery) {
   let gamesUrl = "/api/games";
@@ -55,6 +55,7 @@ function GamesSection() {
 
   const games = data?.games;
   const numPages = data?.numPages;
+  const [items, setItems] = useState<Array<string | number>>([]);
 
   const handlePageChange = useCallback(
     (input: PageChangeHandlerInput) => {
@@ -75,6 +76,46 @@ function GamesSection() {
     },
     [filters.page, numPages],
   );
+
+  useEffect(() => {
+    if (!numPages) return;
+    const newItems = pagination(4)(filters.page, numPages);
+    setItems(newItems);
+  }, [filters.page, numPages]);
+
+  const { floor, min, max } = Math;
+  const range = (lo: number, hi: number) =>
+    Array.from({ length: hi - lo }, (_, i) => i + lo);
+
+  const pagination =
+    (count: number, ellipsis = "…") =>
+    (page: number, total: number) => {
+      const start = max(
+        1,
+        min(page - floor((count - 3) / 2), total - count + 2),
+      );
+      const end = Math.min(
+        total,
+        Math.max(page + floor((count - 4 + 2 * (count % 2)) / 2), count - 1),
+      );
+      return [
+        ...(start > 2
+          ? start === 3
+            ? [1, 2]
+            : [1, ellipsis]
+          : start > 1
+            ? [1]
+            : []),
+        ...range(start, end + 1),
+        ...(end < total - 1
+          ? end === total - 2
+            ? [total - 1, total]
+            : [ellipsis, total]
+          : end < total
+            ? [total]
+            : []),
+      ];
+    };
 
   const pageArr = Array.from({ length: numPages! }).map((_, i) => i + 1);
 
@@ -113,8 +154,44 @@ function GamesSection() {
             >
               <PaginationPrevious disabled={filters.page === 1} />
             </PaginationItem>
-            {pageArr
-              .filter((pageNum) => pageNum <= VISIBLE_NUM_PAGES_ONE_SIDE)
+            {items.map((page, index) => {
+              console.log(page);
+              if (typeof page === "string") {
+                return (
+                  <PaginationItem key={index}>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                );
+              } else {
+                return (
+                  <PaginationItem
+                    key={index}
+                    onClick={() =>
+                      handlePageChange({
+                        desiredPage: page,
+                      })
+                    }
+                  >
+                    <PaginationLink isActive={page === filters.page}>
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              }
+            })}
+            {/* {pageArr
+              .filter((pageNum) => {
+                return (
+                  pageNum >=
+                    Math.max(
+                      1,
+                      filters.page - VISIBLE_NUM_PAGES_ONE_SIDE + 1,
+                    ) &&
+                  pageNum <
+                    Math.max(1, filters.page - VISIBLE_NUM_PAGES_ONE_SIDE + 1) +
+                      2
+                );
+              })
               .map((pageNum) => {
                 return (
                   <PaginationItem
@@ -131,17 +208,21 @@ function GamesSection() {
                   </PaginationItem>
                 );
               })}
-            {filters.page > numPages! * 2 && (
+            {numPages! - 3 > filters.page ? (
               <PaginationItem>
                 <PaginationEllipsis />
               </PaginationItem>
-            )}
+            ) : null}
             {pageArr
-              .filter(
-                (pageNum) =>
-                  pageNum >= numPages! - VISIBLE_NUM_PAGES_ONE_SIDE &&
-                  pageNum > VISIBLE_NUM_PAGES_ONE_SIDE,
-              )
+              .filter((pageNum) => {
+                return false;
+                // pageNum >= filters.page &&
+                // pageNum <=
+                //   Math.min(
+                //     numPages!,
+                //     filters.page + VISIBLE_NUM_PAGES_ONE_SIDE,
+                //   )
+              })
               .map((pageNum) => {
                 return (
                   <PaginationItem
@@ -157,7 +238,7 @@ function GamesSection() {
                     </PaginationLink>
                   </PaginationItem>
                 );
-              })}
+              })} */}
             <PaginationItem
               onClick={() =>
                 handlePageChange({
