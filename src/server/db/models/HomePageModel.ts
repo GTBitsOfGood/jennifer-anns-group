@@ -15,13 +15,16 @@ const GameBoySchema = new Schema<IGameBoy>({
   description: { type: String, required: true },
 });
 
-const HomePageSchema = new Schema<IHomePage>({
-  mdTitle: { type: String, required: true },
-  mdDescription: { type: String, required: true },
-  gameBoyTitle: { type: String, required: true },
-  gameBoys: { type: [GameBoySchema], required: true },
-  singleton: { type: Boolean, default: true, unique: true },
-});
+const HomePageSchema = new Schema<IHomePage>(
+  {
+    mdTitle: { type: String, required: true },
+    mdDescription: { type: String, required: true },
+    gameBoyTitle: { type: String, required: true },
+    gameBoys: { type: [GameBoySchema], required: true },
+    singleton: { type: Boolean, default: true, unique: true },
+  },
+  { versionKey: false },
+);
 
 const HomePageModel =
   (mongoose.models.HomePage as mongoose.Model<IHomePage>) ??

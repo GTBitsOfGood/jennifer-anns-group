@@ -5,11 +5,14 @@ import { noteSchema, userSchema } from "../../../utils/types";
 export interface INote extends z.infer<typeof noteSchema> {}
 export interface IUser extends z.infer<typeof userSchema> {}
 
-const NoteSchema = new Schema<INote>({
-  date: { type: Date, required: true },
-  description: { type: String, required: true },
-  gameId: { type: Schema.Types.ObjectId, required: true },
-});
+const NoteSchema = new Schema<INote>(
+  {
+    date: { type: Date, required: true },
+    description: { type: String, required: true },
+    gameId: { type: Schema.Types.ObjectId, required: true },
+  },
+  { versionKey: false },
+);
 
 const UserSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },

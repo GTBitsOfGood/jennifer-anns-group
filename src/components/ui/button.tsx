@@ -31,6 +31,10 @@ const buttonVariants = cva(
         white: "text-blue-primary",
         upload:
           "bg-[#FAFBFC] border border-[#666666] text-slate-900 hover:opacity-80 dark:bg-slate-800 dark:text-slate-50 dark:hover:bg-slate-800/80",
+        "pagination-outline":
+          "border-[1.5px] font-semibold border-orange-primary text-orange-primary rounded-md hover:cursor-pointer bg-white hover:bg-orange-50",
+        "pagination-ghost":
+          "border-[1.5px] font-semibold rounded-md hover:cursor-pointer hover:bg-neutral-100 hover:text-slate-900 disabled:bg-red-500",
       },
       size: {
         default: "h-10 px-4 py-2",

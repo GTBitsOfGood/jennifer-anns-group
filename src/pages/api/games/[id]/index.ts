@@ -12,6 +12,7 @@ import {
   GameException,
 } from "@/utils/exceptions/game";
 import mongoose from "mongoose";
+import { z } from "zod";
 
 export default async function handler(
   req: NextApiRequest,
@@ -45,9 +46,11 @@ async function getGameByIdHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(HTTP_STATUS_CODE.OK).send(game);
   } catch (e: any) {
     if (e instanceof GameException) {
-      return res.status(e.code).send(e.message);
+      return res.status(e.code).send({ error: e.message });
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
   }
 }
 
@@ -65,12 +68,15 @@ async function deleteGameHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(HTTP_STATUS_CODE.OK).send(deletedGame);
   } catch (e: any) {
     if (e instanceof GameException) {
-      return res.status(e.code).send(e.message);
+      return res.status(e.code).send({ error: e.message });
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
   }
 }
 
+export type EditGameInput = z.infer<typeof editGameSchema>;
 async function editGameHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const gameId = req.query.id as string;
@@ -87,8 +93,10 @@ async function editGameHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(HTTP_STATUS_CODE.OK).send(editedGame);
   } catch (e: any) {
     if (e instanceof GameException) {
-      return res.status(e.code).send(e.message);
+      return res.status(e.code).send({ error: e.message });
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
   }
 }
