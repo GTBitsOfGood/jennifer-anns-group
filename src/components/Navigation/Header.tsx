@@ -62,7 +62,7 @@ const Header = () => {
     const pathname = router.pathname;
     const tabNames = Object.keys(tabLinks);
     const index = tabNames.findIndex((name) => tabLinks[name] === pathname);
-    setSelectedTab(index !== -1 ? index : 0);
+    setSelectedTab(index !== -1 ? index : 1); // set default to game gallery (for game screen, create game, edit game)
   }, [currentUser, router.pathname]);
 
   async function getUserData() {

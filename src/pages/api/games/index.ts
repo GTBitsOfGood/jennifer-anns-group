@@ -1,15 +1,26 @@
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { z, RefinementCtx } from "zod";
 import {
+  GamesFilterOutput,
+  GetSelectedGamesOutput,
+  RESULTS_PER_PAGE,
   createGame,
   getSelectedGames,
 } from "../../../server/db/actions/GameAction";
-import { AllBuilds, GameContentEnum, gameSchema } from "../../../utils/types";
+import {
+  AllBuilds,
+  ExtendId,
+  GameContentEnum,
+  gameSchema,
+} from "../../../utils/types";
 import { NextApiRequest, NextApiResponse } from "next";
 import {
   GameInvalidInputException,
   GameException,
 } from "../../../utils/exceptions/game";
+import { ITag } from "@/server/db/models/TagModel";
+import { ITheme } from "@/server/db/models/ThemeModel";
+import { IBuild, IGame } from "@/server/db/models/GameModel";
 
 export default async function handler(
   req: NextApiRequest,
@@ -27,19 +38,46 @@ export default async function handler(
   }
 }
 
+export type GetGamesOutput = Omit<
+  Awaited<GetSelectedGamesOutput>,
+  "games" | "count"
+> & {
+  games: (Omit<ExtendId<IGame>, "themes" | "tags" | "builds"> & {
+    builds: ExtendId<IBuild>[];
+    themes: ExtendId<ITheme>[];
+    accessibility: ExtendId<ITag>[];
+    custom: ExtendId<ITag>[];
+  })[];
+  numPages: number;
+};
+
 async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const parsedQuery = GetGameQuerySchema.safeParse(req.query);
+    //TODO: Putback parsing
+    const parsedQuery = GetGameQuerySchema.safeParse(req.query); //JSON.parse not necessary
     if (!parsedQuery.success) {
       //Convert to current format.
       return res
         .status(HTTP_STATUS_CODE.BAD_REQUEST)
         .send(parsedQuery.error.format());
     }
-    const games = await getSelectedGames(parsedQuery.data);
-    return res.status(HTTP_STATUS_CODE.OK).send(games);
+    const result = await getSelectedGames(parsedQuery.data);
+    const { count, games } = result;
+    const numPages = Math.ceil(count / RESULTS_PER_PAGE);
+    const tagSeparatedGames = games.map(({ tags, ...game }) => ({
+      ...game,
+      accessibility: tags?.filter((tag) => tag.type === "accessibility") ?? [],
+      custom: tags?.filter((tag) => tag.type === "custom") ?? [],
+    }));
+
+    return res.status(HTTP_STATUS_CODE.OK).send({
+      games: tagSeparatedGames,
+      numPages,
+    });
   } catch (e: any) {
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
   }
 }
 
@@ -56,9 +94,11 @@ async function postGameHandler(req: NextApiRequest, res: NextApiResponse) {
     });
   } catch (e: any) {
     if (e instanceof GameException) {
-      return res.status(e.code).send(e.message);
+      return res.status(e.code).send({ error: e.message });
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
   }
 }
 
@@ -78,10 +118,13 @@ const putSingleStringInArray = (val: string) => {
   return [val];
 };
 
-//Query parameters can pass in a single value but need to be an array, so moddifying it to expect that.
+//Query parameters can pass in a single value but need to be an array, so modifying it to expect that.
 export const GetGameQuerySchema = z.object({
   name: z.string().min(3).max(50).optional(),
-  theme: z.string().optional(),
+  theme: z
+    .array(z.string())
+    .or(z.string().transform(putSingleStringInArray))
+    .optional(),
   tags: z
     .array(z.string())
     .or(z.string().transform(putSingleStringInArray))

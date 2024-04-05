@@ -8,48 +8,91 @@ import {
   AlertDialogCloseButton,
   useDisclosure,
   ChakraProvider,
-  Button,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
 import { useRef, Dispatch } from "react";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
-import { CloseIcon } from "@chakra-ui/icons";
-import { setFips } from "crypto";
 
 interface Props {
+  deleteType: string;
+  isOpen: boolean;
+  onClose: () => void;
   gameData: populatedGameWithId;
   setGameData: Dispatch<populatedGameWithId>;
 }
 
-export default function DeleteVideoTrailer({ gameData, setGameData }: Props) {
+export default function DeleteComponentModal(props: Props) {
   const router = useRouter();
   const gameID = router.query.id;
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement | null>(null);
 
-  async function deleteVideoTrailer() {
-    setGameData({ ...gameData, videoTrailer: "" });
-    onClose();
+  const deleteType = props.deleteType;
+
+  const title: Record<string, string> = {
+    game: props.gameData.name ? props.gameData.name : "",
+    answerKey: "this answer key",
+    parentingGuide: "this parenting guide",
+    lessonPlan: "this lesson plan",
+    trailer: "this trailer",
+  };
+
+  const subtitle: Record<string, string> = {
+    game: "a game page",
+    answerKey: "an answer key",
+    parentingGuide: "a parenting guide",
+    lessonPlan: "a lesson plan",
+    trailer: "a trailer",
+  };
+
+  const button: Record<string, string> = {
+    game: "page",
+    answerKey: "key",
+    parentingGuide: "guide",
+    lessonPlan: "plan",
+    trailer: "trailer",
+  };
+
+  const deleteFunction: Record<string, () => Promise<void>> = {
+    game: deleteGame,
+    answerKey: deleteAnswerKey,
+    parentingGuide: deleteParentingGuide,
+    lessonPlan: deleteLessonPlan,
+    trailer: deleteTrailer,
+  };
+
+  function handleDelete() {
+    deleteFunction[deleteType]();
+  }
+
+  async function deleteGame() {
+    fetch(`/api/games/${gameID}`, {
+      method: "DELETE",
+    });
+    router.push("/games");
+  }
+
+  async function deleteAnswerKey() {}
+
+  async function deleteParentingGuide() {}
+
+  async function deleteLessonPlan() {}
+
+  async function deleteTrailer() {
+    if (props.gameData) {
+      props.setGameData({ ...props.gameData, videoTrailer: "" });
+      props.onClose();
+    }
   }
 
   return (
     <ChakraProvider theme={chakraTheme}>
       <div>
-        <Button
-          onClick={onOpen}
-          rightIcon={<CloseIcon color="deleteRed" boxSize="10px" />}
-          bg="white"
-          color="deleteRed"
-          className="w-183 h-46 mt-5 rounded-md border border-delete-red bg-white px-[17px] py-2 font-sans text-xl font-semibold text-delete-red"
-        >
-          Delete Trailer
-        </Button>
         <AlertDialog
           motionPreset="slideInBottom"
           leastDestructiveRef={cancelRef}
-          onClose={onClose}
-          isOpen={isOpen}
+          onClose={props.onClose}
+          isOpen={props.isOpen}
           isCentered
         >
           <AlertDialogOverlay />
@@ -65,24 +108,24 @@ export default function DeleteVideoTrailer({ gameData, setGameData }: Props) {
             </div>
             <AlertDialogHeader p="0">
               <div className="mx-[110px] mt-[100px] text-center text-[26px] font-bold leading-tight text-blue-primary">
-                Are you sure you want to delete this trailer?
+                Are you sure you want to delete {title[deleteType]}?
               </div>
             </AlertDialogHeader>
             <AlertDialogBody p="0" mt="50px">
-              <div className="text-center font-sans text-base font-normal">
-                Deleting a trailer is final and cannot be undone.
+              <div className="mb-10 text-center font-sans text-base font-normal">
+                Deleting {subtitle[deleteType]} is final and cannot be undone.
               </div>
             </AlertDialogBody>
             <AlertDialogFooter p="0" justifyContent="center">
               <button
-                onClick={deleteVideoTrailer}
+                onClick={handleDelete}
                 className="mb-24 mr-[22px] h-[47px] w-[198px] rounded-[10px] bg-delete-red font-sans font-semibold text-white"
               >
-                Yes, delete trailer
+                Yes, delete {button[deleteType]}
               </button>
               <button
                 ref={cancelRef}
-                onClick={onClose}
+                onClick={props.onClose}
                 className="mb-24 ml-[22px] h-[47px] w-[198px] rounded-[10px] border-[1px] border-solid border-black font-sans font-semibold"
               >
                 No, return

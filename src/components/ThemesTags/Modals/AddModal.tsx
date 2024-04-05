@@ -1,4 +1,4 @@
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import {
   Dialog,
   DialogClose,
@@ -6,15 +6,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
+} from "../../ui/dialog";
+import { Label } from "../../ui/label";
+import { Input } from "../../ui/input";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { IGame } from "@/server/db/models/GameModel";
 import { useCallback, useState } from "react";
 import { z } from "zod";
 import { CreateThemeInput } from "@/pages/api/themes";
 import { CreateTagInput } from "@/pages/api/tags";
+import { GetGamesOutput } from "@/pages/api/games";
 
 const FORM_GAMES_KEY = "games";
 const FORM_NAME_KEY = "name";
@@ -35,13 +35,13 @@ interface Props {
 function AddModal({ subject, open, setOpen }: Props) {
   const queryClient = useQueryClient();
 
-  const { status, data: games } = useQuery({
+  const { status, data } = useQuery({
     queryKey: ["allGames"],
     queryFn: () =>
-      fetch("/api/games").then((res) => res.json()) as Promise<
-        (IGame & { _id: string })[]
-      >,
+      fetch("/api/games").then((res) => res.json()) as Promise<GetGamesOutput>,
   });
+
+  const games = data?.games;
 
   const { mutate: mutateTheme } = useMutation({
     mutationFn: (theme: CreateThemeInput) =>
@@ -89,7 +89,6 @@ function AddModal({ subject, open, setOpen }: Props) {
 
       const parsed = formSchema.safeParse(inputs);
       if (!parsed.success) {
-        console.log(parsed.error.formErrors.fieldErrors);
         setNameError(parsed.error.formErrors.fieldErrors.name?.at(0));
         return;
       }
@@ -126,7 +125,7 @@ function AddModal({ subject, open, setOpen }: Props) {
         <div className="w-full">
           <form
             id="form"
-            className="flex flex-col gap-4"
+            className="m-4 flex flex-col gap-4"
             onSubmit={handleSubmit}
           >
             <div className="relative">
@@ -149,7 +148,7 @@ function AddModal({ subject, open, setOpen }: Props) {
             </div>
             <div className="flex flex-col gap-2">
               <Label className="text-lg font-normal">Select games</Label>
-              <div className="flex flex-row gap-2">
+              <div className="flex flex-row flex-wrap gap-x-2 gap-y-4">
                 {games?.map((game) => {
                   return (
                     <div key={game._id}>
@@ -177,12 +176,17 @@ function AddModal({ subject, open, setOpen }: Props) {
           <DialogClose>
             <Button
               variant="ghost"
-              className="text-blue-primary hover:text-blue-primary"
+              className="h-12 w-28 text-blue-primary hover:text-blue-primary"
             >
               Cancel
             </Button>
           </DialogClose>
-          <Button variant="primary" type="submit" form="form">
+          <Button
+            variant="primary"
+            className="h-12 w-28"
+            type="submit"
+            form="form"
+          >
             Apply
           </Button>
         </DialogFooter>

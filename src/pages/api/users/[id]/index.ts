@@ -34,9 +34,11 @@ async function getUserHandler(req: NextApiRequest, res: NextApiResponse) {
     res.status(HTTP_STATUS_CODE.OK).send(user);
   } catch (e: any) {
     if (e instanceof UserException) {
-      return res.status(e.code).send(e.message);
+      return res.status(e.code).send({ error: e.message });
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
   }
 }
 
@@ -60,9 +62,11 @@ async function editProfileHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(HTTP_STATUS_CODE.OK).send({ result });
   } catch (e: any) {
     if (e instanceof UserException) {
-      return res.status(e.code).send(e.message);
+      return res.status(e.code).send({ error: e.message });
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
   }
 }
 
@@ -73,8 +77,10 @@ async function editPasswordHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(HTTP_STATUS_CODE.OK).send({ result });
   } catch (e: any) {
     if (e instanceof UserException) {
-      return res.status(e.code).send(e.message);
+      return res.status(e.code).send({ error: e.message });
     }
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
   }
 }

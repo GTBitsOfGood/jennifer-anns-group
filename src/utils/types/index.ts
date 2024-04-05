@@ -102,6 +102,7 @@ export const gameSchema = z.object({
     (val) => (val === "" ? undefined : val),
     z.string().url().optional(),
   ),
+  preview: z.boolean(),
 });
 //Since arrays from req.query are just strings, and need to be converted into arrays.
 
@@ -121,6 +122,7 @@ export const editGameSchema = z.object({
   parentingGuide: z.string().url().optional(),
   answerKey: z.string().url().optional(),
   videoTrailer: z.string().url().or(z.literal("")).optional(),
+  preview: z.boolean().optional(),
 });
 
 // Notes
@@ -162,7 +164,6 @@ export const emailSchema = z.object({
 });
 
 export type ExtendId<T extends any> = T & { _id: string };
-export type ExtendVersion<T extends any> = T & { __v: number };
 // For changing password
 export const changePWSchema = z.object({
   oldpassword: z.string(),

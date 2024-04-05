@@ -3,12 +3,15 @@ import { ChangeEvent, useState } from "react";
 import TagsComponent from "@/components/Tags/TagsComponent";
 import TabsComponent from "@/components/Tabs/TabsComponent";
 import React from "react";
-import DeleteGameComponent from "@/components/GameScreen/DeleteGameComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import pageAccessHOC from "@/components/HOC/PageAccess";
 import AddEditWebGLComponent from "@/components/GameScreen/AddEditWebGLComponent";
+import DeleteComponentModal from "@/components/DeleteComponentModal";
+import { useDisclosure } from "@chakra-ui/react";
+import { Button } from "@/components/ui/button";
 
 const EditGamePage = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
   const gameID = router.query.id;
   const [gameData, setGameData] = useState<populatedGameWithId>();
@@ -43,7 +46,11 @@ const EditGamePage = () => {
   };
 
   const discardChanges = async () => {
-    router.push(`/games/${gameID}`);
+    if (gameData?.preview) {
+      router.push(`/games/${gameID}/preview`);
+    } else {
+      router.push(`/games/${gameID}`);
+    }
   };
 
   const saveChanges = async () => {
@@ -68,7 +75,11 @@ const EditGamePage = () => {
       body: JSON.stringify(putData),
     });
 
-    router.push(`/games/${gameID}`);
+    if (gameData?.preview) {
+      router.push(`/games/${gameID}/preview`);
+    } else {
+      router.push(`/games/${gameID}`);
+    }
   };
 
   if (gameID && loading) {
@@ -97,9 +108,24 @@ const EditGamePage = () => {
           onChange={changeName}
         />
       </div>
-      <div className="mx-auto flex w-[75vw] justify-end">
-        <DeleteGameComponent gameName={gameData.name} />
-      </div>
+      {!gameData.preview && (
+        <div className="mx-auto flex w-[75vw] justify-end">
+          <button
+            onClick={onOpen}
+            className="mt-1 rounded-md bg-delete-red px-[17px] py-2 font-sans text-xl font-semibold text-white"
+          >
+            Delete Page
+          </button>
+          <DeleteComponentModal
+            deleteType="game"
+            isOpen={isOpen}
+            onClose={onClose}
+            gameData={gameData}
+            setGameData={setGameData}
+          />
+        </div>
+      )}
+
       <div className="mx-auto my-8 h-[75vh] w-[75vw]">
         <AddEditWebGLComponent gameData={gameData} />
       </div>
@@ -117,20 +143,24 @@ const EditGamePage = () => {
           admin={true}
         />
       ) : null}
-      <div className="mx-auto mb-40 mt-24 flex w-[80vw] justify-end">
-        <div className="absolute">
-          <button
+      <div className="mx-auto mb-40 mt-16 flex w-[80vw] justify-end font-sans">
+        <div className="absolute flex gap-4">
+          <Button
             onClick={discardChanges}
-            className="rounded-xl bg-input-border px-6 py-3 font-sans text-2xl font-medium text-blue-primary"
+            variant="outline2"
+            className="px-5 py-6 text-xl font-semibold"
           >
             Discard changes
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={saveChanges}
-            className="ml-8 rounded-xl bg-blue-primary px-6 py-3 font-sans text-2xl font-medium text-white"
+            variant="mainblue"
+            className="px-5 py-6 text-xl font-semibold"
+
+            // className="ml-8 rounded-xl bg-blue-primary px-6 py-5 font-sans text-2xl font-medium text-white"
           >
             Save changes
-          </button>
+          </Button>
         </div>
       </div>
     </div>

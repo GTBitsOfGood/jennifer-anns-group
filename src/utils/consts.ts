@@ -15,6 +15,7 @@ export enum Pages {
   SIGNUP = "/signup",
   CREATEGAME = "/games/create",
   EDITGAME = "/games/[id]/edit",
+  PREVIEWGAME = "/games/[id]/preview",
   ACCOUNTMANAGEMENT = "/admin/account-management",
   THEMES = "/admin/themes",
 }

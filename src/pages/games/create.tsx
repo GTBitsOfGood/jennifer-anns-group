@@ -18,6 +18,10 @@ import { ExtendId, buildSchema, gameSchema } from "@/utils/types";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { IGame } from "@/server/db/models/GameModel";
 import UploadGameBuild from "@/components/UploadGameBuild";
+import {
+  youtubeREGEX,
+  vimeoREGEX,
+} from "@/components/GameScreen/AddEditVideoTrailerComponent";
 
 import axios from "axios";
 
@@ -127,8 +131,9 @@ function CreateGame() {
   const [codeFile, setCodeFile] = useState<null | File>(null);
   const [frameworkFile, setFrameworkFile] = useState<null | File>(null);
 
-  const [fileValidationError, setFileValidationError] =
-    useState<boolean>(false);
+  const [fileValidationError, setFileValidationError] = useState<
+    string | undefined
+  >(undefined);
 
   const [uploadGameComponents, setUploadGameComponents] = useState<
     React.JSX.Element[]
@@ -183,6 +188,19 @@ function CreateGame() {
   });
 
   async function createGame(data: IGame) {
+    // check video trailer is youtube or vimeo
+    if (data.videoTrailer && data.videoTrailer !== "") {
+      if (
+        !youtubeREGEX.test(data.videoTrailer) &&
+        !vimeoREGEX.test(data.videoTrailer)
+      ) {
+        setValidationErrors((prevValidationErrors) => ({
+          ...prevValidationErrors,
+          videoTrailer: "Invalid URL (Only Youtube and Vimeo videos supported)",
+        }));
+        return;
+      }
+    }
     try {
       const response = await fetch(`/api/games`, {
         method: "POST",
@@ -194,8 +212,9 @@ function CreateGame() {
       } else if (response.status === HTTP_STATUS_CODE.BAD_REQUEST) {
         setValidationErrors((prevValidationErrors) => ({
           ...prevValidationErrors,
-          name: "Game with this title already exists",
+          name: "Game with this title already exists.",
         }));
+        return;
       } else {
         console.error("Error creating game");
         return;
@@ -208,6 +227,7 @@ function CreateGame() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setSubmitting(true);
     if (uploadedWebGL) {
       if (
         loaderFile === null ||
@@ -215,12 +235,16 @@ function CreateGame() {
         codeFile === null ||
         frameworkFile === null
       ) {
-        setFileValidationError(true);
+        setFileValidationError(
+          "All files must be uploaded for the WebGL Build.",
+        );
+        setSubmitting(false);
         return;
       } else {
-        setFileValidationError(false);
+        setFileValidationError(undefined);
       }
     }
+
     const formData = new FormData(e.currentTarget);
     const input = {
       name: formData.get(NAME_FORM_KEY),
@@ -231,35 +255,44 @@ function CreateGame() {
       tags: [...selectedAccessibilityTags, ...selectedCustomTags].map(
         (tag) => tag._id,
       ),
+      preview: true,
     };
     const parse = gameSchema.safeParse(input);
 
     if (parse.success) {
-      if (
-        (!parse.data.builds || parse.data?.builds.length == 0) &&
-        !uploadedWebGL
-      ) {
-        alert("Please add at least one Game Build.");
-        return;
-      }
       setValidationErrors({
         name: undefined,
         videoTrailer: undefined,
         description: undefined,
       });
+      if (fileValidationError !== undefined) return;
+      if (
+        (!parse.data.builds || parse.data?.builds.length == 0) &&
+        !uploadedWebGL
+      ) {
+        alert("Please add at least one Game Build.");
+        setSubmitting(false);
+        return;
+      }
+
       try {
         const response = await createGame(parse.data);
-        if (response) {
+        if (response?.ok) {
+          const data = await response.json();
           if (uploadedWebGL) {
-            const data = await response.json();
-            await handleWebGLSubmit(data._id);
+            const webGLSubmit = await handleWebGLSubmit(data._id);
+            if (!webGLSubmit) return;
           }
+          router.replace(`/games/${data._id}/preview`);
+        } else {
+          setSubmitting(false);
         }
-        router.replace("/games");
       } catch (error) {
+        setSubmitting(false);
         console.error("Error creating game:", error);
       }
     } else {
+      setSubmitting(false);
       const errors = parse.error.formErrors.fieldErrors;
       setValidationErrors({
         name: errors.name?.at(0),
@@ -292,17 +325,17 @@ function CreateGame() {
 
   const [submitting, setSubmitting] = useState<boolean>(false);
 
-  const handleWebGLSubmit = async (gameId: string) => {
+  const handleWebGLSubmit = async (gameId: string): Promise<boolean> => {
     if (
       loaderFile === null ||
       dataFile === null ||
       codeFile === null ||
       frameworkFile === null
     ) {
-      setFileValidationError(true);
-      return;
+      setFileValidationError("All files must be uploaded for the WebGL Build!");
+      return false;
     }
-    setFileValidationError(false);
+    setFileValidationError(undefined);
 
     const files = new Map([
       ["loader", loaderFile],
@@ -312,14 +345,15 @@ function CreateGame() {
     ]);
 
     try {
-      setSubmitting(true);
       await uploadBuildFiles(gameId, files);
       setSubmitting(false);
 
       alert("Files uploaded successfully");
+      return true;
     } catch (e) {
       console.error(e);
-      alert("Failed to upload files");
+      setFileValidationError("An internal error occurred. Please try again.");
+      return false;
     }
   };
 
@@ -354,9 +388,6 @@ function CreateGame() {
             )}
             disabled={submitting}
           />
-          <p className="absolute bottom-[-2em] text-xs text-red-500">
-            {validationErrors.name}
-          </p>
         </div>
 
         <div className="relative flex w-full flex-col gap-3 md:w-2/3">
@@ -382,15 +413,6 @@ function CreateGame() {
             <Plus />
             <p>Add Another Build</p>
           </div>
-
-          {fileValidationError && (
-            <div className="mt-2 flex h-14 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
-              <AlertTriangleIcon className="h-5 w-5" />
-              <p className="">
-                All files must be uploaded for the WebGL Build!
-              </p>
-            </div>
-          )}
         </div>
 
         <div className="relative flex w-full flex-col gap-3 md:w-2/3">
@@ -408,9 +430,6 @@ function CreateGame() {
               "h-12",
             )}
           />
-          <p className="absolute bottom-[-2em] text-xs text-red-500">
-            {validationErrors.videoTrailer}
-          </p>
         </div>
 
         <div className="relative flex w-full flex-col gap-3 md:w-2/3">
@@ -427,9 +446,6 @@ function CreateGame() {
                 : "border-input-border focus:border-blue-primary"
             }
           />
-          <p className="absolute bottom-[-2em] text-xs text-red-500">
-            {validationErrors.description}
-          </p>
         </div>
 
         <div className="relative flex w-full flex-col gap-3">
@@ -461,15 +477,37 @@ function CreateGame() {
           />
         </div>
 
-        <div className="relative mt-10 flex w-full justify-end">
-          <Button
-            type="submit"
-            variant="mainblue"
-            className="px-6 py-6 text-2xl font-semibold"
-            disabled={submitting}
-          >
-            {submitting ? "Uploading..." : "Publish"}
-          </Button>
+        <div className="flex w-full flex-col gap-3">
+          {Object.values(validationErrors).some(
+            (value) => value !== undefined,
+          ) && (
+            <div className="flex h-14 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
+              <AlertTriangleIcon className="h-5 w-5" />
+              <p>
+                {validationErrors.name
+                  ? validationErrors.name
+                  : validationErrors.videoTrailer
+                    ? validationErrors.videoTrailer
+                    : "All required fields need to be filled."}
+              </p>
+            </div>
+          )}
+          {fileValidationError && (
+            <div className="flex h-14 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
+              <AlertTriangleIcon className="h-5 w-5" />
+              <p>{fileValidationError}</p>
+            </div>
+          )}
+          <div className="relative flex justify-end">
+            <Button
+              type="submit"
+              variant="mainblue"
+              className="px-6 py-6 text-2xl font-semibold"
+              disabled={submitting}
+            >
+              {submitting ? "Uploading..." : "Preview"}
+            </Button>
+          </div>
         </div>
       </form>
     </div>
