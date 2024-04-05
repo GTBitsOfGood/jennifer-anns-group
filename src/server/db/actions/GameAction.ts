@@ -226,7 +226,6 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
       ...andFilters,
       ...(orFilters.length > 0 ? [{ $or: orFilters }] : []),
     ];
-    console.log("allSteps", allSteps);
 
     const aggregate = GameModel.aggregate<{
       games: GamesFilterOutput;
@@ -237,6 +236,7 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
       ...(allSteps.length > 0 && { $and: allSteps }),
     });
     aggregate.sort({ name: 1 });
+    aggregate.collation({ locale: "en_US", strength: 1 });
     aggregate.lookup({
       from: "themes",
       localField: "themes",
