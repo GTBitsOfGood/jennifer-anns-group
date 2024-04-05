@@ -197,6 +197,7 @@ function CreateGame() {
           ...prevValidationErrors,
           name: "Game with this title already exists.",
         }));
+        return;
       } else {
         console.error("Error creating game");
         return;
@@ -488,7 +489,7 @@ function CreateGame() {
               className="px-6 py-6 text-2xl font-semibold"
               disabled={submitting}
             >
-              {submitting ? "Uploading..." : "Publish"}
+              {submitting ? "Uploading..." : "Preview"}
             </Button>
           </div>
         </div>

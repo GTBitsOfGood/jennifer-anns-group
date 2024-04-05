@@ -141,7 +141,6 @@ export const GetGameQuerySchema = z.object({
     .array(z.nativeEnum(GameContentEnum))
     .or(z.nativeEnum(GameContentEnum).transform(putSingleStringInArray)) //In this case where only thing is passed into gameContent.
     .optional(),
-  preview: z.enum(["true", "false"]).transform((value) => value === "true"),
   page: z.string().transform(convertINT).pipe(z.number().gte(1)).optional(),
 });
 export type GameQuery = z.infer<typeof GetGameQuerySchema>;

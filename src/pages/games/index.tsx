@@ -113,8 +113,6 @@ export default function Games() {
       params.append("theme", selectedTheme);
     }
 
-    params.append("preview", "false");
-
     const queryString = params.toString();
 
     try {

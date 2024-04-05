@@ -287,8 +287,6 @@ describe("MongodDB Game - Unit Test", () => {
       }),
     gameContent: (games, gameContent, _) =>
       games.filter((game) => gameContent.every((document) => document in game)),
-    preview: (games, preview, _) =>
-      games.filter((game) => game.preview === preview),
   };
 
   function filterGeneratedGames(
@@ -305,6 +303,7 @@ describe("MongodDB Game - Unit Test", () => {
         resultsPerPage,
       );
     }
+    filteredGames = filteredGames.filter((game) => game.preview === false);
     filteredGames = filteredGames.sort((a, b) => a.name.localeCompare(b.name));
     filteredGames = QUERY_FIELD_HANDLER_MAP["page"](
       filteredGames,

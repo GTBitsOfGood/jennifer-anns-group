@@ -165,6 +165,7 @@ export async function getSelectedGames(
   const { page, ...filterSteps } = query;
   let initialFilterAnd: FilterQuery<IGame> = {};
   let initialFilterOr: FilterQuery<IGame> = {};
+  // filter by query parameters
   for (const [key, value] of Object.entries(filterSteps)) {
     const handler = QUERY_FIELD_HANDLER_MAP[key as keyof typeof filterSteps];
     if (handler) {
@@ -178,6 +179,12 @@ export async function getSelectedGames(
       initialFilterOr = result.filterFieldsOr;
     }
   }
+  // only return published games
+  initialFilterAnd = {
+    ...initialFilterAnd,
+    preview: { $exists: false },
+  };
+  // run aggregate query and pagination
   const aggregate = QUERY_FIELD_HANDLER_MAP["page"](
     page,
     initialFilterAnd,
@@ -355,13 +362,6 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
         };
       }
     }
-    return {
-      filterFieldsAnd: filterFieldsAnd,
-      filterFieldsOr: filterFieldsOr,
-    };
-  },
-  preview: async (previewVal, filterFieldsAnd, filterFieldsOr) => {
-    filterFieldsAnd.preview = previewVal;
     return {
       filterFieldsAnd: filterFieldsAnd,
       filterFieldsOr: filterFieldsOr,
