@@ -18,6 +18,10 @@ import { ExtendId, buildSchema, gameSchema } from "@/utils/types";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { IGame } from "@/server/db/models/GameModel";
 import UploadGameBuild from "@/components/UploadGameBuild";
+import {
+  youtubeREGEX,
+  vimeoREGEX,
+} from "@/components/GameScreen/AddEditVideoTrailerComponent";
 
 import axios from "axios";
 
@@ -184,6 +188,19 @@ function CreateGame() {
   });
 
   async function createGame(data: IGame) {
+    // check video trailer is youtube or vimeo
+    if (data.videoTrailer && data.videoTrailer !== "") {
+      if (
+        !youtubeREGEX.test(data.videoTrailer) &&
+        !vimeoREGEX.test(data.videoTrailer)
+      ) {
+        setValidationErrors((prevValidationErrors) => ({
+          ...prevValidationErrors,
+          videoTrailer: "Invalid URL (Only Youtube and Vimeo videos supported)",
+        }));
+        return;
+      }
+    }
     try {
       const response = await fetch(`/api/games`, {
         method: "POST",
@@ -197,6 +214,7 @@ function CreateGame() {
           ...prevValidationErrors,
           name: "Game with this title already exists.",
         }));
+        return;
       } else {
         console.error("Error creating game");
         return;
@@ -209,7 +227,7 @@ function CreateGame() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
+    setSubmitting(true);
     if (uploadedWebGL) {
       if (
         loaderFile === null ||
@@ -220,6 +238,8 @@ function CreateGame() {
         setFileValidationError(
           "All files must be uploaded for the WebGL Build.",
         );
+        setSubmitting(false);
+        return;
       } else {
         setFileValidationError(undefined);
       }
@@ -235,6 +255,7 @@ function CreateGame() {
       tags: [...selectedAccessibilityTags, ...selectedCustomTags].map(
         (tag) => tag._id,
       ),
+      preview: true,
     };
     const parse = gameSchema.safeParse(input);
 
@@ -250,6 +271,7 @@ function CreateGame() {
         !uploadedWebGL
       ) {
         alert("Please add at least one Game Build.");
+        setSubmitting(false);
         return;
       }
 
@@ -261,14 +283,16 @@ function CreateGame() {
             const webGLSubmit = await handleWebGLSubmit(data._id);
             if (!webGLSubmit) return;
           }
-          router.replace(`/games`);
+          router.replace(`/games/${data._id}/preview`);
         } else {
           setSubmitting(false);
         }
       } catch (error) {
+        setSubmitting(false);
         console.error("Error creating game:", error);
       }
     } else {
+      setSubmitting(false);
       const errors = parse.error.formErrors.fieldErrors;
       setValidationErrors({
         name: errors.name?.at(0),
@@ -321,7 +345,6 @@ function CreateGame() {
     ]);
 
     try {
-      setSubmitting(true);
       await uploadBuildFiles(gameId, files);
       setSubmitting(false);
 
@@ -461,11 +484,10 @@ function CreateGame() {
             <div className="flex h-14 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
               <AlertTriangleIcon className="h-5 w-5" />
               <p>
-                {validationErrors.name ===
-                "Game with this title already exists."
-                  ? "Game with this title already exists."
+                {validationErrors.name
+                  ? validationErrors.name
                   : validationErrors.videoTrailer
-                    ? "Please enter a valid URL for the Video Trailer."
+                    ? validationErrors.videoTrailer
                     : "All required fields need to be filled."}
               </p>
             </div>
@@ -483,7 +505,7 @@ function CreateGame() {
               className="px-6 py-6 text-2xl font-semibold"
               disabled={submitting}
             >
-              {submitting ? "Uploading..." : "Publish"}
+              {submitting ? "Uploading..." : "Preview"}
             </Button>
           </div>
         </div>

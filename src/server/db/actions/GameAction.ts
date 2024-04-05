@@ -19,7 +19,7 @@ export const RESULTS_PER_PAGE = 6;
 
 export async function createGame(data: IGame) {
   await connectMongoDB();
-
+  data.lowercaseName = data.name.toLowerCase(); //Properly sets lowercase field.
   const existingGame = await GameModel.findOne({ name: data.name });
 
   if (existingGame) throw new GameAlreadyExistsException();
@@ -165,6 +165,7 @@ export async function getSelectedGames(
   const { page, ...filterSteps } = query;
   let initialFilterAnd: FilterQuery<IGame> = {};
   let initialFilterOr: FilterQuery<IGame> = {};
+  // filter by query parameters
   for (const [key, value] of Object.entries(filterSteps)) {
     const handler = QUERY_FIELD_HANDLER_MAP[key as keyof typeof filterSteps];
     if (handler) {
@@ -178,6 +179,12 @@ export async function getSelectedGames(
       initialFilterOr = result.filterFieldsOr;
     }
   }
+  // only return published games
+  initialFilterAnd = {
+    ...initialFilterAnd,
+    preview: false,
+  };
+  // run aggregate query and pagination
   const aggregate = QUERY_FIELD_HANDLER_MAP["page"](
     page,
     initialFilterAnd,
@@ -228,7 +235,7 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
     aggregate.match({
       ...(allSteps.length > 0 && { $and: allSteps }),
     });
-    aggregate.sort({ name: 1 });
+    aggregate.sort({ lowercaseName: 1 });
     aggregate.lookup({
       from: "themes",
       localField: "themes",

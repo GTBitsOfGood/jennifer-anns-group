@@ -89,7 +89,6 @@ function AddModal({ subject, open, setOpen }: Props) {
 
       const parsed = formSchema.safeParse(inputs);
       if (!parsed.success) {
-        console.log(parsed.error.formErrors.fieldErrors);
         setNameError(parsed.error.formErrors.fieldErrors.name?.at(0));
         return;
       }

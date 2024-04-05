@@ -114,22 +114,20 @@ function ThemesTagsSection() {
           <div className="peer mt-2 flex flex-row flex-wrap gap-2">
             {tags?.accessibility.map((tag) => {
               return (
-                <Tag
-                  key={tag._id}
-                  variant="accessibility"
-                  className="group hover:cursor-pointer"
-                  onClick={() => {
-                    setSelectedDeleteSubject({
-                      subject: tag,
-                      subjectType: "tag",
-                    });
-                    setDeleteModalDisclosure(true);
-                  }}
-                >
+                <Tag key={tag._id} variant="accessibility" className="group">
                   <div className="flex flex-row items-center gap-2">
                     {tag.name}
-                    <div className="hidden group-hover:block">
-                      <X size={18} />
+                    <div className="hidden hover:cursor-pointer group-hover:block">
+                      <X
+                        size={18}
+                        onClick={() => {
+                          setSelectedDeleteSubject({
+                            subject: tag,
+                            subjectType: "tag",
+                          });
+                          setDeleteModalDisclosure(true);
+                        }}
+                      />
                     </div>
                   </div>
                 </Tag>
@@ -161,22 +159,20 @@ function ThemesTagsSection() {
           <div className="peer mt-2 flex flex-row flex-wrap gap-2">
             {tags?.custom.map((tag) => {
               return (
-                <Tag
-                  key={tag._id}
-                  variant="custom"
-                  className="group hover:cursor-pointer"
-                  onClick={() => {
-                    setSelectedDeleteSubject({
-                      subject: tag,
-                      subjectType: "tag",
-                    });
-                    setDeleteModalDisclosure(true);
-                  }}
-                >
+                <Tag key={tag._id} variant="custom" className="group">
                   <div className="flex flex-row items-center gap-2">
                     {tag.name}
-                    <div className="hidden group-hover:block">
-                      <X size={18} />
+                    <div className="hidden hover:cursor-pointer group-hover:block">
+                      <X
+                        size={18}
+                        onClick={() => {
+                          setSelectedDeleteSubject({
+                            subject: tag,
+                            subjectType: "tag",
+                          });
+                          setDeleteModalDisclosure(true);
+                        }}
+                      />
                     </div>
                   </div>
                 </Tag>

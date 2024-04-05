@@ -51,8 +51,8 @@ const AccountManagementPage = () => {
         setNewEmail("");
         setEmailError("");
       } else {
-        const error = await response.text();
-        setEmailError(error);
+        const res = await response.json();
+        setEmailError(res.error);
       }
     } catch (error) {
       console.log("Error adding account:", error);
