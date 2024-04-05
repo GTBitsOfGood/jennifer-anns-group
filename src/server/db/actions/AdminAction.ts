@@ -10,6 +10,7 @@ import { UserLabel } from "@/utils/types";
 
 export async function createAdmin(data: IAdmin) {
   await connectMongoDB();
+  data.lowercaseEmail = data.email.toLowerCase();
   const existingAdmin = await AdminModel.findOne({ email: data.email });
   if (existingAdmin) throw new AdminAlreadyExistsException();
   try {
@@ -58,7 +59,7 @@ export async function getAdminByEmail(email: string) {
 export async function getAllAdmins() {
   await connectMongoDB();
   try {
-    const admins = await AdminModel.find({}).sort({ email: 1 });
+    const admins = await AdminModel.find({}).sort({ lowercaseEmail: 1 });
     return admins ? admins : {};
   } catch (e) {
     throw e;

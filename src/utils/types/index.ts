@@ -157,6 +157,7 @@ export const userSchema = z.object({
 // Admin
 export const adminSchema = z.object({
   email: z.string().email("Not a valid email"),
+  lowercaseEmail: z.string().email("Not a valid email").optional(),
 });
 
 export type ExtendId<T extends any> = T & { _id: string };
