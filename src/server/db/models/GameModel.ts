@@ -44,6 +44,7 @@ const GameSchema = new Schema<IGame>(
     parentingGuide: { type: String },
     answerKey: { type: String },
     videoTrailer: { type: String },
+    preview: { type: Boolean, required: true },
   },
   { versionKey: false },
 );

@@ -303,6 +303,7 @@ describe("MongodDB Game - Unit Test", () => {
         resultsPerPage,
       );
     }
+    filteredGames = filteredGames.filter((game) => game.preview === false);
     filteredGames = filteredGames.sort((a, b) => a.name.localeCompare(b.name));
     filteredGames = QUERY_FIELD_HANDLER_MAP["page"](
       filteredGames,
