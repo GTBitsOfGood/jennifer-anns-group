@@ -1,4 +1,5 @@
-import DeleteModal from "@/components/account-management/DeleteModal";
+import pageAccessHOC from "@/components/HOC/PageAccess";
+import DeleteModal from "@/components/AccountManagement/DeleteModal";
 import { Button } from "@/components/ui/button";
 import CrossIcon from "@/components/ui/icons/crossicon";
 import WarningIcon from "@/components/ui/icons/warningicon";
@@ -19,21 +20,22 @@ const AccountManagementPage = () => {
     null,
   );
 
+  const fetchData = async () => {
+    try {
+      const promise = await fetch("../api/admin");
+      const data = await promise.json();
+      const removableAdmins = data.filter(
+        (admin: Admin) => !UNDELETABLE_EMAILS.includes(admin.email),
+      );
+      setAdmins(removableAdmins);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const promise = await fetch("../api/admin");
-        const data = await promise.json();
-        const removableAdmins = data.filter(
-          (admin: Admin) => !UNDELETABLE_EMAILS.includes(admin.email),
-        );
-        setAdmins(removableAdmins);
-      } catch (e) {
-        console.log(e);
-      }
-    };
     fetchData();
-  }, [admins]);
+  }, []);
 
   const handleAddAccount = async () => {
     try {
@@ -45,6 +47,7 @@ const AccountManagementPage = () => {
         body: JSON.stringify({ email: newEmail }),
       });
       if (response.ok) {
+        fetchData();
         setNewEmail("");
         setEmailError("");
       } else {
@@ -59,9 +62,9 @@ const AccountManagementPage = () => {
   return (
     <div>
       <div className="mb-28 mt-10">
-        <div className="text-center text-5xl font-semibold text-black">
+        <h1 className="mb-16 mt-10 text-center font-sans text-6xl font-semibold">
           Account Management
-        </div>
+        </h1>
         <div className="mt-24 flex flex-col px-28">
           <div className="text-2xl font-semibold text-black">
             Add New Account
@@ -150,4 +153,4 @@ const AccountManagementPage = () => {
   );
 };
 
-export default AccountManagementPage;
+export default pageAccessHOC(AccountManagementPage);

@@ -3,15 +3,18 @@ import { z } from "zod";
 import { tagSchema } from "../../../utils/types";
 export interface ITag extends z.infer<typeof tagSchema> {}
 
-const TagSchema = new Schema<ITag>({
-  name: { type: String, required: true, unique: true },
-  type: {
-    type: String,
-    enum: ["accessibility", "custom"],
-    default: "custom",
-    required: true,
+const TagSchema = new Schema<ITag>(
+  {
+    name: { type: String, required: true, unique: true },
+    type: {
+      type: String,
+      enum: ["accessibility", "custom"],
+      default: "custom",
+      required: true,
+    },
   },
-});
+  { versionKey: false },
+);
 
 const TagModel =
   (mongoose.models.Tag as mongoose.Model<ITag>) ??

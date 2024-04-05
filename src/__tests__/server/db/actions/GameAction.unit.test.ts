@@ -6,6 +6,7 @@ import { randomTags } from "@/server/db/actions/__mocks__/TagAction";
 import { randomThemes } from "@/server/db/actions/__mocks__/ThemeAction";
 import { randomGames } from "@/server/db/actions/__mocks__/GameAction";
 import {
+  GamesFilterOutput,
   RESULTS_PER_PAGE,
   getSelectedGames,
 } from "@/server/db/actions/GameAction";
@@ -28,7 +29,7 @@ jest.spyOn(connectMongoDB, "default").mockImplementation(async () => {
 });
 
 const NUM_GAMES = 300;
-let generatedGames: ExtendId<IGame>[] = randomGames(NUM_GAMES);
+let generatedGames: GamesFilterOutput = randomGames(NUM_GAMES);
 const gameIds = generatedGames.map((game) => game._id.toString());
 let tagInputs: ExtendId<CreateTagInput>[] = randomTags(gameIds, 10);
 let themeInputs: ExtendId<CreateThemeInput>[] = randomThemes(gameIds, 10);
@@ -36,7 +37,7 @@ themeInputs.forEach((themeInput) => {
   const gameIDs = themeInput.games;
   generatedGames.forEach((game) => {
     if (gameIDs.includes(game._id)) {
-      game.themes = [...(game.themes ?? []), themeInput._id];
+      game.themes = [...(game.themes ?? []), themeInput];
     }
   });
 });
@@ -44,7 +45,7 @@ tagInputs.forEach((tag) => {
   const gameIDs = tag.games;
   generatedGames.forEach((game) => {
     if (gameIDs.includes(game._id)) {
-      game.tags = [...(game.tags ?? []), tag._id];
+      game.tags = [...(game.tags ?? []), tag];
     }
   });
 });
@@ -73,11 +74,10 @@ describe("MongodDB Game - Unit Test", () => {
   });
 
   describe("getSelectedGames", () => {
-    test("[pagination] page out of range: expect exception", async () => {
+    test("[pagination] page out of range: expect no games", async () => {
       const numPages = Math.ceil(NUM_GAMES / RESULTS_PER_PAGE);
-      await expect(getSelectedGames({ page: numPages + 1 })).rejects.toThrow(
-        GameNotFoundException,
-      );
+      const result = await getSelectedGames({ page: numPages + 1 });
+      await expect(result.games).toEqual([]);
     });
     test("[pagination] no repeats in paginated results: expect success", async () => {
       const numPages = Math.ceil(NUM_GAMES / RESULTS_PER_PAGE);
@@ -120,7 +120,7 @@ describe("MongodDB Game - Unit Test", () => {
         query.accessibility = [tag.name];
       }
 
-      let games: ExtendId<IGame>[] = [];
+      let games: GamesFilterOutput = [];
       const numPages = Math.ceil(tag.games.length / RESULTS_PER_PAGE);
       for (let page = 1; page <= numPages; page++) {
         query.page = page;
@@ -135,17 +135,17 @@ describe("MongodDB Game - Unit Test", () => {
     test("[theme] nonexistent theme: expect exception", async () => {
       const theme = faker.string.numeric({ length: 40 });
 
-      await expect(getSelectedGames({ page: 1, theme: theme })).rejects.toThrow(
-        ThemeNotFoundException,
-      );
+      await expect(
+        getSelectedGames({ page: 1, theme: [theme] }),
+      ).rejects.toThrow(ThemeNotFoundException);
     });
     test("[theme] in-out groups: expect success", async () => {
       const theme = faker.helpers.arrayElement(themeInputs);
       let query: GameQuery = {
         page: 1,
-        theme: theme.name,
+        theme: [theme.name],
       };
-      let games: ExtendId<IGame>[] = [];
+      let games: GamesFilterOutput = [];
       const numPages = Math.ceil(theme.games.length / RESULTS_PER_PAGE);
       for (let page = 1; page <= numPages; page++) {
         query.page = page;
@@ -191,7 +191,7 @@ describe("MongodDB Game - Unit Test", () => {
         page: 1,
         tags: [randomCustomTag.name],
         accessibility: [randomAccessibilityTag.name],
-        theme: randomTheme.name,
+        theme: [randomTheme.name],
         name: faker.string.alpha({ length: 1 }),
         gameBuilds: [AllBuilds.webgl, AllBuilds.amazon],
         gameContent: [GameContentEnum.parentingGuide],
@@ -201,7 +201,7 @@ describe("MongodDB Game - Unit Test", () => {
         ...query,
         tags: [randomCustomTag._id.toString()],
         accessibility: [randomAccessibilityTag._id.toString()],
-        theme: randomTheme._id.toString(),
+        theme: [randomTheme._id.toString()],
       };
       const expected = filterGeneratedGames(generatedGames, modifiedQuery);
 
@@ -214,12 +214,12 @@ describe("MongodDB Game - Unit Test", () => {
 
         actual.games = actual.games.map((game) => {
           game._id = game._id.toString();
-          game.themes = game.themes?.map((theme) => theme.toString());
-          game.tags = game.tags?.map((tag) => tag.toString());
-          game.builds = game.builds?.map((build) => {
-            build._id = build._id.toString();
-            return build;
-          });
+          // game.themes = game.themes?.map((theme) => theme.toString());
+          // game.tags = game.tags?.map((tag) => tag.toString());
+          // game.builds = game.builds?.map((build) => {
+          //   build._id = build._id.toString();
+          //   return build;
+          // });
           return game;
         });
         expect(actual.games.length).toBe(expected.length);
@@ -230,10 +230,10 @@ describe("MongodDB Game - Unit Test", () => {
 
   type QueryFieldHandlers<T> = {
     [K in keyof T]: (
-      games: ExtendId<IGame>[],
+      games: GamesFilterOutput,
       field: T[K],
       resultsPerPage: number,
-    ) => ExtendId<IGame>[];
+    ) => GamesFilterOutput;
   };
 
   const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<Required<GameQuery>> = {
@@ -249,7 +249,9 @@ describe("MongodDB Game - Unit Test", () => {
     tags: (games, customTags, _) => {
       const filteredGames = games.filter((game) => {
         if (game.tags !== undefined) {
-          const result = customTags.every((tag) => game.tags!.includes(tag));
+          const result = customTags.every((tag) =>
+            game.tags!.map((tag) => tag.name).includes(tag),
+          );
           return result;
         }
         return false;
@@ -258,10 +260,16 @@ describe("MongodDB Game - Unit Test", () => {
     },
     accessibility: (games, accessibilityTags, _) =>
       games.filter((game) =>
-        accessibilityTags.every((tag) => game.tags?.includes(tag)),
+        accessibilityTags.every((tag) =>
+          game.tags!.map((tag) => tag.name).includes(tag),
+        ),
       ),
-    theme: (games, theme, _) =>
-      games.filter((game) => game.themes?.includes(theme)),
+    theme: (games, themes, _) =>
+      games.filter((game) =>
+        themes.every((theme) =>
+          game.themes?.map((theme) => theme.name).includes(theme),
+        ),
+      ),
     gameBuilds: (games, gameBuilds, _) =>
       games.filter((game) => {
         const gameBuildTypes = game.builds?.map((build) => build.type);
@@ -282,7 +290,7 @@ describe("MongodDB Game - Unit Test", () => {
   };
 
   function filterGeneratedGames(
-    games: ExtendId<IGame>[],
+    games: GamesFilterOutput,
     query: GameQuery,
     resultsPerPage = RESULTS_PER_PAGE,
   ) {
@@ -295,6 +303,7 @@ describe("MongodDB Game - Unit Test", () => {
         resultsPerPage,
       );
     }
+    filteredGames = filteredGames.filter((game) => game.preview === false);
     filteredGames = filteredGames.sort((a, b) => a.name.localeCompare(b.name));
     filteredGames = QUERY_FIELD_HANDLER_MAP["page"](
       filteredGames,
