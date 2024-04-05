@@ -22,6 +22,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
+import { AlertTriangleIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 interface Props {
   gameName: string;
@@ -34,6 +35,7 @@ export default function ContactComponent({ gameName }: Props) {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [valid, setValid] = useState(false);
+  const [failedtoSend, setfailedtoSend] = useState(false);
   const colors = { true: "#2352A0", false: "#D9D9D9" };
   const emailRegex = /^\S+@\S+\.\S+$/;
   useEffect(() => {
@@ -67,7 +69,12 @@ export default function ContactComponent({ gameName }: Props) {
         gameName: gameName,
       }),
     });
-    onOpen();
+    if (result.status === 200) {
+      setfailedtoSend(false);
+      onOpen();
+    } else {
+      setfailedtoSend(true);
+    }
   };
 
   return (
@@ -126,7 +133,7 @@ export default function ContactComponent({ gameName }: Props) {
                     />
                   </FormControl>
                 </Flex>
-                <Flex className="mx-4 mb-2 mt-2 w-full flex-col items-end md:mx-8 lg:mx-16">
+                <Flex className="mb-2 ml-4 mt-2 w-full flex-col items-end md:ml-8 lg:ml-16">
                   <FormControl>
                     <FormLabel htmlFor="message">Message</FormLabel>
                     <Textarea
@@ -139,18 +146,6 @@ export default function ContactComponent({ gameName }: Props) {
                       height="154px"
                     />
                   </FormControl>
-                  <Button
-                    type="submit"
-                    width="219px"
-                    height="47px"
-                    color="white"
-                    bg={colors[`${valid}`]}
-                    _hover={{ bg: colors[`${valid}`] }}
-                    onClick={valid ? onOpenFeatured : () => {}}
-                    className="mt-8 rounded-md border border-transparent px-4 py-2 text-sm font-medium   focus:outline-none focus:ring-2"
-                  >
-                    Send Message
-                  </Button>
                   <Modal isOpen={isOpen} onClose={onCloseFeatured}>
                     <ModalOverlay />
                     <ModalContent
@@ -185,6 +180,27 @@ export default function ContactComponent({ gameName }: Props) {
                   </Modal>
                 </Flex>
               </Flex>
+              {failedtoSend && (
+                <div className="mt-4 flex h-14 w-full items-center gap-2 rounded-sm bg-red-100 px-4 text-sm text-red-500">
+                  <AlertTriangleIcon className="h-5 w-5" />
+                  <p className="font-semibold">
+                    Sending failed. Please try again.
+                  </p>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                width="219px"
+                height="47px"
+                color="white"
+                bg={colors[`${valid}`]}
+                _hover={{ bg: colors[`${valid}`] }}
+                onClick={valid ? onOpenFeatured : () => {}}
+                className="float-right mt-8 rounded-md border border-transparent px-4 py-2 text-sm  font-medium focus:outline-none focus:ring-2"
+              >
+                Send Message
+              </Button>
             </TabPanel>
           </TabPanels>
         </Tabs>
