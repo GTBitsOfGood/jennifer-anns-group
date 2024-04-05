@@ -181,6 +181,7 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
       ...(allSteps.length > 0 && { $and: allSteps }),
     });
     aggregate.sort({ name: 1 });
+    aggregate.collation({ locale: "en_US", strength: 1 });
     if (pageNum !== undefined) {
       aggregate.facet({
         games: [
