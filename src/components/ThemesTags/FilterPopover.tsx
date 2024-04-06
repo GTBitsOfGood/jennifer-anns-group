@@ -56,7 +56,6 @@ function FilterPopover(props: Props) {
       accessibility: formData.getAll(FORM_TAGS_ACCESSIBILITY_KEY) as string[],
       tags: formData.getAll(FORM_TAGS_CUSTOM_KEY) as string[],
     };
-    console.log("input", input);
     setFilters({
       ...filters,
       page: 1, // reset page

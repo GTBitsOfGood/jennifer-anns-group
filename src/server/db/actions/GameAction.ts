@@ -271,16 +271,12 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
     return aggregate;
   },
   theme: async (theme, filterFieldsAnd, filterFieldsOr) => {
-    // console.log("theme", theme);
     const foundThemes = await ThemeModel.find({
       name: {
         $in: theme,
       },
     });
-    // console.log("foundThemes", foundThemes);
     if (foundThemes.length !== theme?.length) {
-      // console.log("themes.length", theme?.length);
-      // console.log("foundThemes.length", foundThemes.length);
       throw new ThemeNotFoundException("One or more themes are invalid.");
     }
     filterFieldsAnd.themes = {

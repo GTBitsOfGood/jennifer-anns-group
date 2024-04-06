@@ -37,7 +37,6 @@ function generateQueryUrl(filters: GameQuery) {
       searchParams.push(`${k}=${val}`);
     }
   });
-  console.log("URL", `${gamesUrl}?${searchParams.join("&")}`);
   return `${gamesUrl}?${searchParams.join("&")}`;
 }
 
