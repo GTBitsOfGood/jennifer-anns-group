@@ -61,6 +61,7 @@ async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
         .status(HTTP_STATUS_CODE.BAD_REQUEST)
         .send(parsedQuery.error.format());
     }
+    console.log("parsedQuery data: ", parsedQuery.data);
     const result = await getSelectedGames(parsedQuery.data);
     const { count, games } = result;
     const numPages = Math.ceil(count / RESULTS_PER_PAGE);
