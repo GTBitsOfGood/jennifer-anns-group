@@ -19,7 +19,7 @@ export default function DeleteComponentModal(props: Props) {
         const error = await response.text();
         console.error(error);
       }
-      signOut();
+      signOut({ callbackUrl: "/" });
     } catch (error) {
       console.error("Error deleting user:", error);
     }

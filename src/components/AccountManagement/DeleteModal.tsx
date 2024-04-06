@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/select";
 import { userSchema } from "@/utils/types";
 import { z } from "zod";
+import { signOut, useSession } from "next-auth/react";
+import router from "next/router";
 
 const idSchema = z.string().length(24);
 
@@ -36,6 +38,7 @@ const UPDATE_LABEL_MAP: Record<UpdateLabel, string> = {
 };
 
 function DeleteModal({ open, setOpen, admin }: Props) {
+  const { status, data } = useSession();
   const [selectedRole, setSelectedRole] = useState<UpdateLabel>(
     UpdateLabel.Student,
   );
@@ -44,19 +47,41 @@ function DeleteModal({ open, setOpen, admin }: Props) {
     return <div></div>;
   }
 
+  const isCurrUser = async () => {
+    try {
+      const response = await fetch(`/api/users/${data?.user._id}`);
+      const responseData = await response.json();
+      const email = responseData.email;
+      if (email === admin.email) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error fetching user status");
+    }
+  };
+
   const handleUpdateRole = async () => {
     if (selectedRole === UpdateLabel.Delete) {
       await handleDeleteAccount();
       return;
     }
     try {
-      await handleAdminDelete();
+      const response = (await handleAdminDelete()) as Response;
+      if (!response.ok) {
+        console.log("Error deleting admin:", await response.text());
+        return;
+      }
       const userData = await fetchUserByEmail(admin.email);
       if (userData) {
         const updatedUserData = { ...userData, label: selectedRole };
         await updateUser(updatedUserData);
       }
       setOpen(false);
+      const currUser = await isCurrUser();
+      if (currUser) {
+        router.push("/");
+      }
     } catch (error) {
       console.error("Error updating role:", error);
     }
@@ -69,21 +94,31 @@ function DeleteModal({ open, setOpen, admin }: Props) {
       });
       if (!response.ok) {
         const error = await response.text();
-        console.error(error);
+        return error;
       }
+      return response;
     } catch (error) {
       console.error("Error deleting admin:", error);
+      return error;
     }
   };
 
   const handleDeleteAccount = async () => {
     try {
-      await handleAdminDelete();
+      const response = (await handleAdminDelete()) as Response;
+      if (!response.ok) {
+        console.log("Error deleting admin:", await response.text());
+        return;
+      }
       const userData = await fetchUserByEmail(admin.email);
       if (userData) {
         await deleteUser(userData._id);
       }
       setOpen(false);
+      const currUser = await isCurrUser();
+      if (currUser) {
+        signOut({ callbackUrl: "/" });
+      }
     } catch (error) {
       console.error("Error deleting account:", error);
     }

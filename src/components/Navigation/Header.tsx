@@ -83,7 +83,7 @@ const Header = () => {
 
   function handleSignUpLogOut() {
     if (userType !== UserType.Public) {
-      signOut();
+      signOut({ callbackUrl: "/" });
     } else {
       router.push("/signup");
     }
