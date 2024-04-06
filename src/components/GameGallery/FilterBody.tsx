@@ -217,7 +217,7 @@ export default function FilterBody({
         })}
       </div>
 
-      <div className=" mb-[60px] ml-[52px] mr-[52px] flex flex-row justify-between">
+      <div className=" mb-[60px] mr-[52px] flex flex-row justify-between">
         <button
           onClick={clearSelections}
           className="font-sans font-semibold text-blue-primary"
