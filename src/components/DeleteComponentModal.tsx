@@ -12,8 +12,7 @@ import {
 import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
 import { useRef, Dispatch } from "react";
-import { populatedGameWithId } from "@/server/db/models/GameModel";
-import { GameDataState } from "@/pages/games/[id]/edit";
+import { GameDataState } from "./GameScreen/GamePage";
 
 interface Props {
   deleteType: string;

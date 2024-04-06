@@ -18,8 +18,7 @@ import {
 import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
 import { useRef, useState, useEffect, Dispatch } from "react";
-import { populatedGameWithId } from "@/server/db/models/GameModel";
-import { GameDataState } from "@/pages/games/[id]/edit";
+import { GameDataState } from "./GamePage";
 export const youtubeREGEX =
   /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|live\/|v\/)?)([\w\-]+)(\S+)?$/;
 export const vimeoREGEX =

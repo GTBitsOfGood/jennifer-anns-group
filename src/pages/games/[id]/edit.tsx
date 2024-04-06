@@ -12,12 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { uploadApplicationFile } from "@/utils/file";
 import { v4 as uuidv4 } from "uuid";
-
-export type GameDataState = populatedGameWithId & {
-  parentingGuideFile: File | undefined;
-  answerKeyFile: File | undefined;
-  lessonFile: File | undefined;
-};
+import { GameDataState } from "@/components/GameScreen/GamePage";
 
 const EditGamePage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();

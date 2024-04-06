@@ -2,16 +2,14 @@ import { Pencil, Upload, X } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { Label } from "../ui/label";
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { GameDataState } from "@/pages/games/[id]/edit";
+import { useEffect, useRef, useState } from "react";
+import { GameDataState } from "../GameScreen/GamePage";
 
 interface Props {
   title: string;

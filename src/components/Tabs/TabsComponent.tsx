@@ -13,9 +13,9 @@ import GameBuildList from "../GameGallery/GameBuildList";
 import VideoComponent from "./VideoComponent";
 import { Button } from "../ui/button";
 import { X } from "lucide-react";
-import { GameDataState } from "@/pages/games/[id]/edit";
 import UploadModal from "./UploadModal";
 import DeleteComponentModal from "../DeleteComponentModal";
+import { GameDataState } from "../GameScreen/GamePage";
 
 interface Props {
   mode: string;
