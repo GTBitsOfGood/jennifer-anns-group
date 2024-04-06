@@ -72,6 +72,22 @@ export async function getUser(id: z.infer<typeof idSchema>) {
 }
 
 /**
+ * Gets a user by their email.
+ * @param {z.infer<typeof idSchema>} email Email of the user to get.
+ * @throws {UserDoesNotExistException} If unable to find user
+ */
+export async function getUserByEmail(email: string) {
+  await connectMongoDB();
+  const user = await UserModel.findOne({ email: email }).select(
+    "-hashedPassword",
+  );
+  if (!user) {
+    throw new UserDoesNotExistException();
+  }
+  return user;
+}
+
+/**
  * Edits a user.
  * @param {z.infer<typeof userSchema> & { _id: z.infer<typeof idSchema> }} userInfo Info of the user to find/update.
  * @throws {GenericUserErrorException} If changing email to an email that corresponds to a pre-existing account
@@ -139,4 +155,18 @@ export async function editPassword(
   if (!updatedUser) {
     throw new UserDoesNotExistException();
   }
+}
+
+/**
+ * Delete a user by their ID.
+ * @param {z.infer<typeof idSchema>} id ID of the user to delete.
+ * @throws {UserDoesNotExistException} If unable to find user
+ */
+export async function deleteUser(id: z.infer<typeof idSchema>) {
+  await connectMongoDB();
+  const user = await UserModel.findByIdAndDelete(id).select("-hashedPassword");
+  if (!user) {
+    throw new UserDoesNotExistException();
+  }
+  return user;
 }

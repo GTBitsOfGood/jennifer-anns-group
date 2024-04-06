@@ -13,14 +13,14 @@ import { AlertKeys, accountSchema } from "@/pages/signup";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 
-enum Label {
+export enum Label {
   Student = "student",
   Parent = "parent",
   Educator = "educator",
   Administrator = "administrator",
 }
 
-const ROLE_LABEL_MAP: Record<Label, string> = {
+export const ROLE_LABEL_MAP: Record<Label, string> = {
   [Label.Student]: "Student",
   [Label.Parent]: "Parent",
   [Label.Educator]: "Educator",
@@ -120,6 +120,22 @@ function InformationSlide({
       setIsAlertShowing(true);
       setAlertType("generic");
       return;
+    }
+    if (parse.data.label == "administrator") {
+      const admin = await fetch(
+        `/api/admin?email=${combinedAccountData.email}`,
+      );
+      if (!admin.ok) {
+        setIsAlertShowing(true);
+        setAlertType("generic");
+        return;
+      }
+      const admin_data = await admin.json();
+      if (Object.keys(admin_data).length == 0) {
+        setIsAlertShowing(true);
+        setAlertType("admin");
+        return;
+      }
     }
     const creds = signIn("credentials", {
       email: combinedAccountData.email,
