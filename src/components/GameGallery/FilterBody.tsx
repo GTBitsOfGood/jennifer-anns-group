@@ -1,11 +1,5 @@
 import { UserLabel, tagSchema } from "@/utils/types";
-import {
-  Checkbox,
-  CheckboxGroup,
-  Tag,
-  VStack,
-  useCheckboxGroup,
-} from "@chakra-ui/react";
+import { Tag, VStack } from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { z } from "zod";
 
@@ -41,6 +35,7 @@ export default function FilterBody({
     "Parenting guide",
     "Lesson plan",
     "Video trailer",
+    "Answer key",
   ];
   const [accessibilityOptions, setAccessibilityOptions] = useState<string[]>(
     [],
@@ -52,15 +47,10 @@ export default function FilterBody({
   );
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedGameContent, setSelectedGameContent] = useState<string[]>([]);
-  const { value, setValue, onChange } = useCheckboxGroup();
 
   useEffect(() => {
     getAllTags();
   }, []);
-
-  useEffect(() => {
-    setSelectedGameContent(value.map(String));
-  }, [value]);
 
   async function getAllTags() {
     const response = await fetch(`/api/tags`);
@@ -90,16 +80,15 @@ export default function FilterBody({
     setSelectedGameBuilds([]);
     setSelectedAccessibility([]);
     setSelectedTags([]);
-    setValue([]);
     setSelectedGameContent([]);
   }
 
   return (
-    <div>
-      <p className="mb-5 ml-16 mt-[93px] font-sans font-extrabold text-gray-500">
+    <div className="ml-16">
+      <p className="mb-5 mt-[93px] font-sans font-extrabold text-gray-500">
         Game builds
       </p>
-      <div className="mb-[52px] ml-[52px] mr-[52px]">
+      <div className="mb-[52px] mr-[52px]">
         {gameBuildsOptions.map((gameBuild) => {
           return (
             <Tag
@@ -128,43 +117,52 @@ export default function FilterBody({
         })}
       </div>
 
-      <p className="mb-5 ml-16	font-sans font-extrabold text-gray-500">
+      <p className="mb-5 font-sans font-extrabold text-gray-500">
         Game content
       </p>
-      <CheckboxGroup>
-        <VStack align="start" ml="52px" mb="52px">
-          {gameContentOptions.map((content) => {
-            return (
-              <Checkbox
-                key={content}
-                value={content}
-                isChecked={value.includes(content)}
-                onChange={onChange}
-                variant="filter"
-              >
-                {content}
-              </Checkbox>
-            );
-          })}
-          {userLabel === "administrator" ||
-          userLabel === "parent" ||
-          userLabel === "educator" ? (
-            <Checkbox
-              value={"Answer key"}
-              isChecked={value.includes("Answer key")}
-              onChange={onChange}
-              variant="filter"
-            >
-              Answer key
-            </Checkbox>
-          ) : null}
-        </VStack>
-      </CheckboxGroup>
+      <VStack align="start" mb="52px">
+        {gameContentOptions.map((content) => {
+          return (
+            (content !== "Answer key" ||
+              userLabel === "administrator" ||
+              userLabel === "parent" ||
+              userLabel === "educator") && (
+              <div key={content} className="flex items-center align-baseline">
+                <input
+                  id={content}
+                  value={content}
+                  onChange={() => {
+                    if (selectedGameContent.includes(content)) {
+                      setSelectedGameContent(
+                        selectedGameContent.filter((gc) => {
+                          return gc !== content;
+                        }),
+                      );
+                    } else {
+                      setSelectedGameContent([...selectedGameContent, content]);
+                    }
+                  }}
+                  className="peer mr-2 h-4 w-4 cursor-pointer rounded-none transition-colors duration-200 checked:text-blue-primary"
+                  name={content}
+                  type="checkbox"
+                  checked={selectedGameContent.includes(content)}
+                />
+                <label
+                  htmlFor={content}
+                  className="ml-2 cursor-pointer font-sans text-sm text-gray-500 peer-checked:text-blue-primary"
+                >
+                  {content}
+                </label>
+              </div>
+            )
+          );
+        })}
+      </VStack>
 
-      <p className="mb-5 ml-16	font-sans font-extrabold text-gray-500">
+      <p className="mb-5 font-sans font-extrabold text-gray-500">
         Accessibility
       </p>
-      <div className="mb-[52px] ml-[52px]">
+      <div className="mb-[52px]">
         {accessibilityOptions.map((a) => {
           return (
             <Tag
@@ -193,8 +191,8 @@ export default function FilterBody({
         })}
       </div>
 
-      <p className="mb-5 ml-16	font-sans font-extrabold text-gray-500">Tags</p>
-      <div className="mb-[52px] ml-[52px]">
+      <p className="mb-5 font-sans font-extrabold text-gray-500">Tags</p>
+      <div className="mb-[52px]">
         {tagsOptions?.map((t) => {
           return (
             <Tag
