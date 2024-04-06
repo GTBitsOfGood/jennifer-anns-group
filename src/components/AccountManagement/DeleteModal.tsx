@@ -49,7 +49,7 @@ function DeleteModal({ open, setOpen, admin }: Props) {
 
   const isCurrUser = async () => {
     try {
-      const response = await fetch(`/api/users/${data?.user._id}`);
+      const response = await fetch(`../api/users/${data?.user._id}`);
       const responseData = await response.json();
       const email = responseData.email;
       if (email === admin.email) {
@@ -67,18 +67,14 @@ function DeleteModal({ open, setOpen, admin }: Props) {
       return;
     }
     try {
-      const response = (await handleAdminDelete()) as Response;
-      if (!response.ok) {
-        console.log("Error deleting admin:", await response.text());
-        return;
-      }
+      await handleAdminDelete();
       const userData = await fetchUserByEmail(admin.email);
+      const currUser = await isCurrUser();
       if (userData) {
         const updatedUserData = { ...userData, label: selectedRole };
         await updateUser(updatedUserData);
       }
       setOpen(false);
-      const currUser = await isCurrUser();
       if (currUser) {
         router.push("/");
       }
@@ -105,19 +101,14 @@ function DeleteModal({ open, setOpen, admin }: Props) {
 
   const handleDeleteAccount = async () => {
     try {
-      const response = (await handleAdminDelete()) as Response;
-      if (!response.ok) {
-        console.log("Error deleting admin:", await response.text());
-        return;
-      }
+      await handleAdminDelete();
       const userData = await fetchUserByEmail(admin.email);
+      const currUser = await isCurrUser();
       if (userData) {
         await deleteUser(userData._id);
       }
-      setOpen(false);
-      const currUser = await isCurrUser();
       if (currUser) {
-        signOut({ callbackUrl: "/" });
+        signOut();
       }
     } catch (error) {
       console.error("Error deleting account:", error);

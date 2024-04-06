@@ -112,15 +112,6 @@ function InformationSlide({
       ...accountData,
       ...parse.data,
     };
-    const res = await fetch("/api/users", {
-      method: "POST",
-      body: JSON.stringify(combinedAccountData),
-    });
-    if (!res.ok) {
-      setIsAlertShowing(true);
-      setAlertType("generic");
-      return;
-    }
     if (parse.data.label == "administrator") {
       const admin = await fetch(
         `/api/admin?email=${combinedAccountData.email}`,
@@ -136,6 +127,15 @@ function InformationSlide({
         setAlertType("admin");
         return;
       }
+    }
+    const res = await fetch("/api/users", {
+      method: "POST",
+      body: JSON.stringify(combinedAccountData),
+    });
+    if (!res.ok) {
+      setIsAlertShowing(true);
+      setAlertType("generic");
+      return;
     }
     const creds = signIn("credentials", {
       email: combinedAccountData.email,
