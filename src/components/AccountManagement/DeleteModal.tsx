@@ -18,16 +18,17 @@ interface Props {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   admin: Admin | null | undefined;
+  fetchData: () => void;
 }
 
-export enum UpdateLabel {
+enum UpdateLabel {
   Student = "student",
   Parent = "parent",
   Educator = "educator",
   Delete = "delete",
 }
 
-export const UPDATE_LABEL_MAP: Record<UpdateLabel, string> = {
+const UPDATE_LABEL_MAP: Record<UpdateLabel, string> = {
   [UpdateLabel.Student]: "Student",
   [UpdateLabel.Parent]: "Parent",
   [UpdateLabel.Educator]: "Educator",
