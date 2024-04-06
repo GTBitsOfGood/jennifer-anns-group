@@ -6,9 +6,10 @@ interface Props {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   admin: Admin | null | undefined;
+  fetchData: () => void;
 }
 
-function DeleteModal({ open, setOpen, admin }: Props) {
+function DeleteModal({ open, setOpen, admin, fetchData }: Props) {
   if (!admin) {
     return <div></div>;
   }
@@ -23,6 +24,7 @@ function DeleteModal({ open, setOpen, admin }: Props) {
         console.log(error);
       } else {
         setOpen(false);
+        fetchData();
       }
     } catch (error) {
       console.log("Error deleting account:", error);

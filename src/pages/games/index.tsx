@@ -240,7 +240,7 @@ export default function Games() {
         <Divider borderColor="brand.700" borderWidth="1px" />
       </div>
 
-      <div className="m-auto mt-[60px] flex w-[85vw] flex-row justify-center">
+      <div className="m-auto mb-10 mt-[60px] flex w-[85vw] flex-row justify-center">
         <ThemeSidebar
           themes={themes}
           selectedTheme={selectedTheme}

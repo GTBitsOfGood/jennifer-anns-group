@@ -67,7 +67,7 @@ const AccountManagementPage = () => {
         </h1>
         <div className="mt-24 flex flex-col px-28">
           <div className="text-2xl font-semibold text-black">
-            Add New Account
+            Add New Admin Account
           </div>
           <div className="mt-5 flex flex-row flex-wrap justify-between gap-5">
             <input
@@ -94,7 +94,7 @@ const AccountManagementPage = () => {
             <div className="text-sm font-normal text-red-600">{emailError}</div>
           </div>
           <div className="mt-14 text-2xl font-semibold text-black">
-            Manage Accounts
+            Manage Admin Accounts
           </div>
           <div className="font-['DM Sans'] mx-1 mt-14 flex flex-row justify-between text-base font-medium leading-7 text-slate-400">
             <div>Email</div>
@@ -147,6 +147,7 @@ const AccountManagementPage = () => {
           open={deleteModalDisclosure}
           setOpen={setDeleteModalDisclosure}
           admin={selectedDeleteAdmin}
+          fetchData={fetchData}
         />
       </div>
     </div>
