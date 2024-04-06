@@ -21,7 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { GameDataState } from "@/pages/games/[id]/edit";
+import { GameDataState } from "../GameScreen/GamePage";
 
 interface Props {
   gameData: GameDataState;
