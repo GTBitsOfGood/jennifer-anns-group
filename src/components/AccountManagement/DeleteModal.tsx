@@ -35,13 +35,13 @@ export const UPDATE_LABEL_MAP: Record<UpdateLabel, string> = {
 };
 
 function DeleteModal({ open, setOpen, admin }: Props) {
-  if (!admin) {
-    return <div></div>;
-  }
-
   const [selectedRole, setSelectedRole] = useState<UpdateLabel>(
     UpdateLabel.Student,
   );
+
+  if (!admin) {
+    return <div></div>;
+  }
 
   const handleUpdateRole = async () => {
     if (selectedRole === UpdateLabel.Delete) {
