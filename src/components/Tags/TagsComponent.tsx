@@ -11,7 +11,7 @@ import { Dispatch, useEffect, useState } from "react";
 import SearchTagsComponent from "./SearchTagsComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { tagSchema, themeSchema } from "@/utils/types";
-import { GameDataState } from "@/pages/games/[id]/edit";
+import { GameDataState } from "../GameScreen/GamePage";
 
 const themeDataSchema = themeSchema.extend({
   _id: z.string().length(24),

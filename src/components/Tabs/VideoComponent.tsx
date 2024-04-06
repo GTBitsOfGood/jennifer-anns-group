@@ -5,7 +5,7 @@ import AddEditVideoTrailer from "../GameScreen/AddEditVideoTrailerComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { Dispatch } from "react";
 import { CloseIcon } from "@chakra-ui/icons";
-import { GameDataState } from "@/pages/games/[id]/edit";
+import { GameDataState } from "../GameScreen/GamePage";
 
 interface Props {
   gameData: GameDataState;
