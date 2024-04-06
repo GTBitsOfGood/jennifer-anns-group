@@ -5,10 +5,11 @@ import AddEditVideoTrailer from "../GameScreen/AddEditVideoTrailerComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { Dispatch } from "react";
 import { CloseIcon } from "@chakra-ui/icons";
+import { GameDataState } from "@/pages/games/[id]/edit";
 
 interface Props {
-  gameData: populatedGameWithId;
-  setGameData?: Dispatch<populatedGameWithId>;
+  gameData: GameDataState;
+  setGameData: Dispatch<React.SetStateAction<GameDataState | undefined>>;
   edit: boolean;
 }
 

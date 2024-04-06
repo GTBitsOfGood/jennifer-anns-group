@@ -9,15 +9,29 @@ import AddEditWebGLComponent from "@/components/GameScreen/AddEditWebGLComponent
 import DeleteComponentModal from "@/components/DeleteComponentModal";
 import { useDisclosure } from "@chakra-ui/react";
 import { Button } from "@/components/ui/button";
+import { useMutation } from "@tanstack/react-query";
+import { uploadApplicationFile } from "@/utils/file";
+import { v4 as uuidv4 } from "uuid";
+
+export type GameDataState = populatedGameWithId & {
+  parentingGuideFile: File | undefined;
+  answerKeyFile: File | undefined;
+  lessonFile: File | undefined;
+};
 
 const EditGamePage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
   const gameID = router.query.id;
-  const [gameData, setGameData] = useState<populatedGameWithId>();
+  const [gameData, setGameData] = useState<GameDataState | undefined>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [name, setName] = useState("");
+
+  const { mutateAsync: getDirectUpload } = useMutation({
+    mutationFn: (file: File) => fetch("/api/file").then((res) => res.json()),
+  });
+
   const getGame = async () => {
     try {
       const response = await fetch(`/api/games/${gameID}`);
@@ -54,6 +68,70 @@ const EditGamePage = () => {
   };
 
   const saveChanges = async () => {
+    const fieldInputs: Record<
+      "parentingGuide" | "answerKey" | "lesson",
+      string | undefined
+    > = {
+      parentingGuide: gameData?.parentingGuide,
+      answerKey: gameData?.answerKey,
+      lesson: gameData?.lesson,
+    };
+    const pdfInputs: Record<
+      "parentingGuide" | "answerKey" | "lesson",
+      File | undefined
+    > = {
+      parentingGuide: gameData?.parentingGuideFile,
+      answerKey: gameData?.answerKeyFile,
+      lesson: gameData?.lessonFile,
+    };
+
+    const pdfInputsKeys = Object.keys(pdfInputs);
+
+    const nonNullPdfInputsKeys = pdfInputsKeys.filter(
+      (k) => pdfInputs[k as keyof typeof pdfInputs],
+    );
+
+    const directUploadUrls = await Promise.all(
+      nonNullPdfInputsKeys.map((k) =>
+        getDirectUpload(pdfInputs[k as keyof typeof pdfInputs] as File),
+      ),
+    );
+
+    const fieldDirectUploadUrls: Record<
+      string,
+      { uploadUrl: string; uploadAuthToken: string }
+    > = nonNullPdfInputsKeys.reduce((acc, cur, i) => {
+      return { ...acc, [cur]: directUploadUrls[i] };
+    }, {});
+
+    const storedUrls = await Promise.all(
+      nonNullPdfInputsKeys.map((key) =>
+        uploadApplicationFile(
+          fieldDirectUploadUrls[key].uploadUrl,
+          pdfInputs[key as keyof typeof pdfInputs] as File,
+          fieldDirectUploadUrls[key].uploadAuthToken,
+          uuidv4(),
+        ),
+      ),
+    );
+
+    const fieldStoredUrls: Record<string, string> = nonNullPdfInputsKeys.reduce(
+      (acc, cur, i) => {
+        return { ...acc, [cur as keyof typeof pdfInputs]: storedUrls[i] };
+      },
+      {},
+    );
+
+    const nullPdfInputsKeys = Object.keys(fieldInputs).filter(
+      (k) => !fieldInputs[k as keyof typeof fieldInputs],
+    );
+    const nullPdfInputsNewValues = nullPdfInputsKeys.reduce((acc, cur) => {
+      return {
+        ...acc,
+        [cur]: "",
+      };
+    }, {});
+
     const themeIds = gameData?.themes.map((theme) => {
       return theme._id;
     });
@@ -68,6 +146,8 @@ const EditGamePage = () => {
       name: gameData?.name,
       builds: gameData?.builds,
       videoTrailer: gameData?.videoTrailer,
+      ...nullPdfInputsNewValues,
+      ...fieldStoredUrls,
     };
 
     await fetch(`/api/games/${gameID}`, {
