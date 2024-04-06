@@ -165,7 +165,7 @@ export async function getSelectedGames(
   const { page, ...filterSteps } = query;
   let initialFilterAnd: FilterQuery<IGame> = {};
   let initialFilterOr: FilterQuery<IGame> = {};
-  console.log(filterSteps.theme);
+  // console.log(filterSteps.theme);
   // filter by query parameters
   for (const [key, value] of Object.entries(filterSteps)) {
     const handler = QUERY_FIELD_HANDLER_MAP[key as keyof typeof filterSteps];
@@ -271,16 +271,16 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
     return aggregate;
   },
   theme: async (theme, filterFieldsAnd, filterFieldsOr) => {
-    console.log("theme", theme);
+    // console.log("theme", theme);
     const foundThemes = await ThemeModel.find({
       name: {
         $in: theme,
       },
     });
-    console.log("foundThemes", foundThemes);
+    // console.log("foundThemes", foundThemes);
     if (foundThemes.length !== theme?.length) {
-      console.log("themes.length", theme?.length);
-      console.log("foundThemes.length", foundThemes.length);
+      // console.log("themes.length", theme?.length);
+      // console.log("foundThemes.length", foundThemes.length);
       throw new ThemeNotFoundException("One or more themes are invalid.");
     }
     filterFieldsAnd.themes = {
