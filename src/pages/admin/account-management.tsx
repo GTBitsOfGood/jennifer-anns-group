@@ -35,7 +35,7 @@ const AccountManagementPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [deleteModalDisclosure]);
 
   const handleAddAccount = async () => {
     try {
@@ -59,6 +59,13 @@ const AccountManagementPage = () => {
     }
   };
 
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleAddAccount();
+    }
+  };
+
   return (
     <div>
       <div className="mb-28 mt-10">
@@ -77,6 +84,7 @@ const AccountManagementPage = () => {
               placeholder="Email"
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
+              onKeyDown={handleKeyPress}
               name="Email"
             />
             <Button
