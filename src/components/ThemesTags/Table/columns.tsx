@@ -1,15 +1,6 @@
 import { IBuild, IGame } from "@/server/db/models/GameModel";
 import { ExtendId } from "@/utils/types";
 import { ColumnDef } from "@tanstack/react-table";
-import { Pencil } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-
-import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
 import EditPopover from "./EditPopover";
 import { ITheme } from "@/server/db/models/ThemeModel";
 import { ITag } from "@/server/db/models/TagModel";
@@ -28,23 +19,25 @@ export const columns: ColumnDef<
   {
     accessorKey: "name",
     header: "Game Title",
+    meta: "w-1/6",
   },
   {
     id: "themes",
     header: "Themes",
+    meta: "w-1/4",
     cell: ({ row }) => {
       return (
         <div className="flex flex-row items-center gap-2">
-          <div className="flex flex-row">
+          <div className="flex flex-row flex-wrap">
             {row.original.themes.map((theme) => {
               return (
-                <Tag key={theme._id} variant="theme" className="group">
+                <Tag key={theme._id} variant="theme" className="group m-0.5">
                   {theme.name}
                 </Tag>
               );
             })}
+            <EditPopover gameId={row.original._id} contentType="theme" />
           </div>
-          <EditPopover gameId={row.original._id} contentType="theme" />
         </div>
       );
     },
@@ -52,23 +45,27 @@ export const columns: ColumnDef<
   {
     id: "accessibility",
     header: "Accessibility",
+    meta: "w-1/4",
     cell: ({ row }) => {
       return (
         <div className="flex flex-row items-center gap-2">
-          <div className="flex flex-row">
+          <div className="flex flex-row flex-wrap">
             {row.original.accessibility.map((accessibilityTag) => {
               return (
                 <Tag
                   key={accessibilityTag._id}
                   variant="accessibility"
-                  className="group"
+                  className="group m-0.5"
                 >
                   {accessibilityTag.name}
                 </Tag>
               );
             })}
+            <EditPopover
+              gameId={row.original._id}
+              contentType="accessibility"
+            />
           </div>
-          <EditPopover gameId={row.original._id} contentType="accessibility" />
         </div>
       );
     },
@@ -76,19 +73,24 @@ export const columns: ColumnDef<
   {
     id: "custom",
     header: "Tags",
+    meta: "w-1/3",
     cell: ({ row }) => {
       return (
         <div className="flex flex-row items-center gap-2">
-          <div className="flex flex-row">
+          <div className="flex flex-row flex-wrap">
             {row.original.custom.map((customTag) => {
               return (
-                <Tag key={customTag._id} variant="custom" className="group">
+                <Tag
+                  key={customTag._id}
+                  variant="custom"
+                  className="group m-0.5"
+                >
                   {customTag.name}
                 </Tag>
               );
             })}
+            <EditPopover gameId={row.original._id} contentType="custom" />
           </div>
-          <EditPopover gameId={row.original._id} contentType="custom" />
         </div>
       );
     },

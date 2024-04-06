@@ -303,7 +303,12 @@ describe("MongodDB Game - Unit Test", () => {
         resultsPerPage,
       );
     }
-    filteredGames = filteredGames.sort((a, b) => a.name.localeCompare(b.name));
+    filteredGames = filteredGames.filter((game) => game.preview === false);
+    filteredGames = filteredGames.sort((a, b) => {
+      if (a.lowercaseName && b.lowercaseName) {
+        return a.lowercaseName.localeCompare(b.lowercaseName);
+      } else return a.name.localeCompare(b.name); //Simply for validating the type,as lowercaseName will actually always be present.
+    });
     filteredGames = QUERY_FIELD_HANDLER_MAP["page"](
       filteredGames,
       page!,

@@ -29,6 +29,8 @@ async function deleteAdminHandler(req: NextApiRequest, res: NextApiResponse) {
     );
     return res.status(HTTP_STATUS_CODE.OK).send(deletedAdmin);
   } catch (e: any) {
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
   }
 }

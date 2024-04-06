@@ -25,6 +25,11 @@ const BuildSchema = new Schema<IBuild>({
 const GameSchema = new Schema<IGame>(
   {
     name: { type: String, required: true, unique: true },
+    lowercaseName: {
+      type: String,
+      required: true,
+      select: false,
+    },
     themes: {
       type: [Schema.Types.ObjectId],
       ref: "Theme",
@@ -44,6 +49,7 @@ const GameSchema = new Schema<IGame>(
     parentingGuide: { type: String },
     answerKey: { type: String },
     videoTrailer: { type: String },
+    preview: { type: Boolean, required: true },
   },
   { versionKey: false },
 );

@@ -12,29 +12,36 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useRef } from "react";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   gameID: string | string[] | undefined;
+  preview: boolean;
 }
 
-export default function DiscardChanges({ gameID }: Props) {
+export default function DiscardChanges({ gameID, preview }: Props) {
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement | null>(null);
 
   const discard = () => {
-    router.push(`/games/${gameID}`);
+    if (preview) {
+      router.push(`/games/${gameID}/preview`);
+    } else {
+      router.push(`/games/${gameID}`);
+    }
   };
 
   return (
     <ChakraProvider theme={chakraTheme}>
       <div>
-        <button
+        <Button
           onClick={onOpen}
-          className="rounded-xl bg-input-border px-6 py-3 font-sans text-2xl font-medium text-blue-primary"
+          variant="outline2"
+          className="px-5 py-6 text-xl font-semibold"
         >
           Discard changes
-        </button>
+        </Button>
         <AlertDialog
           motionPreset="slideInBottom"
           leastDestructiveRef={cancelRef}

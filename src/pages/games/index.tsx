@@ -180,7 +180,7 @@ export default function Games() {
           ) : null}
         </div>
 
-        <div className="m-auto ml-[10vw] w-[80vw]">
+        <div className="m-auto w-[85vw]">
           <Divider borderColor="brand.700" borderWidth="1px" />
         </div>
 

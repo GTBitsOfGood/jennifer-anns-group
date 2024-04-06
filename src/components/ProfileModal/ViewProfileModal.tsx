@@ -55,13 +55,22 @@ function ViewProfileModal(props: ViewProps) {
         </div>
       </div>
       <DialogFooter>
-        <Button
-          variant="mainblue"
-          className="px-6 text-lg"
-          onClick={() => props.setProfileState("edit")}
-        >
-          Edit
-        </Button>
+        <div className="relative mt-10 w-full">
+          <Button
+            variant="destructive"
+            className="absolute bottom-0 left-0 px-4 font-sans text-lg font-semibold"
+            onClick={() => props.setProfileState("deleteUser")}
+          >
+            Delete Profile
+          </Button>
+          <Button
+            variant="mainblue"
+            className="absolute bottom-0 right-0 px-4 text-lg"
+            onClick={() => props.setProfileState("edit")}
+          >
+            Edit
+          </Button>
+        </div>
       </DialogFooter>
     </>
   );

@@ -8,6 +8,7 @@ export interface IAdmin extends z.infer<typeof adminSchema> {}
 
 const AdminSchema = new Schema<IAdmin>({
   email: { type: String, required: true, unique: true },
+  lowercaseEmail: { type: String, required: true, select: false },
 });
 
 AdminSchema.pre("findOneAndDelete", async function (next) {

@@ -121,7 +121,7 @@ export default function GameCardView({
 
   return (
     <div className="ml-6 flex w-full flex-row flex-wrap">
-      {games.length > 0 ? (
+      {games?.length > 0 ? (
         games.map((game) => {
           return (
             <div key={game.name} className="mb-6 ml-6">
