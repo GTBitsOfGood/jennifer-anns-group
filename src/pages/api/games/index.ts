@@ -115,8 +115,8 @@ const convertINT = (val: string, ctx: RefinementCtx) => {
     return result;
   }
 };
-const putSingleStringInArray = (val: string) => {
-  return [val];
+const putSingleStringInArray = (str: string) => {
+  return str.split(",").map((val) => val.trim());
 };
 
 //Query parameters can pass in a single value but need to be an array, so modifying it to expect that.
