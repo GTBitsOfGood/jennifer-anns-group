@@ -165,6 +165,7 @@ export async function getSelectedGames(
   const { page, ...filterSteps } = query;
   let initialFilterAnd: FilterQuery<IGame> = {};
   let initialFilterOr: FilterQuery<IGame> = {};
+  console.log(filterSteps.theme);
   // filter by query parameters
   for (const [key, value] of Object.entries(filterSteps)) {
     const handler = QUERY_FIELD_HANDLER_MAP[key as keyof typeof filterSteps];
