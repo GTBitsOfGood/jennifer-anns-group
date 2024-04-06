@@ -12,10 +12,10 @@ export const Footer = () => {
   };
 
   return (
-    <div className="flex w-full justify-center border-t border-zinc-200">
-      <div className="flex w-[calc(100%-4rem)] max-w-7xl flex-col justify-between">
-        <div className="flex justify-between p-12">
-          <div className="mb-5 ml-5 mr-5">
+    <div>
+      <div className="flex w-full justify-center border-t border-zinc-200">
+        <div className="flex w-[calc(100%-4rem)] max-w-7xl flex-row justify-between py-24">
+          <div className="mb-5 ml-5 mr-5 shrink-0">
             <img
               src="/logo_gray.svg"
               className="mb-5 h-36 w-36"
@@ -52,7 +52,7 @@ export const Footer = () => {
               )}
             </div>
           </div>
-          <div className="m-5">
+          <div className="mb-5 ml-5 mr-5 mt-7 shrink lg:ml-[20vw] lg:mr-[5vw]">
             <div className="mb-10 font-dm-sans text-xl font-bold leading-snug text-indigo-950">
               Mission
             </div>
@@ -61,15 +61,15 @@ export const Footer = () => {
               advocacy.
             </div>
           </div>
-          <div className="m-5">
+          <div className="m-5 mt-7 shrink-0">
             <div className="mb-10 font-dm-sans text-xl font-bold leading-snug text-indigo-950">
               Contact us
             </div>
             <img className="w-full" src="/contact.svg" alt="Contact"></img>
           </div>
         </div>
-        <div className="mx-auto mb-12 w-11/12 border-t border-zinc-200"></div>
       </div>
+      <div className="mx-auto mb-20 w-11/12 border-t border-zinc-200"></div>
     </div>
   );
 };
