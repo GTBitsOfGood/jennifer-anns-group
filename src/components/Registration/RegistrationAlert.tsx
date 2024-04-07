@@ -27,7 +27,7 @@ const RegistrationAlert = (props: PropsWithChildren<Props>) => {
         </svg>
       </button>
       <p className="mb-2 text-xs text-red-500">{props.title}</p>
-      <p className="text-xs text-grey">{props.children}</p>
+      <div className="text-xs text-grey">{props.children}</div>
     </div>
   );
 };

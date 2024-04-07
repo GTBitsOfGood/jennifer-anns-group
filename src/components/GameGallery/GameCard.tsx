@@ -1,7 +1,12 @@
 import { Card, Image, CardBody, Stack } from "@chakra-ui/react";
-import { gameDataSchema } from "@/pages/games";
 import z from "zod";
 import { useRouter } from "next/router";
+import { gameSchema } from "@/utils/types";
+
+const idSchema = z.string().length(24);
+const gameDataSchema = gameSchema.extend({
+  _id: idSchema,
+});
 
 interface Props {
   game: z.infer<typeof gameDataSchema>;
