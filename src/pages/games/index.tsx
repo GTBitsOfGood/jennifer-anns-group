@@ -16,7 +16,6 @@ import {
   Button,
   PopoverCloseButton,
 } from "@chakra-ui/react";
-import { themeSchema } from "@/utils/types";
 import {
   Search2Icon,
   TriangleDownIcon,
@@ -28,50 +27,39 @@ import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
 import ThemeSidebar from "@/components/GameGallery/ThemeSidebar";
 import SelectedFilters from "@/components/GameGallery/SelectedFilters";
-import GameCardView from "@/components/GameGallery/GameCardView";
+import GameCardView, {
+  gameDataSchema,
+} from "@/components/GameGallery/GameCardView";
 import GamesPagination from "@/components/GameGallery/GamesPagination";
-import { PageRequiredGameQuery } from "@/components/ThemesTags/GamesSection";
+import {
+  PageRequiredGameQuery,
+  generateQueryUrl,
+} from "@/components/ThemesTags/GamesSection";
 
 export default function Games() {
   const { data: session } = useSession();
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
-  const [themes, setThemes] = useState<string[]>([]);
-  const [selectedTheme, setSelectedTheme] = useState("All Games");
-  const [gameBuilds, setGameBuilds] = useState<string[]>([]);
-  const [gameContent, setGameContent] = useState<string[]>([]);
-  const [accessibility, setAccessibility] = useState<string[]>([]);
-  const [tags, setTags] = useState<string[]>([]);
-  const [name, setName] = useState("");
   const router = useRouter();
-  const [filtersApplied, setFiltersApplied] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [results, setResults] = useState<z.infer<typeof gameDataSchema>[]>([]);
 
   const [currPage, setCurrPage] = useState(1);
   const [numPages, setNumPages] = useState(0);
   const [filters, setFilters] = useState<PageRequiredGameQuery>({
     page: 1,
+    theme: [],
   });
-
-  useEffect(() => {
-    getThemes();
-  }, []);
-
-  async function getThemes() {
-    const response = await fetch(`/api/themes`);
-    const data = await response.json();
-    const themesString = data.map((theme: z.infer<typeof themeSchema>) => {
-      return theme.name;
-    });
-    themesString.sort();
-    setThemes(themesString);
-  }
 
   useEffect(() => {
     if (currentUser) {
       getUserData();
     }
   }, [currentUser, userData?.label]);
+
+  useEffect(() => {
+    filterGames();
+  }, [filters]);
 
   async function getUserData() {
     try {
@@ -83,9 +71,30 @@ export default function Games() {
     }
   }
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
-    setFiltersApplied(true);
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, ...rest } = filters;
+    const value = event.target.value;
+    if (value.length === 0) {
+      setFilters(rest);
+    }
+    if (value.length < 3 || value.length > 50) return;
+    setFilters({
+      ...rest,
+      name: event.target.value,
+      page: 1,
+    });
+  };
+
+  const filterGames = async () => {
+    try {
+      const response = await fetch(generateQueryUrl(filters));
+      const data = await response.json();
+      setNumPages(data.numPages);
+      setCurrPage(data.page);
+      setResults(data.games);
+    } catch (e: any) {
+      console.log(e.message);
+    }
   };
 
   return (
@@ -106,7 +115,7 @@ export default function Games() {
               </InputLeftElement>
               <Input
                 height="36px"
-                onChange={handleInputChange}
+                onChange={handleNameChange}
                 borderColor="gray.500"
                 bg="gray.50"
                 color="gray.500"
@@ -148,11 +157,8 @@ export default function Games() {
                 />
                 <PopoverBody>
                   <FilterBody
-                    setAcccessibility={setAccessibility}
-                    setGameBuilds={setGameBuilds}
-                    setGameContent={setGameContent}
-                    setTags={setTags}
-                    setFiltersApplied={setFiltersApplied}
+                    setFilters={setFilters}
+                    filters={filters}
                     userLabel={userData?.label}
                     onClose={onClose}
                   />
@@ -160,12 +166,7 @@ export default function Games() {
               </PopoverContent>
             </Popover>
             <div className="flex flex-row flex-wrap">
-              <SelectedFilters
-                gameBuilds={gameBuilds}
-                gameContent={gameContent}
-                accessibility={accessibility}
-                tags={tags}
-              />
+              <SelectedFilters filters={filters} />
             </div>
           </div>
           {userData?.label === "administrator" ? (
@@ -187,26 +188,8 @@ export default function Games() {
         <div>
           <div className="m-auto flex flex-row justify-center">
             <div className="m-auto mt-[60px] flex w-[85vw] flex-row">
-              <ThemeSidebar
-                themes={themes}
-                selectedTheme={selectedTheme}
-                setSelectedTheme={setSelectedTheme}
-                setFiltersApplied={setFiltersApplied}
-              />
-              <GameCardView
-                filtersApplied={filtersApplied}
-                setFiltersApplied={setFiltersApplied}
-                gameBuilds={gameBuilds}
-                gameContent={gameContent}
-                accessibility={accessibility}
-                tags={tags}
-                name={name}
-                selectedTheme={selectedTheme}
-                currPage={currPage}
-                setNumPages={setNumPages}
-                filters={filters}
-                setFilters={setFilters}
-              />
+              <ThemeSidebar filters={filters} setFilters={setFilters} />
+              <GameCardView results={results} />
             </div>
           </div>
           {numPages ? (

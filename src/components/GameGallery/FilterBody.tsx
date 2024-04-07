@@ -2,41 +2,36 @@ import { UserLabel, tagSchema } from "@/utils/types";
 import { Tag, VStack } from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { z } from "zod";
+import { PageRequiredGameQuery } from "../ThemesTags/GamesSection";
 
 interface Props {
-  setGameBuilds: Dispatch<SetStateAction<string[]>>;
-  setGameContent: Dispatch<SetStateAction<string[]>>;
-  setAcccessibility: Dispatch<SetStateAction<string[]>>;
-  setTags: Dispatch<SetStateAction<string[]>>;
-  setFiltersApplied: Dispatch<SetStateAction<boolean>>;
+  setFilters: Dispatch<SetStateAction<PageRequiredGameQuery>>;
+  filters: PageRequiredGameQuery;
   userLabel: UserLabel | undefined;
   onClose: () => void;
 }
+export const gameBuildsMap: Record<string, string> = {
+  amazon: "Amazon",
+  android: "Android",
+  appstore: "App Store",
+  linux: "Linux",
+  mac: "Mac",
+  webgl: "WebGL",
+  windows: "Windows",
+};
+export const gameContentsMap: Record<string, string> = {
+  parentingGuide: "Parenting guide",
+  lessonPlan: "Lesson plan",
+  videoTrailer: "Video trailer",
+  answerKey: "Answer key",
+};
 
 export default function FilterBody({
-  setGameBuilds,
-  setGameContent,
-  setAcccessibility,
-  setTags,
-  setFiltersApplied,
+  setFilters,
+  filters,
   userLabel,
   onClose,
 }: Props) {
-  const gameBuildsOptions = [
-    "Amazon",
-    "Android",
-    "App Store",
-    "Linux",
-    "Mac",
-    "WebGL",
-    "Windows",
-  ];
-  const gameContentOptions = [
-    "Parenting guide",
-    "Lesson plan",
-    "Video trailer",
-    "Answer key",
-  ];
   const [accessibilityOptions, setAccessibilityOptions] = useState<string[]>(
     [],
   );
@@ -68,11 +63,14 @@ export default function FilterBody({
   }
 
   function applyFilters() {
-    setGameBuilds(selectedGameBuilds);
-    setAcccessibility(selectedAccessibility);
-    setTags(selectedTags);
-    setGameContent(selectedGameContent);
-    setFiltersApplied(true);
+    setFilters({
+      ...filters,
+      gameBuilds: selectedGameBuilds,
+      accessibility: selectedAccessibility,
+      tags: selectedTags,
+      gameContent: selectedGameContent,
+      page: 1,
+    });
     onClose();
   }
 
@@ -81,6 +79,8 @@ export default function FilterBody({
     setSelectedAccessibility([]);
     setSelectedTags([]);
     setSelectedGameContent([]);
+    const { gameBuilds, accessibility, tags, gameContent, ...rest } = filters;
+    setFilters(rest);
   }
 
   return (
@@ -89,7 +89,7 @@ export default function FilterBody({
         Game builds
       </p>
       <div className="mb-[52px] mr-[52px]">
-        {gameBuildsOptions.map((gameBuild) => {
+        {Object.keys(gameBuildsMap).map((gameBuild) => {
           return (
             <Tag
               key={gameBuild}
@@ -111,7 +111,7 @@ export default function FilterBody({
               }}
               cursor="pointer"
             >
-              {gameBuild}
+              {gameBuildsMap[gameBuild]}
             </Tag>
           );
         })}
@@ -121,9 +121,9 @@ export default function FilterBody({
         Game content
       </p>
       <VStack align="start" mb="52px">
-        {gameContentOptions.map((content) => {
+        {Object.keys(gameContentsMap).map((content) => {
           return (
-            (content !== "Answer key" ||
+            (content !== "answerKey" ||
               userLabel === "administrator" ||
               userLabel === "parent" ||
               userLabel === "educator") && (
@@ -151,7 +151,7 @@ export default function FilterBody({
                   htmlFor={content}
                   className="ml-2 cursor-pointer font-sans text-sm text-gray-500 peer-checked:text-blue-primary"
                 >
-                  {content}
+                  {gameContentsMap[content]}
                 </label>
               </div>
             )

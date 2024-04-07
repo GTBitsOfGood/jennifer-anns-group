@@ -22,7 +22,7 @@ type IncDecInput = { type: "inc" | "dec" };
 type DirectInput = { desiredPage: number };
 type PageChangeHandlerInput = IncDecInput | DirectInput;
 
-function generateQueryUrl(filters: GameQuery) {
+export function generateQueryUrl(filters: GameQuery) {
   let gamesUrl = "/api/games";
   const searchParams: string[] = [];
   Object.keys(filters).forEach((k) => {
@@ -131,6 +131,7 @@ function GamesSection() {
             setFilters({
               ...rest,
               name: e.target.value,
+              page: 1,
             });
           }}
         />

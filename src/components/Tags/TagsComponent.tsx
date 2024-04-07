@@ -11,6 +11,7 @@ import { Dispatch, useEffect, useState } from "react";
 import SearchTagsComponent from "./SearchTagsComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { tagSchema, themeSchema } from "@/utils/types";
+import { gameBuildsMap } from "@/components/GameGallery/FilterBody";
 
 const themeDataSchema = themeSchema.extend({
   _id: z.string().length(24),
@@ -89,10 +90,6 @@ export default function TagsComponent({
     }
   }
 
-  const capitalizeFirstLetter = (word: string) => {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-  };
-
   return (
     <ChakraProvider theme={chakraTheme}>
       <div>
@@ -104,7 +101,7 @@ export default function TagsComponent({
           {gameData.webGLBuild ? <Tag>WebGL</Tag> : null}
           {gameData.builds
             ? gameData.builds.map((build) => (
-                <Tag key={build.type}>{capitalizeFirstLetter(build.type)}</Tag>
+                <Tag key={build.type}>{gameBuildsMap[build.type]}</Tag>
               ))
             : null}
           {themes
