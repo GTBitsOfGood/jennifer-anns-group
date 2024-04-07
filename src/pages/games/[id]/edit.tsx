@@ -8,6 +8,7 @@ import pageAccessHOC from "@/components/HOC/PageAccess";
 import AddEditWebGLComponent from "@/components/GameScreen/AddEditWebGLComponent";
 import DeleteComponentModal from "@/components/DeleteComponentModal";
 import { useDisclosure } from "@chakra-ui/react";
+import DiscardChanges from "@/components/GameScreen/DiscardChanges";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { uploadApplicationFile } from "@/utils/file";
@@ -51,14 +52,6 @@ const EditGamePage = () => {
         ...gameData,
         name: newValue,
       });
-    }
-  };
-
-  const discardChanges = async () => {
-    if (gameData?.preview) {
-      router.push(`/games/${gameID}/preview`);
-    } else {
-      router.push(`/games/${gameID}`);
     }
   };
 
@@ -218,21 +211,13 @@ const EditGamePage = () => {
           admin={true}
         />
       ) : null}
-      <div className="mx-auto mb-40 mt-16 flex w-[80vw] justify-end font-sans">
-        <div className="absolute flex gap-4">
-          <Button
-            onClick={discardChanges}
-            variant="outline2"
-            className="px-5 py-6 text-xl font-semibold"
-          >
-            Discard changes
-          </Button>
+      <div className="mx-auto mb-40 mt-24 flex w-[80vw] justify-end">
+        <div className="absolute flex flex-row gap-10">
+          <DiscardChanges gameID={gameID} preview={gameData.preview} />
           <Button
             onClick={saveChanges}
             variant="mainblue"
             className="px-5 py-6 text-xl font-semibold"
-
-            // className="ml-8 rounded-xl bg-blue-primary px-6 py-5 font-sans text-2xl font-medium text-white"
           >
             Save changes
           </Button>

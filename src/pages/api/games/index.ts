@@ -70,6 +70,19 @@ async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
       custom: tags?.filter((tag) => tag.type === "custom") ?? [],
     }));
 
+    // sort themes and tags to always return in same order
+    tagSeparatedGames.forEach((game) => {
+      game.themes?.sort((a, b) =>
+        a._id.toString().localeCompare(b._id.toString()),
+      );
+      game.accessibility?.sort((a, b) =>
+        a._id.toString().localeCompare(b._id.toString()),
+      );
+      game.custom?.sort((a, b) =>
+        a._id.toString().localeCompare(b._id.toString()),
+      );
+    });
+
     return res.status(HTTP_STATUS_CODE.OK).send({
       games: tagSeparatedGames,
       numPages,
@@ -114,8 +127,11 @@ const convertINT = (val: string, ctx: RefinementCtx) => {
     return result;
   }
 };
-const putSingleStringInArray = (val: string) => {
-  return [val];
+
+// Note: not entirely sure why safeParse is always defaulting to using this
+// even when there are more than two values in the parameters.
+const putSingleStringInArray = (str: string) => {
+  return str.split(",").map((val) => val.trim());
 };
 
 //Query parameters can pass in a single value but need to be an array, so modifying it to expect that.

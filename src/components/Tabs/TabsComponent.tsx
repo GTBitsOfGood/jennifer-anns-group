@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { ChangeEvent, Dispatch, useState } from "react";
-import GameBuildList from "../GameGallery/GameBuildList";
+import GameBuildList from "../GameScreen/GameBuildList";
 import VideoComponent from "./VideoComponent";
 import { Button } from "../ui/button";
 import { X } from "lucide-react";
@@ -123,7 +123,8 @@ export default function TabsComponent({
             {((gameData.lesson && gameData.lesson !== "") ||
               mode === "edit") && (
               <TabPanel display="flex" flexDir="column" gap={2}>
-                {(gameData.lesson !== "" || gameData.lessonFile) && (
+                {((gameData.lesson && gameData.lesson !== "") ||
+                  gameData.lessonFile) && (
                   <iframe
                     className="w-full"
                     height="400"
@@ -143,7 +144,8 @@ export default function TabsComponent({
                       gameData={gameData}
                       setGameData={setGameData}
                     />
-                    {(gameData.lesson !== "" || gameData.lessonFile) && (
+                    {((gameData.lesson && gameData.lesson !== "") ||
+                      gameData.lessonFile) && (
                       <Button
                         type="button"
                         variant="outline"
@@ -167,7 +169,7 @@ export default function TabsComponent({
             {((gameData.parentingGuide && gameData.parentingGuide !== "") ||
               mode === "edit") && (
               <TabPanel display="flex" flexDir="column" gap={2}>
-                {(gameData.parentingGuide !== "" ||
+                {((gameData.parentingGuide && gameData.parentingGuide !== "") ||
                   gameData.parentingGuideFile) && (
                   <iframe
                     className="w-full"
@@ -191,7 +193,8 @@ export default function TabsComponent({
                       gameData={gameData}
                       setGameData={setGameData}
                     />
-                    {(gameData.parentingGuide !== "" ||
+                    {((gameData.parentingGuide &&
+                      gameData.parentingGuide !== "") ||
                       gameData.parentingGuideFile) && (
                       <Button
                         type="button"
@@ -216,7 +219,8 @@ export default function TabsComponent({
             {((gameData.answerKey && gameData.answerKey !== "" && authorized) ||
               mode === "edit") && (
               <TabPanel display="flex" flexDir="column" gap={2}>
-                {(gameData.answerKey !== "" || gameData.answerKeyFile) && (
+                {((gameData.answerKey && gameData.answerKey !== "") ||
+                  gameData.answerKeyFile) && (
                   <iframe
                     className="w-full"
                     height="400"
@@ -236,7 +240,8 @@ export default function TabsComponent({
                       gameData={gameData}
                       setGameData={setGameData}
                     />
-                    {(gameData.answerKey !== "" || gameData.answerKeyFile) && (
+                    {((gameData.answerKey && gameData.answerKey !== "") ||
+                      gameData.answerKeyFile) && (
                       <Button
                         type="button"
                         variant="outline"

@@ -1,14 +1,11 @@
-import React, { useRef } from "react";
 import pageAccessHOC from "@/components/HOC/PageAccess";
 import { z } from "zod";
 import cn from "classnames";
-
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TextArea } from "@/components/ui/textarea";
 import { AlertTriangleIcon, MoveLeft, Plus, Upload, X } from "lucide-react";
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import ThemeSelect from "@/components/Themes/ThemeSelect";
 import TagSelect from "@/components/Tags/TagSelect";
@@ -31,12 +28,14 @@ import { uploadApplicationFile } from "@/utils/file";
 const NAME_FORM_KEY = "name";
 const TRAILER_FORM_KEY = "videoTrailer";
 const DESCR_FORM_KEY = "description";
+const IMAGE_FORM_KEY = "image";
 const PARENTING_GUIDE_FORM_KEY = "parentingGuide";
 const LESSON_PLAN_FORM_KEY = "lesson";
 const ANSWER_KEY_FORM_KEY = "answerKey";
 
 export const createGameSchema = z.object({
   name: z.string().min(3, "Title must be at least 3 characters"),
+  image: z.string().min(1, "Image is required"),
   videoTrailer: z.string().url("Not a valid URL").or(z.literal("")),
   description: z.string().min(1, "Description is required"),
 });
@@ -112,7 +111,7 @@ async function uploadBuildFiles(gameId: string, files: Map<string, File>) {
 
 function CreateGame() {
   const router = useRouter();
-
+  const hiddenImagePreviewRef = useRef<HTMLInputElement>(null);
   const [themes, setThemes] = useState<ExtendId<ITheme>[]>([]);
   const [selectedThemes, setSelectedThemes] = useState<ExtendId<ITheme>[]>([]);
 
@@ -137,6 +136,7 @@ function CreateGame() {
   const [codeFile, setCodeFile] = useState<null | File>(null);
   const [frameworkFile, setFrameworkFile] = useState<null | File>(null);
 
+  const [imagePreviewFile, setImagePreviewFile] = useState<null | File>(null);
   const [fileValidationError, setFileValidationError] = useState<
     string | undefined
   >(undefined);
@@ -203,6 +203,7 @@ function CreateGame() {
     Record<keyof z.input<typeof createGameSchema>, string | undefined>
   >({
     name: undefined,
+    image: undefined,
     videoTrailer: undefined,
     description: undefined,
   });
@@ -264,7 +265,40 @@ function CreateGame() {
         setFileValidationError(undefined);
       }
     }
-
+    if (imagePreviewFile) {
+      if (
+        imagePreviewFile.type !== "image/png" &&
+        imagePreviewFile.type !== "image/jpg" &&
+        imagePreviewFile.type !== "image/jpeg"
+      ) {
+        setValidationErrors((prevValidationErrors) => ({
+          ...prevValidationErrors,
+          image: "Invalid Image: Only PNG, JPG, or JPEG permitted.",
+        }));
+        return;
+      }
+      const img = new Image();
+      img.src = URL.createObjectURL(imagePreviewFile);
+      img.onload = () => {
+        const naturalWidth = img.naturalWidth;
+        const naturalHeight = img.naturalHeight;
+        URL.revokeObjectURL(img.src);
+        if (naturalWidth !== 630 || naturalHeight !== 500) {
+          setValidationErrors((prevValidationErrors) => ({
+            ...prevValidationErrors,
+            image: "Image must have dimensions 630x500 pixels.",
+          }));
+          return;
+        }
+      };
+      img.onerror = () => {
+        setValidationErrors((prevValidationErrors) => ({
+          ...prevValidationErrors,
+          image: "Image failed to load",
+        }));
+        return;
+      };
+    }
     const formData = new FormData(e.currentTarget);
 
     const pdfFormKeys = [
@@ -321,6 +355,7 @@ function CreateGame() {
       videoTrailer: formData.get(TRAILER_FORM_KEY),
       description: formData.get(DESCR_FORM_KEY),
       builds: builds,
+      image: imagePreviewFile ? "http://dummy-image-url.com" : "", // Temporary image
       themes: selectedThemes.map((theme) => theme._id),
       tags: [...selectedAccessibilityTags, ...selectedCustomTags].map(
         (tag) => tag._id,
@@ -333,6 +368,7 @@ function CreateGame() {
     if (parse.success) {
       setValidationErrors({
         name: undefined,
+        image: undefined,
         videoTrailer: undefined,
         description: undefined,
       });
@@ -367,6 +403,7 @@ function CreateGame() {
       const errors = parse.error.formErrors.fieldErrors;
       setValidationErrors({
         name: errors.name?.at(0),
+        image: errors.image?.at(0),
         videoTrailer: errors.videoTrailer?.at(0),
         description: errors.description?.at(0),
       });
@@ -458,9 +495,67 @@ function CreateGame() {
               "h-12",
             )}
             disabled={submitting}
+            onChange={() => {
+              setValidationErrors({ ...validationErrors, name: undefined });
+            }}
           />
         </div>
 
+        <div className="relative flex w-full flex-col gap-3 md:w-2/5">
+          <label htmlFor={IMAGE_FORM_KEY} className="text-xl font-semibold">
+            Image Preview
+            <span className="text-orange-primary">*</span>
+          </label>
+          <div className="flex gap-6">
+            <Button
+              name={IMAGE_FORM_KEY}
+              variant="upload"
+              className={cn(
+                validationErrors.image
+                  ? "border-red-500 focus-visible:ring-red-500"
+                  : "",
+                "flex h-12 w-32 flex-row gap-3 self-start",
+              )}
+              type="button"
+              onClick={() => {
+                setValidationErrors({ ...validationErrors, image: undefined });
+                if (hiddenImagePreviewRef.current !== null) {
+                  hiddenImagePreviewRef.current.click();
+                }
+              }}
+            >
+              <Upload className="h-6 w-6" />
+              <p>Upload</p>
+            </Button>
+            {imagePreviewFile ? (
+              <div className="flex flex-row items-center gap-3">
+                <p>{imagePreviewFile.name}</p>
+                <X
+                  className="cursor-pointer text-orange-primary"
+                  type="button"
+                  size={18}
+                  onClick={() => {
+                    setImagePreviewFile(null);
+                  }}
+                />
+              </div>
+            ) : null}
+          </div>
+          <Input
+            type="file"
+            ref={hiddenImagePreviewRef}
+            accept=".jpg,.jpeg,.png"
+            className="hidden"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              if (
+                event.target.files === null ||
+                event.target.files.length === 0
+              )
+                return;
+              setImagePreviewFile(event.target.files[0]);
+            }}
+          ></Input>
+        </div>
         <div className="relative flex w-full flex-col gap-3 md:w-2/3">
           <label className="text-xl font-semibold">
             Game Build
@@ -500,6 +595,12 @@ function CreateGame() {
                 : "border-input-border focus:border-blue-primary",
               "h-12",
             )}
+            onChange={() => {
+              setValidationErrors({
+                ...validationErrors,
+                videoTrailer: undefined,
+              });
+            }}
           />
         </div>
 
@@ -516,6 +617,12 @@ function CreateGame() {
                 ? "border-red-500 focus-visible:ring-red-500"
                 : "border-input-border focus:border-blue-primary"
             }
+            onChange={() => {
+              setValidationErrors({
+                ...validationErrors,
+                description: undefined,
+              });
+            }}
           />
         </div>
 
@@ -694,7 +801,9 @@ function CreateGame() {
                   ? validationErrors.name
                   : validationErrors.videoTrailer
                     ? validationErrors.videoTrailer
-                    : "All required fields need to be filled."}
+                    : validationErrors.image
+                      ? validationErrors.image
+                      : "All required fields need to be filled."}
               </p>
             </div>
           )}

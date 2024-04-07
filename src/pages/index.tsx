@@ -183,7 +183,7 @@ const Home = () => {
                   }}
                 />
               )}
-              <div className="w-4/5 items-center">
+              <div className="flex w-4/5 flex-col items-center">
                 <h1 className="mb-12 text-center text-3xl font-medium">
                   {pageData.mdTitle}
                 </h1>
@@ -227,7 +227,7 @@ const Home = () => {
         <div className="flex w-full flex-col items-center bg-blue-bg px-32 py-16">
           <div className="flex flex-row items-center">
             <Image
-              src={`/social/Discord.svg`}
+              src={`/footer/social/Discord.svg`}
               className="mr-16 -rotate-6 fill-blue-primary"
               width={120}
               height={120}

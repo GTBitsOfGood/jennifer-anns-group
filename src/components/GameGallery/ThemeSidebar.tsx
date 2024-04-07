@@ -1,27 +1,38 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { PageRequiredGameQuery } from "../ThemesTags/GamesSection";
+import { themeSchema } from "@/utils/types";
+import { z } from "zod";
 
 interface Props {
-  themes: string[];
-  selectedTheme: string;
-  setSelectedTheme: Dispatch<SetStateAction<string>>;
-  setFiltersApplied: Dispatch<SetStateAction<boolean>>;
+  setFilters: Dispatch<SetStateAction<PageRequiredGameQuery>>;
+  filters: PageRequiredGameQuery;
 }
 
-export default function ThemeSidebar({
-  themes,
-  selectedTheme,
-  setSelectedTheme,
-  setFiltersApplied,
-}: Props) {
+export default function ThemeSidebar({ setFilters, filters }: Props) {
+  const [themes, setThemes] = useState<string[]>([]);
+
+  useEffect(() => {
+    getThemes();
+  }, []);
+
+  async function getThemes() {
+    const response = await fetch(`/api/themes`);
+    const data = await response.json();
+    const themesString = data.map((theme: z.infer<typeof themeSchema>) => {
+      return theme.name;
+    });
+    themesString.sort();
+    setThemes(themesString);
+  }
+
   return (
     <div className="flex h-[365px] w-[268px] flex-col overflow-y-scroll">
       <p
         onClick={() => {
-          setSelectedTheme("All Games");
-          setFiltersApplied(true);
+          setFilters({ ...filters, theme: [], page: 1 });
         }}
         className={
-          selectedTheme === "All Games"
+          filters.theme?.length === 0
             ? "mb-[26px] cursor-pointer font-sans text-2xl font-bold text-[#2352A0]"
             : "mb-[26px] cursor-pointer font-sans text-2xl text-neutral-500"
         }
@@ -34,11 +45,10 @@ export default function ThemeSidebar({
               <p
                 key={theme}
                 onClick={() => {
-                  setSelectedTheme(theme);
-                  setFiltersApplied(true);
+                  setFilters({ ...filters, theme: [theme], page: 1 });
                 }}
                 className={
-                  selectedTheme === theme
+                  filters.theme?.includes(theme)
                     ? "mb-[26px] cursor-pointer font-sans text-2xl font-bold text-[#2352A0]"
                     : "mb-[26px] cursor-pointer font-sans text-2xl text-neutral-500"
                 }

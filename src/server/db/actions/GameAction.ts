@@ -312,7 +312,7 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
   gameContent: async (gameContent, filterFieldsAnd, filterFieldsOr) => {
     if (gameContent) {
       filterFieldsAnd = gameContent.reduce((acc, curr) => {
-        acc[curr] = { $exists: true };
+        acc[curr] = { $exists: true, $ne: "" };
         return acc;
       }, filterFieldsAnd);
     }

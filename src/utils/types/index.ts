@@ -103,6 +103,7 @@ export const gameSchema = z.object({
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
   answerKey: z.string().url().optional(),
+  image: z.string().min(1, "Image is required"),
   videoTrailer: z.preprocess(
     (val) => (val === "" ? undefined : val),
     z.string().url().optional(),
@@ -158,6 +159,15 @@ export const userSchema = z.object({
 export const adminSchema = z.object({
   email: z.string().email("Not a valid email"),
   lowercaseEmail: z.string().email("Not a valid email").optional(),
+});
+
+// Email Format
+export const emailSchema = z.object({
+  email: z.string().email(),
+  firstName: z.string(),
+  lastName: z.string(),
+  message: z.string(),
+  gameName: z.string(),
 });
 
 export type ExtendId<T extends any> = T & { _id: string };

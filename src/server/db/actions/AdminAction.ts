@@ -15,6 +15,12 @@ export async function createAdmin(data: IAdmin) {
   if (existingAdmin) throw new AdminAlreadyExistsException();
   try {
     const admin = await AdminModel.create(data);
+    const correspondingUser = await UserModel.findOne({ email: admin.email });
+    if (correspondingUser) {
+      await UserModel.findByIdAndUpdate(correspondingUser._id, {
+        label: UserLabel.Administrator,
+      });
+    }
     return admin.toObject();
   } catch (e) {
     throw e;
