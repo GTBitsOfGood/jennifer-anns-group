@@ -183,7 +183,7 @@ const Home = () => {
                   }}
                 />
               )}
-              <div className="w-4/5 items-center">
+              <div className="flex w-4/5 flex-col items-center">
                 <h1 className="mb-12 text-center text-3xl font-medium">
                   {pageData.mdTitle}
                 </h1>

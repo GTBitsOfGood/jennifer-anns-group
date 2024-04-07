@@ -14,5 +14,5 @@ export default function MarkdownRenderer({
   const html = parse(markdown);
   const reactElement = htmlToReactParser.parse(html);
 
-  return <div className="prose">{reactElement}</div>;
+  return <div className="prose text-center">{reactElement}</div>;
 }
