@@ -224,7 +224,9 @@ const GamePage = ({ mode }: Props) => {
       {loaded && userData.label !== "administrator" && (
         <NotesComponent gameId={gameId} userId={userId} />
       )}
-      {loaded && userData.label !== "administrator" && <ContactComponent />}
+      {loaded && userData.label !== "administrator" && (
+        <ContactComponent gameName={gameData.name} />
+      )}
       <TagsComponent mode="view" gameData={gameData} admin={visibleAnswer} />
       {loaded && mode === "preview" && (
         <div className="relative my-10 flex w-11/12 justify-end gap-6 font-sans">
