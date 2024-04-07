@@ -9,6 +9,8 @@ export const Footer = () => {
     Instagram: ["https://www.instagram.com", "19", "19"],
     LinkedIn: ["https://www.linkedin.com", "19", "18"],
     YouTube: ["https://www.youtube.com", "21", "15"],
+    Mastodon: ["https://joinmastodon.org/", "19", "15"],
+    Pinterest: ["https://www.pinterest.com", "19", "19"],
   };
 
   return (
@@ -43,7 +45,7 @@ export const Footer = () => {
                 ([name, [link, width, height]]) => (
                   <Link href={link} key={name} target="_blank">
                     <img
-                      src={`/social/${name}.svg`}
+                      src={`/footer/social/${name}.svg`}
                       className={`w-[${width}px] h-[${height}px]`}
                       alt={name}
                     />
@@ -61,11 +63,30 @@ export const Footer = () => {
               advocacy.
             </div>
           </div>
-          <div className="m-5 mt-7 shrink-0">
-            <div className="mb-10 font-dm-sans text-xl font-bold leading-snug text-indigo-950">
+          <div className="m-5 mt-7 flex shrink-0 flex-col gap-6">
+            <div className="mb-[14px] font-dm-sans text-xl font-bold leading-snug text-indigo-950">
               Contact us
             </div>
-            <img className="w-full" src="/contact.svg" alt="Contact"></img>
+            <div className="flex gap-[6px]">
+              <img src="/footer/Website.svg"></img>
+              <Link
+                className="font-dm-sans text-lg font-normal leading-tight text-slate-500 hover:underline"
+                href="https://jenniferann.org/"
+                target="_blank"
+              >
+                JenniferAnn.org
+              </Link>
+            </div>
+            <img
+              src="/footer/Email_Contact.png"
+              className="h-5 w-[245px]"
+            ></img>
+            <div className="flex gap-[6px]">
+              <img src="/footer/Phone.svg"></img>
+              <div className="font-dm-sans text-lg font-normal leading-tight text-slate-500">
+                877-786-7838 (877 STOP TDV)
+              </div>
+            </div>
           </div>
         </div>
       </div>
