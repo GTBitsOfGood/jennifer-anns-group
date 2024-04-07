@@ -11,7 +11,6 @@ import {
   UserException,
   UserInvalidInputException,
 } from "@/utils/exceptions/user";
-import { deleteAdmin } from "@/server/db/actions/AdminAction";
 import AdminModel from "@/server/db/models/AdminModel";
 
 export default async function handler(
