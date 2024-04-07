@@ -11,6 +11,7 @@ import {
   UserException,
   UserInvalidInputException,
 } from "@/utils/exceptions/user";
+import AdminModel from "@/server/db/models/AdminModel";
 
 export default async function handler(
   req: NextApiRequest,
@@ -96,6 +97,14 @@ async function deleteUserHandler(req: NextApiRequest, res: NextApiResponse) {
       throw new UserInvalidInputException();
     }
     const deletedUser = await deleteUser(userId);
+
+    const correspondingAdmin = await AdminModel.findOne({
+      email: deletedUser.email,
+    });
+    if (correspondingAdmin) {
+      await AdminModel.findOneAndDelete({ email: deletedUser.email });
+    }
+
     return res.status(HTTP_STATUS_CODE.OK).send(deletedUser);
   } catch (e: any) {
     return res
