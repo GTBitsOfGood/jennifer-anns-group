@@ -8,11 +8,13 @@ function createRandomGame(): GamesFilterOutput[number] {
   const appTypeValues = Object.values(NonWebGLBuilds);
   const numBuilds = faker.number.int({ min: 0, max: appTypeValues.length });
   salt++;
+  const name = faker.person.fullName() + salt.toString();
   return {
     _id: new mongoose.Types.ObjectId().toString(),
     themes: [],
     tags: [],
-    name: faker.person.fullName() + salt.toString(),
+    name: name,
+    lowercaseName: name.toLowerCase(),
     description: faker.lorem.paragraph(),
     webGLBuild: faker.datatype.boolean(),
     lesson: faker.internet.url(),

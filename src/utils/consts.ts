@@ -29,3 +29,6 @@ export const UNDELETABLE_EMAILS = [
   "drew@jenniferann.org",
   "susanne@jenniferann.org",
 ];
+export const DEV_ADMIN_CONTACT = "bogjenniferanns@gmail.com";
+
+export const MAIL_SEND_DOMAIN = "trial-z86org8kpm1gew13.mlsender.net";

@@ -18,6 +18,10 @@ import { ExtendId, buildSchema, gameSchema } from "@/utils/types";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { IGame } from "@/server/db/models/GameModel";
 import UploadGameBuild from "@/components/UploadGameBuild";
+import {
+  youtubeREGEX,
+  vimeoREGEX,
+} from "@/components/GameScreen/AddEditVideoTrailerComponent";
 
 import axios from "axios";
 
@@ -188,6 +192,19 @@ function CreateGame() {
   });
 
   async function createGame(data: IGame) {
+    // check video trailer is youtube or vimeo
+    if (data.videoTrailer && data.videoTrailer !== "") {
+      if (
+        !youtubeREGEX.test(data.videoTrailer) &&
+        !vimeoREGEX.test(data.videoTrailer)
+      ) {
+        setValidationErrors((prevValidationErrors) => ({
+          ...prevValidationErrors,
+          videoTrailer: "Invalid URL (Only Youtube and Vimeo videos supported)",
+        }));
+        return;
+      }
+    }
     try {
       const response = await fetch(`/api/games`, {
         method: "POST",
@@ -558,11 +575,10 @@ function CreateGame() {
             <div className="flex h-14 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
               <AlertTriangleIcon className="h-5 w-5" />
               <p>
-                {validationErrors.name ===
-                "Game with this title already exists."
-                  ? "Game with this title already exists."
+                {validationErrors.name
+                  ? validationErrors.name
                   : validationErrors.videoTrailer
-                    ? "Please enter a valid URL for the Video Trailer."
+                    ? validationErrors.videoTrailer
                     : "All required fields need to be filled."}
               </p>
             </div>

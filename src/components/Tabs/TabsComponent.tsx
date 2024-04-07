@@ -9,7 +9,7 @@ import {
 import chakraTheme from "@/styles/chakraTheme";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { ChangeEvent, Dispatch, useState } from "react";
-import GameBuildList from "../GameGallery/GameBuildList";
+import GameBuildList from "../GameScreen/GameBuildList";
 import VideoComponent from "./VideoComponent";
 interface Props {
   mode: string;

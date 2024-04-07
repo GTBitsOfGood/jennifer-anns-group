@@ -15,8 +15,9 @@ import { changePWSchema, userSchema } from "@/utils/types";
 import ViewProfileModal from "./ViewProfileModal";
 import EditProfileModal from "./EditProfileModal";
 import ChangePasswordModal from "./ChangePasswordModal";
+import DeleteUserModal from "./DeleteUserModal";
 
-export type ProfileState = "view" | "changePw" | "edit";
+export type ProfileState = "view" | "changePw" | "edit" | "deleteUser";
 
 const idSchema = z.string().length(24);
 
@@ -85,6 +86,7 @@ export function ProfileModal(props: ProfileProps) {
     view: "Profile",
     edit: "Edit Profile",
     changePw: "Edit Password",
+    deleteUser: "",
   };
 
   return (
@@ -132,6 +134,12 @@ export function ProfileModal(props: ProfileProps) {
             setProfileState={setProfileState}
             userData={userData}
             editUser={editUser}
+          />
+        )}
+        {profileState === "deleteUser" && (
+          <DeleteUserModal
+            setProfileState={setProfileState}
+            userData={userData}
           />
         )}
       </DialogContent>

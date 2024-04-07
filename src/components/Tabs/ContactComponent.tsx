@@ -22,15 +22,21 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
+import { AlertTriangleIcon } from "lucide-react";
 import { useState, useEffect } from "react";
-export default function ContactComponent() {
+import cn from "classnames";
+interface Props {
+  gameName: string;
+}
+
+export default function ContactComponent({ gameName }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [firstName, setfirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [valid, setValid] = useState(false);
-  const colors = { true: "#2352A0", false: "#D9D9D9" };
+  const [failedtoSend, setfailedtoSend] = useState(false);
   const emailRegex = /^\S+@\S+\.\S+$/;
   useEffect(() => {
     if (
@@ -45,12 +51,30 @@ export default function ContactComponent() {
       setValid(false);
     }
   }, [firstName, lastName, email, message]);
-  const onCloseFeatured = () => {
+  const resetForm = () => {
     setfirstName("");
     setLastName("");
     setEmail("");
     setMessage("");
     onClose();
+  };
+  const sendEmail = async () => {
+    const result = await fetch("/api/email", {
+      method: "POST",
+      body: JSON.stringify({
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        message: message,
+        gameName: gameName,
+      }),
+    });
+    if (result.status === 200) {
+      setfailedtoSend(false);
+      onOpen();
+    } else {
+      setfailedtoSend(true);
+    }
   };
 
   return (
@@ -109,7 +133,7 @@ export default function ContactComponent() {
                     />
                   </FormControl>
                 </Flex>
-                <Flex className="mx-4 mb-2 mt-2 w-full flex-col items-end md:mx-8 lg:mx-16">
+                <Flex className="mb-2 ml-4 mt-2 w-full flex-col items-end md:ml-8 lg:ml-16">
                   <FormControl>
                     <FormLabel htmlFor="message">Message</FormLabel>
                     <Textarea
@@ -122,19 +146,7 @@ export default function ContactComponent() {
                       height="154px"
                     />
                   </FormControl>
-                  <Button
-                    type="submit"
-                    width="219px"
-                    height="47px"
-                    color="white"
-                    bg={colors[`${valid}`]}
-                    _hover={{ bg: colors[`${valid}`] }}
-                    onClick={valid ? onOpen : () => {}}
-                    className="mt-8 rounded-md border border-transparent px-4 py-2 text-sm font-medium   focus:outline-none focus:ring-2"
-                  >
-                    Send Message
-                  </Button>
-                  <Modal isOpen={isOpen} onClose={onCloseFeatured}>
+                  <Modal isOpen={isOpen} onClose={resetForm}>
                     <ModalOverlay />
                     <ModalContent
                       className="mx-[110px] mt-[100px] flex flex-col items-center"
@@ -159,7 +171,7 @@ export default function ContactComponent() {
                         />
                       </ModalHeader>
                       <ModalBody maxWidth="400">
-                        <div className="text-center font-medium">
+                        <div className="text-center font-sans font-medium">
                           Your message has been sent. Someone from our team will
                           reply to your question shortly.
                         </div>
@@ -168,6 +180,25 @@ export default function ContactComponent() {
                   </Modal>
                 </Flex>
               </Flex>
+              {failedtoSend && (
+                <div className="mt-4 flex h-14 w-full items-center gap-2 rounded-sm bg-red-100 px-4 text-sm text-red-500">
+                  <AlertTriangleIcon className="h-5 w-5" />
+                  <p className="font-semibold">
+                    Sending failed. Please try again.
+                  </p>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                onClick={valid ? sendEmail : () => {}}
+                className={cn(
+                  valid ? " bg-blue-primary hover:bg-black" : "bg-input-border",
+                  "float-right mt-8 h-[47px] w-[219px] rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2",
+                )}
+              >
+                Send Message
+              </Button>
             </TabPanel>
           </TabPanels>
         </Tabs>

@@ -19,7 +19,7 @@ export const RESULTS_PER_PAGE = 6;
 
 export async function createGame(data: IGame) {
   await connectMongoDB();
-
+  data.lowercaseName = data.name.toLowerCase(); //Properly sets lowercase field.
   const existingGame = await GameModel.findOne({ name: data.name });
 
   if (existingGame) throw new GameAlreadyExistsException();
@@ -226,7 +226,6 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
       ...andFilters,
       ...(orFilters.length > 0 ? [{ $or: orFilters }] : []),
     ];
-    console.log("allSteps", allSteps);
 
     const aggregate = GameModel.aggregate<{
       games: GamesFilterOutput;
@@ -236,7 +235,7 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
     aggregate.match({
       ...(allSteps.length > 0 && { $and: allSteps }),
     });
-    aggregate.sort({ name: 1 });
+    aggregate.sort({ lowercaseName: 1 });
     aggregate.lookup({
       from: "themes",
       localField: "themes",
