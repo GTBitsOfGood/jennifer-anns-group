@@ -275,8 +275,8 @@ function CreateGame() {
 
     const nonNullPdfInputs: Record<string, File> = pdfFormKeys.reduce(
       (acc, cur) => {
-        const value = formData.get(cur);
-        if (!value) {
+        const value = formData.get(cur) as File;
+        if (value.size === 0) {
           return acc;
         } else {
           return { ...acc, [cur]: value };
