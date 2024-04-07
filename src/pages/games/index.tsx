@@ -81,6 +81,7 @@ export default function Games() {
     setFilters({
       ...rest,
       name: event.target.value,
+      page: 1,
     });
   };
 

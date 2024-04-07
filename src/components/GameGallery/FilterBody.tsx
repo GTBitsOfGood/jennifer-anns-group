@@ -62,6 +62,7 @@ export default function FilterBody({
       accessibility: selectedAccessibility,
       tags: selectedTags,
       gameContent: selectedGameContent,
+      page: 1,
     });
     onClose();
   }

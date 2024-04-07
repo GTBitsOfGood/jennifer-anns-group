@@ -131,6 +131,7 @@ function GamesSection() {
             setFilters({
               ...rest,
               name: e.target.value,
+              page: 1,
             });
           }}
         />
