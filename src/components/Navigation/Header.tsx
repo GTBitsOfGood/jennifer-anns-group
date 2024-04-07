@@ -63,7 +63,6 @@ const Header = () => {
     } else {
       setLoaded(true);
     }
-    console.log(currentUser);
     const pathname = router.pathname;
     const tabNames = Object.keys(tabLinks);
     const index = tabNames.findIndex((name) => tabLinks[name] === pathname);
