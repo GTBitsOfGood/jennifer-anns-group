@@ -70,6 +70,19 @@ async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
       custom: tags?.filter((tag) => tag.type === "custom") ?? [],
     }));
 
+    // sort themes and tags to always return in same order
+    tagSeparatedGames.forEach((game) => {
+      game.themes?.sort((a, b) =>
+        a._id.toString().localeCompare(b._id.toString()),
+      );
+      game.accessibility?.sort((a, b) =>
+        a._id.toString().localeCompare(b._id.toString()),
+      );
+      game.custom?.sort((a, b) =>
+        a._id.toString().localeCompare(b._id.toString()),
+      );
+    });
+
     return res.status(HTTP_STATUS_CODE.OK).send({
       games: tagSeparatedGames,
       numPages,
