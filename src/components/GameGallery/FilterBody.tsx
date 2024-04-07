@@ -19,6 +19,15 @@ export default function FilterBody({
   userLabel,
   onClose,
 }: Props) {
+  const gameBuildsMap: Record<string, string> = {
+    Amazon: "amazon",
+    Android: "android",
+    "App Store": "appstore",
+    Linux: "linux",
+    Mac: "mac",
+    WebGL: "webgl",
+    Windows: "windows",
+  };
   const gameContentOptions = [
     "Parenting guide",
     "Lesson plan",
@@ -72,6 +81,8 @@ export default function FilterBody({
     setSelectedAccessibility([]);
     setSelectedTags([]);
     setSelectedGameContent([]);
+    const { gameBuilds, accessibility, tags, gameContent, ...rest } = filters;
+    setFilters(rest);
   }
 
   return (
@@ -80,33 +91,32 @@ export default function FilterBody({
         Game builds
       </p>
       <div className="mb-[52px] mr-[52px]">
-        {Object.keys(AllBuilds).map((gameBuild) => {
-          const gbName =
-            gameBuild === "appstore"
-              ? "App Store"
-              : capitalizeFirstLetter(gameBuild);
+        {Object.keys(gameBuildsMap).map((gameBuild) => {
           return (
             <Tag
-              key={gbName}
+              key={gameBuild}
               variant={
-                !selectedGameBuilds.includes(gameBuild)
+                !selectedGameBuilds.includes(gameBuildsMap[gameBuild])
                   ? "filter"
                   : "filter_selected"
               }
               onClick={() => {
-                if (selectedGameBuilds.includes(gameBuild)) {
+                if (selectedGameBuilds.includes(gameBuildsMap[gameBuild])) {
                   setSelectedGameBuilds(
                     selectedGameBuilds.filter((gb) => {
-                      return gb !== gameBuild;
+                      return gb !== gameBuildsMap[gameBuild];
                     }),
                   );
                 } else {
-                  setSelectedGameBuilds([...selectedGameBuilds, gameBuild]);
+                  setSelectedGameBuilds([
+                    ...selectedGameBuilds,
+                    gameBuildsMap[gameBuild],
+                  ]);
                 }
               }}
               cursor="pointer"
             >
-              {gbName}
+              {gameBuild}
             </Tag>
           );
         })}
