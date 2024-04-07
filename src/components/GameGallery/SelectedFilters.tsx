@@ -1,6 +1,6 @@
 import { Tag } from "@chakra-ui/react";
 import { PageRequiredGameQuery } from "../ThemesTags/GamesSection";
-import { capitalizeFirstLetter } from "@/utils/consts";
+import { gameContentsMap, gameBuildsMap } from "./FilterBody";
 
 interface Props {
   filters: PageRequiredGameQuery;
@@ -12,18 +12,16 @@ export default function SelectedFilters({ filters }: Props) {
   return (
     <div>
       {gameBuilds?.map((item) => {
-        const gbName =
-          item === "appstore" ? "App Store" : capitalizeFirstLetter(item);
         return (
-          <Tag key={gbName} height="36px" variant="filter_selected">
-            {gbName}
+          <Tag key={item} height="36px" variant="filter_selected">
+            {gameBuildsMap[item]}
           </Tag>
         );
       })}
       {gameContent?.map((item) => {
         return (
           <Tag key={item} height="36px" variant="filter_selected">
-            {item}
+            {gameContentsMap[item]}
           </Tag>
         );
       })}

@@ -3,8 +3,6 @@ import { Tag, VStack } from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { z } from "zod";
 import { PageRequiredGameQuery } from "../ThemesTags/GamesSection";
-import { AllBuilds } from "@/utils/types";
-import { capitalizeFirstLetter } from "@/utils/consts";
 
 interface Props {
   setFilters: Dispatch<SetStateAction<PageRequiredGameQuery>>;
@@ -12,6 +10,21 @@ interface Props {
   userLabel: UserLabel | undefined;
   onClose: () => void;
 }
+export const gameBuildsMap: Record<string, string> = {
+  amazon: "Amazon",
+  android: "Android",
+  appstore: "App Store",
+  linux: "Linux",
+  mac: "Mac",
+  webgl: "WebGL",
+  windows: "Windows",
+};
+export const gameContentsMap: Record<string, string> = {
+  parentingGuide: "Parenting guide",
+  lessonPlan: "Lesson plan",
+  videoTrailer: "Video trailer",
+  answerKey: "Answer key",
+};
 
 export default function FilterBody({
   setFilters,
@@ -19,21 +32,6 @@ export default function FilterBody({
   userLabel,
   onClose,
 }: Props) {
-  const gameBuildsMap: Record<string, string> = {
-    Amazon: "amazon",
-    Android: "android",
-    "App Store": "appstore",
-    Linux: "linux",
-    Mac: "mac",
-    WebGL: "webgl",
-    Windows: "windows",
-  };
-  const gameContentOptions = [
-    "Parenting guide",
-    "Lesson plan",
-    "Video trailer",
-    "Answer key",
-  ];
   const [accessibilityOptions, setAccessibilityOptions] = useState<string[]>(
     [],
   );
@@ -96,27 +94,24 @@ export default function FilterBody({
             <Tag
               key={gameBuild}
               variant={
-                !selectedGameBuilds.includes(gameBuildsMap[gameBuild])
+                !selectedGameBuilds.includes(gameBuild)
                   ? "filter"
                   : "filter_selected"
               }
               onClick={() => {
-                if (selectedGameBuilds.includes(gameBuildsMap[gameBuild])) {
+                if (selectedGameBuilds.includes(gameBuild)) {
                   setSelectedGameBuilds(
                     selectedGameBuilds.filter((gb) => {
-                      return gb !== gameBuildsMap[gameBuild];
+                      return gb !== gameBuild;
                     }),
                   );
                 } else {
-                  setSelectedGameBuilds([
-                    ...selectedGameBuilds,
-                    gameBuildsMap[gameBuild],
-                  ]);
+                  setSelectedGameBuilds([...selectedGameBuilds, gameBuild]);
                 }
               }}
               cursor="pointer"
             >
-              {gameBuild}
+              {gameBuildsMap[gameBuild]}
             </Tag>
           );
         })}
@@ -126,9 +121,9 @@ export default function FilterBody({
         Game content
       </p>
       <VStack align="start" mb="52px">
-        {gameContentOptions.map((content) => {
+        {Object.keys(gameContentsMap).map((content) => {
           return (
-            (content !== "Answer key" ||
+            (content !== "answerKey" ||
               userLabel === "administrator" ||
               userLabel === "parent" ||
               userLabel === "educator") && (
@@ -156,7 +151,7 @@ export default function FilterBody({
                   htmlFor={content}
                   className="ml-2 cursor-pointer font-sans text-sm text-gray-500 peer-checked:text-blue-primary"
                 >
-                  {content}
+                  {gameContentsMap[content]}
                 </label>
               </div>
             )
