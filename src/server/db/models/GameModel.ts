@@ -50,6 +50,7 @@ const GameSchema = new Schema<IGame>(
     answerKey: { type: String },
     videoTrailer: { type: String },
     preview: { type: Boolean, required: true },
+    image: { type: String, required: true },
   },
   { versionKey: false },
 );

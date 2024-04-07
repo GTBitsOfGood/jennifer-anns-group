@@ -103,6 +103,7 @@ export const gameSchema = z.object({
   lesson: z.string().url().optional(),
   parentingGuide: z.string().url().optional(),
   answerKey: z.string().url().optional(),
+  image: z.string().min(1, "Image is required"),
   videoTrailer: z.preprocess(
     (val) => (val === "" ? undefined : val),
     z.string().url().optional(),

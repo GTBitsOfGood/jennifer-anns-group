@@ -20,6 +20,7 @@ function createRandomGame(): GamesFilterOutput[number] {
     lesson: faker.internet.url(),
     parentingGuide: faker.internet.url(),
     answerKey: faker.internet.url(),
+    image: faker.internet.url(),
     videoTrailer: faker.internet.url(),
     builds: Array.from({ length: numBuilds }).map(() => {
       return {
