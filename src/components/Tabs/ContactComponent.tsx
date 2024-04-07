@@ -24,6 +24,7 @@ import {
 import chakraTheme from "@/styles/chakraTheme";
 import { AlertTriangleIcon } from "lucide-react";
 import { useState, useEffect } from "react";
+import cn from "classnames";
 interface Props {
   gameName: string;
 }
@@ -36,7 +37,6 @@ export default function ContactComponent({ gameName }: Props) {
   const [message, setMessage] = useState("");
   const [valid, setValid] = useState(false);
   const [failedtoSend, setfailedtoSend] = useState(false);
-  const colors = { true: "#2352A0", false: "#D9D9D9" };
   const emailRegex = /^\S+@\S+\.\S+$/;
   useEffect(() => {
     if (
@@ -51,14 +51,14 @@ export default function ContactComponent({ gameName }: Props) {
       setValid(false);
     }
   }, [firstName, lastName, email, message]);
-  const onCloseFeatured = () => {
+  const resetForm = () => {
     setfirstName("");
     setLastName("");
     setEmail("");
     setMessage("");
     onClose();
   };
-  const onOpenFeatured = async () => {
+  const sendEmail = async () => {
     const result = await fetch("/api/email", {
       method: "POST",
       body: JSON.stringify({
@@ -146,7 +146,7 @@ export default function ContactComponent({ gameName }: Props) {
                       height="154px"
                     />
                   </FormControl>
-                  <Modal isOpen={isOpen} onClose={onCloseFeatured}>
+                  <Modal isOpen={isOpen} onClose={resetForm}>
                     <ModalOverlay />
                     <ModalContent
                       className="mx-[110px] mt-[100px] flex flex-col items-center"
@@ -191,13 +191,11 @@ export default function ContactComponent({ gameName }: Props) {
 
               <Button
                 type="submit"
-                width="219px"
-                height="47px"
-                color="white"
-                bg={colors[`${valid}`]}
-                _hover={{ bg: colors[`${valid}`] }}
-                onClick={valid ? onOpenFeatured : () => {}}
-                className="float-right mt-8 rounded-md border border-transparent px-4 py-2 text-sm  font-medium focus:outline-none focus:ring-2"
+                onClick={valid ? sendEmail : () => {}}
+                className={cn(
+                  valid ? " bg-blue-primary hover:bg-black" : "bg-input-border",
+                  "float-right mt-8 h-[47px] w-[219px] rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2",
+                )}
               >
                 Send Message
               </Button>

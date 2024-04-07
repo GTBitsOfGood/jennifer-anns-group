@@ -21,7 +21,6 @@ export type EmailData = z.infer<typeof emailSchema>;
 async function sendEmailHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const parsedData = emailSchema.safeParse(JSON.parse(req.body));
-    console.log(parsedData);
     if (!parsedData.success) {
       throw new EmailInvalidInputException();
     }
