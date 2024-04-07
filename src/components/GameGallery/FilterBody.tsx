@@ -2,35 +2,23 @@ import { UserLabel, tagSchema } from "@/utils/types";
 import { Tag, VStack } from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { z } from "zod";
+import { PageRequiredGameQuery } from "../ThemesTags/GamesSection";
+import { AllBuilds } from "@/utils/types";
+import { capitalizeFirstLetter } from "@/utils/consts";
 
 interface Props {
-  setGameBuilds: Dispatch<SetStateAction<string[]>>;
-  setGameContent: Dispatch<SetStateAction<string[]>>;
-  setAcccessibility: Dispatch<SetStateAction<string[]>>;
-  setTags: Dispatch<SetStateAction<string[]>>;
-  setFiltersApplied: Dispatch<SetStateAction<boolean>>;
+  setFilters: Dispatch<SetStateAction<PageRequiredGameQuery>>;
+  filters: PageRequiredGameQuery;
   userLabel: UserLabel | undefined;
   onClose: () => void;
 }
 
 export default function FilterBody({
-  setGameBuilds,
-  setGameContent,
-  setAcccessibility,
-  setTags,
-  setFiltersApplied,
+  setFilters,
+  filters,
   userLabel,
   onClose,
 }: Props) {
-  const gameBuildsOptions = [
-    "Amazon",
-    "Android",
-    "App Store",
-    "Linux",
-    "Mac",
-    "WebGL",
-    "Windows",
-  ];
   const gameContentOptions = [
     "Parenting guide",
     "Lesson plan",
@@ -68,11 +56,13 @@ export default function FilterBody({
   }
 
   function applyFilters() {
-    setGameBuilds(selectedGameBuilds);
-    setAcccessibility(selectedAccessibility);
-    setTags(selectedTags);
-    setGameContent(selectedGameContent);
-    setFiltersApplied(true);
+    setFilters({
+      ...filters,
+      gameBuilds: selectedGameBuilds,
+      accessibility: selectedAccessibility,
+      tags: selectedTags,
+      gameContent: selectedGameContent,
+    });
     onClose();
   }
 
@@ -89,10 +79,14 @@ export default function FilterBody({
         Game builds
       </p>
       <div className="mb-[52px] mr-[52px]">
-        {gameBuildsOptions.map((gameBuild) => {
+        {Object.keys(AllBuilds).map((gameBuild) => {
+          const gbName =
+            gameBuild === "appstore"
+              ? "App Store"
+              : capitalizeFirstLetter(gameBuild);
           return (
             <Tag
-              key={gameBuild}
+              key={gbName}
               variant={
                 !selectedGameBuilds.includes(gameBuild)
                   ? "filter"
@@ -111,7 +105,7 @@ export default function FilterBody({
               }}
               cursor="pointer"
             >
-              {gameBuild}
+              {gbName}
             </Tag>
           );
         })}

@@ -11,6 +11,7 @@ import { Dispatch, useEffect, useState } from "react";
 import SearchTagsComponent from "./SearchTagsComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { tagSchema, themeSchema } from "@/utils/types";
+import { capitalizeFirstLetter } from "@/utils/consts";
 
 const themeDataSchema = themeSchema.extend({
   _id: z.string().length(24),
@@ -88,10 +89,6 @@ export default function TagsComponent({
       setThemes(newList);
     }
   }
-
-  const capitalizeFirstLetter = (word: string) => {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-  };
 
   return (
     <ChakraProvider theme={chakraTheme}>
