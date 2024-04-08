@@ -23,13 +23,19 @@ import {
 import chakraTheme from "@/styles/chakraTheme";
 import { Button } from "@/components/ui/button";
 
+export type GameDataState = populatedGameWithId & {
+  parentingGuideFile: File | undefined;
+  answerKeyFile: File | undefined;
+  lessonFile: File | undefined;
+};
+
 interface Props {
   mode: "view" | "preview";
 }
 
 const GamePage = ({ mode }: Props) => {
   const gameId = useRouter().query.id as string;
-  const [gameData, setGameData] = useState<populatedGameWithId>();
+  const [gameData, setGameData] = useState<GameDataState | undefined>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -219,6 +225,7 @@ const GamePage = ({ mode }: Props) => {
       <TabsComponent
         mode="view"
         gameData={gameData}
+        setGameData={setGameData}
         authorized={visibleAnswer}
       />
       {loaded && userData.label !== "administrator" && (
@@ -227,7 +234,12 @@ const GamePage = ({ mode }: Props) => {
       {loaded && userData.label !== "administrator" && (
         <ContactComponent gameName={gameData.name} />
       )}
-      <TagsComponent mode="view" gameData={gameData} admin={visibleAnswer} />
+      <TagsComponent
+        mode="view"
+        gameData={gameData}
+        setGameData={setGameData}
+        admin={visibleAnswer}
+      />
       {loaded && mode === "preview" && (
         <div className="relative my-10 flex w-11/12 justify-end gap-6 font-sans">
           <ChakraProvider theme={chakraTheme}>

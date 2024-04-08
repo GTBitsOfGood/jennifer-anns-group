@@ -12,14 +12,14 @@ import {
 import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
 import { useRef, Dispatch } from "react";
-import { populatedGameWithId } from "@/server/db/models/GameModel";
+import { GameDataState } from "./GameScreen/GamePage";
 
 interface Props {
   deleteType: string;
   isOpen: boolean;
   onClose: () => void;
-  gameData: populatedGameWithId;
-  setGameData: Dispatch<populatedGameWithId>;
+  gameData: GameDataState;
+  setGameData: Dispatch<React.SetStateAction<GameDataState | undefined>>;
 }
 
 export default function DeleteComponentModal(props: Props) {
@@ -72,11 +72,31 @@ export default function DeleteComponentModal(props: Props) {
     router.push("/games");
   }
 
-  async function deleteAnswerKey() {}
+  async function deleteAnswerKey() {
+    if (!props.gameData) return;
+    props.setGameData({
+      ...props.gameData,
+      answerKey: "",
+      answerKeyFile: undefined,
+    });
+    props.onClose();
+  }
 
-  async function deleteParentingGuide() {}
+  async function deleteParentingGuide() {
+    if (!props.gameData) return;
+    props.setGameData({
+      ...props.gameData,
+      parentingGuide: "",
+      parentingGuideFile: undefined,
+    });
+    props.onClose();
+  }
 
-  async function deleteLessonPlan() {}
+  async function deleteLessonPlan() {
+    if (!props.gameData) return;
+    props.setGameData({ ...props.gameData, lesson: "", lessonFile: undefined });
+    props.onClose();
+  }
 
   async function deleteTrailer() {
     if (props.gameData) {

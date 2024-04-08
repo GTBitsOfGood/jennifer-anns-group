@@ -25,7 +25,6 @@ export async function sendEmail(data: EmailData) {
     .setText(data.message);
   const result = await mailerSend.email.send(emailParams);
   if (result.statusCode < 200 || result.statusCode >= 300) {
-    console.log(result);
     throw new EmailFailedToSendException();
   }
 }

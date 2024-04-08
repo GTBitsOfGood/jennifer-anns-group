@@ -11,6 +11,7 @@ import { Dispatch, useEffect, useState } from "react";
 import SearchTagsComponent from "./SearchTagsComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { tagSchema, themeSchema } from "@/utils/types";
+import { GameDataState } from "../GameScreen/GamePage";
 import { gameBuildsMap } from "@/components/GameGallery/FilterBody";
 
 const themeDataSchema = themeSchema.extend({
@@ -23,8 +24,8 @@ const tagDataSchema = tagSchema.extend({
 
 interface Props {
   mode: string;
-  gameData: populatedGameWithId;
-  setGameData?: Dispatch<populatedGameWithId>;
+  gameData: GameDataState;
+  setGameData: Dispatch<React.SetStateAction<GameDataState | undefined>>;
   admin?: boolean;
 }
 

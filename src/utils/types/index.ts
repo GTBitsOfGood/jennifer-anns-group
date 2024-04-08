@@ -124,9 +124,9 @@ export const editGameSchema = z.object({
   description: z.string().optional(),
   webGLBuild: z.boolean().optional(),
   builds: z.array(buildSchema).optional(),
-  lesson: z.string().url().optional(),
-  parentingGuide: z.string().url().optional(),
-  answerKey: z.string().url().optional(),
+  parentingGuide: z.literal("").or(z.string().url()).optional(),
+  lesson: z.literal("").or(z.string().url()).optional(),
+  answerKey: z.literal("").or(z.string().url()).optional(),
   videoTrailer: z.string().url().or(z.literal("")).optional(),
   preview: z.boolean().optional(),
 });

@@ -1,13 +1,11 @@
-import React from "react";
 import pageAccessHOC from "@/components/HOC/PageAccess";
 import { z } from "zod";
 import cn from "classnames";
-import { Upload } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TextArea } from "@/components/ui/textarea";
-import { AlertTriangleIcon, MoveLeft, Plus, X } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { AlertTriangleIcon, MoveLeft, Plus, Upload, X } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import ThemeSelect from "@/components/Themes/ThemeSelect";
 import TagSelect from "@/components/Tags/TagSelect";
@@ -23,11 +21,17 @@ import {
 } from "@/components/GameScreen/AddEditVideoTrailerComponent";
 
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
+import { useMutation } from "@tanstack/react-query";
+import { uploadApplicationFile } from "@/utils/file";
 
 const NAME_FORM_KEY = "name";
 const TRAILER_FORM_KEY = "videoTrailer";
 const DESCR_FORM_KEY = "description";
 const IMAGE_FORM_KEY = "image";
+const PARENTING_GUIDE_FORM_KEY = "parentingGuide";
+const LESSON_PLAN_FORM_KEY = "lesson";
+const ANSWER_KEY_FORM_KEY = "answerKey";
 
 export const createGameSchema = z.object({
   name: z.string().min(3, "Title must be at least 3 characters"),
@@ -137,6 +141,16 @@ function CreateGame() {
     string | undefined
   >(undefined);
 
+  const lessonRef = useRef<HTMLInputElement>(null);
+  const parentingGuideRef = useRef<HTMLInputElement>(null);
+  const answerKeyRef = useRef<HTMLInputElement>(null);
+
+  const [selectedPdfInputs, setSelectedPdfInputs] = useState({
+    parentingGuide: false,
+    answerKey: false,
+    lesson: false,
+  });
+
   const [uploadGameComponents, setUploadGameComponents] = useState<
     React.JSX.Element[]
   >([
@@ -180,6 +194,10 @@ function CreateGame() {
 
     fetchData();
   }, []);
+
+  const { mutateAsync: getDirectUpload } = useMutation({
+    mutationFn: (file: File) => fetch("/api/file").then((res) => res.json()),
+  });
 
   const [validationErrors, setValidationErrors] = useState<
     Record<keyof z.input<typeof createGameSchema>, string | undefined>
@@ -282,6 +300,56 @@ function CreateGame() {
       };
     }
     const formData = new FormData(e.currentTarget);
+
+    const pdfFormKeys = [
+      PARENTING_GUIDE_FORM_KEY,
+      LESSON_PLAN_FORM_KEY,
+      ANSWER_KEY_FORM_KEY,
+    ];
+
+    const nonNullPdfInputs: Record<string, File> = pdfFormKeys.reduce(
+      (acc, cur) => {
+        const value = formData.get(cur) as File;
+        if (value.size === 0) {
+          return acc;
+        } else {
+          return { ...acc, [cur]: value };
+        }
+      },
+      {},
+    );
+
+    const nonNullFormKeys = Object.keys(nonNullPdfInputs);
+
+    const directUploadUrls = await Promise.all(
+      nonNullFormKeys.map((k) => getDirectUpload(nonNullPdfInputs[k])),
+    );
+
+    const fieldDirectUploadUrls: Record<
+      string,
+      { uploadUrl: string; uploadAuthToken: string }
+    > = nonNullFormKeys.reduce((acc, cur, i) => {
+      return { ...acc, [cur]: directUploadUrls[i] };
+    }, {});
+
+    const storedUrls = await Promise.all(
+      nonNullFormKeys.map((formKey) =>
+        uploadApplicationFile(
+          fieldDirectUploadUrls[formKey].uploadUrl,
+          nonNullPdfInputs[formKey],
+          fieldDirectUploadUrls[formKey].uploadAuthToken,
+          uuidv4(),
+        ),
+      ),
+    );
+
+    const fieldStoredUrls: Record<string, string> = nonNullFormKeys.reduce(
+      (acc, cur, i) => {
+        return { ...acc, [cur]: storedUrls[i] };
+      },
+      {},
+    );
+
     const input = {
       name: formData.get(NAME_FORM_KEY),
       videoTrailer: formData.get(TRAILER_FORM_KEY),
@@ -293,6 +361,7 @@ function CreateGame() {
         (tag) => tag._id,
       ),
       preview: true,
+      ...fieldStoredUrls,
     };
     const parse = gameSchema.safeParse(input);
 
@@ -332,7 +401,6 @@ function CreateGame() {
     } else {
       setSubmitting(false);
       const errors = parse.error.formErrors.fieldErrors;
-      console.log(errors);
       setValidationErrors({
         name: errors.name?.at(0),
         image: errors.image?.at(0),
@@ -556,6 +624,141 @@ function CreateGame() {
               });
             }}
           />
+        </div>
+
+        <div className="relative flex w-fit flex-col gap-3 md:w-2/3">
+          <label className="text-xl font-semibold">Parenting Guide</label>
+          <div className="flex w-fit flex-row items-center justify-start gap-2">
+            <label htmlFor={PARENTING_GUIDE_FORM_KEY}>
+              <div className="flex h-12 w-32 flex-row items-center justify-center gap-3 rounded-md border border-[#666666] bg-[#FAFBFC] text-slate-900 hover:opacity-80">
+                <div>
+                  <Upload size={24} />
+                </div>
+                <p className="text-sm">Upload</p>
+              </div>
+            </label>
+            <input
+              ref={parentingGuideRef}
+              className="block w-fit min-w-0 text-sm file:hidden"
+              id={PARENTING_GUIDE_FORM_KEY}
+              name={PARENTING_GUIDE_FORM_KEY}
+              type="file"
+              accept=".pdf"
+              onChange={(e) => {
+                const files = e.currentTarget.files;
+                setSelectedPdfInputs({
+                  ...selectedPdfInputs,
+                  parentingGuide: !!files,
+                });
+              }}
+            />
+            <X
+              className={
+                selectedPdfInputs.parentingGuide
+                  ? "block text-orange-primary hover:cursor-pointer"
+                  : "hidden"
+              }
+              onClick={() => {
+                if (!parentingGuideRef.current) return;
+                parentingGuideRef.current.value = "";
+
+                setSelectedPdfInputs({
+                  ...selectedPdfInputs,
+                  parentingGuide: false,
+                });
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="relative flex w-full flex-col gap-3 md:w-2/3">
+          <label className="text-xl font-semibold">Lesson Plan</label>
+          <div className="flex w-fit flex-row items-center justify-start gap-2">
+            <label htmlFor={LESSON_PLAN_FORM_KEY}>
+              <div className="flex h-12 w-32 flex-row items-center justify-center gap-3 rounded-md border border-[#666666] bg-[#FAFBFC] text-slate-900 hover:opacity-80">
+                <div>
+                  <Upload size={24} />
+                </div>
+                <p className="text-sm">Upload</p>
+              </div>
+            </label>
+            <input
+              ref={lessonRef}
+              className="block w-fit text-sm file:hidden"
+              id={LESSON_PLAN_FORM_KEY}
+              name={LESSON_PLAN_FORM_KEY}
+              type="file"
+              accept=".pdf"
+              onChange={(e) => {
+                const files = e.currentTarget.files;
+                setSelectedPdfInputs({
+                  ...selectedPdfInputs,
+                  lesson: !!files,
+                });
+              }}
+            />
+            <X
+              className={
+                selectedPdfInputs.lesson
+                  ? "block text-orange-primary hover:cursor-pointer"
+                  : "hidden"
+              }
+              onClick={() => {
+                if (!lessonRef.current) return;
+                lessonRef.current.value = "";
+
+                setSelectedPdfInputs({
+                  ...selectedPdfInputs,
+                  lesson: false,
+                });
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="relative flex w-full flex-col gap-3 md:w-2/3">
+          <label className="text-xl font-semibold">Answer Key</label>
+          <div className="flex w-fit flex-row items-center justify-start gap-2">
+            <label htmlFor={ANSWER_KEY_FORM_KEY}>
+              <div className="flex h-12 w-32 flex-row items-center justify-center gap-3 rounded-md border border-[#666666] bg-[#FAFBFC] text-slate-900 hover:opacity-80">
+                <div>
+                  <Upload size={24} />
+                </div>
+                <p className="text-sm">Upload</p>
+              </div>
+            </label>
+            <input
+              ref={answerKeyRef}
+              className="block w-fit text-sm file:hidden"
+              id={ANSWER_KEY_FORM_KEY}
+              name={ANSWER_KEY_FORM_KEY}
+              type="file"
+              accept=".pdf"
+              onChange={(e) => {
+                const files = e.currentTarget.files;
+                setSelectedPdfInputs({
+                  ...selectedPdfInputs,
+                  answerKey: !!files,
+                });
+              }}
+            />
+            <X
+              className={
+                selectedPdfInputs.answerKey
+                  ? "block text-orange-primary hover:cursor-pointer"
+                  : "hidden"
+              }
+              onClick={() => {
+                if (!answerKeyRef.current) return;
+                answerKeyRef.current.value = "";
+
+                setSelectedPdfInputs({
+                  ...selectedPdfInputs,
+                  answerKey: false,
+                });
+              }}
+            />
+          </div>
         </div>
 
         <div className="relative flex w-full flex-col gap-3">

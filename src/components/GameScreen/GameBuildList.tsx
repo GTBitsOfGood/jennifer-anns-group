@@ -3,7 +3,6 @@ import Image from "next/image";
 import { NonWebGLBuilds, buildSchema } from "@/utils/types";
 import { AlertTriangleIcon, Download, Pencil, Plus, Trash } from "lucide-react";
 import { z } from "zod";
-import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -22,11 +21,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { GameDataState } from "../GameScreen/GamePage";
 
 interface Props {
-  gameData: populatedGameWithId;
+  gameData: GameDataState;
   editing: boolean;
-  setGameData?: React.Dispatch<populatedGameWithId>;
+  setGameData?: React.Dispatch<GameDataState>;
 }
 
 function GameBuildList({ gameData, editing, setGameData }: Props) {

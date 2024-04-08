@@ -5,16 +5,22 @@ import {
   Tab,
   TabPanel,
   ChakraProvider,
+  useDisclosure,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
-import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { ChangeEvent, Dispatch, useState } from "react";
 import GameBuildList from "../GameScreen/GameBuildList";
 import VideoComponent from "./VideoComponent";
+import { Button } from "../ui/button";
+import { X } from "lucide-react";
+import UploadModal from "./UploadModal";
+import DeleteComponentModal from "../DeleteComponentModal";
+import { GameDataState } from "../GameScreen/GamePage";
+
 interface Props {
   mode: string;
-  gameData: populatedGameWithId;
-  setGameData?: Dispatch<populatedGameWithId>;
+  gameData: GameDataState;
+  setGameData: Dispatch<React.SetStateAction<GameDataState | undefined>>;
   authorized?: boolean;
 }
 
@@ -24,6 +30,21 @@ export default function TabsComponent({
   setGameData,
   authorized,
 }: Props) {
+  const {
+    isOpen: isDeleteLessonOpen,
+    onOpen: onDeleteLessonOpen,
+    onClose: onDeleteLessonClose,
+  } = useDisclosure();
+  const {
+    isOpen: isDeleteParentingGuideOpen,
+    onOpen: onDeleteParentingGuideOpen,
+    onClose: onDeleteParentingGuideClose,
+  } = useDisclosure();
+  const {
+    isOpen: isDeleteAnswerKeyOpen,
+    onOpen: onDeleteAnswerKeyOpen,
+    onClose: onDeleteAnswerKeyClose,
+  } = useDisclosure();
   const [description, setDescription] = useState(gameData.description);
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
@@ -73,7 +94,7 @@ export default function TabsComponent({
               </>
             )}
           </TabList>
-          <TabPanels className="mb-12 mt-8 text-gray-500">
+          <TabPanels className="mb-12 mt-8  text-gray-500">
             {/** description tab display depends on edit or view mode */}
             <TabPanel p="0px">
               {mode === "edit" ? (
@@ -100,11 +121,147 @@ export default function TabsComponent({
               </TabPanel>
             )}
             {((gameData.lesson && gameData.lesson !== "") ||
-              mode === "edit") && <TabPanel>Lesson Plan</TabPanel>}
+              mode === "edit") && (
+              <TabPanel display="flex" flexDir="column" gap={2}>
+                {((gameData.lesson && gameData.lesson !== "") ||
+                  gameData.lessonFile) && (
+                  <iframe
+                    className="w-full"
+                    height="400"
+                    src={
+                      gameData.lessonFile
+                        ? URL.createObjectURL(gameData.lessonFile as File)
+                        : gameData.lesson
+                    }
+                  />
+                )}
+                {mode === "edit" && (
+                  <div className="flex flex-row gap-2">
+                    <UploadModal
+                      title="Lesson Plan"
+                      field="lesson"
+                      fileField="lessonFile"
+                      gameData={gameData}
+                      setGameData={setGameData}
+                    />
+                    {((gameData.lesson && gameData.lesson !== "") ||
+                      gameData.lessonFile) && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="items-center gap-1 border-red-700 text-red-700 hover:bg-red-700"
+                        onClick={onDeleteLessonOpen}
+                      >
+                        Delete Lesson Plan <X size={18} />
+                      </Button>
+                    )}
+                    <DeleteComponentModal
+                      isOpen={isDeleteLessonOpen}
+                      onClose={onDeleteLessonClose}
+                      gameData={gameData}
+                      setGameData={setGameData}
+                      deleteType="lessonPlan"
+                    />
+                  </div>
+                )}
+              </TabPanel>
+            )}
             {((gameData.parentingGuide && gameData.parentingGuide !== "") ||
-              mode === "edit") && <TabPanel>Parenting Guide</TabPanel>}
+              mode === "edit") && (
+              <TabPanel display="flex" flexDir="column" gap={2}>
+                {((gameData.parentingGuide && gameData.parentingGuide !== "") ||
+                  gameData.parentingGuideFile) && (
+                  <iframe
+                    className="w-full"
+                    height="400"
+                    src={
+                      gameData.parentingGuideFile
+                        ? URL.createObjectURL(
+                            gameData.parentingGuideFile as File,
+                          )
+                        : gameData.parentingGuide
+                    }
+                  />
+                )}
+
+                {mode === "edit" && (
+                  <div className="flex flex-row gap-2">
+                    <UploadModal
+                      title="Parenting Guide"
+                      field="parentingGuide"
+                      fileField="parentingGuideFile"
+                      gameData={gameData}
+                      setGameData={setGameData}
+                    />
+                    {((gameData.parentingGuide &&
+                      gameData.parentingGuide !== "") ||
+                      gameData.parentingGuideFile) && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="items-center gap-1 border-red-700 text-red-700 hover:bg-red-700"
+                        onClick={onDeleteParentingGuideOpen}
+                      >
+                        Delete Parenting Guide <X size={18} />
+                      </Button>
+                    )}
+                    <DeleteComponentModal
+                      isOpen={isDeleteParentingGuideOpen}
+                      onClose={onDeleteParentingGuideClose}
+                      gameData={gameData}
+                      setGameData={setGameData}
+                      deleteType="parentingGuide"
+                    />
+                  </div>
+                )}
+              </TabPanel>
+            )}
             {((gameData.answerKey && gameData.answerKey !== "" && authorized) ||
-              mode === "edit") && <TabPanel>Answer Key</TabPanel>}
+              mode === "edit") && (
+              <TabPanel display="flex" flexDir="column" gap={2}>
+                {((gameData.answerKey && gameData.answerKey !== "") ||
+                  gameData.answerKeyFile) && (
+                  <iframe
+                    className="w-full"
+                    height="400"
+                    src={
+                      gameData.answerKeyFile
+                        ? URL.createObjectURL(gameData.answerKeyFile as File)
+                        : gameData.answerKey
+                    }
+                  />
+                )}
+                {mode === "edit" && (
+                  <div className="flex flex-row gap-2">
+                    <UploadModal
+                      title="Answer Key"
+                      field="answerKey"
+                      fileField="answerKeyFile"
+                      gameData={gameData}
+                      setGameData={setGameData}
+                    />
+                    {((gameData.answerKey && gameData.answerKey !== "") ||
+                      gameData.answerKeyFile) && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="items-center gap-1 border-red-700 text-red-700 hover:bg-red-700"
+                        onClick={onDeleteAnswerKeyOpen}
+                      >
+                        Delete Answer Key <X size={18} />
+                      </Button>
+                    )}
+                    <DeleteComponentModal
+                      isOpen={isDeleteAnswerKeyOpen}
+                      onClose={onDeleteAnswerKeyClose}
+                      gameData={gameData}
+                      setGameData={setGameData}
+                      deleteType="answerKey"
+                    />
+                  </div>
+                )}
+              </TabPanel>
+            )}
             {((gameData?.builds && gameData.builds.length > 0) ||
               mode === "edit") && (
               <TabPanel>

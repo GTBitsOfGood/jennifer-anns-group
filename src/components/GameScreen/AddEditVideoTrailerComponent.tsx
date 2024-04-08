@@ -18,14 +18,14 @@ import {
 import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
 import { useRef, useState, useEffect, Dispatch } from "react";
-import { populatedGameWithId } from "@/server/db/models/GameModel";
+import { GameDataState } from "./GamePage";
 export const youtubeREGEX =
   /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|live\/|v\/)?)([\w\-]+)(\S+)?$/;
 export const vimeoREGEX =
   /(http|https)?:\/\/(www\.|player\.)?vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|video\/|)(\d+)(?:|\/\?)/;
 interface Props {
-  gameData: populatedGameWithId;
-  setGameData: Dispatch<populatedGameWithId>;
+  gameData: GameDataState;
+  setGameData: Dispatch<GameDataState>;
 }
 
 export default function AddEditVideoTrailer({ gameData, setGameData }: Props) {
