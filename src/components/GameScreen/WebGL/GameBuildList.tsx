@@ -12,16 +12,16 @@ import {
   SelectGroup,
   SelectItem,
 } from "@/components/ui/select";
-import { TextArea } from "../ui/textarea";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { TextArea } from "../../ui/textarea";
+import { Input } from "../../ui/input";
+import { Button } from "../../ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { GameDataState } from "../GameScreen/GamePage";
+import { GameDataState } from "../GamePage";
 
 interface Props {
   gameData: GameDataState;

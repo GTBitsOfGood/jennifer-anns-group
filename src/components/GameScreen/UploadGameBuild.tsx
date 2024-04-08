@@ -11,9 +11,9 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { ChangeEvent } from "react";
-import { Input } from "./ui/input";
-import { TextArea } from "./ui/textarea";
-import WebGLUpload from "./WebGLUpload";
+import { Input } from "../ui/input";
+import { TextArea } from "../ui/textarea";
+import WebGLUpload from "./WebGL/WebGLUpload";
 
 import { z } from "zod";
 import { AllBuilds, NonWebGLBuilds, buildSchema } from "@/utils/types";

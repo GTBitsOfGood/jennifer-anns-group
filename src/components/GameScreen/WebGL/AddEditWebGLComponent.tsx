@@ -1,6 +1,6 @@
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import React, { useEffect } from "react";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "../ui/label";
+import { Label } from "../../ui/label";
 import { AlertTriangleIcon, Pencil, Plus, X } from "lucide-react";
 
 import { useState } from "react";

@@ -6,7 +6,7 @@ import ContactComponent from "../Tabs/ContactComponent";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { userSchema } from "@/utils/types";
-import EmbeddedGame from "@/components/EmbeddedGame";
+import EmbeddedGame from "@/components/GameScreen/WebGL/EmbeddedGame";
 import NotesComponent from "@/components/Tabs/NotesComponent";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import AdminEditButton from "@/components/GameScreen/AdminEditButton";
@@ -63,6 +63,7 @@ const GamePage = ({ mode }: Props) => {
       setVisibleAnswer(false);
     }
   }, [userData]);
+
   useEffect(() => {
     if (currentUser) {
       getUserData();

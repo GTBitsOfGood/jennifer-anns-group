@@ -14,7 +14,7 @@ import { ITag } from "@/server/db/models/TagModel";
 import { ExtendId, buildSchema, gameSchema } from "@/utils/types";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { IGame } from "@/server/db/models/GameModel";
-import UploadGameBuild from "@/components/UploadGameBuild";
+import UploadGameBuild from "@/components/GameScreen/UploadGameBuild";
 import {
   youtubeREGEX,
   vimeoREGEX,

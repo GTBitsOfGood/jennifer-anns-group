@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { ChangeEvent, Dispatch, useState } from "react";
-import GameBuildList from "../GameScreen/GameBuildList";
+import GameBuildList from "../GameScreen/WebGL/GameBuildList";
 import VideoComponent from "./VideoComponent";
 import { Button } from "../ui/button";
 import { X } from "lucide-react";

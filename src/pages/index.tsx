@@ -19,7 +19,7 @@ import { WarningTwoIcon } from "@chakra-ui/icons";
 import cx from "classnames";
 import EditGameBoyModal from "@/components/HomePage/EditGameBoyModal";
 import GameBoy from "@/components/HomePage/GameBoy";
-import MarkdownRenderer from "@/components/MarkdownRenderer";
+import MarkdownRenderer from "@/components/HomePage/MarkdownRenderer";
 
 // const mdPlugins = ["font-bold", "font-italic", "font-underline"];
 const mdParser = new MarkdownIt().use(insert);

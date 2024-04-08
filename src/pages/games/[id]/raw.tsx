@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import RawEmbeddedGame from "@/components/RawEmbeddedGame";
+import RawEmbeddedGame from "@/components/GameScreen/WebGL/RawEmbeddedGame";
 
 const GamePage = () => {
   const gameId = useRouter().query.id;
@@ -15,6 +15,8 @@ const GamePage = () => {
   }, []);
 
   if (!gameId || typeof window === "undefined") {
+    console.log("gameId", gameId);
+    console.log("window", typeof window);
     return <></>;
   }
 
