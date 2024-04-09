@@ -12,16 +12,16 @@ import {
   SelectGroup,
   SelectItem,
 } from "@/components/ui/select";
-import { TextArea } from "../ui/textarea";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { TextArea } from "../../ui/textarea";
+import { Input } from "../../ui/input";
+import { Button } from "../../ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { GameDataState } from "../GameScreen/GamePage";
+import { GameDataState } from "../GamePage";
 
 interface Props {
   gameData: GameDataState;
@@ -450,7 +450,9 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
                   <div className="max-w-4/5 min-w-[78px]"></div>
                   <div className="flex max-w-[85%] flex-col gap-2">
                     <p className="text-sm text-blue-primary">Instructions</p>
-                    <p className="text-sm">{data.instructions}</p>
+                    <div className="text-sm" style={{ whiteSpace: "pre-line" }}>
+                      {data.instructions}
+                    </div>
                   </div>
                 </div>
               )}

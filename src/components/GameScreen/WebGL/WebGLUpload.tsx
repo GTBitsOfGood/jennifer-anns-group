@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Button } from "./ui/button";
-import { Label } from "./ui/label";
+import { Button } from "../../ui/button";
+import { Label } from "../../ui/label";
 import { AlertTriangle, AlertTriangleIcon, X } from "lucide-react";
 
 // there's probably a better place to put these

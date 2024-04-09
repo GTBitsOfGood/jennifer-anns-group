@@ -53,6 +53,8 @@ async function postThemeHandler(req: NextApiRequest, res: NextApiResponse) {
     if (!parsedBody.success) {
       throw new ThemeInvalidInputException();
     }
+    parsedBody.data.name =
+      parsedBody.data.name[0].toUpperCase() + parsedBody.data.name.slice(1);
     const newTheme = await createTheme(parsedBody.data);
     return res.status(HTTP_STATUS_CODE.OK).send({
       ...newTheme,

@@ -5,7 +5,7 @@ import TabsComponent from "@/components/Tabs/TabsComponent";
 import React from "react";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import pageAccessHOC from "@/components/HOC/PageAccess";
-import AddEditWebGLComponent from "@/components/GameScreen/AddEditWebGLComponent";
+import AddEditWebGLComponent from "@/components/GameScreen/WebGL/AddEditWebGLComponent";
 import DeleteComponentModal from "@/components/DeleteComponentModal";
 import { useDisclosure } from "@chakra-ui/react";
 import DiscardChanges from "@/components/GameScreen/DiscardChanges";

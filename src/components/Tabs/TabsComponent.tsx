@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { ChangeEvent, Dispatch, useState } from "react";
-import GameBuildList from "../GameScreen/GameBuildList";
+import GameBuildList from "../GameScreen/WebGL/GameBuildList";
 import VideoComponent from "./VideoComponent";
 import { Button } from "../ui/button";
 import { X } from "lucide-react";
@@ -127,7 +127,7 @@ export default function TabsComponent({
                   gameData.lessonFile) && (
                   <iframe
                     className="w-full"
-                    height="400"
+                    height="600"
                     src={
                       gameData.lessonFile
                         ? URL.createObjectURL(gameData.lessonFile as File)
@@ -173,7 +173,7 @@ export default function TabsComponent({
                   gameData.parentingGuideFile) && (
                   <iframe
                     className="w-full"
-                    height="400"
+                    height="600"
                     src={
                       gameData.parentingGuideFile
                         ? URL.createObjectURL(
@@ -223,7 +223,7 @@ export default function TabsComponent({
                   gameData.answerKeyFile) && (
                   <iframe
                     className="w-full"
-                    height="400"
+                    height="600"
                     src={
                       gameData.answerKeyFile
                         ? URL.createObjectURL(gameData.answerKeyFile as File)
