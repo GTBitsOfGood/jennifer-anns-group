@@ -10,8 +10,8 @@ interface EmbeddedGameProps {
 export default function EmbeddedGame({ gameId }: EmbeddedGameProps) {
   const ref = useRef<HTMLIFrameElement | null>(null);
   const [height, setHeight] = useState("0px");
-  const [loadGame, setLoadGame] = useState(false);
-  const [iframeLoading, setIframeLoading] = useState(false);
+  // const [loadGame, setLoadGame] = useState(false);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
 
   const updateHeight = () => {
     const iframe = ref.current;
@@ -21,12 +21,13 @@ export default function EmbeddedGame({ gameId }: EmbeddedGameProps) {
     if (frameHeight) {
       setHeight(frameHeight + "px");
     }
-    setIframeLoading(false);
   };
 
   const handleLoad = () => {
     const iframe = ref.current;
     if (!iframe) return;
+
+    setIframeLoaded(true);
 
     const observer = new MutationObserver(updateHeight);
 
@@ -42,48 +43,45 @@ export default function EmbeddedGame({ gameId }: EmbeddedGameProps) {
   };
 
   useEffect(() => {
+    if (iframeLoaded) {
+      updateHeight();
+    }
+  }, [iframeLoaded]);
+
+  useEffect(() => {
     window.addEventListener("resize", updateHeight);
     return () => {
       window.removeEventListener("resize", updateHeight);
     };
   }, []);
 
-  const RunGame = () => (
-    <div className="m-auto my-6 flex aspect-video w-10/12 items-center justify-center border-2 border-solid border-black">
-      <Button
-        type="button"
-        variant="mainblue"
-        className="flex h-12 rounded-xl text-lg font-semibold text-white"
-        onClick={() => {
-          setLoadGame(true);
-          setIframeLoading(true);
-        }}
-      >
-        <div className="flex items-center gap-2 font-sans">
-          <p>Run Game</p>
-          <Play />
-        </div>
-      </Button>
-    </div>
-  );
+  // const RunGame = () => (
+  //   <div className="m-auto my-6 flex aspect-video w-10/12 items-center justify-center border-2 border-solid border-black">
+  //     <Button
+  //       type="button"
+  //       variant="mainblue"
+  //       className="flex h-12 rounded-xl text-lg font-semibold text-white"
+  //       onClick={() => {
+  //         setLoadGame(true);
+  //       }}
+  //     >
+  //       <div className="flex items-center gap-2 font-sans">
+  //         <p>Run Game</p>
+  //         <Play />
+  //       </div>
+  //     </Button>
+  //   </div>
+  // );
 
   return (
-    <div>
-      {loadGame ? (
-        <iframe
-          ref={ref}
-          onLoad={handleLoad}
-          height={height}
-          src={`/games/${gameId}/raw`}
-          className={cn({
-            "m-auto my-6 w-10/12 border-2 border-solid border-black":
-              height !== "0px",
-          })}
-        />
-      ) : (
-        <RunGame />
-      )}
-      {iframeLoading && <RunGame />}
-    </div>
+    <iframe
+      ref={ref}
+      onLoad={handleLoad}
+      height={height}
+      src={`/games/${gameId}/raw`}
+      className={cn("m-auto my-6 w-10/12", {
+        "border-2 border-solid border-black": height !== "0px",
+      })}
+    />
   );
 }

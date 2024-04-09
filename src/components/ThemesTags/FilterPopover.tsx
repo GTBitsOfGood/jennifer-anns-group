@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/popover";
 import { ITag } from "@/server/db/models/TagModel";
 import { ITheme } from "@/server/db/models/ThemeModel";
-import { Spinner } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { PageRequiredGameQuery } from "./GamesSection";
@@ -45,7 +44,7 @@ function FilterPopover(props: Props) {
   });
 
   if (themesStatus === "pending" || tagsStatus === "pending") {
-    return <Spinner />;
+    return <></>;
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

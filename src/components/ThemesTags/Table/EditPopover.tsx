@@ -15,7 +15,6 @@ import {
   GetGameContextOutput,
   GetGameContextThemesOutput,
 } from "@/pages/api/games/[id]/themes";
-import { Spinner } from "@chakra-ui/react";
 import { PopoverClose } from "@radix-ui/react-popover";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil } from "lucide-react";
@@ -108,7 +107,7 @@ function EditPopover(props: Props) {
   }
 
   if (status === "pending" || nestedSource === undefined) {
-    return <Spinner />;
+    return <></>;
   }
 
   return (

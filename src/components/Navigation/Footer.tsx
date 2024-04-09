@@ -54,7 +54,7 @@ export const Footer = () => {
               )}
             </div>
           </div>
-          <div className="mb-5 ml-5 mr-5 mt-7 shrink lg:ml-[20vw] lg:mr-[5vw]">
+          <div className="m-5 shrink lg:ml-[15vw] lg:mr-[5vw]">
             <div className="mb-10 font-dm-sans text-xl font-bold leading-snug text-indigo-950">
               Mission
             </div>
@@ -63,7 +63,7 @@ export const Footer = () => {
               advocacy.
             </div>
           </div>
-          <div className="m-5 mt-7 flex shrink-0 flex-col gap-6">
+          <div className="m-5 flex shrink-0 flex-col gap-6">
             <div className="mb-[14px] font-dm-sans text-xl font-bold leading-snug text-indigo-950">
               Contact us
             </div>

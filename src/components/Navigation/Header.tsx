@@ -97,7 +97,12 @@ const Header = () => {
   return (
     <div className="flex w-full justify-center">
       <div className="mx-auto flex h-16 w-[calc(100%-4rem)] max-w-[90%] items-center justify-between bg-white p-12">
-        <div className="flex items-center">
+        <div
+          className="flex items-center hover:cursor-pointer"
+          onClick={() => {
+            router.push("/");
+          }}
+        >
           <img className="w-50 h-auto" src="/logo_gray.svg" alt="Logo" />
           <div className="ml-6 font-open-sans text-xl font-semibold text-stone-900 opacity-70">
             Jennifer Ann&apos;s Group
