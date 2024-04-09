@@ -44,6 +44,9 @@ async function postTagHandler(req: NextApiRequest, res: NextApiResponse) {
     if (!parsedBody.success) {
       throw new TagInvalidInputException();
     }
+    parsedBody.data.name =
+      parsedBody.data.name[0].toUpperCase() + parsedBody.data.name.slice(1);
+
     const tag = await createTag(parsedBody.data);
 
     return res.status(HTTP_STATUS_CODE.CREATED).send({

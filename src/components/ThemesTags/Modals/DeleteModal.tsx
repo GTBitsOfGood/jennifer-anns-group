@@ -31,6 +31,7 @@ function DeleteModal({ open, setOpen, subject, subjectType }: Props) {
       }).then((res) => res.json()) as Promise<ITheme & { _id: string }>,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["allThemes"] });
+      queryClient.invalidateQueries({ queryKey: ["allGames"] });
     },
   });
 
@@ -42,6 +43,7 @@ function DeleteModal({ open, setOpen, subject, subjectType }: Props) {
       }).then((res) => res.json()) as Promise<ITag & { _id: string }>,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tagsByType"] });
+      queryClient.invalidateQueries({ queryKey: ["allGames"] });
     },
   });
 

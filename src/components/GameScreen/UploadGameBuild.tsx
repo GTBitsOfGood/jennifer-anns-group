@@ -10,7 +10,6 @@ import {
   SelectGroup,
   SelectItem,
 } from "@/components/ui/select";
-import { ChangeEvent } from "react";
 import { Input } from "../ui/input";
 import { TextArea } from "../ui/textarea";
 import WebGLUpload from "./WebGL/WebGLUpload";
@@ -362,6 +361,7 @@ function UploadGameBuild(props: Props) {
                         className="min-h-24 shrink text-xs font-light"
                         value={instructions}
                         onChange={handleInstructionsChange}
+                        style={{ whiteSpace: "pre-line" }}
                       />
                     </span>
                   </div>

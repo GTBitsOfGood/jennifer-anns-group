@@ -9,8 +9,9 @@ interface EmbeddedGameProps {
 
 export default function EmbeddedGame({ gameId }: EmbeddedGameProps) {
   const ref = useRef<HTMLIFrameElement | null>(null);
-  const [height, setHeight] = useState("350px");
+  const [height, setHeight] = useState("0px");
   const [loadGame, setLoadGame] = useState(false);
+  const [iframeLoading, setIframeLoading] = useState(false);
 
   const updateHeight = () => {
     const iframe = ref.current;
@@ -20,6 +21,7 @@ export default function EmbeddedGame({ gameId }: EmbeddedGameProps) {
     if (frameHeight) {
       setHeight(frameHeight + "px");
     }
+    setIframeLoading(false);
   };
 
   const handleLoad = () => {
@@ -34,7 +36,6 @@ export default function EmbeddedGame({ gameId }: EmbeddedGameProps) {
         subtree: true,
       });
     }
-
     return () => {
       observer.disconnect();
     };
@@ -47,6 +48,25 @@ export default function EmbeddedGame({ gameId }: EmbeddedGameProps) {
     };
   }, []);
 
+  const RunGame = () => (
+    <div className="m-auto my-6 flex aspect-video w-10/12 items-center justify-center border-2 border-solid border-black">
+      <Button
+        type="button"
+        variant="mainblue"
+        className="flex h-12 rounded-xl text-lg font-semibold text-white"
+        onClick={() => {
+          setLoadGame(true);
+          setIframeLoading(true);
+        }}
+      >
+        <div className="flex items-center gap-2 font-sans">
+          <p>Run Game</p>
+          <Play />
+        </div>
+      </Button>
+    </div>
+  );
+
   return (
     <div>
       {loadGame ? (
@@ -55,28 +75,15 @@ export default function EmbeddedGame({ gameId }: EmbeddedGameProps) {
           onLoad={handleLoad}
           height={height}
           src={`/games/${gameId}/raw`}
-          className={cn("m-auto my-6 w-10/12", {
-            "border-2 border-solid border-black": height !== "0px",
+          className={cn({
+            "m-auto my-6 w-10/12 border-2 border-solid border-black":
+              height !== "0px",
           })}
         />
       ) : (
-        <div
-          className="m-auto my-6 flex w-10/12 items-center justify-center border-2 border-solid border-black"
-          style={{ height }}
-        >
-          <Button
-            type="button"
-            variant="mainblue"
-            className="flex h-12 rounded-xl text-lg font-semibold text-white"
-            onClick={() => setLoadGame(true)}
-          >
-            <div className="flex items-center gap-2 font-sans">
-              <p>Run Game</p>
-              <Play />
-            </div>
-          </Button>
-        </div>
+        <RunGame />
       )}
+      {iframeLoading && <RunGame />}
     </div>
   );
 }

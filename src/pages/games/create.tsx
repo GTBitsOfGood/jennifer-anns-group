@@ -24,6 +24,7 @@ import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import { useMutation } from "@tanstack/react-query";
 import { uploadApplicationFile } from "@/utils/file";
+import UploadPDF from "@/components/CreateGameScreen/UploadPDF";
 
 const NAME_FORM_KEY = "name";
 const TRAILER_FORM_KEY = "videoTrailer";
@@ -32,13 +33,11 @@ const IMAGE_FORM_KEY = "image";
 const PARENTING_GUIDE_FORM_KEY = "parentingGuide";
 const LESSON_PLAN_FORM_KEY = "lesson";
 const ANSWER_KEY_FORM_KEY = "answerKey";
-
-export const createGameSchema = z.object({
-  name: z.string().min(3, "Title must be at least 3 characters"),
-  image: z.string().min(1, "Image is required"),
-  videoTrailer: z.string().url("Not a valid URL").or(z.literal("")),
-  description: z.string().min(1, "Description is required"),
-});
+const pdfFormKeys = [
+  PARENTING_GUIDE_FORM_KEY,
+  LESSON_PLAN_FORM_KEY,
+  ANSWER_KEY_FORM_KEY,
+];
 
 export type BuildFileType = "data" | "framework" | "loader" | "code";
 export const buildFileTypes = Object.freeze({
@@ -137,18 +136,15 @@ function CreateGame() {
   const [frameworkFile, setFrameworkFile] = useState<null | File>(null);
 
   const [imagePreviewFile, setImagePreviewFile] = useState<null | File>(null);
-  const [fileValidationError, setFileValidationError] = useState<
-    string | undefined
-  >(undefined);
 
-  const lessonRef = useRef<HTMLInputElement>(null);
-  const parentingGuideRef = useRef<HTMLInputElement>(null);
-  const answerKeyRef = useRef<HTMLInputElement>(null);
-
-  const [selectedPdfInputs, setSelectedPdfInputs] = useState({
-    parentingGuide: false,
-    answerKey: false,
-    lesson: false,
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string | undefined>
+  >({
+    name: undefined,
+    image: undefined,
+    videoTrailer: undefined,
+    description: undefined,
+    builds: undefined,
   });
 
   const [uploadGameComponents, setUploadGameComponents] = useState<
@@ -170,6 +166,31 @@ function CreateGame() {
       setFrameworkFile={setFrameworkFile}
     />,
   ]);
+
+  const { mutateAsync: getDirectUpload } = useMutation({
+    mutationFn: (file: File) => fetch("/api/file").then((res) => res.json()),
+  });
+
+  const addUploadComponent = () => {
+    setUploadGameComponents((prevComponents) => [
+      ...prevComponents,
+      <UploadGameBuild
+        key={prevComponents.length}
+        builds={builds}
+        uploadedWebGL={uploadedWebGL}
+        setUploadedWebGL={setUploadedWebGL}
+        setBuilds={setBuilds}
+        loaderFile={loaderFile}
+        setLoaderFile={setLoaderFile}
+        dataFile={dataFile}
+        setDataFile={setDataFile}
+        codeFile={codeFile}
+        setCodeFile={setCodeFile}
+        frameworkFile={frameworkFile}
+        setFrameworkFile={setFrameworkFile}
+      />,
+    ]);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -195,33 +216,7 @@ function CreateGame() {
     fetchData();
   }, []);
 
-  const { mutateAsync: getDirectUpload } = useMutation({
-    mutationFn: (file: File) => fetch("/api/file").then((res) => res.json()),
-  });
-
-  const [validationErrors, setValidationErrors] = useState<
-    Record<keyof z.input<typeof createGameSchema>, string | undefined>
-  >({
-    name: undefined,
-    image: undefined,
-    videoTrailer: undefined,
-    description: undefined,
-  });
-
   async function createGame(data: IGame) {
-    // check video trailer is youtube or vimeo
-    if (data.videoTrailer && data.videoTrailer !== "") {
-      if (
-        !youtubeREGEX.test(data.videoTrailer) &&
-        !vimeoREGEX.test(data.videoTrailer)
-      ) {
-        setValidationErrors((prevValidationErrors) => ({
-          ...prevValidationErrors,
-          videoTrailer: "Invalid URL (Only Youtube and Vimeo videos supported)",
-        }));
-        return;
-      }
-    }
     try {
       const response = await fetch(`/api/games`, {
         method: "POST",
@@ -246,67 +241,7 @@ function CreateGame() {
     }
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setSubmitting(true);
-    if (uploadedWebGL) {
-      if (
-        loaderFile === null ||
-        dataFile === null ||
-        codeFile === null ||
-        frameworkFile === null
-      ) {
-        setFileValidationError(
-          "All files must be uploaded for the WebGL Build.",
-        );
-        setSubmitting(false);
-        return;
-      } else {
-        setFileValidationError(undefined);
-      }
-    }
-    if (imagePreviewFile) {
-      if (
-        imagePreviewFile.type !== "image/png" &&
-        imagePreviewFile.type !== "image/jpg" &&
-        imagePreviewFile.type !== "image/jpeg"
-      ) {
-        setValidationErrors((prevValidationErrors) => ({
-          ...prevValidationErrors,
-          image: "Invalid Image: Only PNG, JPG, or JPEG permitted.",
-        }));
-        return;
-      }
-      const img = new Image();
-      img.src = URL.createObjectURL(imagePreviewFile);
-      img.onload = () => {
-        const naturalWidth = img.naturalWidth;
-        const naturalHeight = img.naturalHeight;
-        URL.revokeObjectURL(img.src);
-        if (naturalWidth !== 630 || naturalHeight !== 500) {
-          setValidationErrors((prevValidationErrors) => ({
-            ...prevValidationErrors,
-            image: "Image must have dimensions 630x500 pixels.",
-          }));
-          return;
-        }
-      };
-      img.onerror = () => {
-        setValidationErrors((prevValidationErrors) => ({
-          ...prevValidationErrors,
-          image: "Image failed to load",
-        }));
-        return;
-      };
-    }
-    const formData = new FormData(e.currentTarget);
-
-    const pdfFormKeys = [
-      PARENTING_GUIDE_FORM_KEY,
-      LESSON_PLAN_FORM_KEY,
-      ANSWER_KEY_FORM_KEY,
-    ];
-
+  async function uploadPDFs(formData: FormData) {
     const nonNullPdfInputs: Record<string, File> = pdfFormKeys.reduce(
       (acc, cur) => {
         const value = formData.get(cur) as File;
@@ -350,6 +285,93 @@ function CreateGame() {
       {},
     );
 
+    return fieldStoredUrls;
+  }
+
+  function validateVideoTrailer(link: string) {
+    if (link && link !== "") {
+      if (!youtubeREGEX.test(link) && !vimeoREGEX.test(link)) {
+        setValidationErrors((prevValidationErrors) => ({
+          ...prevValidationErrors,
+          videoTrailer: "Invalid URL (Only Youtube and Vimeo videos supported)",
+        }));
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function validateImage() {
+    if (imagePreviewFile) {
+      if (
+        imagePreviewFile.type !== "image/png" &&
+        imagePreviewFile.type !== "image/jpg" &&
+        imagePreviewFile.type !== "image/jpeg"
+      ) {
+        setValidationErrors((prevValidationErrors) => ({
+          ...prevValidationErrors,
+          image: "Invalid Image: Only PNG, JPG, or JPEG permitted.",
+        }));
+        return false;
+      }
+      const img = new Image();
+      img.src = URL.createObjectURL(imagePreviewFile);
+      img.onload = () => {
+        const naturalWidth = img.naturalWidth;
+        const naturalHeight = img.naturalHeight;
+        URL.revokeObjectURL(img.src);
+        if (naturalWidth !== 630 || naturalHeight !== 500) {
+          setValidationErrors((prevValidationErrors) => ({
+            ...prevValidationErrors,
+            image: "Image must have dimensions 630x500 pixels.",
+          }));
+          return false;
+        }
+      };
+      img.onerror = () => {
+        setValidationErrors((prevValidationErrors) => ({
+          ...prevValidationErrors,
+          image: "Image failed to load",
+        }));
+        return false;
+      };
+    }
+    return true;
+  }
+
+  function validateBuilds() {
+    if (uploadedWebGL) {
+      if (
+        loaderFile === null ||
+        dataFile === null ||
+        codeFile === null ||
+        frameworkFile === null
+      ) {
+        setValidationErrors((prevValidationErrors) => ({
+          ...prevValidationErrors,
+          builds: "All files must be uploaded for the WebGL Build.",
+        }));
+        return false;
+      }
+    } else {
+      if (builds.length === 0) {
+        setValidationErrors((prevValidationErrors) => ({
+          ...prevValidationErrors,
+          builds: "Please add at least one Game Build.",
+        }));
+      }
+    }
+    return true;
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSubmitting(true);
+
+    const formData = new FormData(e.currentTarget);
+
+    const PDFUrls = await uploadPDFs(formData);
+
     const input = {
       name: formData.get(NAME_FORM_KEY),
       videoTrailer: formData.get(TRAILER_FORM_KEY),
@@ -361,9 +383,20 @@ function CreateGame() {
         (tag) => tag._id,
       ),
       preview: true,
-      ...fieldStoredUrls,
+      ...PDFUrls,
     };
     const parse = gameSchema.safeParse(input);
+
+    const validImage = validateImage();
+    const validVideo = validateVideoTrailer(
+      formData.get(TRAILER_FORM_KEY) as string,
+    );
+    const validBuilds = validateBuilds();
+
+    if (!validImage || !validVideo || !validBuilds) {
+      setSubmitting(false);
+      return;
+    }
 
     if (parse.success) {
       setValidationErrors({
@@ -371,16 +404,8 @@ function CreateGame() {
         image: undefined,
         videoTrailer: undefined,
         description: undefined,
+        builds: undefined,
       });
-      if (fileValidationError !== undefined) return;
-      if (
-        (!parse.data.builds || parse.data?.builds.length == 0) &&
-        !uploadedWebGL
-      ) {
-        alert("Please add at least one Game Build.");
-        setSubmitting(false);
-        return;
-      }
 
       try {
         const response = await createGame(parse.data);
@@ -406,30 +431,10 @@ function CreateGame() {
         image: errors.image?.at(0),
         videoTrailer: errors.videoTrailer?.at(0),
         description: errors.description?.at(0),
+        builds: errors.builds?.at(0),
       });
     }
   }
-
-  const addUploadComponent = () => {
-    setUploadGameComponents((prevComponents) => [
-      ...prevComponents,
-      <UploadGameBuild
-        key={prevComponents.length}
-        builds={builds}
-        uploadedWebGL={uploadedWebGL}
-        setUploadedWebGL={setUploadedWebGL}
-        setBuilds={setBuilds}
-        loaderFile={loaderFile}
-        setLoaderFile={setLoaderFile}
-        dataFile={dataFile}
-        setDataFile={setDataFile}
-        codeFile={codeFile}
-        setCodeFile={setCodeFile}
-        frameworkFile={frameworkFile}
-        setFrameworkFile={setFrameworkFile}
-      />,
-    ]);
-  };
 
   const [submitting, setSubmitting] = useState<boolean>(false);
 
@@ -440,10 +445,12 @@ function CreateGame() {
       codeFile === null ||
       frameworkFile === null
     ) {
-      setFileValidationError("All files must be uploaded for the WebGL Build!");
+      setValidationErrors((prevValidationErrors) => ({
+        ...prevValidationErrors,
+        builds: "All files must be uploaded for the WebGL Build.",
+      }));
       return false;
     }
-    setFileValidationError(undefined);
 
     const files = new Map([
       ["loader", loaderFile],
@@ -455,12 +462,13 @@ function CreateGame() {
     try {
       await uploadBuildFiles(gameId, files);
       setSubmitting(false);
-
-      alert("Files uploaded successfully");
       return true;
     } catch (e) {
       console.error(e);
-      setFileValidationError("An internal error occurred. Please try again.");
+      setValidationErrors((prevValidationErrors) => ({
+        ...prevValidationErrors,
+        builds: "An internal error occurred. Please try again.",
+      }));
       return false;
     }
   };
@@ -626,140 +634,7 @@ function CreateGame() {
           />
         </div>
 
-        <div className="relative flex w-fit flex-col gap-3 md:w-2/3">
-          <label className="text-xl font-semibold">Parenting Guide</label>
-          <div className="flex w-fit flex-row items-center justify-start gap-2">
-            <label htmlFor={PARENTING_GUIDE_FORM_KEY}>
-              <div className="flex h-12 w-32 flex-row items-center justify-center gap-3 rounded-md border border-[#666666] bg-[#FAFBFC] text-slate-900 hover:opacity-80">
-                <div>
-                  <Upload size={24} />
-                </div>
-                <p className="text-sm">Upload</p>
-              </div>
-            </label>
-            <input
-              ref={parentingGuideRef}
-              className="block w-fit min-w-0 text-sm file:hidden"
-              id={PARENTING_GUIDE_FORM_KEY}
-              name={PARENTING_GUIDE_FORM_KEY}
-              type="file"
-              accept=".pdf"
-              onChange={(e) => {
-                const files = e.currentTarget.files;
-                setSelectedPdfInputs({
-                  ...selectedPdfInputs,
-                  parentingGuide: !!files,
-                });
-              }}
-            />
-            <X
-              className={
-                selectedPdfInputs.parentingGuide
-                  ? "block text-orange-primary hover:cursor-pointer"
-                  : "hidden"
-              }
-              onClick={() => {
-                if (!parentingGuideRef.current) return;
-                parentingGuideRef.current.value = "";
-
-                setSelectedPdfInputs({
-                  ...selectedPdfInputs,
-                  parentingGuide: false,
-                });
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="relative flex w-full flex-col gap-3 md:w-2/3">
-          <label className="text-xl font-semibold">Lesson Plan</label>
-          <div className="flex w-fit flex-row items-center justify-start gap-2">
-            <label htmlFor={LESSON_PLAN_FORM_KEY}>
-              <div className="flex h-12 w-32 flex-row items-center justify-center gap-3 rounded-md border border-[#666666] bg-[#FAFBFC] text-slate-900 hover:opacity-80">
-                <div>
-                  <Upload size={24} />
-                </div>
-                <p className="text-sm">Upload</p>
-              </div>
-            </label>
-            <input
-              ref={lessonRef}
-              className="block w-fit text-sm file:hidden"
-              id={LESSON_PLAN_FORM_KEY}
-              name={LESSON_PLAN_FORM_KEY}
-              type="file"
-              accept=".pdf"
-              onChange={(e) => {
-                const files = e.currentTarget.files;
-                setSelectedPdfInputs({
-                  ...selectedPdfInputs,
-                  lesson: !!files,
-                });
-              }}
-            />
-            <X
-              className={
-                selectedPdfInputs.lesson
-                  ? "block text-orange-primary hover:cursor-pointer"
-                  : "hidden"
-              }
-              onClick={() => {
-                if (!lessonRef.current) return;
-                lessonRef.current.value = "";
-
-                setSelectedPdfInputs({
-                  ...selectedPdfInputs,
-                  lesson: false,
-                });
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="relative flex w-full flex-col gap-3 md:w-2/3">
-          <label className="text-xl font-semibold">Answer Key</label>
-          <div className="flex w-fit flex-row items-center justify-start gap-2">
-            <label htmlFor={ANSWER_KEY_FORM_KEY}>
-              <div className="flex h-12 w-32 flex-row items-center justify-center gap-3 rounded-md border border-[#666666] bg-[#FAFBFC] text-slate-900 hover:opacity-80">
-                <div>
-                  <Upload size={24} />
-                </div>
-                <p className="text-sm">Upload</p>
-              </div>
-            </label>
-            <input
-              ref={answerKeyRef}
-              className="block w-fit text-sm file:hidden"
-              id={ANSWER_KEY_FORM_KEY}
-              name={ANSWER_KEY_FORM_KEY}
-              type="file"
-              accept=".pdf"
-              onChange={(e) => {
-                const files = e.currentTarget.files;
-                setSelectedPdfInputs({
-                  ...selectedPdfInputs,
-                  answerKey: !!files,
-                });
-              }}
-            />
-            <X
-              className={
-                selectedPdfInputs.answerKey
-                  ? "block text-orange-primary hover:cursor-pointer"
-                  : "hidden"
-              }
-              onClick={() => {
-                if (!answerKeyRef.current) return;
-                answerKeyRef.current.value = "";
-
-                setSelectedPdfInputs({
-                  ...selectedPdfInputs,
-                  answerKey: false,
-                });
-              }}
-            />
-          </div>
-        </div>
+        <UploadPDF pdfFormKeys={pdfFormKeys} />
 
         <div className="relative flex w-full flex-col gap-3">
           <label className="text-xl font-semibold">Theme(s)</label>
@@ -797,20 +672,12 @@ function CreateGame() {
             <div className="flex h-14 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
               <AlertTriangleIcon className="h-5 w-5" />
               <p>
-                {validationErrors.name
-                  ? validationErrors.name
-                  : validationErrors.videoTrailer
-                    ? validationErrors.videoTrailer
-                    : validationErrors.image
-                      ? validationErrors.image
-                      : "All required fields need to be filled."}
+                {validationErrors.name ||
+                  validationErrors.image ||
+                  validationErrors.builds ||
+                  validationErrors.videoTrailer ||
+                  validationErrors.description}
               </p>
-            </div>
-          )}
-          {fileValidationError && (
-            <div className="flex h-14 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
-              <AlertTriangleIcon className="h-5 w-5" />
-              <p>{fileValidationError}</p>
             </div>
           )}
           <div className="relative flex justify-end">

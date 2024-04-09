@@ -51,6 +51,7 @@ function AddModal({ subject, open, setOpen }: Props) {
       }).then((res) => res.json()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allThemes"] });
+      queryClient.invalidateQueries({ queryKey: ["allGames"] });
     },
   });
 
@@ -62,6 +63,7 @@ function AddModal({ subject, open, setOpen }: Props) {
       }).then((res) => res.json()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tagsByType"] });
+      queryClient.invalidateQueries({ queryKey: ["allGames"] });
     },
   });
 

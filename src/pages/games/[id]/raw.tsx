@@ -15,8 +15,6 @@ const GamePage = () => {
   }, []);
 
   if (!gameId || typeof window === "undefined") {
-    console.log("gameId", gameId);
-    console.log("window", typeof window);
     return <></>;
   }
 

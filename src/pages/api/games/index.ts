@@ -72,15 +72,9 @@ async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
 
     // sort themes and tags to always return in same order
     tagSeparatedGames.forEach((game) => {
-      game.themes?.sort((a, b) =>
-        a._id.toString().localeCompare(b._id.toString()),
-      );
-      game.accessibility?.sort((a, b) =>
-        a._id.toString().localeCompare(b._id.toString()),
-      );
-      game.custom?.sort((a, b) =>
-        a._id.toString().localeCompare(b._id.toString()),
-      );
+      game.themes?.sort((a, b) => a.name.localeCompare(b.name));
+      game.accessibility?.sort((a, b) => a.name.localeCompare(b.name));
+      game.custom?.sort((a, b) => a.name.localeCompare(b.name));
     });
 
     return res.status(HTTP_STATUS_CODE.OK).send({
