@@ -13,7 +13,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "../ui/pagination";
-import { Spinner } from "@chakra-ui/react";
 import FilterPopover from "./FilterPopover";
 
 export type PageRequiredGameQuery = GameQuery &
@@ -138,7 +137,7 @@ function GamesSection() {
         <FilterPopover filters={filters} setFilters={setFilters} />
       </div>
       <div className="w-full">
-        {games ? <DataTable columns={columns} data={games} /> : <Spinner />}
+        {games && <DataTable columns={columns} data={games} />}
       </div>
       {gamesStatus === "success" ? (
         <Pagination>
