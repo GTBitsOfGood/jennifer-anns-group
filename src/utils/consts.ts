@@ -28,7 +28,7 @@ export const CLOUDFLARE_URL =
 export const UNDELETABLE_EMAILS = [
   "drew@jenniferann.org",
   "susanne@jenniferann.org",
-  "lianenguyen150@gmail.com",
+  "testAdmin@gmail.com",
 ];
 export const DEV_ADMIN_CONTACT = "bogjenniferanns@gmail.com";
 
