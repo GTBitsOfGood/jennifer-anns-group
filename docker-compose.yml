@@ -8,13 +8,15 @@ services:
       - /app/.next
     ports:
       - "3000:3000"
-    # entrypoint: ./entrypoint.sh
     environment:
       MONGODB_URI: mongodb://mongo:27017/jennifer-anns
+    env_file:
+      - bitwarden.env
     networks:
       - jennifer-anns-net
     depends_on:
       - mongo
+    entrypoint: ./entrypoint.sh
 
   mongo:
     image: mongo

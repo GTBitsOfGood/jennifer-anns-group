@@ -12,13 +12,15 @@ const buttonVariants = cva(
         default:
           "bg-slate-900 text-slate-50 hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90",
         destructive:
-          "bg-red-500 text-slate-50 hover:bg-red-500/90 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-900/90",
+          "bg-delete-red text-white hover:bg-red-800 dark:bg-delete-red dark:text-slate-50 dark:hover:bg-red-900/90",
         outline:
           "border border-blue-primary border-[1px] text-blue-primary bg-white hover:bg-blue-primary hover:text-white dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
+        primary:
+          "bg-blue-primary text-white hover:bg-[#2b61bb] dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90",
         secondary:
           "bg-slate-100 text-slate-900 hover:bg-slate-100/80 dark:bg-slate-800 dark:text-slate-50 dark:hover:bg-slate-800/80",
         ghost:
-          "hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-50",
+          "hover:bg-[#e5f0ff] hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-50",
         link: "text-slate-900 underline-offset-4 hover:underline dark:text-slate-50",
         mainblue:
           "border border-blue-primary transition-opacity border-[1px] bg-blue-primary text-white hover:opacity-75 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
@@ -26,6 +28,13 @@ const buttonVariants = cva(
           "border-2 border-[1px] transition-bg border-blue-primary text-blue-primary bg-white hover:bg-gray-100 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
         mainorange:
           "border border-orange-primary transition-opacity border-[1px] bg-orange-primary text-white hover:opacity-80 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
+        white: "text-blue-primary",
+        upload:
+          "bg-[#FAFBFC] border border-[#666666] text-slate-900 hover:opacity-80 dark:bg-slate-800 dark:text-slate-50 dark:hover:bg-slate-800/80",
+        "pagination-outline":
+          "border-[1.5px] font-semibold border-orange-primary text-orange-primary rounded-md hover:cursor-pointer bg-white hover:bg-orange-50",
+        "pagination-ghost":
+          "border-[1.5px] font-semibold rounded-md hover:cursor-pointer hover:bg-neutral-100 hover:text-slate-900 disabled:bg-red-500",
       },
       size: {
         default: "h-10 px-4 py-2",

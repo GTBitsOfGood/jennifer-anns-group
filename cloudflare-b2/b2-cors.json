@@ -1,0 +1,14 @@
+[
+  {
+    "allowedHeaders": ["*"],
+    "allowedOperations": ["b2_upload_file"],
+    "allowedOrigins": [
+      "http://localhost:3000",
+      "https://jennifer-anns.netlify.app",
+      "https://main--jennifer-anns.netlify.app"
+    ],
+    "corsRuleName": "uploadFromLocalhostNetlify",
+    "exposeHeaders": null,
+    "maxAgeSeconds": 3600
+  }
+]

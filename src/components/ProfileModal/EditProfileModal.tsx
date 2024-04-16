@@ -2,19 +2,10 @@ import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
+import WarningIcon from "@/components/ui/icons/warningicon";
 import { userSchema } from "@/utils/types";
 import cn from "classnames";
 import { z } from "zod";
-
 import { useState } from "react";
 import {
   ProfileState,
@@ -23,7 +14,7 @@ import {
   EditUserReturnValue,
 } from "./ProfileModal";
 
-const formUserSchema = userSchema.omit({ hashedPassword: true });
+const formUserSchema = userSchema.omit({ hashedPassword: true, notes: true });
 
 type EditProps = {
   setProfileState: React.Dispatch<React.SetStateAction<ProfileState>>;
@@ -39,7 +30,6 @@ function EditProfileModal(props: EditProps) {
   const FNAME_FORM_KEY = "firstName";
   const LNAME_FORM_KEY = "lastName";
   const EMAIL_FORM_KEY = "email";
-  const LABEL_FORM_KEY = "label";
 
   const [invalidEmail, setInvalidEmail] = useState("");
 
@@ -49,8 +39,8 @@ function EditProfileModal(props: EditProps) {
     const input = {
       firstName: formData.get(FNAME_FORM_KEY),
       lastName: formData.get(LNAME_FORM_KEY),
-      label: formData.get(LABEL_FORM_KEY),
       email: formData.get(EMAIL_FORM_KEY),
+      label: props.userData?.label,
     };
     const parse = formUserSchema.safeParse(input);
     if (parse.success) {
@@ -79,7 +69,11 @@ function EditProfileModal(props: EditProps) {
     } else {
       const errors = parse.error.formErrors.fieldErrors;
       if (errors.email) {
-        setInvalidEmail(String(errors.email.at(0)));
+        if (input.email == "") {
+          setInvalidEmail("Email cannot be empty");
+        } else {
+          setInvalidEmail(String(errors.email.at(0)));
+        }
       }
     }
   }
@@ -131,33 +125,20 @@ function EditProfileModal(props: EditProps) {
               "border-red-500": invalidEmail !== "",
             })}
           />
-          <p className="mt-1 text-xs text-red-500">{invalidEmail}</p>
+          <div className="mt-1 flex gap-1">
+            {invalidEmail && <WarningIcon />}
+            <p className="text-xs text-red-500">{invalidEmail}</p>
+          </div>
         </div>
 
         <div className="col-span-8 items-center">
-          <Label
-            htmlFor={LABEL_FORM_KEY}
-            className="text-right text-lg font-normal"
-          >
-            Label
-          </Label>
-
-          <Select name={LABEL_FORM_KEY} defaultValue={props.userData?.label}>
-            <SelectTrigger className="col-span-8 text-xs font-light">
-              <SelectValue
-                placeholder={props.userData?.label}
-                className="text-red-500"
-              />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="student">Student</SelectItem>
-                <SelectItem value="parent">Parent</SelectItem>
-                <SelectItem value="educator">Educator</SelectItem>
-                <SelectItem value="administrator">Administrator</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <Label className="text-right text-lg font-normal">Label</Label>
+          <p className="col-span-3 py-2 text-sm font-light text-blue-primary">
+            {props.userData?.label
+              ? props.userData?.label.charAt(0).toUpperCase() +
+                props.userData?.label.slice(1)
+              : ""}
+          </p>
         </div>
         <div className="col-span-8 items-center">
           <p

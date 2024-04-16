@@ -14,15 +14,22 @@ Jennifer Ann's Group is a nonprofit organization dedicated to preventing teen da
   ```sh
   docker run --name mongodb -d -p 27017:27017 mongo
   ```
-- Create a `.env` file in the root of the repository with the content:
-  ```sh
-  MONGODB_URI=mongodb://localhost:27017/jennifer-anns
-  ```
 - In the root directory of the project, run:
 
   ```sh
   npm install
   ```
+
+- In the root directory, run one of these commands based on your OS:
+
+  ```sh
+  npm run secrets:linux # mac / linux
+  npm run secrets:windows # windows
+  ```
+
+  You should be prompted for a master password. Ask your Engineering leadership to continue. Once the password has been verified, your `.env` file should have been created automatically for you.
+
+  If you are unable to use the commands to retrieve the `.env` file, you can download or visit [Bitwarden](https://bitwarden.com/) and login using `product@bitsofgood.org` and the master password. The `.env` file will be available within the vault.
 
 - To start the Next.js dev server, run:
 
@@ -35,7 +42,15 @@ Jennifer Ann's Group is a nonprofit organization dedicated to preventing teen da
 ## Run With Docker
 
 1. Install [Docker](https://docs.docker.com/engine/install/)
-2. Start the application with Docker Compose: `docker compose up`
+2. Obtain the Bitwarden password from your EM. Create a `bitwarden.env` file and fill it in with the following contents:
+
+```
+BW_PASSWORD=<your bitwarden password>
+```
+
+This only needs to be done on your first run. After that, you should delete the file from your repository to avoid pushing it to Github.
+
+3. Start the application with Docker Compose: `docker compose up`
 
 If you make any changes to the packages, you may need to rebuild the images. To do this, append `--build` to the above docker compose up command.
 

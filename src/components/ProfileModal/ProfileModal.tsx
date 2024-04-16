@@ -15,8 +15,9 @@ import { changePWSchema, userSchema } from "@/utils/types";
 import ViewProfileModal from "./ViewProfileModal";
 import EditProfileModal from "./EditProfileModal";
 import ChangePasswordModal from "./ChangePasswordModal";
+import DeleteUserModal from "./DeleteUserModal";
 
-export type ProfileState = "view" | "changePw" | "edit";
+export type ProfileState = "view" | "changePw" | "edit" | "deleteUser";
 
 const idSchema = z.string().length(24);
 
@@ -24,7 +25,7 @@ export const userDataSchema = userSchema
   .extend({
     _id: idSchema,
   })
-  .omit({ hashedPassword: true });
+  .omit({ hashedPassword: true, notes: true });
 
 async function editUser(
   data: z.infer<typeof userDataSchema> | z.infer<typeof changePWSchema>,
@@ -51,13 +52,19 @@ async function editUser(
 export type EditUserParams = Parameters<typeof editUser>;
 export type EditUserReturnValue = ReturnType<typeof editUser>;
 
-export function ProfileModal() {
+type ProfileProps = {
+  userData: z.infer<typeof userDataSchema> | undefined;
+  setUserData: React.Dispatch<
+    React.SetStateAction<z.infer<typeof userDataSchema> | undefined>
+  >;
+};
+
+export function ProfileModal(props: ProfileProps) {
   const [profileState, setProfileState] = useState<ProfileState>("view");
   const [open, setOpen] = useState(false);
-
   const { data: session } = useSession();
   const currentUser = session?.user;
-  const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
+  const [userData, setUserData] = [props.userData, props.setUserData];
 
   useEffect(() => {
     if (currentUser) {
@@ -69,7 +76,7 @@ export function ProfileModal() {
     try {
       const response = await fetch(`/api/users/${currentUser?._id}`);
       const data = await response.json();
-      setUserData(data.data);
+      setUserData(data);
     } catch (error) {
       console.error("Error getting user:", error);
     }
@@ -79,6 +86,7 @@ export function ProfileModal() {
     view: "Profile",
     edit: "Edit Profile",
     changePw: "Edit Password",
+    deleteUser: "",
   };
 
   return (
@@ -126,6 +134,12 @@ export function ProfileModal() {
             setProfileState={setProfileState}
             userData={userData}
             editUser={editUser}
+          />
+        )}
+        {profileState === "deleteUser" && (
+          <DeleteUserModal
+            setProfileState={setProfileState}
+            userData={userData}
           />
         )}
       </DialogContent>

@@ -3,15 +3,13 @@ import UserModel from "../models/UserModel";
 import connectMongoDB from "../mongodb";
 import { createUserSchema } from "@/pages/api/users";
 import bcrypt from "bcrypt";
-import { changePWSchema, userSchema } from "@/utils/types";
-// import { Error } from "mongoose";
-import {
-  GenericServerErrorException,
-  UserAlreadyExistsException,
-  UserCredentialsIncorrectException,
-  UserDoesNotExistException,
-} from "@/utils/exceptions";
 import { MongoError } from "mongodb";
+import { changePWSchema, userSchema } from "@/utils/types";
+import {
+  UserAlreadyExistsException,
+  UserDoesNotExistException,
+  UserCredentialsIncorrectException,
+} from "@/utils/exceptions/user";
 
 const SALT_ROUNDS = 10;
 const DUP_KEY_ERROR_CODE = 11000;
@@ -25,6 +23,7 @@ export async function createUser(data: z.infer<typeof createUserSchema>) {
   const userData: z.infer<typeof userSchema> = {
     ...data,
     hashedPassword,
+    notes: [],
   };
 
   try {
@@ -37,7 +36,7 @@ export async function createUser(data: z.infer<typeof createUserSchema>) {
     ) {
       throw new UserAlreadyExistsException();
     }
-    throw new GenericServerErrorException();
+    throw e;
   }
 }
 
@@ -66,6 +65,22 @@ export async function verifyUser(email: string, password: string) {
 export async function getUser(id: z.infer<typeof idSchema>) {
   await connectMongoDB();
   const user = await UserModel.findById(id).select("-hashedPassword");
+  if (!user) {
+    throw new UserDoesNotExistException();
+  }
+  return user;
+}
+
+/**
+ * Gets a user by their email.
+ * @param {z.infer<typeof idSchema>} email Email of the user to get.
+ * @throws {UserDoesNotExistException} If unable to find user
+ */
+export async function getUserByEmail(email: string) {
+  await connectMongoDB();
+  const user = await UserModel.findOne({ email: email }).select(
+    "-hashedPassword",
+  );
   if (!user) {
     throw new UserDoesNotExistException();
   }
@@ -138,6 +153,20 @@ export async function editPassword(
 
   // Check if user was able to be found/updated
   if (!updatedUser) {
-    throw new GenericServerErrorException();
+    throw new UserDoesNotExistException();
   }
+}
+
+/**
+ * Delete a user by their ID.
+ * @param {z.infer<typeof idSchema>} id ID of the user to delete.
+ * @throws {UserDoesNotExistException} If unable to find user
+ */
+export async function deleteUser(id: z.infer<typeof idSchema>) {
+  await connectMongoDB();
+  const user = await UserModel.findByIdAndDelete(id).select("-hashedPassword");
+  if (!user) {
+    throw new UserDoesNotExistException();
+  }
+  return user;
 }

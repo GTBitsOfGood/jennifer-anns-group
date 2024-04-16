@@ -1,14 +1,35 @@
-export const HTTP_BAD_REQUEST = 400;
-export const HTTP_OK = 200;
-export const HTTP_CREATED = 201;
-export const HTTP_UNAUTHORIZED = 401;
-export const HTTP_FORBIDDEN = 403;
-export const HTTP_NOT_FOUND = 404;
-export const HTTP_METHOD_NOT_ALLOWED = 405;
-export const HTTP_INTERNAL_SERVER_ERROR = 500;
+export enum HTTP_STATUS_CODE {
+  BAD_REQUEST = 400,
+  OK = 200,
+  CREATED = 201,
+  UNAUTHORIZED = 401,
+  FORBIDDEN = 403,
+  NOT_FOUND = 404,
+  METHOD_NOT_ALLOWED = 405,
+  INTERNAL_SERVER_ERROR = 500,
+}
 
 export enum Pages {
   HOME = "/",
   LOGIN = "/login",
   SIGNUP = "/signup",
+  CREATEGAME = "/games/create",
+  EDITGAME = "/games/[id]/edit",
+  PREVIEWGAME = "/games/[id]/preview",
+  ACCOUNTMANAGEMENT = "/admin/account-management",
+  THEMES = "/admin/themes",
 }
+
+export const ADMIN_CONTACT = "contact@jenniferann.org";
+
+export const CLOUDFLARE_URL =
+  "https://cloudflare-b2.bogjenniferanns.workers.dev";
+
+export const UNDELETABLE_EMAILS = [
+  "drew@jenniferann.org",
+  "susanne@jenniferann.org",
+  "testAdmin@gmail.com",
+];
+export const DEV_ADMIN_CONTACT = "bogjenniferanns@gmail.com";
+
+export const MAIL_SEND_DOMAIN = "trial-z86org8kpm1gew13.mlsender.net";
