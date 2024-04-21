@@ -13,6 +13,7 @@ import { userSchema } from "@/utils/types";
 import { z } from "zod";
 import { signOut, useSession } from "next-auth/react";
 import router from "next/router";
+import { UserDoesNotExistException } from "@/utils/exceptions/user";
 
 const idSchema = z.string().length(24);
 
@@ -69,6 +70,11 @@ function DeleteModal({ open, setOpen, admin }: Props) {
     try {
       await handleAdminDelete();
       const userData = await fetchUserByEmail(admin.email);
+      if (!userData) {
+        console.log("User doesn't exist, no need to update role");
+        setOpen(false);
+        return;
+      }
       const currUser = await isCurrUser();
       if (userData) {
         const updatedUserData = { ...userData, label: selectedRole };
@@ -103,10 +109,16 @@ function DeleteModal({ open, setOpen, admin }: Props) {
     try {
       await handleAdminDelete();
       const userData = await fetchUserByEmail(admin.email);
+      if (!userData) {
+        console.log("User doesn't exist, no need to delete");
+        setOpen(false);
+        return;
+      }
       const currUser = await isCurrUser();
       if (userData) {
         await deleteUser(userData._id);
       }
+      setOpen(false);
       if (currUser) {
         signOut();
       }

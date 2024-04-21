@@ -132,7 +132,7 @@ function EditProfileModal(props: EditProps) {
         </div>
 
         <div className="col-span-8 items-center">
-          <Label className="text-right text-lg font-normal">Label</Label>
+          <Label className="text-right text-lg font-normal">Role</Label>
           <p className="col-span-3 py-2 text-sm font-light text-blue-primary">
             {props.userData?.label
               ? props.userData?.label.charAt(0).toUpperCase() +
