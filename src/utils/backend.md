@@ -1,6 +1,6 @@
 # Backend
 
-So sorry for how many changes and refactorings we've done to the backend guys!! Hopefully this guide helps a little. It's currently only updated for what exists in the backend as of Sprint 2, but I will update it to include what will be added in future sprints as well!
+So sorry for how many changes and refactorings we've done to the backend guys!! Hopefully this guide helps a little. 
 
 ## Models
 
@@ -13,30 +13,23 @@ These files contain the schemas for the models used in the database. The models 
 This file contains the schema for the game model, including relationships with themes, tags, and builds.
 
 - name: String, required, unique
+- lowercaseName: String, required, unique
+  - Sprint 5: added to support case-insensitive search for games (since serverless doesn't support collation)
 - themes: Array of ObjectIds, ref: "Theme", default: []
-
-  - Sprint 1: this started out as theme (since we thought each game would have one theme)
-  - Sprint 2: modified to an array of themes pointing to ObjectIds in the theme model
-
 - tags: Array of ObjectIds, ref: "Tag", default: []
-
-  - Sprint 1: this started out as a string array of tags
-  - Sprint 2: modified to an array of tags pointing to ObjectIds in the tag model
-
 - description: String, required
 - webGLBuild: Boolean, default: false
-  - Sprint 1: this was originally "game" when we thought webGL was the only build we were supporting
-  - Sprint 2: modified to a boolean that signifies whether or not the game has a build
 - builds: [BuildSchema]
-  - Sprint 2: added to point to all the builds for a game EXCEPT webGL
+  - points to all the builds for a game EXCEPT webGL
 - lesson: String
 - parentingGuide: String
 - answerKey: String
-  - Sprint 2: added to support nonprofit's request for answer keys in games
 - videoTrailer: String
-  - Sprint 2: added to support nonprofit's request for video trailer in games
-- image: String (not yet implemented)
-  - Sprint 5: will be added to support image previews on game gallery, home page, game pages without webgl builds, etc
+- preview: Boolean, required
+  - Sprint 5: added to support filtering games by preview status
+  - games start off as preview=true and when published become preview=false
+- image: String, required
+  - Sprint 5: field has been added, but backblaze has not been integrated
 
 This file also contains the schema for the build model, which is a subdocument of the game model. This schema was implemented in Sprint 2.
 
@@ -69,34 +62,38 @@ This file contains the schema for the user model, which is used to store user in
 - lastName: String, required
 - label: String, enum: ["student", "parent", "educator", "administrator"], required
 - notes: [NotesSchema], required
-  - Sprint 3: added to support notes for games
 
-### NotesModel
+### NoteModel
 
 This file contains the schema for the notes model, which is used to store notes for games. This model was implemented in Sprint 3.
 
 - date: Date, required
 - description: String, required
-- gameId: ObjectId, ref: "Game", required
+- gameId: ObjectId, required
+  - references the corresponding game that the note is for
 
 ### AdminModel
 
 This file contains the schema for the admin model, which is used to store authorized admin emails. This means that only users with these emails will have the ability to sign up as an admin. This model will be implemented in Sprint 4.
 
 - email: String, required, unique
+- lowercaseEmail: String, required, select: false
+  - Sprint 5: added to support case-insensitive search for emails (since serverless doesn't support collation)
 
 ### HomePageModel
 
-This file contains the schema for the home page model, which is used to store the information that will be displayed on the home page. This model will be implemented in Sprint 4.
+This file contains the schema for the home page model, which is used to store the information that will be displayed on the home page. Only one document will exist in this collection.
 
 - mdTitle: String, required
 - mdDescription: String, required
 - gameBoyTitle: String, required
 - gameBoys: [GameBoySchema], required
+- singleton: Boolean, unique, default: true
+  - ensures only one document exists in the collection
 
-This file also contains the schema for the Gameboy model, which is a subdocument of the home page model. This schema will be implemented in Sprint 4.
+This file also contains the schema for the Gameboy model, which is a subdocument of the home page model.
 
-- gameID: ObjectId, ref: "Game", required
+- gameID: ObjectId, required
 - description: String, required
 
 ## Actions
@@ -104,8 +101,6 @@ This file also contains the schema for the Gameboy model, which is a subdocument
 `src/server/db/actions`
 
 These files contain the functions that interact with the database. The functions are used to create, read, update, and delete games, themes, tags, and users.
-
-**These files were heavily modified** in the refactoring to follow the same format for error handling. See more about error handling below!
 
 ### BuildAction
 
@@ -120,7 +115,8 @@ This file contains the functions:
 - `createGame` which creates a game along with its associated themes and tags IDs
 - `deleteGame` which deletes a game and its associated WebGL build if it exists (check if `webGLBuild` is true)
 - `editGame` which updates the game's information and associated themes and tags IDs if the themes and tags were modified
-- `getAllGames` which returns all games
+- `getSelectedGames` which returns all games matching the given filters
+  - this action is quite complex (and may require refactoring if future modifications are needed)
 - `getGameById` which returns a game given an ID
 
 ### TagAction
@@ -140,8 +136,10 @@ This file contains the functions:
 - `createUser` which creates a user and hashes the user's password
 - `verifyUser` which verifies a user's email and password for login
 - `getUser` which returns a user given an id
+- `getUserByEmail` which returns a user given an email
 - `editUser` which updates a user's information (and only updates the email if the email is not already in use)
 - `editPassword` which updates a user's password after verifying the user's old password
+- `deleteUser` which deletes a user given an id
 
 ### NotesAction
 
@@ -152,18 +150,27 @@ This file contains the functions:
 
 ### AdminAction
 
-These actions will be implemented in Sprint 4.
-
 - `createAdmin` which adds an authorized admin email to the database
 - `deleteAdmin` which removes an authorized admin email from the database. Drew and Susanne's emails cannot be removed.
-- `getAdmin` which returns the email of an authorized admin given an id
+- `getAdminByEmail` which returns the admin given an email
+- `getAllAdmins` which returns all the authorized admin emails
 
 ### HomePageAction
 
-These actions will be implemented in Sprint 4. There is no createHomePage function because there will only be one document in this collection.
-
+- `createHomePage` which creates the information on the home page IF no information exists (only one document allowed)
 - `editHomePage` which updates the information on the home page
 - `getHomePage` which returns the information on the home page
+
+### EmailAction
+
+- `sendEmail` when sends an email to the nonprofit after the user fills out the Contact Us form on a game page
+
+### NoteAction
+
+- `getNotes` which returns all the notes given a userId and gameId
+- `createNote` which creates a note given data (INote) and a userId
+- `updateNote` which updates a note given a userId, noteId, and data (INote)
+- `deleteNote` which deletes a note given a userId and noteId
 
 ## API Endpoints
 
@@ -185,16 +192,8 @@ Based on the HTTP method, the handler will call the appropriate function in the 
 
 Notice that the exceptions thrown are specific to games. These exceptions can be found in `src/utils/exceptions/game.ts`. The HTTP status codes can be found in `src/utils/consts.ts`.
 
-### tags
-
-There currently exists a delete endpoint in both `tags/index.ts` and `tags/[id]/index.ts`. For the frontend, please stick to using `tags/[id]` when you can for deleting tags and I will remove the `tags` DELETE endpoint in the next refactor. The same thing applies for themes.
-
 ## Error Handling
 
 `src/utils/exceptions`
 
 Originally, these exceptions were located in a file `src/utils/exceptions` which contained a custom error handler. It has now been refactored to have a separate exceptions file for each model. Please use these exceptions when throwing errors in the backend! Additionally, please use the HTTP status codes in `src/utils/consts.ts` when returning status codes in the backend.
-
-## Other
-
-If you notice anything that wasn't refactored correctly or needs to be refactored, please let me know! I'll try to complete the refactoring between sprints instead of during the sprint to prevent future merge conflicts. Sorry for the inconvenience this sprint guys... I really appreciate all the work you're putting into this project!!

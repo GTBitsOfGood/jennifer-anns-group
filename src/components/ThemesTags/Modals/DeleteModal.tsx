@@ -32,6 +32,7 @@ function DeleteModal({ open, setOpen, subject, subjectType }: Props) {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["allThemes"] });
       queryClient.invalidateQueries({ queryKey: ["allGames"] });
+      queryClient.invalidateQueries({ queryKey: ["gameById"] });
     },
   });
 
@@ -44,6 +45,7 @@ function DeleteModal({ open, setOpen, subject, subjectType }: Props) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tagsByType"] });
       queryClient.invalidateQueries({ queryKey: ["allGames"] });
+      queryClient.invalidateQueries({ queryKey: ["gameById"] });
     },
   });
 
