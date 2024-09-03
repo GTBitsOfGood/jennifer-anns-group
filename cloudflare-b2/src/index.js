@@ -35,7 +35,7 @@ function filterHeaders(headers, env) {
   );
 }
 
-export default {
+const exported = {
   async fetch(request, env) {
     // Only allow GET and HEAD methods
     if (!["GET", "HEAD"].includes(request.method)) {
@@ -190,3 +190,4 @@ export default {
     return newResponse;
   },
 };
+export default exported;

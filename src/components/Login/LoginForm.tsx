@@ -43,6 +43,8 @@ function LoginForm() {
       ...parse.data,
       redirect: false,
     });
+    // this is a potential security problem as the response is handled on the client, allowing for
+    // user enumeration
 
     if (!res?.ok) {
       setValidationErrors({

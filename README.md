@@ -6,7 +6,7 @@ Jennifer Ann's Group is a nonprofit organization dedicated to preventing teen da
 
 ## Development Setup
 
-- Install [Node.js](https://nodejs.org/en/download/)
+- Install [Node.js 21](https://nodejs.org/en/download/)
 - Install [MongoDB Community Server](https://www.mongodb.com/docs/manual/administration/install-community/) to host a local instance of MongoDB. It may also be helpful to download [MongoDB Compass](https://www.mongodb.com/try/download/compass#compass) to view the state of your database.
 - Install and enable [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) in VSCode
 - Get a locally running MongoDB instance.
@@ -17,7 +17,7 @@ Jennifer Ann's Group is a nonprofit organization dedicated to preventing teen da
 - In the root directory of the project, run:
 
   ```sh
-  npm install
+  npm ci
   ```
 
 - In the root directory, run one of these commands based on your OS:
