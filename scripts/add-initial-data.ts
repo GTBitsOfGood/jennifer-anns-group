@@ -7,7 +7,7 @@ import HomePageModel from "@/server/db/models/HomePageModel";
 
 const addNondeletableEmails = async () => {
   for (const email of UNDELETABLE_EMAILS) {
-    const admin = { email: email };
+    const admin = { email: email, lowercaseEmail: email.toLowerCase() };
     try {
       const existingAdmin = await AdminModel.findOne({ email: admin.email });
       if (existingAdmin) throw new AdminAlreadyExistsException();
