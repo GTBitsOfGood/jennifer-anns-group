@@ -56,7 +56,7 @@ const Header = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const userType = userData?.label
-    ? userLabelToType[userData.label]
+    ? userLabelToType[userData.label as UserLabel]
     : UserType.Public;
 
   useEffect(() => {
@@ -68,7 +68,7 @@ const Header = () => {
     }
     const pathname = router.pathname;
     const tabNames = Object.keys(tabLinks) as TabName[];
-    const index = tabNames.findIndex((name) => tabLinks[name] === pathname);
+    const index = tabNames.findIndex((name) => tabLinks[name] === pathname); // this might need to be changed later on, pathname could be dynamic
     setSelectedTab(index !== -1 ? index : 1); // set default to game gallery (for game screen, create game, edit game)
   }, [status, router.pathname]);
 
