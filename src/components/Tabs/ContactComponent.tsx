@@ -17,7 +17,6 @@ import {
   Image,
   FormControl,
   FormLabel,
-  Input,
   Textarea,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -25,9 +24,8 @@ import chakraTheme from "@/styles/chakraTheme";
 import { AlertTriangleIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 import cn from "classnames";
-import { z } from "zod";
 
-interface Props {
+interface ContactComponentProps {
   gameName: string;
   userId: string;
   firstName: string;
@@ -37,7 +35,7 @@ export default function ContactComponent({
   gameName,
   userId,
   firstName,
-}: Props) {
+}: ContactComponentProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [message, setMessage] = useState("");
   const [valid, setValid] = useState(false);
