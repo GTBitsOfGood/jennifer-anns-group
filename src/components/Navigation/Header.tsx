@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { ProfileModal, userDataSchema } from "../ProfileModal/ProfileModal";
 import { Button } from "../ui/button";
 import { z } from "zod";
 import { UserLabel } from "@/utils/types";
+import Select from "react-select";
+
+type TabName =
+  | "Home"
+  | "Game Gallery"
+  | "Donate"
+  | "Account Management"
+  | "Themes and Tags";
 
 enum UserType {
   Public = "Public",
@@ -14,18 +21,14 @@ enum UserType {
   Admin = "Admin",
 }
 
-const userLabelToType = {
+const userLabelToType: Record<UserLabel, UserType> = {
   [UserLabel.Educator]: UserType.AccountHolder,
   [UserLabel.Student]: UserType.AccountHolder,
   [UserLabel.Parent]: UserType.AccountHolder,
   [UserLabel.Administrator]: UserType.Admin,
 };
 
-type TabLinks = {
-  [tabName: string]: string;
-};
-
-const tabLinks: TabLinks = {
+const tabLinks: Record<TabName, string> = {
   Home: "/",
   "Game Gallery": "/games",
   Donate: "https://www.paypal.com/paypalme/stopTDV",
@@ -33,7 +36,7 @@ const tabLinks: TabLinks = {
   "Themes and Tags": "/admin/themes",
 };
 
-const tabData = {
+const tabData: Record<UserType, TabName[]> = {
   [UserType.Public]: ["Home", "Game Gallery", "Donate"],
   [UserType.AccountHolder]: ["Home", "Game Gallery", "Donate"],
   [UserType.Admin]: [
@@ -64,7 +67,7 @@ const Header = () => {
       setLoaded(true);
     }
     const pathname = router.pathname;
-    const tabNames = Object.keys(tabLinks);
+    const tabNames = Object.keys(tabLinks) as TabName[];
     const index = tabNames.findIndex((name) => tabLinks[name] === pathname);
     setSelectedTab(index !== -1 ? index : 1); // set default to game gallery (for game screen, create game, edit game)
   }, [status, router.pathname]);
@@ -80,12 +83,6 @@ const Header = () => {
     }
   }
 
-  function handlePageChange(tabname: string, index: number) {
-    if (tabname !== "Donate") {
-      setSelectedTab(index);
-    }
-  }
-
   function handleSignUpLogOut() {
     if (userType !== UserType.Public) {
       signOut({ callbackUrl: "/" });
@@ -94,65 +91,110 @@ const Header = () => {
     }
   }
 
-  return (
-    <div className="flex w-full justify-center">
-      <div className="mx-auto flex h-16 w-[calc(100%-4rem)] max-w-[90%] items-center justify-between bg-white p-12">
-        <div
-          className="flex items-center hover:cursor-pointer"
-          onClick={() => {
-            router.push("/");
-          }}
-        >
-          <img className="w-50 h-auto" src="/logo_gray.svg" alt="Logo" />
-          <div className="ml-6 font-open-sans text-xl font-semibold text-stone-900 opacity-70">
-            Jennifer Ann&apos;s Group
-          </div>
-        </div>
-        {loaded && (
-          <div className="flex items-center">
-            {tabData[userType].map((tabName, index) => (
-              <div
-                key={index}
-                className={`ml-8 cursor-pointer text-center font-sans text-sm ${
-                  selectedTab === index
-                    ? "relative font-bold text-orange-primary"
-                    : "font-normal text-stone-900 opacity-50"
-                } hover:text-orange-primary`}
-                onClick={() => handlePageChange(tabName, index)}
-              >
-                <div>
-                  <Link
-                    href={tabLinks[tabName]}
-                    target={tabName === "Donate" ? "_blank" : ""}
-                  >
-                    {tabName}
-                  </Link>
-                  {selectedTab === index && (
-                    <div className="absolute left-1/2 top-8 h-0.5 w-full -translate-x-1/2 transform bg-orange-primary" />
-                  )}
-                </div>
-              </div>
-            ))}
-            <div className="ml-10 px-4 py-2 font-sans">
-              {userType === UserType.Public ? (
-                <Link href="/login">
-                  <Button variant="mainorange">Log in</Button>
-                </Link>
-              ) : (
-                <ProfileModal userData={userData} setUserData={setUserData} />
+  function handlePageChange(i: number) {
+    if (tabData[userType][i] !== "Donate") {
+      setSelectedTab(i);
+      router.push(tabLinks[tabData[userType][i]]);
+    } else {
+      window.open(tabLinks[tabData[userType][i]], "_blank");
+    }
+  }
+
+  const TabLinkOptions = (
+    <>
+      {/* for larger screens */}
+      <div
+        className={`mr-10 hidden items-center ${userType === UserType.Admin ? "2xl:flex" : "lg:flex"}`}
+      >
+        {tabData[userType].map((tabName, index) => (
+          <div
+            key={index}
+            className={`ml-8 cursor-pointer text-nowrap text-center font-sans text-sm ${
+              selectedTab === index
+                ? "relative font-bold text-orange-primary"
+                : "font-normal text-stone-900 opacity-50"
+            } hover:text-orange-primary`}
+            onClick={() => handlePageChange(index)}
+          >
+            <div>
+              {tabName}
+              {selectedTab === index && (
+                <div className="absolute left-1/2 top-8 h-0.5 w-full -translate-x-1/2 transform bg-orange-primary" />
               )}
             </div>
-            <div
-              className="cursor-pointer rounded-md border border-gray-100 bg-white px-4 py-2 shadow"
-              onClick={handleSignUpLogOut}
-            >
-              <div className="text-center font-sans text-sm font-normal text-neutral-600">
-                {userType === UserType.Public ? "Sign up" : "Log out"}
-              </div>
-            </div>
           </div>
-        )}
+        ))}
       </div>
+      {/* for smaller screens */}
+      <Select
+        className={`relative m-2 ${userType === UserType.Admin ? "2xl:hidden" : "lg:hidden"}`}
+        classNames={{
+          control: () =>
+            `${userType === UserType.Admin ? "w-56" : "w-40"} cursor-pointer rounded-md outline-none ring-0 text-nowrap font-sans font-semibold text-sm bg-orange-bg border-none`,
+          singleValue: () => "text-neutral-600",
+          menu: () => `cursor-pointer rounded-md bg-input-bg m-0 ring-0`,
+          option: () =>
+            "cursor-pointer text-nowrap font-sans text-sm bg-input-bg text-neutral-600",
+          indicatorSeparator: () => "hidden",
+          dropdownIndicator: () => "text-neutral-600",
+        }}
+        options={tabData[userType]
+          .map((item) => ({
+            value: item,
+            label: item,
+          }))
+          .filter((option) => option.label !== tabData[userType][selectedTab])}
+        onChange={(e) =>
+          e && handlePageChange(tabData[userType].indexOf(e.value as TabName))
+        }
+        value={{
+          value: tabData[userType][selectedTab],
+          label: tabData[userType][selectedTab],
+        }}
+        isSearchable={false}
+      />
+    </>
+  );
+
+  const ProfileButtons = (
+    <div className="mx-2 my-2 flex items-center gap-4">
+      {userType === UserType.Public ? (
+        <Button
+          variant="mainorange"
+          onClick={() => {
+            router.push("/login");
+          }}
+        >
+          Log in
+        </Button>
+      ) : (
+        <ProfileModal userData={userData} setUserData={setUserData} />
+      )}
+      <Button variant="gray" onClick={handleSignUpLogOut}>
+        {userType === UserType.Public ? "Sign up" : "Log out"}
+      </Button>
+    </div>
+  );
+
+  return (
+    <div className="mx-auto my-6 flex w-[calc(100%-4rem)] max-w-[90%] flex-wrap items-center justify-between">
+      <div
+        className="flex items-center hover:cursor-pointer"
+        onClick={() => {
+          router.push("/");
+        }}
+      >
+        <img className="w-50 h-auto" src="/logo_gray.svg" alt="Logo" />
+        <div className="ml-4 text-nowrap font-open-sans text-xl font-semibold text-stone-900 opacity-70">
+          Jennifer Ann&apos;s Group
+        </div>
+      </div>
+      {loaded && (
+        <div className="flex flex-wrap items-center">
+          {TabLinkOptions}
+          {ProfileButtons}
+        </div>
+      )}
     </div>
   );
 };

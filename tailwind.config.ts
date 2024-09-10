@@ -23,6 +23,7 @@ const config = {
         "blue-primary": "#2352A0",
         "blue-bg": "#A9CBEB",
         "orange-primary": "#FC9300",
+        "orange-bg": "#FFDFB3",
         "input-bg": "#FAFBFC",
         "input-border": "#D9D9D9",
         "delete-red": "#8B0000",

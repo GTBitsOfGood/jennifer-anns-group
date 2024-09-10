@@ -15,7 +15,7 @@ export const Footer = () => {
 
   return (
     <div>
-      <div className="flex w-full justify-center border-t border-zinc-200">
+      <div className="flex w-full justify-center overflow-hidden border-t border-zinc-200">
         <div className="flex w-[calc(100%-4rem)] max-w-7xl flex-row justify-between py-24">
           <div className="mb-5 ml-5 mr-5 shrink-0">
             <img
