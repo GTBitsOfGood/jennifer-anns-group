@@ -2,6 +2,7 @@ import {
   editUser,
   getUser,
   editPassword,
+  resetPassword,
   deleteUser,
 } from "../../../../server/db/actions/UserAction";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -12,6 +13,8 @@ import {
   UserInvalidInputException,
 } from "@/utils/exceptions/user";
 import AdminModel from "@/server/db/models/AdminModel";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]";
 
 export default async function handler(
   req: NextApiRequest,
@@ -54,6 +57,8 @@ async function editUserHandler(req: NextApiRequest, res: NextApiResponse) {
     return editProfileHandler(req, res);
   } else if (type === "password") {
     return editPasswordHandler(req, res);
+  } else if (type === "resetpassword") {
+    return resetPasswordHandler(req, res);
   } else {
     return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
       error: `Request type PUT: ${type} is not allowed`,
@@ -84,6 +89,34 @@ async function editPasswordHandler(req: NextApiRequest, res: NextApiResponse) {
     if (e instanceof UserException) {
       return res.status(e.code).send({ error: e.message });
     }
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
+  }
+}
+
+async function resetPasswordHandler(req: NextApiRequest, res: NextApiResponse) {
+  const id = req.query.id;
+
+  try {
+    const session = await getServerSession(req, res, authOptions);
+
+    if (!session || session.user._id !== id) {
+      return res
+        .status(HTTP_STATUS_CODE.UNAUTHORIZED)
+        .send({ error: "User has not been validated." });
+    }
+    const { newPassword } = req.body;
+    if (!newPassword) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .send({ error: "New password is required" });
+    }
+    await resetPassword(newPassword, String(id));
+    return res
+      .status(HTTP_STATUS_CODE.CREATED)
+      .send({ message: "Password reset successfully" });
+  } catch (e: any) {
     return res
       .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
       .send({ error: e.message });

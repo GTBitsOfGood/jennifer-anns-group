@@ -9,6 +9,7 @@ import {
   UserAlreadyExistsException,
   UserDoesNotExistException,
   UserCredentialsIncorrectException,
+  GenericUserErrorException,
 } from "@/utils/exceptions/user";
 
 const SALT_ROUNDS = 10;
@@ -154,6 +155,34 @@ export async function editPassword(
   // Check if user was able to be found/updated
   if (!updatedUser) {
     throw new UserDoesNotExistException();
+  }
+}
+
+/**
+ * Resets user password.
+ * @param {string} newPassword The new password to set for the user.
+ * @param {string} id ID of the user.
+ * @throws {UserDoesNotExistException} If unable to find user.
+ * @throws {GenericUserErrorException} If unable to update user.
+ */
+export async function resetPassword(newPassword: string, id: string) {
+  await connectMongoDB();
+
+  const user = await UserModel.findById(id);
+  if (!user) {
+    throw new UserDoesNotExistException();
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+  const updatedUser = await UserModel.findByIdAndUpdate(
+    id,
+    { $set: { hashedPassword } },
+    { new: true },
+  );
+
+  if (!updatedUser) {
+    throw new GenericUserErrorException();
   }
 }
 
