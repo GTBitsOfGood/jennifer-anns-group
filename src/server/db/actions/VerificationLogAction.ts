@@ -28,7 +28,7 @@ type VerificationLogVerificationParams = z.infer<
 >;
 
 /**
- * Create a verification log for an email. If a verification log already exists for the email, it is deleted.
+ * Create a verification log for an email. Pre-existing verification logs for the same email and type are deleted.
  * @param email Email of the user
  * @param token Token to be sent to the user for verification later
  * @param type Type of verification log (e.g. password reset, email verification)
@@ -62,6 +62,7 @@ const createVerificationLog = async ({
 /**
  * Verify a verification log for an email. If the token is verified, the verification log is deleted.
  * If the token is incorrect and @decrementAttempts is set, the number of attempts remaining is decremented.
+ * If the number of attempts remaining reaches 0, the verification log is deleted to prevent brute-forcing the token.
  * @param email Email of the user
  * @param type Type of verification log (e.g. password reset, email verification)
  * @param token Token to verify
@@ -105,7 +106,7 @@ const verifyVerificationLog = async ({
 };
 
 /**
- * Create a password reset log for an email.
+ * Create a password reset log for an email. Pre-existing password reset logs for the same email are deleted.
  * @param email Email of the user
  * @returns Verification log object
  */
@@ -125,7 +126,8 @@ export const createPasswordResetLog = async (
 };
 
 /**
- * Verify a password reset log for an email.
+ * Verify a password reset log for an email. If the token is verified, the password reset log is deleted.
+ * If the token is incorrect, the number of attempts remaining is decremented. If the number of attempts remaining reaches 0, the password reset log is deleted to prevent brute-forcing the token.
  * @param email Email of the user
  * @param token Token to verify
  * @returns Whether the token is verified
@@ -144,7 +146,7 @@ export const verifyPasswordResetLog = async (
 };
 
 /**
- * Create an email verification log for an email.
+ * Create an email verification log for an email. Pre-existing email verification logs for the same email are deleted.
  * @param email Email of the user
  * @returns Verification log object
  */
