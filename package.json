@@ -44,6 +44,7 @@
     "backblaze-b2": "^1.7.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
+    "bog-analytics": "^1.0.8",
     "bson": "^6.2.0",
     "class-variance-authority": "^0.7.0",
     "classnames": "^2.5.1",

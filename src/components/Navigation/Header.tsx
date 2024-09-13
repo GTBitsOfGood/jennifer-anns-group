@@ -7,6 +7,7 @@ import { ProfileModal, userDataSchema } from "../ProfileModal/ProfileModal";
 import { Button } from "../ui/button";
 import { z } from "zod";
 import { UserLabel } from "@/utils/types";
+import getAnalyticsLogger from "@/utils/analytics-logger";
 
 enum UserType {
   Public = "Public",
@@ -80,7 +81,14 @@ const Header = () => {
     }
   }
 
-  function handlePageChange(tabname: string, index: number) {
+  async function handlePageChange(tabname: string, index: number) {
+    // Log page visit
+    const analyticsLogger = await getAnalyticsLogger();
+    const visitEvent = await analyticsLogger.logVisitEvent({
+      pageUrl: tabLinks[tabname],
+      userId: session?.user?._id,
+    });
+
     if (tabname !== "Donate") {
       setSelectedTab(index);
     }
