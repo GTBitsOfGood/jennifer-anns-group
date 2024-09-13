@@ -168,6 +168,21 @@ export const contactSchema = z.object({
   userId: z.string().length(24),
 });
 
+// VerificationLog
+export enum VerificationLogType {
+  PASSWORD_RESET = "PASSWORD_RESET",
+  EMAIL_VERIFICATION = "EMAIL_VERIFICATION",
+}
+
+export const verificationLogSchema = z.object({
+  email: z.string().email("Not a valid email"),
+  type: z.nativeEnum(VerificationLogType),
+  token: z.union([z.string().length(6), z.string().length(36)]),
+  numAttemptsRemaining: z.number().int(),
+  createdAt: z.date(),
+  expiresAt: z.date(),
+});
+
 export type ExtendId<T extends any> = T & { _id: string };
 // For changing password
 export const changePWSchema = z.object({
