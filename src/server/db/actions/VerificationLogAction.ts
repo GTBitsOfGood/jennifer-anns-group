@@ -77,29 +77,29 @@ const verifyVerificationLog = async ({
   decrementAttempts = false,
 }: VerificationLogVerificationParams): Promise<boolean> => {
   await connectMongoDB();
-  const passwordResetLog = await VerificationLogModel.findOne({
+  const verificationLog = await VerificationLogModel.findOne({
     email,
     type,
   });
-  if (!passwordResetLog) {
+  if (!verificationLog) {
     throw new VerificationLogDoesNotExistException();
   }
 
-  if (passwordResetLog.token === token) {
-    await passwordResetLog.deleteOne();
+  if (verificationLog.token === token) {
+    await verificationLog.deleteOne();
     return true;
   }
 
-  // Password reset log exists but token provided is incorrect
+  // Verification log exists but token provided is incorrect
 
   // Decrement the number of attempts remaining if the parameter is set
   // If the number of attempts remaining reaches 0, delete the verification log so that the user cannot brute-force the token
   if (decrementAttempts) {
-    passwordResetLog.numAttemptsRemaining -= 1;
-    if (passwordResetLog.numAttemptsRemaining === 0) {
-      await passwordResetLog.deleteOne();
+    verificationLog.numAttemptsRemaining -= 1;
+    if (verificationLog.numAttemptsRemaining === 0) {
+      await verificationLog.deleteOne();
     } else {
-      await passwordResetLog.save();
+      await verificationLog.save();
     }
   }
   return false;
