@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { EmailInvalidInputException } from "@/utils/exceptions/email";
 import { contactSchema } from "@/utils/types";
-import { sendEmail } from "@/server/db/actions/EmailAction";
+import { sendContactEmail } from "@/server/db/actions/EmailAction";
 import z from "zod";
 export default async function handler(
   req: NextApiRequest,
@@ -24,7 +24,7 @@ async function sendEmailHandler(req: NextApiRequest, res: NextApiResponse) {
     if (!parsedData.success) {
       throw new EmailInvalidInputException(); //May need to modify this slightly
     }
-    await sendEmail(parsedData.data);
+    await sendContactEmail(parsedData.data);
     return res.status(HTTP_STATUS_CODE.OK).send("Succesfully sent email");
   } catch (e: any) {
     console.error(e);
