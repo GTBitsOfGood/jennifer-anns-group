@@ -3,7 +3,7 @@ import { AnalyticsLogger, EventEnvironment } from "bog-analytics";
 const devLogger = new AnalyticsLogger({
   environment: EventEnvironment.DEVELOPMENT,
 });
-const clientApiKey = process.env.BOG_ANALYTICS_CLIENT_API_KEY as string;
+const clientApiKey = process.env.NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY;
 
 const getAnalyticsLogger = async () => {
   await devLogger.authenticate(clientApiKey);
