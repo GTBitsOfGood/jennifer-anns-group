@@ -15,6 +15,7 @@
     "secrets:login": "FOR /F %a IN ('bw login product@bitsofgood.org %BW_PASSWORD% --raw') DO SET BW_SESSION=%a && npm run secrets:get",
     "secrets:get": "bw sync && bw get item 59607d65-8de1-4105-8eaf-b11f0038670c | fx .notes > \".env\"",
     "add-initial-data": "tsx scripts/add-initial-data.ts",
+    "docker-run": "tsx scripts/add-initial-data.ts && next dev",
     "test": "jest --watchAll=false",
     "prepare": "husky || true"
   },
@@ -91,7 +92,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/markdown-it": "^13.0.7",
     "@types/mongodb": "^4.0.7",
-    "@types/node": "^20.11.24",
+    "@types/node": "^20.16.5",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/uuid": "^9.0.8",
