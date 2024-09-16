@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { EmailInvalidInputException } from "@/utils/exceptions/email";
-import { emailSchema } from "@/utils/types";
+import { contactSchema } from "@/utils/types";
 import { sendEmail } from "@/server/db/actions/EmailAction";
 import z from "zod";
 export default async function handler(
@@ -17,12 +17,12 @@ export default async function handler(
       });
   }
 }
-export type EmailData = z.infer<typeof emailSchema>;
+export type ContactData = z.infer<typeof contactSchema>;
 async function sendEmailHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const parsedData = emailSchema.safeParse(JSON.parse(req.body));
+    const parsedData = contactSchema.safeParse(JSON.parse(req.body)); //This data should eventually be replaced with just a message
     if (!parsedData.success) {
-      throw new EmailInvalidInputException();
+      throw new EmailInvalidInputException(); //May need to modify this slightly
     }
     await sendEmail(parsedData.data);
     return res.status(HTTP_STATUS_CODE.OK).send("Succesfully sent email");
