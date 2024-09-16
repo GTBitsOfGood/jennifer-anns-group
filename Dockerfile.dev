@@ -21,6 +21,11 @@ COPY ./ ./
 
 EXPOSE 3000
 
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 RUN ./entrypoint.sh
 
-ENTRYPOINT ["npm", "run", "docker-run"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+CMD ["npm", "run", "docker-run"]
