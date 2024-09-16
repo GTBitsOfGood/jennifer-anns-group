@@ -14,6 +14,7 @@ type TabName =
   | "Donate"
   | "Account Management"
   | "Themes and Tags";
+import getAnalyticsLogger from "@/utils/analytics-logger";
 
 enum UserType {
   Public = "Public",
@@ -91,12 +92,21 @@ const Header = () => {
     }
   }
 
-  function handlePageChange(i: number) {
-    if (tabData[userType][i] !== "Donate") {
+  async function handlePageChange(i: number) {
+    const analyticsLogger = await getAnalyticsLogger();
+    const tabName = tabData[userType][i];
+    const tabLink = tabLinks[tabData[userType][i]];
+
+    analyticsLogger.logVisitEvent({
+      pageUrl: tabLinks[tabName],
+      userId: (session?.user?._id as string) ?? "Unauthenticated",
+    }); // not awaiting because it slows down page renders :)
+
+    if (tabName !== "Donate") {
       setSelectedTab(i);
-      router.push(tabLinks[tabData[userType][i]]);
+      router.push(tabLink);
     } else {
-      window.open(tabLinks[tabData[userType][i]], "_blank");
+      window.open(tabLink, "_blank");
     }
   }
 
