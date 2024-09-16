@@ -18,7 +18,7 @@ const verificationLogVerificationParams = verificationLogSchema
     createdAt: true,
     expiresAt: true,
   })
-  .extend({ decrementAttempts: z.boolean().optional() });
+  .extend({ shouldDecrementAttempts: z.boolean().optional() });
 
 type VerificationLogCreationParams = z.infer<
   typeof verificationLogCreationParams
@@ -61,12 +61,12 @@ const createVerificationLog = async ({
 
 /**
  * Verify a verification log for an email. If the token is verified, the verification log is deleted.
- * If the token is incorrect and @decrementAttempts is set, the number of attempts remaining is decremented.
+ * If the token is incorrect and @shouldDecrementAttempts is set, the number of attempts remaining is decremented.
  * If the number of attempts remaining reaches 0, the verification log is deleted to prevent brute-forcing the token.
  * @param email Email of the user
  * @param type Type of verification log (e.g. password reset, email verification)
  * @param token Token to verify
- * @param decrementAttempts Whether to decrement the number of attempts remaining in case of incorrect token
+ * @param shouldDecrementAttempts Whether to decrement the number of attempts remaining in case of incorrect token
  * @returns Whether the token is verified
  * @throws {VerificationLogDoesNotExistException} If the verification log does not exist
  */
@@ -74,7 +74,7 @@ const verifyVerificationLog = async ({
   email,
   type,
   token,
-  decrementAttempts = false,
+  shouldDecrementAttempts = false,
 }: VerificationLogVerificationParams): Promise<boolean> => {
   await connectMongoDB();
   const verificationLog = await VerificationLogModel.findOne({
@@ -94,7 +94,7 @@ const verifyVerificationLog = async ({
 
   // Decrement the number of attempts remaining if the parameter is set
   // If the number of attempts remaining reaches 0, delete the verification log so that the user cannot brute-force the token
-  if (decrementAttempts) {
+  if (shouldDecrementAttempts) {
     verificationLog.numAttemptsRemaining -= 1;
     if (verificationLog.numAttemptsRemaining === 0) {
       await verificationLog.deleteOne();
@@ -141,7 +141,7 @@ export const verifyPasswordResetLog = async (
     email,
     type: VerificationLogType.PASSWORD_RESET,
     token,
-    decrementAttempts: true,
+    shouldDecrementAttempts: true,
   });
 };
 
