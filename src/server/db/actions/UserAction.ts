@@ -159,7 +159,12 @@ export async function editPassword(
 }
 
 /**
- * Resets user password.
+ * Resets user password with token
+ * TODO: Update to accept token and verify that token matches created token for password reset.
+ *       Otherwise, this route should NOT be used in production, since it does not require proper verification.
+ *       Next dev: Change newPassword to match a similar structure as passwordInfo as shown in editPassword,
+ *       instead taking in a token for verification and handling the token flow for proper verification/deletion
+ *       after use.
  * @param {string} newPassword The new password to set for the user.
  * @param {string} id ID of the user.
  * @throws {UserDoesNotExistException} If unable to find user.
