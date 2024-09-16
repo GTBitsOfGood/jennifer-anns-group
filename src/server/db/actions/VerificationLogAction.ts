@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
 import { generateRandomNumberSequence } from "@/utils/misc";
@@ -153,14 +152,15 @@ export const verifyPasswordResetLog = async (
 export const createEmailVerificationLog = async (
   email: string,
 ): Promise<IVerificationLog> => {
-  const token: string = uuidv4();
+  const otp: string = generateRandomNumberSequence(6);
   const expiresAt: Date = new Date(
     new Date().getTime() + 7 * 24 * 60 * 60 * 1000,
   ); // 7 days from now
   const emailVerificationLog = await createVerificationLog({
     email,
     type: VerificationLogType.EMAIL_VERIFICATION,
-    token,
+    token: otp,
+    numAttempts: 20,
     expiresAt,
   });
   return emailVerificationLog;
