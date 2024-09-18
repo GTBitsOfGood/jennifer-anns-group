@@ -7,6 +7,7 @@ import { Button } from "../ui/button";
 import { z } from "zod";
 import { UserLabel } from "@/utils/types";
 import Select from "react-select";
+import { useAnalytics } from "@/context/AnalyticsContext";
 
 type TabName =
   | "Home"
@@ -14,7 +15,6 @@ type TabName =
   | "Donate"
   | "Account Management"
   | "Themes and Tags";
-import getAnalyticsLogger from "@/utils/analytics-logger";
 
 enum UserType {
   Public = "Public",
@@ -59,6 +59,7 @@ const Header = () => {
   const userType = userData?.label
     ? userLabelToType[userData.label as UserLabel]
     : UserType.Public;
+  const { analyticsLogger } = useAnalytics();
 
   useEffect(() => {
     if (status === "loading") return;
@@ -92,8 +93,7 @@ const Header = () => {
     }
   }
 
-  async function handlePageChange(i: number) {
-    const analyticsLogger = await getAnalyticsLogger();
+  function handlePageChange(i: number) {
     const tabName = tabData[userType][i];
     const tabLink = tabLinks[tabData[userType][i]];
 
