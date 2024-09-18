@@ -2,6 +2,7 @@ FROM node:21
 
 WORKDIR /app
 
+# Copy package.json and package-lock.json first
 COPY ./package.json ./package-lock.json ./
 
 ARG BW_PASSWORD
@@ -10,8 +11,10 @@ ENV BW_PASSWORD=${BW_PASSWORD}
 ARG MONGODB_URI
 ENV MONGODB_URI=${MONGODB_URI}
 
-# "Disable" Husky
+# Disable Husky
 RUN npm pkg delete scripts.prepare
+
+# Set global npm config
 RUN npm config set fetch-retry-maxtimeout 600000 -g
 
 RUN npm cache clean --force
@@ -27,5 +30,4 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 RUN ./entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
 CMD ["npm", "run", "docker-run"]
