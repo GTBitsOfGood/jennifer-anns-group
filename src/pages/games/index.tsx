@@ -99,7 +99,7 @@ export default function Games() {
 
   return (
     <div>
-      <ChakraProvider theme={chakraTheme}>
+      <ChakraProvider theme={chakraTheme} resetCSS={false}>
         <h1 className="mb-16 mt-10 text-center font-sans text-6xl font-semibold">
           Game Gallery
         </h1>

@@ -1,20 +1,26 @@
-import { EmailData } from "@/pages/api/email";
+import { ContactData } from "@/pages/api/email";
+import { getUser } from "../../../server/db/actions/UserAction";
 import { EmailFailedToSendException } from "@/utils/exceptions/email";
 import { DEV_ADMIN_CONTACT } from "@/utils/consts";
 import { MailerSend, EmailParams, Sender, Recipient } from "mailersend";
 import { MAIL_SEND_DOMAIN } from "@/utils/consts";
-export async function sendEmail(data: EmailData) {
+
+export async function sendEmail(data: ContactData) {
+  //Call user endpoint to get firstName, lastName, and email
+
+  const user = await getUser(data.userId); //This should def have a type
+
   const mailerSend = new MailerSend({
     apiKey: process.env.MAILSEND_KEY || "",
   });
   const sentFrom = new Sender(
     `randomemail@${MAIL_SEND_DOMAIN}`,
-    `${data.firstName} ${data.lastName}`,
+    `${user.firstName} ${user.lastName}`,
   );
   const adminContact = [new Recipient(DEV_ADMIN_CONTACT)];
   const replyBack = new Recipient(
-    data.email,
-    `${data.firstName} ${data.lastName}`,
+    user.email,
+    `${user.firstName} ${user.lastName}`,
   );
 
   const emailParams = new EmailParams()

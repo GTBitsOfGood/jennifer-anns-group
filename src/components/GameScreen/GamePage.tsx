@@ -233,7 +233,11 @@ const GamePage = ({ mode }: Props) => {
         <NotesComponent gameId={gameId} userId={userId} />
       )}
       {loaded && userData.label !== "administrator" && (
-        <ContactComponent gameName={gameData.name} />
+        <ContactComponent
+          gameName={gameData.name}
+          userId={userId}
+          firstName={userData.firstName}
+        />
       )}
       <TagsComponent
         mode="view"

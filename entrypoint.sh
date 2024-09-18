@@ -15,7 +15,9 @@ if [ ! -f "./.env" ]; then
   bw get item 59607d65-8de1-4105-8eaf-b11f0038670ca | fx .notes > ".env"
 
   echo "Secrets successfully retrieved."
+else
+  echo "Secrets already loaded, no need for BW_PASSWORD. If you need to refetch, delete .env and re-sync."
 fi
 echo "Checking if primary admin emails exist"
-npm run add-initial-data
-npm run dev
+
+exec "$@"

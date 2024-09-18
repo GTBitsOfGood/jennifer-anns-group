@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-sans font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300",
   {
     variants: {
       variant: {
@@ -29,6 +29,7 @@ const buttonVariants = cva(
         mainorange:
           "border border-orange-primary transition-opacity border-[1px] bg-orange-primary text-white hover:opacity-80 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
         white: "text-blue-primary",
+        gray: "border border-gray-100 transition-opacity border-[1px] bg-white text-neutral-600 shadow hover:opacity-80 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
         upload:
           "bg-[#FAFBFC] border border-[#666666] text-slate-900 hover:opacity-80 dark:bg-slate-800 dark:text-slate-50 dark:hover:bg-slate-800/80",
         "pagination-outline":

@@ -1,7 +1,11 @@
 services:
   app:
+    container_name: jennifer-anns-app
     build:
       dockerfile: ./Dockerfile.dev
+      args:
+        BW_PASSWORD: ${BW_PASSWORD}
+        MONGODB_URI: mongodb://mongo:27017/jennifer-anns
     volumes:
       - ./:/app
       - /app/node_modules
@@ -10,13 +14,11 @@ services:
       - "3000:3000"
     environment:
       MONGODB_URI: mongodb://mongo:27017/jennifer-anns
-    env_file:
-      - bitwarden.env
+      BW_PASSWORD: ${BW_PASSWORD}
     networks:
       - jennifer-anns-net
     depends_on:
       - mongo
-    entrypoint: ./entrypoint.sh
 
   mongo:
     image: mongo
@@ -24,7 +26,12 @@ services:
       - "27017:27017"
     networks:
       - jennifer-anns-net
+    volumes:
+      - mongodb-data:/data/db
 
 networks:
   jennifer-anns-net:
     driver: bridge
+
+volumes:
+  mongodb-data:

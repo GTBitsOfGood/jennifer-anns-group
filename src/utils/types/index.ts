@@ -161,13 +161,11 @@ export const adminSchema = z.object({
   lowercaseEmail: z.string().email("Not a valid email").optional(),
 });
 
-// Email Format
-export const emailSchema = z.object({
-  email: z.string().email(),
-  firstName: z.string(),
-  lastName: z.string(),
-  message: z.string(),
+//Contact Info
+export const contactSchema = z.object({
   gameName: z.string(),
+  message: z.string(),
+  userId: z.string().length(24),
 });
 
 export type ExtendId<T extends any> = T & { _id: string };
