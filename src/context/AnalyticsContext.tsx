@@ -15,7 +15,7 @@ const clientApiKey = process.env
   .NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY as string;
 
 const devLogger = new AnalyticsLogger({
-  apiBaseUrl: "https://data.bitsofgood.org/",
+  apiBaseUrl: "https://data.bitsofgood.org",
   environment: EventEnvironment.DEVELOPMENT,
 });
 
