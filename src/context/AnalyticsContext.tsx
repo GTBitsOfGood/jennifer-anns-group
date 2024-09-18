@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { AnalyticsLogger, EventEnvironment } from "bog-analytics";
-import { init } from "next/dist/compiled/webpack/webpack";
 
 //// Create Context
 
