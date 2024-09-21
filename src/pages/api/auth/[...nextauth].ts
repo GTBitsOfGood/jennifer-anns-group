@@ -26,7 +26,6 @@ export const authOptions: NextAuthOptions = {
         ...otherUser,
       };
       session.user = user;
-      console.log("Session", session.user);
       return session;
     },
   },
