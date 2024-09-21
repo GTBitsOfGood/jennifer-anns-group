@@ -1,0 +1,43 @@
+import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
+import { userDataSchema } from "./components/ProfileModal/ProfileModal";
+import { getUser } from "./server/db/actions/UserAction";
+import { z } from "zod";
+import {
+  getBrowserName,
+  getLogger,
+  authenticateLoggers,
+  logVisitEventServer,
+} from "./context/AnalyticsContext";
+export async function middleware(request: NextRequest) {
+  //Only takes in pages
+  const secret = process.env.NEXTAUTH_SECRET;
+  const token = await getToken({ req: request, secret });
+  if (token) {
+    const user_id = token._id;
+
+    const current_date = Date();
+    const logger = getLogger();
+    await logger.authenticate(
+      process.env.BOG_ANALYTICS_CLIENT_API_KEY as string,
+    );
+    const referrer = request.referrer;
+    let user_agent = request.headers.get("user-agent");
+    if (user_agent == null) {
+      user_agent = "";
+    }
+    const browser_agent = getBrowserName(user_agent);
+    logVisitEventServer(logger, {
+      referrer: referrer,
+      userId: (token?._id as string) ?? "Unauthenticated",
+      createdDate: current_date,
+      browserAgent: browser_agent,
+    });
+  }
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: "/((?!api|static|.*\\..*|_next).*)",
+};

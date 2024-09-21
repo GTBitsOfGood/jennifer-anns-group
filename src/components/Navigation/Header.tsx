@@ -7,7 +7,7 @@ import { Button } from "../ui/button";
 import { z } from "zod";
 import { UserLabel } from "@/utils/types";
 import Select from "react-select";
-import { useAnalytics } from "@/context/AnalyticsContext";
+import { log } from "util";
 
 type TabName =
   | "Home"
@@ -59,7 +59,6 @@ const Header = () => {
   const userType = userData?.label
     ? userLabelToType[userData.label as UserLabel]
     : UserType.Public;
-  const { analyticsLogger } = useAnalytics();
 
   useEffect(() => {
     if (status === "loading") return;
@@ -96,12 +95,6 @@ const Header = () => {
   function handlePageChange(i: number) {
     const tabName = tabData[userType][i];
     const tabLink = tabLinks[tabData[userType][i]];
-
-    analyticsLogger.logVisitEvent({
-      pageUrl: tabLinks[tabName],
-      userId: (session?.user?._id as string) ?? "Unauthenticated",
-    }); // not awaiting because it slows down page renders :)
-
     if (tabName !== "Donate") {
       setSelectedTab(i);
       router.push(tabLink);
