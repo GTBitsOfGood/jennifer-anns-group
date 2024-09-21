@@ -66,7 +66,7 @@ interface visitProperties {
   referrer: string;
   userId: string;
   createdDate: string;
-  // userGroup: string;
+  userGroup: string;
   browserAgent: string;
 }
 

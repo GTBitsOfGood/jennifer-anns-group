@@ -70,14 +70,8 @@ const GamePage = ({ mode }: Props) => {
     }
   }, [currentUser]);
 
-  async function getUserData() {
-    try {
-      const response = await fetch(`/api/users/${currentUser?._id}`);
-      const data = await response.json();
-      setUserData(data);
-    } catch (error) {
-      console.error("Error getting user:", error);
-    }
+  function getUserData() {
+    setUserData(currentUser);
   }
 
   const getGame = async () => {

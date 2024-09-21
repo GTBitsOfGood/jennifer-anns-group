@@ -73,15 +73,9 @@ const Header = () => {
     setSelectedTab(index !== -1 ? index : 1); // set default to game gallery (for game screen, create game, edit game)
   }, [status, router.pathname]);
 
-  async function getUserData() {
-    try {
-      const response = await fetch(`/api/users/${currentUser?._id}`);
-      const data = await response.json();
-      setUserData(data);
-      setLoaded(true);
-    } catch (error) {
-      console.log("Error getting user:", error);
-    }
+  function getUserData() {
+    setUserData(currentUser);
+    setLoaded(true);
   }
 
   function handleSignUpLogOut() {
