@@ -202,6 +202,7 @@ const EditGamePage = () => {
         gameData={gameData}
         setGameData={setGameData}
         authorized={true}
+        userData={undefined}
       />
       {gameData.tags && gameData.themes ? (
         <TagsComponent

@@ -27,7 +27,7 @@ interface Props {
   gameData: GameDataState;
   setGameData: Dispatch<React.SetStateAction<GameDataState | undefined>>;
   authorized?: boolean;
-  userData: z.infer<typeof userDataSchema>;
+  userData: z.infer<typeof userDataSchema> | undefined;
 }
 
 export default function TabsComponent({
@@ -71,16 +71,18 @@ export default function TabsComponent({
   const [visitedAnswerKey, setVisitedAnswerKey] = useState(false);
 
   const loadedFile = (resourceUrl: string, resourceName: string) => {
-    const properties = {
-      userId: userData._id,
-      userGroup: userData.label,
-      createdDate: Date(),
-      gameName: gameData.name,
-      resourceName: resourceName,
-      resourceUrl: resourceUrl,
-      downloadSrc: window.location.href,
-    };
-    analyticsLogger.logCustomEvent("View", "pdf", properties);
+    if (userData != undefined) {
+      const properties = {
+        userId: userData._id,
+        userGroup: userData.label,
+        createdDate: Date(),
+        gameName: gameData.name,
+        resourceName: resourceName,
+        resourceUrl: resourceUrl,
+        downloadSrc: window.location.href,
+      };
+      analyticsLogger.logCustomEvent("View", "pdf", properties);
+    }
   };
   const onTabChange = (index: number) => {
     if (!visitedLessonPlan && index == 1) {

@@ -29,7 +29,7 @@ interface Props {
   gameData: GameDataState;
   editing: boolean;
   setGameData?: React.Dispatch<GameDataState>;
-  userData: z.infer<typeof userDataSchema>;
+  userData: z.infer<typeof userDataSchema> | undefined;
 }
 
 function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
@@ -179,16 +179,18 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
         newSet.add(gameBuildName);
         return newSet;
       });
-      const properties = {
-        userId: userData._id,
-        userGroup: userData.label,
-        createdDate: Date(),
-        gameName: gameData.name,
-        resourceName: gameBuildName,
-        resourceUrl: gameUrl,
-        downloadSrc: window.location.href,
-      };
-      analyticsLogger.logCustomEvent("Download", "game", properties);
+      if (userData != undefined) {
+        const properties = {
+          userId: userData._id,
+          userGroup: userData.label,
+          createdDate: Date(),
+          gameName: gameData.name,
+          resourceName: gameBuildName,
+          resourceUrl: gameUrl,
+          downloadSrc: window.location.href,
+        };
+        analyticsLogger.logCustomEvent("Download", "game", properties);
+      }
     }
   };
   return (
