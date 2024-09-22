@@ -216,7 +216,11 @@ const GamePage = ({ mode }: Props) => {
           )}
         </>
       )}
-      <EmbeddedGame gameId={gameId as string} />
+      <EmbeddedGame
+        gameId={gameId as string}
+        userData={currentUser}
+        gameName={gameData.name}
+      />
       <TabsComponent
         mode="view"
         gameData={gameData}

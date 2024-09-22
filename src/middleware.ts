@@ -16,7 +16,7 @@ export async function middleware(request: NextRequest) {
     const current_date = Date();
     const logger = getLogger();
     await logger.authenticate(
-      process.env.BOG_ANALYTICS_CLIENT_API_KEY as string,
+      process.env.NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY as string,
     );
     const referrer = request.referrer;
     let user_agent = request.headers.get("user-agent");
