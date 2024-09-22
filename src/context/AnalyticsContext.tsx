@@ -27,14 +27,12 @@ export async function authenticateLoggers() {
   await devLogger.authenticate(clientApiKey);
 }
 authenticateLoggers(); //Specifically for front-end
-
 export function getLogger() {
   // return logger corresponding to current environment
   return devLogger;
   // add options for other environments later
 }
 const logger = getLogger;
-
 interface AnalyticsProviderProps {
   children: ReactNode;
 }
@@ -77,7 +75,6 @@ export async function logVisitEventServer(
   properties: visitProperties,
 ) {
   await logger.logCustomEvent("Visit", "Visit", properties);
-  console.log("Successfully logged event");
 }
 
 export function getBrowserName(userAgent: string) {

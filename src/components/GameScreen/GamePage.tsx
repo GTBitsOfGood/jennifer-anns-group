@@ -222,6 +222,7 @@ const GamePage = ({ mode }: Props) => {
         gameData={gameData}
         setGameData={setGameData}
         authorized={visibleAnswer}
+        userData={currentUser}
       />
       {loaded && userData.label !== "administrator" && (
         <NotesComponent gameId={gameId} userId={userId} />

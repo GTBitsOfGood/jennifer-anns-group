@@ -16,12 +16,18 @@ import { X } from "lucide-react";
 import UploadModal from "./UploadModal";
 import DeleteComponentModal from "../DeleteComponentModal";
 import { GameDataState } from "../GameScreen/GamePage";
+import { userDataSchema } from "../ProfileModal/ProfileModal";
+import { useContext } from "react";
+import { z } from "zod";
+import { authenticateLoggers, useAnalytics } from "@/context/AnalyticsContext";
+import { GameException } from "@/utils/exceptions/game";
 
 interface Props {
   mode: string;
   gameData: GameDataState;
   setGameData: Dispatch<React.SetStateAction<GameDataState | undefined>>;
   authorized?: boolean;
+  userData: z.infer<typeof userDataSchema>;
 }
 
 export default function TabsComponent({
@@ -29,6 +35,7 @@ export default function TabsComponent({
   gameData,
   setGameData,
   authorized,
+  userData,
 }: Props) {
   const {
     isOpen: isDeleteLessonOpen,
@@ -56,11 +63,45 @@ export default function TabsComponent({
       });
     }
   };
+  //Handle Analytics
+  const { analyticsLogger } = useAnalytics();
 
+  const [visitedLessonPlan, setVisitedLessonPlan] = useState(false);
+  const [visitedParentingGuide, setVisitedParentingGuide] = useState(false);
+  const [visitedAnswerKey, setVisitedAnswerKey] = useState(false);
+
+  const loadedFile = (resourceUrl: string, resourceName: string) => {
+    const properties = {
+      userId: userData._id,
+      userGroup: userData.label,
+      createdDate: Date(),
+      gameName: gameData.name,
+      resourceName: resourceName,
+      resourceUrl: resourceUrl,
+      downloadSrc: window.location.href,
+    };
+    analyticsLogger.logCustomEvent("View", "pdf", properties);
+  };
+  const onTabChange = (index: number) => {
+    if (!visitedLessonPlan && index == 1) {
+      setVisitedLessonPlan(true);
+      loadedFile(gameData.lesson ?? "No Url", "Lesson Plan");
+    } else if (!visitedParentingGuide && index == 2) {
+      setVisitedParentingGuide(true);
+      loadedFile(gameData.parentingGuide ?? "No Url", "Parenting Guide");
+    } else if (!visitedAnswerKey && index == 3) {
+      setVisitedAnswerKey(true);
+      loadedFile(gameData.answerKey ?? "No Url", "Answer Key");
+    }
+  };
   return (
     <ChakraProvider theme={chakraTheme}>
       <div>
-        <Tabs colorScheme="brand" className="m-auto w-5/6 font-sans">
+        <Tabs
+          colorScheme="brand"
+          className="m-auto w-5/6 font-sans"
+          onChange={onTabChange}
+        >
           <TabList>
             {mode === "view" ? (
               <>
@@ -269,6 +310,7 @@ export default function TabsComponent({
                   gameData={gameData}
                   editing={mode === "edit"}
                   setGameData={setGameData}
+                  userData={userData}
                 />
               </TabPanel>
             )}
