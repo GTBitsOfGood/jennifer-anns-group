@@ -6,7 +6,7 @@ import {
   getLogger,
   logVisitEventServer,
 } from "./context/AnalyticsContext";
-import { authOptions } from "./pages/api/auth/[...nextauth]";
+
 export async function middleware(request: NextRequest) {
   //Only takes in pages
   const secret = process.env.NEXTAUTH_SECRET;
@@ -36,5 +36,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/((?!api|static|.*\\..*|_next).*)",
+  // routes that middleware applies to, exclude api, static, raw files, etc.
+  matcher: "/((?!api|static|.*\\..*|_next|.*\\/raw).*)",
 };

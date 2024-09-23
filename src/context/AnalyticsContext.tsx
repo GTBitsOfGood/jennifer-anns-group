@@ -1,19 +1,11 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import {
-  AnalyticsLogger,
-  CustomEventType,
-  EventEnvironment,
-} from "bog-analytics";
-import { apiBaseUrl } from "next-auth/client/_utils";
-
-//// Create Context
-
+import { AnalyticsLogger, EventEnvironment } from "bog-analytics";
 interface AnalyticsContextType {
   analyticsLogger: AnalyticsLogger;
   // can add manager / viewer in the future
 }
+// Create context for provider
 const AnalyticsContext = createContext<AnalyticsContextType | null>(null);
-//// Create Provider
 
 const clientApiKey = process.env
   .NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY as string;
@@ -48,8 +40,6 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
   );
 };
 
-//// Hook
-
 export const useAnalytics = () => {
   const context = useContext(AnalyticsContext);
   if (!context) {
@@ -57,8 +47,6 @@ export const useAnalytics = () => {
   }
   return context;
 };
-
-//
 
 interface visitProperties {
   referrer: string;
