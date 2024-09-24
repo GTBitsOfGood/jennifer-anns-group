@@ -15,12 +15,15 @@ declare global {
 let cached = global.mongoose;
 
 if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+  cached = global.mongoose = { conn: null, promise: null } as {
+    conn: Connection | null;
+    promise: Promise<Connection> | unknown;
+  };
 }
 
 const connectMongoDB = async () => {
   if (cached.conn) {
-    return cached.conn;
+    return cached.conn as Connection;
   }
 
   if (!cached.promise) {
@@ -29,14 +32,20 @@ const connectMongoDB = async () => {
     };
 
     cached.promise = mongoose.connect(uri, opts).then((mongoose) => {
-      return mongoose;
+      return mongoose.connection as Connection;
     });
   }
 
   try {
     cached.conn = await cached.promise;
+    console.log(
+      `New connection established. Connection state: ${cached.conn.readyState}`,
+    );
+    console.log(`Connected to database: ${cached.conn.db.databaseName}`);
+    return cached.conn;
   } catch (e) {
     cached.promise = null;
+    console.error("Failed to connect to MongoDB", e);
     throw e;
   }
 };

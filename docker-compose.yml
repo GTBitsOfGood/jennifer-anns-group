@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   app:
     container_name: jennifer-anns-app
@@ -5,29 +7,38 @@ services:
       dockerfile: ./Dockerfile.dev
       args:
         BW_PASSWORD: ${BW_PASSWORD}
-        MONGODB_URI: mongodb://mongo:27017/jennifer-anns
+        MONGODB_URI: mongodb://mongo:27017/jennifer-anns?replicaSet=rs0
     volumes:
       - ./:/app
       - /app/node_modules
+      - ./app-init.sh:/app/app-init.sh
       - /app/.next
     ports:
       - "3000:3000"
-    environment:
-      MONGODB_URI: mongodb://mongo:27017/jennifer-anns
-      BW_PASSWORD: ${BW_PASSWORD}
     networks:
       - jennifer-anns-net
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+    entrypoint: /app/app-init.sh
 
   mongo:
-    image: mongo
+    image: mongo:7.0
     ports:
       - "27017:27017"
     networks:
       - jennifer-anns-net
+    entrypoint: /app/mongo-init.sh
     volumes:
       - mongodb-data:/data/db
+      - ./mongo-init.sh:/app/mongo-init.sh
+      - ./setup-hosts.sh:/app/setup-hosts.sh
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "rs.status().ok", "--quiet"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
 networks:
   jennifer-anns-net:
