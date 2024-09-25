@@ -17,7 +17,7 @@ function PasswordReset() {
   const [page, setPage] = useState<PasswordResetPage>(
     PasswordResetPage.REQUEST,
   );
-  const emailRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef("");
 
   const pageComponents = useMemo(
     () => ({

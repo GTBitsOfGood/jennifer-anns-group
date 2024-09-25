@@ -7,7 +7,7 @@ import { z } from "zod";
 
 interface Props {
   onSuccess: () => void;
-  emailRef: React.RefObject<HTMLInputElement>;
+  emailRef: React.MutableRefObject<string>;
 }
 
 function PasswordResetRequest({ onSuccess, emailRef }: Props) {
@@ -17,7 +17,7 @@ function PasswordResetRequest({ onSuccess, emailRef }: Props) {
       e.preventDefault();
       setValidationError(null);
 
-      const email = emailRef.current?.value;
+      const email = emailRef.current;
       const parse = z.string().email().safeParse(email);
       if (!parse.success) {
         setValidationError("Invalid email provided");
@@ -33,14 +33,13 @@ function PasswordResetRequest({ onSuccess, emailRef }: Props) {
         setValidationError(json.error);
         return;
       }
-
       onSuccess();
     },
     [onSuccess, emailRef],
   );
 
   return (
-    <div className="flex w-[47%]  min-w-[15em] flex-col items-center gap-6">
+    <div className="flex w-[40%]  min-w-[15em] flex-col items-center gap-6">
       <div className="">
         <h2 className="text-3xl font-bold text-blue-primary">
           Reset Your Password
@@ -55,16 +54,19 @@ function PasswordResetRequest({ onSuccess, emailRef }: Props) {
         onSubmit={handleLoginSubmit}
       >
         <div className="relative flex flex-col">
-          <label className="text-xl">Email*</label>
+          <label htmlFor="email" className="text-l">
+            Email*
+          </label>
           <Input
+            name="email"
             placeholder="Email"
-            ref={emailRef}
             className={
               "w-[100%]" +
               (validationError
                 ? "border-red-500"
                 : "border-input-border focus:border-blue-primary")
             }
+            onChange={(e) => (emailRef.current = e.target.value)}
           />
           <p className="absolute bottom-[-2em] w-[100%] text-xs text-red-500">
             {validationError}
