@@ -19,6 +19,7 @@ export default function App({
   const showHeaderAndFooter =
     !router.pathname.includes("/login") &&
     !router.pathname.includes("/signup") &&
+    !router.pathname.includes("/password-reset") &&
     !router.pathname.includes("/raw");
 
   return (

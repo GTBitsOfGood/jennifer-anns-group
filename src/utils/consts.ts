@@ -13,6 +13,7 @@ export enum Pages {
   HOME = "/",
   LOGIN = "/login",
   SIGNUP = "/signup",
+  PASSWORD_RESET = "/password-reset",
   CREATEGAME = "/games/create",
   EDITGAME = "/games/[id]/edit",
   PREVIEWGAME = "/games/[id]/preview",
