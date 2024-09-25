@@ -7,17 +7,17 @@ import { z } from "zod";
 
 interface Props {
   onSuccess: () => void;
+  emailRef: React.RefObject<HTMLInputElement>;
 }
 
-function PasswordResetRequest({ onSuccess }: Props) {
+function PasswordResetRequest({ onSuccess, emailRef }: Props) {
   const [validationError, setValidationError] = useState<string | null>(null);
   const handleLoginSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setValidationError(null);
 
-      const formData = new FormData(e.currentTarget);
-      const email = formData.get("email");
+      const email = emailRef.current?.value;
       const parse = z.string().email().safeParse(email);
       if (!parse.success) {
         setValidationError("Invalid email provided");
@@ -36,7 +36,7 @@ function PasswordResetRequest({ onSuccess }: Props) {
 
       onSuccess();
     },
-    [onSuccess],
+    [onSuccess, emailRef],
   );
 
   return (
@@ -55,12 +55,10 @@ function PasswordResetRequest({ onSuccess }: Props) {
         onSubmit={handleLoginSubmit}
       >
         <div className="relative flex flex-col">
-          <label htmlFor={"email"} className="text-xl">
-            Email*
-          </label>
+          <label className="text-xl">Email*</label>
           <Input
-            name={"email"}
             placeholder="Email"
+            ref={emailRef}
             className={
               "w-[100%]" +
               (validationError

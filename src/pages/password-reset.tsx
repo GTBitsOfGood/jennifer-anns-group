@@ -4,7 +4,7 @@ import PasswordResetConfirmation from "@/components/PasswordReset/PasswordResetC
 import PasswordResetRequest from "@/components/PasswordReset/PasswordResetRequest";
 import PasswordResetUpdate from "@/components/PasswordReset/PasswordResetUpdate";
 import PasswordResetVerification from "@/components/PasswordReset/PasswordResetVerification";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 enum PasswordResetPage {
   REQUEST,
@@ -13,33 +13,44 @@ enum PasswordResetPage {
   CONFIRMATION,
 }
 
-const pageComponents = (setPage: (page: PasswordResetPage) => void) => ({
-  [PasswordResetPage.REQUEST]: (
-    <PasswordResetRequest onSuccess={() => setPage(PasswordResetPage.VERIFY)} />
-  ),
-  [PasswordResetPage.VERIFY]: (
-    <PasswordResetVerification
-      onSuccess={() => setPage(PasswordResetPage.UPDATE)}
-    />
-  ),
-  [PasswordResetPage.UPDATE]: (
-    <PasswordResetUpdate onSuccess={() => setPage(PasswordResetPage.UPDATE)} />
-  ),
-  [PasswordResetPage.CONFIRMATION]: <PasswordResetConfirmation />,
-});
-
 function PasswordReset() {
   const [page, setPage] = useState<PasswordResetPage>(
     PasswordResetPage.REQUEST,
+  );
+  const emailRef = useRef<HTMLInputElement>(null);
+
+  const pageComponents = useMemo(
+    () => ({
+      [PasswordResetPage.REQUEST]: (
+        <PasswordResetRequest
+          onSuccess={() => setPage(PasswordResetPage.VERIFY)}
+          emailRef={emailRef}
+        />
+      ),
+      [PasswordResetPage.VERIFY]: (
+        <PasswordResetVerification
+          onSuccess={() => setPage(PasswordResetPage.UPDATE)}
+          // emailRef={emailRef}
+        />
+      ),
+      [PasswordResetPage.UPDATE]: (
+        <PasswordResetUpdate
+          onSuccess={() => setPage(PasswordResetPage.UPDATE)}
+          // emailRef={emailRef}
+        />
+      ),
+      [PasswordResetPage.CONFIRMATION]: <PasswordResetConfirmation />,
+    }),
+    [],
   );
 
   const pageComponent = useMemo(() => {
     return (
       <HeroImage containerClassName="flex flex-col items-center justify-center">
-        {pageComponents(setPage)[page]}
+        {pageComponents[page]}
       </HeroImage>
     );
-  }, [page]);
+  }, [pageComponents, page]);
 
   return pageComponent;
 }
