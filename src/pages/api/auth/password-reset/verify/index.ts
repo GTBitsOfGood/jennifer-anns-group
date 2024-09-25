@@ -58,6 +58,8 @@ async function verifyPasswordResetHandler(
       .send("Succesfully verified token");
   } catch (e: any) {
     console.error(e);
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
   }
 }

@@ -3,7 +3,7 @@ import z from "zod";
 import jwt from "jsonwebtoken";
 
 import { HTTP_STATUS_CODE } from "@/utils/consts";
-import { getUserByEmail } from "@/server/db/actions/UserAction";
+import { getUserByEmail, resetPassword } from "@/server/db/actions/UserAction";
 
 export default async function handler(
   req: NextApiRequest,
@@ -20,7 +20,7 @@ export default async function handler(
 }
 
 const passwordObject = z.object({
-  password: z
+  newPassword: z
     .string()
     .min(8, { message: "Password must be at least 8 characters long" })
     .regex(/[A-Z]/, {
@@ -44,20 +44,31 @@ async function updatePasswordHandler(
   res: NextApiResponse,
 ) {
   try {
-    const { password } = passwordObject.parse(JSON.parse(req.body));
-
     const { email } = emailObject.parse(
       jwt.decode(req.cookies.passwordResetJwt || ""),
     );
-
     const user = await getUserByEmail(email);
-    // TODO: Enter code to update the user's password in the database
+    if (!user) {
+      return res
+        .status(HTTP_STATUS_CODE.NOT_FOUND)
+        .send({ error: "User not found" });
+    }
 
+    const { newPassword } = passwordObject.parse(JSON.parse(req.body));
+    if (!newPassword) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .send({ error: "New password is required" });
+    }
+
+    await resetPassword(newPassword, String(user._id));
     return res
       .status(HTTP_STATUS_CODE.OK)
-      .send("Succesfully updated the password");
+      .send({ message: "Password reset successfully" });
   } catch (e: any) {
     console.error(e);
-    return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).send(e.message);
+    return res
+      .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
+      .send({ error: e.message });
   }
 }
