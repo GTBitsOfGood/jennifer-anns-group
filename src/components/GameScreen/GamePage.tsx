@@ -8,8 +8,8 @@ import { useSession } from "next-auth/react";
 import { userSchema } from "@/utils/types";
 import EmbeddedGame from "@/components/GameScreen/WebGL/EmbeddedGame";
 import NotesComponent from "@/components/Tabs/NotesComponent";
-import { populatedGameWithId } from "@/server/db/models/GameModel";
 import AdminEditButton from "@/components/GameScreen/AdminEditButton";
+import { populatedGameWithId } from "@/server/db/models/GameModel";
 import {
   AlertDialog,
   AlertDialogFooter,
@@ -22,6 +22,28 @@ import {
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { Button } from "@/components/ui/button";
+import wrapPromise from "../wrapPromise";
+
+// Function to fetch game data and wrap the promise
+function fetchGameData(gameId: string) {
+  console.log("fetching", gameId);
+  if (!gameId) {
+    return wrapPromise(
+      new Promise((_, reject) => {
+        reject(new Error("No game ID provided"));
+      }),
+    );
+  }
+  const promise = fetch(`/api/games/${gameId}`).then((res) => {
+    if (!res.ok) {
+      throw new Error("Failed to fetch game");
+    }
+    return res.json();
+  });
+  return wrapPromise(promise);
+}
+
+const gameDataResource: { [key: string]: ReturnType<typeof wrapPromise> } = {}; // To cache wrapped promises
 
 export type GameDataState = populatedGameWithId & {
   parentingGuideFile: File | undefined;
@@ -34,14 +56,34 @@ interface Props {
 }
 
 const GamePage = ({ mode }: Props) => {
-  const gameId = useRouter().query.id as string;
-  const [gameData, setGameData] = useState<GameDataState | undefined>();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const router = useRouter();
+  const gameId = router.query.id as string;
+
+  // // Fetch game data if not already cached
+  // if (!gameDataResource[gameId]) {
+  //   console.log(gameId);
+
+  // }
+  const [gameData, setGameData] = useState<GameDataState | undefined>();
+
+  useEffect(() => {
+    if (gameId) {
+      if (!gameDataResource[gameId]) {
+        gameDataResource[gameId] = fetchGameData(gameId);
+      }
+    }
+  }, [gameId]);
+
+  if (gameId && gameDataResource[gameId]) {
+    const data = gameDataResource[gameId].read();
+    if (!gameData) {
+      setGameData(data);
+    }
+  }
+
+  const [visibleAnswer, setVisibleAnswer] = useState(false);
   const { data: session } = useSession();
   const idSchema = z.string().length(24);
-  const [visibleAnswer, setVisibleAnswer] = useState(false);
   const userDataSchema = userSchema
     .extend({
       _id: idSchema,
@@ -57,6 +99,12 @@ const GamePage = ({ mode }: Props) => {
   const deleteOnRouteChange = useRef<boolean>(true);
 
   useEffect(() => {
+    if (currentUser) {
+      setUserData(currentUser);
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
     if (userData && userData.label !== "student") {
       setVisibleAnswer(true);
     } else {
@@ -64,51 +112,10 @@ const GamePage = ({ mode }: Props) => {
     }
   }, [userData]);
 
-  useEffect(() => {
-    if (currentUser) {
-      getUserData();
-    }
-  }, [currentUser]);
-
-  function getUserData() {
-    setUserData(currentUser);
-  }
-
-  const getGame = async () => {
-    try {
-      const response = await fetch(`/api/games/${gameId}`);
-      if (!response.ok) {
-        deleteOnRouteChange.current = false;
-        setError("Failed to fetch game");
-        router.push("/");
-      }
-      const data = await response.json();
-      if (!data.preview && mode == "preview") {
-        deleteOnRouteChange.current = false;
-        router.replace(`/games/${gameId}`);
-      } else {
-        setGameData(data);
-        setLoading(false);
-      }
-    } catch (error: any) {
-      setError(error.message);
-    }
-  };
-
-  useEffect(() => {
-    if (gameId && loading) {
-      getGame();
-    }
-  }, [gameId, loading]);
-
   const publishGame = async () => {
     try {
-      const themeIds = gameData?.themes.map((theme) => {
-        return theme._id;
-      });
-      const tagIds = gameData?.tags.map((tag) => {
-        return tag._id;
-      });
+      const themeIds = gameData?.themes.map((theme) => theme._id);
+      const tagIds = gameData?.tags.map((tag) => tag._id);
 
       const putData = {
         tags: tagIds,
@@ -126,13 +133,13 @@ const GamePage = ({ mode }: Props) => {
       });
 
       if (!response.ok) {
-        setError("Failed to publish game.");
+        console.error("Failed to publish game.");
       } else {
         deleteOnRouteChange.current = false;
         router.replace(`/games/${gameId}`);
       }
     } catch (error) {
-      console.error("Error setting game as preview:", error);
+      console.error("Error publishing game:", error);
     }
   };
 
@@ -146,7 +153,7 @@ const GamePage = ({ mode }: Props) => {
         keepalive: deleteOnRouteChange.current,
       });
       if (!response.ok) {
-        setError("Failed to delete game.");
+        console.error("Failed to delete game.");
       }
     } catch (error) {
       console.error("Error deleting game:", error);
@@ -181,19 +188,11 @@ const GamePage = ({ mode }: Props) => {
     }
   }, []);
 
-  if (error) {
-    return <div>{error}</div>;
-  }
-
-  if (loading) {
-    return <></>;
-  }
+  const loaded = userData && userId;
 
   if (!gameData) {
     return <div>Game does not exist</div>;
   }
-
-  const loaded = userData && userId;
 
   return (
     <div>

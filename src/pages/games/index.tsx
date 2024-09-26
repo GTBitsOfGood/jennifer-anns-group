@@ -1,6 +1,6 @@
 import { userDataSchema } from "@/components/ProfileModal/ProfileModal";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { z } from "zod";
 import {
   ChakraProvider,
@@ -35,6 +35,7 @@ import {
   PageRequiredGameQuery,
   generateQueryUrl,
 } from "@/components/ThemesTags/GamesSection";
+import wrapPromise from "@/components/wrapPromise";
 
 export default function Games() {
   const { data: session } = useSession();
@@ -57,10 +58,6 @@ export default function Games() {
     }
   }, [currentUser, userData?.label]);
 
-  useEffect(() => {
-    filterGames();
-  }, [filters]);
-
   function getUserData() {
     setUserData(currentUser);
   }
@@ -77,18 +74,6 @@ export default function Games() {
       name: event.target.value,
       page: 1,
     });
-  };
-
-  const filterGames = async () => {
-    try {
-      const response = await fetch(generateQueryUrl(filters));
-      const data = await response.json();
-      setNumPages(data.numPages);
-      setCurrPage(data.page);
-      setResults(data.games);
-    } catch (e: any) {
-      console.log(e.message);
-    }
   };
 
   return (
@@ -183,7 +168,15 @@ export default function Games() {
           <div className="m-auto flex flex-row justify-center">
             <div className="m-auto mt-[60px] flex w-[85vw] flex-row">
               <ThemeSidebar filters={filters} setFilters={setFilters} />
-              <GameCardView results={results} />
+              <Suspense
+                fallback={
+                  <div className="flex h-screen items-center justify-center">
+                    <div className="h-24 w-24 animate-ping rounded-full bg-orange-primary"></div>
+                  </div>
+                }
+              >
+                <GameCardView filters={filters} />
+              </Suspense>
             </div>
           </div>
           {numPages ? (
