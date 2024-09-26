@@ -31,7 +31,14 @@ async function verifyPasswordResetHandler(
   res: NextApiResponse,
 ) {
   try {
-    const { email, token } = passwordResetParams.parse(JSON.parse(req.body));
+    const parsed = passwordResetParams.safeParse(JSON.parse(req.body));
+    if (!parsed.success) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .send({ error: parsed.error.errors[0].message });
+    }
+
+    const { email, token } = parsed.data;
     const user = await getUserByEmail(email); // This function will throw an error if the user does not exist
 
     const success = await verifyPasswordResetLog(email, token);

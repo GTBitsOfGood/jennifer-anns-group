@@ -30,7 +30,7 @@ function PasswordReset() {
       [PasswordResetPage.VERIFY]: (
         <PasswordResetVerification
           onSuccess={() => setPage(PasswordResetPage.UPDATE)}
-          // emailRef={emailRef}
+          emailRef={emailRef}
         />
       ),
       [PasswordResetPage.UPDATE]: (
