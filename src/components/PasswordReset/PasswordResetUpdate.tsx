@@ -5,7 +5,6 @@ import { Button } from "../ui/button";
 import { useCallback, useRef, useState } from "react";
 import { z } from "zod";
 import Image from "next/image";
-import { set } from "mongoose";
 
 interface Props {
   onSuccess: () => void;

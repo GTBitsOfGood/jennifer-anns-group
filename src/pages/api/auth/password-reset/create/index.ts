@@ -36,7 +36,9 @@ async function sendPasswordResetEmailHandler(
     const passwordResetLog = await createPasswordResetLog(email);
     await sendPasswordResetEmail(email, passwordResetLog.token);
 
-    return res.status(HTTP_STATUS_CODE.CREATED).send("Succesfully sent email");
+    return res
+      .status(HTTP_STATUS_CODE.CREATED)
+      .send({ message: "Succesfully sent email" });
   } catch (e: any) {
     console.error(e);
     return res
