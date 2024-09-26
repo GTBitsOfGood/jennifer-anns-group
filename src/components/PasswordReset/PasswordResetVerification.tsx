@@ -4,59 +4,12 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useCallback, useRef, useState } from "react";
 import { z } from "zod";
-import Image from "next/image";
+import ErrorNotification from "./ErrorNotification";
+import EmailSentNotification from "./EmailSentNotification";
 
 interface Props {
   onSuccess: () => void;
   emailRef: React.RefObject<string>;
-}
-
-function EmailSentNotification({ onClick }: { onClick: () => void }) {
-  return (
-    <div className="absolute top-[-18vh] flex w-[20%] min-w-[20em] items-center gap-2 rounded-md bg-[#C6E3F9] p-3">
-      <img
-        className="h-5 w-5"
-        src="/check_circle_outline.png"
-        alt="Check Circle Icon"
-      />
-      <div className="flex items-start">
-        <span className="text-xs">
-          A confirmation code has been sent to your email address. Please check
-          your inbox.
-        </span>
-        <Image
-          src="/cross.svg"
-          alt="Cross Icon"
-          width={15}
-          height={15}
-          role="button"
-          onClick={onClick}
-        />
-      </div>
-    </div>
-  );
-}
-
-function ErrorNotification({ onClick }: { onClick: () => void }) {
-  return (
-    <div className="absolute top-[-18vh] flex w-[20%] min-w-[20em] items-center gap-2 rounded-md border-2 border-solid border-red-400 p-3">
-      <img className="h-5 w-5" src="/error.svg" alt="Error Icon" />
-      <div className="flex min-w-[90%] items-start justify-between">
-        <span className="text-xs">
-          We ran into an error while verifying your password reset token. Your
-          token might have expired or is invalid. Please try again later.
-        </span>
-        <Image
-          src="/cross.svg"
-          alt="Cross Icon"
-          width={15}
-          height={15}
-          role="button"
-          onClick={onClick}
-        />
-      </div>
-    </div>
-  );
 }
 
 function PasswordResetVerification({ onSuccess, emailRef }: Props) {
@@ -99,7 +52,11 @@ function PasswordResetVerification({ onSuccess, emailRef }: Props) {
           onClick={() => setShowEmailNotification(false)}
         />
       ) : showErrorNotification ? (
-        <ErrorNotification onClick={() => setShowErrorNotification(false)} />
+        <ErrorNotification
+          errorMessage="We ran into an error while verifying your password reset token. Your
+          token might have expired or is invalid. Please try again later."
+          onClick={() => setShowErrorNotification(false)}
+        />
       ) : null}
 
       <h2 className="w-[100%] text-3xl font-bold text-blue-primary">

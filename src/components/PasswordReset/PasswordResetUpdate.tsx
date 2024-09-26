@@ -4,38 +4,10 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useCallback, useRef, useState } from "react";
 import { z } from "zod";
-import Image from "next/image";
+import ErrorNotification from "./ErrorNotification";
 
 interface Props {
   onSuccess: () => void;
-}
-
-function ErrorNotification({
-  errorMessage,
-  onClick,
-}: {
-  errorMessage: string | null;
-  onClick: () => void;
-}) {
-  return (
-    <div className="absolute top-[-18vh] flex w-[20%] min-w-[20em] items-center gap-2 rounded-md border-2 border-solid border-red-400 p-3">
-      <img className="h-5 w-5" src="/error.svg" alt="Error Icon" />
-      <div className="flex min-w-[90%] items-start justify-between">
-        <span className="text-xs">
-          {errorMessage ??
-            "We ran into an error while updating your password. Your token might have expired or is invalid. Please try again later."}
-        </span>
-        <Image
-          src="/cross.svg"
-          alt="Cross Icon"
-          width={15}
-          height={15}
-          role="button"
-          onClick={onClick}
-        />
-      </div>
-    </div>
-  );
 }
 
 function PasswordResetUpdate({ onSuccess }: Props) {
@@ -74,7 +46,10 @@ function PasswordResetUpdate({ onSuccess }: Props) {
     <div className="relative flex w-[40%] min-w-[15em] flex-col items-center gap-6">
       {showErrorNotification ? (
         <ErrorNotification
-          errorMessage={errorMessage}
+          errorMessage={
+            errorMessage ??
+            "We ran into an error while updating your password. Your token might have expired or is invalid. Please try again later."
+          }
           onClick={() => setShowErrorNotification(false)}
         />
       ) : null}
