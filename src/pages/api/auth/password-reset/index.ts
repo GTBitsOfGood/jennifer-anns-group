@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import z from "zod";
+import cookie from "cookie";
 import jwt from "jsonwebtoken";
 
 import { HTTP_STATUS_CODE } from "@/utils/consts";
@@ -52,8 +53,22 @@ async function updatePasswordHandler(
     }
 
     await resetPassword(newPassword, String(user._id));
+
+    const serializedCookie = cookie.serialize(
+      "passwordResetJwt",
+      "invalidValue",
+      {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 0, // Expire the cookie
+        path: "/",
+      },
+    );
+
     return res
       .status(HTTP_STATUS_CODE.OK)
+      .setHeader("Set-Cookie", serializedCookie)
       .send({ message: "Password reset successfully" });
   } catch (e: any) {
     console.error(e);
