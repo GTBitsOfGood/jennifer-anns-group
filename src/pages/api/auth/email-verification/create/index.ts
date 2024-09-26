@@ -11,7 +11,7 @@ export default async function handler(
 ) {
   switch (req.method) {
     case "POST":
-      return sendPasswordResetEmailHandler(req, res);
+      return sendEmailVerificationEmailHandler(req, res);
     default:
       return res.status(HTTP_STATUS_CODE.METHOD_NOT_ALLOWED).json({
         error: `Request method ${req.method} is not allowed`,
@@ -24,14 +24,14 @@ const emailObject = z.object({
 });
 
 export type EmailData = z.infer<typeof emailObject>;
-async function sendPasswordResetEmailHandler(
+async function sendEmailVerificationEmailHandler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
   try {
     const { email } = emailObject.parse(JSON.parse(req.body));
-    const passwordResetLog = await createEmailVerificationLog(email);
-    await sendEmailVerificationEmail(email, passwordResetLog.token);
+    const emailVerificationLog = await createEmailVerificationLog(email);
+    await sendEmailVerificationEmail(email, emailVerificationLog.token);
 
     return res
       .status(HTTP_STATUS_CODE.CREATED)

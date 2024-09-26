@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import z from "zod";
 
 import { HTTP_STATUS_CODE } from "@/utils/consts";
-import { verifyPasswordResetLog } from "@/server/db/actions/VerificationLogAction";
+import { verifyEmailVerificationLog } from "@/server/db/actions/VerificationLogAction";
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,7 +10,7 @@ export default async function handler(
 ) {
   switch (req.method) {
     case "POST":
-      return verifyPasswordResetHandler(req, res);
+      return verifyEmailVerificationHandler(req, res);
     default:
       return res.status(HTTP_STATUS_CODE.METHOD_NOT_ALLOWED).json({
         error: `Request method ${req.method} is not allowed`,
@@ -18,17 +18,17 @@ export default async function handler(
   }
 }
 
-const passwordResetParams = z.object({
+const emailVerificationParams = z.object({
   email: z.string().email("Email is not valid"),
   token: z.string().length(6),
 });
 
-async function verifyPasswordResetHandler(
+async function verifyEmailVerificationHandler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
   try {
-    const parsed = passwordResetParams.safeParse(JSON.parse(req.body));
+    const parsed = emailVerificationParams.safeParse(JSON.parse(req.body));
     if (!parsed.success) {
       return res
         .status(HTTP_STATUS_CODE.BAD_REQUEST)
@@ -36,7 +36,7 @@ async function verifyPasswordResetHandler(
     }
 
     const { email, token } = parsed.data;
-    const success = await verifyPasswordResetLog(email, token);
+    const success = await verifyEmailVerificationLog(email, token);
     if (!success) {
       return res
         .status(HTTP_STATUS_CODE.NOT_FOUND)
