@@ -63,3 +63,29 @@ export async function sendPasswordResetEmail(email: string, otpCode: string) {
 
   await sendEmail(emailParams);
 }
+
+export async function sendEmailVerificationEmail(
+  email: string,
+  otpCode: string,
+) {
+  const sentFrom = new Sender(
+    `randomemail@${MAIL_SEND_DOMAIN}`,
+    "Jennifer Ann's Group",
+  );
+
+  const emailParams = new EmailParams()
+    .setFrom(sentFrom)
+    .setTo([new Recipient(email)])
+    .setSubject("Verify Your Email")
+    .setTemplateId(process.env.EMAIL_VERIFICATION_TEMPLATE_ID || "")
+    .setPersonalization([
+      {
+        email: email,
+        data: {
+          otp_code: otpCode,
+        },
+      },
+    ]);
+
+  await sendEmail(emailParams);
+}

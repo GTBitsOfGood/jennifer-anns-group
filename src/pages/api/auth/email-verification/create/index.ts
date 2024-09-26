@@ -2,9 +2,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 import z from "zod";
 
 import { HTTP_STATUS_CODE } from "@/utils/consts";
-import { getUserByEmail } from "@/server/db/actions/UserAction";
-import { createPasswordResetLog } from "@/server/db/actions/VerificationLogAction";
-import { sendPasswordResetEmail } from "@/server/db/actions/EmailAction";
+import { createEmailVerificationLog } from "@/server/db/actions/VerificationLogAction";
+import { sendEmailVerificationEmail } from "@/server/db/actions/EmailAction";
 
 export default async function handler(
   req: NextApiRequest,
@@ -31,14 +30,12 @@ async function sendPasswordResetEmailHandler(
 ) {
   try {
     const { email } = emailObject.parse(JSON.parse(req.body));
-    const user = await getUserByEmail(email); // This function will throw an error if the user does not exist
-
-    const passwordResetLog = await createPasswordResetLog(email);
-    await sendPasswordResetEmail(email, passwordResetLog.token);
+    const passwordResetLog = await createEmailVerificationLog(email);
+    await sendEmailVerificationEmail(email, passwordResetLog.token);
 
     return res
       .status(HTTP_STATUS_CODE.CREATED)
-      .send({ message: "Succesfully sent password reset email" });
+      .send({ message: "Succesfully sent email verification email" });
   } catch (e: any) {
     console.error(e);
     return res

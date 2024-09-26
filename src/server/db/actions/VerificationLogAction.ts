@@ -153,9 +153,7 @@ export const createEmailVerificationLog = async (
   email: string,
 ): Promise<IVerificationLog> => {
   const otp: string = generateRandomNumberSequence(6);
-  const expiresAt: Date = new Date(
-    new Date().getTime() + 7 * 24 * 60 * 60 * 1000,
-  ); // 7 days from now
+  const expiresAt: Date = new Date(new Date().getTime() + 60 * 60 * 1000); // 60 minutes from now
   const emailVerificationLog = await createVerificationLog({
     email,
     type: VerificationLogType.EMAIL_VERIFICATION,
