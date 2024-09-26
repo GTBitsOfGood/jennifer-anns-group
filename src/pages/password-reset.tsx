@@ -35,8 +35,7 @@ function PasswordReset() {
       ),
       [PasswordResetPage.UPDATE]: (
         <PasswordResetUpdate
-          onSuccess={() => setPage(PasswordResetPage.UPDATE)}
-          // emailRef={emailRef}
+          onSuccess={() => setPage(PasswordResetPage.CONFIRMATION)}
         />
       ),
       [PasswordResetPage.CONFIRMATION]: <PasswordResetConfirmation />,

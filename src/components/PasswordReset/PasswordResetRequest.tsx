@@ -12,7 +12,7 @@ interface Props {
 
 function PasswordResetRequest({ onSuccess, emailRef }: Props) {
   const [validationError, setValidationError] = useState<string | null>(null);
-  const handleLoginSubmit = useCallback(
+  const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setValidationError(null);
@@ -49,10 +49,7 @@ function PasswordResetRequest({ onSuccess, emailRef }: Props) {
           a confirmation code.
         </p>
       </div>
-      <form
-        className="flex w-[100%] flex-col gap-8"
-        onSubmit={handleLoginSubmit}
-      >
+      <form className="flex w-[100%] flex-col gap-8" onSubmit={handleSubmit}>
         <div className="relative flex flex-col">
           <label htmlFor="email" className="text-l">
             Email*

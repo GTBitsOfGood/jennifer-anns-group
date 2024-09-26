@@ -64,7 +64,7 @@ function PasswordResetVerification({ onSuccess, emailRef }: Props) {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const confirmationCodeRef = useRef<HTMLInputElement>(null);
 
-  const handleLoginSubmit = useCallback(
+  const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setShowEmailNotification(false);
@@ -93,7 +93,7 @@ function PasswordResetVerification({ onSuccess, emailRef }: Props) {
   );
 
   return (
-    <div className="relative flex w-[40%]  min-w-[15em] flex-col items-center gap-6">
+    <div className="relative flex w-[40%] min-w-[15em] flex-col items-center gap-6">
       {showEmailNotification ? (
         <EmailSentNotification
           onClick={() => setShowEmailNotification(false)}
@@ -101,19 +101,11 @@ function PasswordResetVerification({ onSuccess, emailRef }: Props) {
       ) : showErrorNotification ? (
         <ErrorNotification onClick={() => setShowErrorNotification(false)} />
       ) : null}
-      <div className="">
-        <h2 className="text-3xl font-bold text-blue-primary">
-          Reset Your Password
-        </h2>
-        <p className="text-xs">
-          Enter the email address linked to your account and we&apos;ll send you
-          a confirmation code.
-        </p>
-      </div>
-      <form
-        className="flex w-[100%] flex-col gap-8"
-        onSubmit={handleLoginSubmit}
-      >
+
+      <h2 className="w-[100%] text-3xl font-bold text-blue-primary">
+        Reset Your Password
+      </h2>
+      <form className="flex w-[100%] flex-col gap-8" onSubmit={handleSubmit}>
         <div className="relative flex flex-col">
           <label htmlFor="confirmation-code">
             <span className="text-l">Confirmation Code</span>
