@@ -4,6 +4,8 @@ import { EmailFailedToSendException } from "@/utils/exceptions/email";
 import { DEV_ADMIN_CONTACT } from "@/utils/consts";
 import { MailerSend, EmailParams, Sender, Recipient } from "mailersend";
 import { MAIL_SEND_DOMAIN } from "@/utils/consts";
+import passwordResetEmailTemplate from "@/server/email-templates/passwordResetEmailTemplate";
+import emailVerificationEmailTemplate from "@/server/email-templates/emailVerificationEmailTemplate";
 
 export async function sendEmail(emailParams: EmailParams) {
   const mailerSend = new MailerSend({
@@ -51,15 +53,7 @@ export async function sendPasswordResetEmail(email: string, otpCode: string) {
     .setFrom(sentFrom)
     .setTo([new Recipient(email)])
     .setSubject("Reset Your Password")
-    .setTemplateId(process.env.PASSWORD_RESET_TEMPLATE_ID || "")
-    .setPersonalization([
-      {
-        email: email,
-        data: {
-          otp_code: otpCode,
-        },
-      },
-    ]);
+    .setHtml(passwordResetEmailTemplate(email, otpCode));
 
   await sendEmail(emailParams);
 }
@@ -77,15 +71,7 @@ export async function sendEmailVerificationEmail(
     .setFrom(sentFrom)
     .setTo([new Recipient(email)])
     .setSubject("Verify Your Email")
-    .setTemplateId(process.env.EMAIL_VERIFICATION_TEMPLATE_ID || "")
-    .setPersonalization([
-      {
-        email: email,
-        data: {
-          otp_code: otpCode,
-        },
-      },
-    ]);
+    .setHtml(emailVerificationEmailTemplate(email, otpCode));
 
   await sendEmail(emailParams);
 }
