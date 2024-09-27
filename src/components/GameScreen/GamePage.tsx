@@ -45,16 +45,18 @@ export type GameDataState = populatedGameWithId & {
   parentingGuideFile: File | undefined;
   answerKeyFile: File | undefined;
   lessonFile: File | undefined;
+  _id: string;
+  preview: boolean;
 };
 
 interface Props {
   mode: "view" | "preview";
+  gameData: GameDataState;
 }
 
-const GamePage = ({ mode }: Props) => {
+const GamePage = ({ mode, gameData }: Props) => {
   const router = useRouter();
-  const gameId = router.query.id as string;
-  const [gameData, setGameData] = useState<GameDataState | undefined>();
+  const [curData, setCurData] = useState<GameDataState | undefined>(gameData);
   const [error, setError] = useState("");
   const [visibleAnswer, setVisibleAnswer] = useState(false);
   const { data: session } = useSession();
@@ -89,20 +91,20 @@ const GamePage = ({ mode }: Props) => {
 
   const publishGame = async () => {
     try {
-      const themeIds = gameData?.themes.map((theme) => theme._id);
-      const tagIds = gameData?.tags.map((tag) => tag._id);
+      const themeIds = curData?.themes.map((theme) => theme._id);
+      const tagIds = curData?.tags.map((tag) => tag._id);
 
       const putData = {
         tags: tagIds,
         themes: themeIds,
-        description: gameData?.description,
-        name: gameData?.name,
-        builds: gameData?.builds,
-        videoTrailer: gameData?.videoTrailer,
+        description: curData?.description,
+        name: curData?.name,
+        builds: curData?.builds,
+        videoTrailer: curData?.videoTrailer,
         preview: false,
       };
 
-      const response = await fetch(`/api/games/${gameId}`, {
+      const response = await fetch(`/api/games/${gameData._id}`, {
         method: "PUT",
         body: JSON.stringify(putData),
       });
@@ -111,7 +113,7 @@ const GamePage = ({ mode }: Props) => {
         setError("Failed to publish game.");
       } else {
         deleteOnRouteChange.current = false;
-        router.replace(`/games/${gameId}`);
+        router.replace(`/games/${gameData._id}`);
       }
     } catch (error) {
       console.error("Error publishing game:", error);
@@ -120,7 +122,7 @@ const GamePage = ({ mode }: Props) => {
 
   const handleCancel = async () => {
     try {
-      const response = await fetch(`/api/games/${gameId}`, {
+      const response = await fetch(`/api/games/${gameData._id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -165,25 +167,39 @@ const GamePage = ({ mode }: Props) => {
 
   const loaded = userData && userId;
 
-  useEffect(() => {
-    gameDataResource[gameId] = fetchGameData(gameId);
-  }, [gameId]);
+  // useEffect(() => {
+  //   gameDataResource[gameId] = fetchGameData(gameId);
+  // }, [gameId]);
 
-  const data = gameDataResource[gameId]?.read();
-  if (!gameData && data) {
-    if (!data.name) {
+  // const data = gameDataResource[gameId]?.read();
+  // if (!curData && data) {
+  //   if (!data.name) {
+  //     deleteOnRouteChange.current = false;
+  //     router.replace("/");
+  //   }
+  //   if (!data.preview && mode == "preview") {
+  //     deleteOnRouteChange.current = false;
+  //     router.replace(`/games/${gameId}`);
+  //   } else {
+  //     setCurData(data);
+  //   }
+  // }
+
+  useEffect(() => {
+    console.log(gameData);
+    if (!gameData) {
       deleteOnRouteChange.current = false;
       router.replace("/");
     }
-    if (!data.preview && mode == "preview") {
+    if (!gameData.preview && mode == "preview") {
       deleteOnRouteChange.current = false;
-      router.replace(`/games/${gameId}`);
+      router.replace(`/games/${gameData._id}`);
     } else {
-      setGameData(data);
+      setCurData(gameData);
     }
-  }
+  }, [gameData]);
 
-  if (!gameData) {
+  if (!curData) {
     return null;
   }
 
@@ -201,44 +217,44 @@ const GamePage = ({ mode }: Props) => {
           </div>
         )}
         <h1 className="mt-[32px] text-center font-sans text-[56px] font-semibold">
-          {gameData.name}
+          {curData.name}
         </h1>
         {loaded && (
           <>
             {userData.label === "administrator" && (
               <AdminEditButton
-                gameId={gameId}
+                gameId={gameData._id}
                 deleteOnRouteChange={deleteOnRouteChange}
               />
             )}
           </>
         )}
         <EmbeddedGame
-          gameId={gameId as string}
+          gameId={gameData._id as string}
           userData={currentUser}
-          gameName={gameData.name}
+          gameName={curData.name}
         />
         <TabsComponent
           mode="view"
-          gameData={gameData}
-          setGameData={setGameData}
+          gameData={curData}
+          setGameData={setCurData}
           authorized={visibleAnswer}
           userData={currentUser}
         />
         {loaded && userData.label !== "administrator" && (
-          <NotesComponent gameId={gameId} userId={userId} />
+          <NotesComponent gameId={gameData._id} userId={userId} />
         )}
         {loaded && userData.label !== "administrator" && (
           <ContactComponent
-            gameName={gameData.name}
+            gameName={curData.name}
             userId={userId}
             firstName={userData.firstName}
           />
         )}
         <TagsComponent
           mode="view"
-          gameData={gameData}
-          setGameData={setGameData}
+          gameData={curData}
+          setGameData={setCurData}
           admin={visibleAnswer}
         />
         {loaded && mode === "preview" && (

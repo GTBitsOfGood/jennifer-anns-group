@@ -1,17 +1,34 @@
 import GamePage from "@/components/GameScreen/GamePage";
 import React, { Suspense } from "react";
+import { InferGetServerSidePropsType, GetServerSideProps } from "next";
+import { getGameById } from "@/server/db/actions/GameAction";
 
-function ViewGame() {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  try {
+    const data = await getGameById(ctx.query.id as string);
+    const gameData = JSON.parse(JSON.stringify(data));
+    return {
+      props: {
+        gameData,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching game data:", error);
+    return {
+      props: {
+        gameData: null,
+      },
+    };
+  }
+};
+
+function ViewGame({
+  gameData,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
-    <Suspense
-      fallback={
-        <div className="flex h-screen items-center justify-center">
-          <div className="h-24 w-24 animate-ping rounded-full bg-orange-primary"></div>
-        </div>
-      }
-    >
-      <GamePage mode="view" />
-    </Suspense>
+    <>
+      <GamePage mode="view" gameData={gameData} />
+    </>
   );
 }
 
