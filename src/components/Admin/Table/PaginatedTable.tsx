@@ -95,6 +95,7 @@ export function PaginatedTable<TData, TValue>({
     setPaginatedData(
       data.slice((currPage - 1) * itemsPerPage, currPage * itemsPerPage),
     );
+    setSelectedRow && setSelectedRow((currPage - 1) * itemsPerPage);
   }, [currPage, numPages, data]);
 
   return (
