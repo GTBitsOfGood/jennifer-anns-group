@@ -14,7 +14,6 @@ const VerificationLogSchema = new Schema<IVerificationLog>({
   email: {
     type: mongoose.Schema.Types.String,
     required: true,
-    unique: true,
   },
   type: {
     type: mongoose.Schema.Types.String,
