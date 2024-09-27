@@ -27,15 +27,9 @@ import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/router";
 import ThemeSidebar from "@/components/GameGallery/ThemeSidebar";
 import SelectedFilters from "@/components/GameGallery/SelectedFilters";
-import GameCardView, {
-  gameDataSchema,
-} from "@/components/GameGallery/GameCardView";
+import GameCardView from "@/components/GameGallery/GameCardView";
 import GamesPagination from "@/components/GameGallery/GamesPagination";
-import {
-  PageRequiredGameQuery,
-  generateQueryUrl,
-} from "@/components/ThemesTags/GamesSection";
-import wrapPromise from "@/components/wrapPromise";
+import { PageRequiredGameQuery } from "@/components/ThemesTags/GamesSection";
 
 export default function Games() {
   const { data: session } = useSession();
@@ -169,7 +163,7 @@ export default function Games() {
               <ThemeSidebar filters={filters} setFilters={setFilters} />
               <Suspense
                 fallback={
-                  <div className="flex h-full w-full items-center justify-center">
+                  <div className="flex h-96 w-full items-center justify-center">
                     <div className="h-14 w-14 animate-ping rounded-full bg-orange-primary"></div>
                   </div>
                 }

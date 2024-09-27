@@ -2,22 +2,27 @@ import ReactPlayer from "react-player/lazy";
 import { Flex, Button, useDisclosure } from "@chakra-ui/react";
 import DeleteComponentModal from "@/components/DeleteComponentModal";
 import AddEditVideoTrailer from "../GameScreen/AddEditVideoTrailerComponent";
-import { populatedGameWithId } from "@/server/db/models/GameModel";
-import { Dispatch } from "react";
+import { Dispatch, useEffect, useState } from "react";
 import { CloseIcon } from "@chakra-ui/icons";
 import { GameDataState } from "../GameScreen/GamePage";
 
 interface Props {
   gameData: GameDataState;
-  setGameData: Dispatch<React.SetStateAction<GameDataState | undefined>>;
+  setGameData: Dispatch<React.SetStateAction<GameDataState>>;
   edit: boolean;
 }
 
 export default function VideoComponent({ gameData, edit, setGameData }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   return (
     <div className="flex flex-col justify-center">
-      {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
+      {isClient && gameData.videoTrailer && gameData.videoTrailer !== "" ? (
         <div style={{ paddingTop: "56.25%", position: "relative" }}>
           <ReactPlayer
             url={gameData.videoTrailer}

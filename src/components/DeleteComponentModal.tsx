@@ -19,7 +19,7 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   gameData: GameDataState;
-  setGameData: Dispatch<React.SetStateAction<GameDataState | undefined>>;
+  setGameData: Dispatch<React.SetStateAction<GameDataState>>;
 }
 
 export default function DeleteComponentModal(props: Props) {

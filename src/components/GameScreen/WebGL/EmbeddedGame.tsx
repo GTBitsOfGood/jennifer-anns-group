@@ -1,10 +1,9 @@
-import { Button } from "@/components/ui/button";
 import cn from "classnames";
 import { useEffect, useRef, useState } from "react";
-import { Play } from "lucide-react";
 import { useAnalytics } from "@/context/AnalyticsContext";
 import { userDataSchema } from "@/components/ProfileModal/ProfileModal";
 import { z } from "zod";
+
 interface EmbeddedGameProps {
   gameId: string;
   userData: z.infer<typeof userDataSchema>;
@@ -17,7 +16,7 @@ export default function EmbeddedGame({
   gameName,
 }: EmbeddedGameProps) {
   const ref = useRef<HTMLIFrameElement | null>(null);
-  const [height, setHeight] = useState("0px");
+  const [height, setHeight] = useState("725px");
   // const [loadGame, setLoadGame] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const { analyticsLogger } = useAnalytics();
@@ -68,6 +67,10 @@ export default function EmbeddedGame({
   }, [iframeLoaded]);
 
   useEffect(() => {
+    const iframeWidth = ref.current?.offsetWidth;
+    if (iframeWidth) {
+      setHeight(`${iframeWidth / 2}px`);
+    }
     window.addEventListener("resize", updateHeight);
     return () => {
       window.removeEventListener("resize", updateHeight);

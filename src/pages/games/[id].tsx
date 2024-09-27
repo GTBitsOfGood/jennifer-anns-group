@@ -1,5 +1,5 @@
 import GamePage from "@/components/GameScreen/GamePage";
-import React, { Suspense } from "react";
+import React from "react";
 import { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { getGameById } from "@/server/db/actions/GameAction";
 

@@ -22,24 +22,6 @@ import {
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { Button } from "@/components/ui/button";
-import wrapPromise from "../wrapPromise";
-
-// Fetch game data and wrap the promise for Suspense
-function fetchGameData(gameId: string) {
-  if (!gameId) {
-    return wrapPromise(
-      new Promise<void>((resolve) => {
-        resolve();
-      }),
-    );
-  }
-  const promise = fetch(`/api/games/${gameId}`).then((res) => {
-    return res.json();
-  });
-  return wrapPromise(promise);
-}
-
-let gameDataResource: { [key: string]: ReturnType<typeof wrapPromise> } = {};
 
 export type GameDataState = populatedGameWithId & {
   parentingGuideFile: File | undefined;
@@ -56,7 +38,7 @@ interface Props {
 
 const GamePage = ({ mode, gameData }: Props) => {
   const router = useRouter();
-  const [curData, setCurData] = useState<GameDataState | undefined>(gameData);
+  const [curData, setCurData] = useState<GameDataState>(gameData);
   const [error, setError] = useState("");
   const [visibleAnswer, setVisibleAnswer] = useState(false);
   const { data: session } = useSession();
@@ -167,26 +149,7 @@ const GamePage = ({ mode, gameData }: Props) => {
 
   const loaded = userData && userId;
 
-  // useEffect(() => {
-  //   gameDataResource[gameId] = fetchGameData(gameId);
-  // }, [gameId]);
-
-  // const data = gameDataResource[gameId]?.read();
-  // if (!curData && data) {
-  //   if (!data.name) {
-  //     deleteOnRouteChange.current = false;
-  //     router.replace("/");
-  //   }
-  //   if (!data.preview && mode == "preview") {
-  //     deleteOnRouteChange.current = false;
-  //     router.replace(`/games/${gameId}`);
-  //   } else {
-  //     setCurData(data);
-  //   }
-  // }
-
   useEffect(() => {
-    console.log(gameData);
     if (!gameData) {
       deleteOnRouteChange.current = false;
       router.replace("/");
@@ -198,10 +161,6 @@ const GamePage = ({ mode, gameData }: Props) => {
       setCurData(gameData);
     }
   }, [gameData]);
-
-  if (!curData) {
-    return null;
-  }
 
   if (error) {
     return <div>{error}</div>;
