@@ -54,9 +54,8 @@ interface Props {
 const GamePage = ({ mode }: Props) => {
   const router = useRouter();
   const gameId = router.query.id as string;
-
   const [gameData, setGameData] = useState<GameDataState | undefined>();
-
+  const [error, setError] = useState("");
   const [visibleAnswer, setVisibleAnswer] = useState(false);
   const { data: session } = useSession();
   const idSchema = z.string().length(24);
@@ -109,7 +108,7 @@ const GamePage = ({ mode }: Props) => {
       });
 
       if (!response.ok) {
-        console.error("Failed to publish game.");
+        setError("Failed to publish game.");
       } else {
         deleteOnRouteChange.current = false;
         router.replace(`/games/${gameId}`);
@@ -129,7 +128,7 @@ const GamePage = ({ mode }: Props) => {
         keepalive: deleteOnRouteChange.current,
       });
       if (!response.ok) {
-        console.error("Failed to delete game.");
+        setError("Failed to delete game.");
       }
     } catch (error) {
       console.error("Error deleting game:", error);
@@ -186,6 +185,10 @@ const GamePage = ({ mode }: Props) => {
 
   if (!gameData) {
     return null;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
   }
 
   return (
