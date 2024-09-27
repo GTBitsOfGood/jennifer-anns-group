@@ -17,11 +17,15 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  minRowIndex?: number;
+  setSelectedRow?: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  minRowIndex,
+  setSelectedRow,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -61,6 +65,10 @@ export function DataTable<TData, TValue>({
                   <TableCell
                     key={cell.id}
                     className={cell.column.columnDef.meta?.toString()}
+                    onClick={() => {
+                      setSelectedRow &&
+                        setSelectedRow((minRowIndex ?? 0) + row.index);
+                    }}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>

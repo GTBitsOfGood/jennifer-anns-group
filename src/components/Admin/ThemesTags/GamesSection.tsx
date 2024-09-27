@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { Input } from "../ui/input";
-import { DataTable } from "./Table/data-table";
-import { columns } from "./Table/columns";
+import { Input } from "../../ui/input";
+import { DataTable } from "../Table/data-table";
+import { columns } from "../Table/themes-columns";
 import { useCallback, useEffect, useState } from "react";
 import { GameQuery, GetGamesOutput } from "@/pages/api/games";
 import {
@@ -12,7 +12,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "../ui/pagination";
+} from "../../ui/pagination";
 import FilterPopover from "./FilterPopover";
 
 export type PageRequiredGameQuery = GameQuery &

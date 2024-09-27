@@ -34,7 +34,7 @@ import GamesPagination from "@/components/GameGallery/GamesPagination";
 import {
   PageRequiredGameQuery,
   generateQueryUrl,
-} from "@/components/ThemesTags/GamesSection";
+} from "@/components/Admin/ThemesTags/GamesSection";
 
 export default function Games() {
   const { data: session } = useSession();

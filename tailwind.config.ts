@@ -24,13 +24,18 @@ const config = {
         "blue-bg": "#A9CBEB",
         "orange-primary": "#FC9300",
         "orange-bg": "#FFDFB3",
+        "orange-light-bg": "#FFF5E6",
         "input-bg": "#FAFBFC",
         "input-border": "#D9D9D9",
         "delete-red": "#8B0000",
         grey: "#666666",
         "gray-500": "#667085",
+        "gray-hover": "#EAEAEA",
+        "gray-text": "#7D7E82",
+        "light-gray": "#F4F4F4",
         placeholder: "#A3AED0",
         "stone-primary": "#535353",
+        black: "#4C4B4B",
       },
       fontFamily: {
         sans: ["Poppins", "sans-serif"], // Default `Poppins` font family to sans

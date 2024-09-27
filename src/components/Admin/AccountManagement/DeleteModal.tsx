@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Button } from "../ui/button";
-import { Dialog, DialogClose, DialogContent } from "../ui/dialog";
+import { Button } from "../../ui/button";
+import { Dialog, DialogClose, DialogContent } from "../../ui/dialog";
 import { Admin } from "@/pages/admin/account-management";
 import {
   Select,

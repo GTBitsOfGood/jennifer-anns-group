@@ -1,4 +1,4 @@
-import { Button } from "../../ui/button";
+import { Button } from "../../../ui/button";
 import {
   Dialog,
   DialogClose,
@@ -6,9 +6,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../ui/dialog";
-import { Label } from "../../ui/label";
-import { Input } from "../../ui/input";
+} from "../../../ui/dialog";
+import { Label } from "../../../ui/label";
+import { Input } from "../../../ui/input";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { z } from "zod";
