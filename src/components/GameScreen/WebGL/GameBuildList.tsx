@@ -4,6 +4,7 @@ import { NonWebGLBuilds, buildSchema } from "@/utils/types";
 import { AlertTriangleIcon, Download, Pencil, Plus, Trash } from "lucide-react";
 import { z } from "zod";
 import { Label } from "@/components/ui/label";
+import { useAnalytics } from "@/context/AnalyticsContext";
 import {
   Select,
   SelectTrigger,
@@ -22,14 +23,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { GameDataState } from "../GamePage";
+import { userDataSchema } from "@/components/ProfileModal/ProfileModal";
 
 interface Props {
   gameData: GameDataState;
   editing: boolean;
   setGameData?: React.Dispatch<GameDataState>;
+  userData: z.infer<typeof userDataSchema> | undefined;
 }
 
-function GameBuildList({ gameData, editing, setGameData }: Props) {
+function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [editData, setEditData] = useState<z.infer<typeof buildSchema> | null>(
     null,
@@ -166,6 +169,30 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
 
   const cancelRef = useRef<HTMLButtonElement | null>(null);
 
+  //Handle Download Analytics
+  const { analyticsLogger } = useAnalytics();
+  const [downloadedGames, setDownloadedGames] = useState(new Set());
+  const downloadGame = (gameUrl: string, gameBuildName: string) => {
+    if (!downloadedGames.has(gameBuildName)) {
+      setDownloadedGames((prev) => {
+        const newSet = new Set(prev);
+        newSet.add(gameBuildName);
+        return newSet;
+      });
+      if (userData != undefined) {
+        const properties = {
+          userId: userData._id,
+          userGroup: userData.label,
+          createdDate: Date(),
+          gameName: gameData.name,
+          resourceName: gameBuildName,
+          resourceUrl: gameUrl,
+          downloadSrc: window.location.href,
+        };
+        analyticsLogger.logCustomEvent("Download", "game", properties);
+      }
+    }
+  };
   return (
     <div>
       {gameData.builds &&
@@ -186,7 +213,10 @@ function GameBuildList({ gameData, editing, setGameData }: Props) {
                   <div className="flex flex-col justify-center">
                     <div
                       className="flex cursor-pointer flex-row gap-2 font-semibold text-blue-primary"
-                      onClick={() => window.open(data.link, "_blank")}
+                      onClick={() => {
+                        downloadGame(data.link, data.type);
+                        window.open(data.link, "_blank");
+                      }}
                     >
                       <Download />
                       Download

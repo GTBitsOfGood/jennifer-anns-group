@@ -19,8 +19,11 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
+      const { iat, exp, jti, ...otherUser } = token;
+
       const user = {
         _id: token._id,
+        ...otherUser,
       };
       session.user = user;
       return session;
@@ -43,7 +46,7 @@ export const authOptions: NextAuthOptions = {
         const { email, password } = credentials;
         const user = await verifyUser(email, password);
 
-        return { _id: user._id };
+        return user;
       },
     }),
   ],

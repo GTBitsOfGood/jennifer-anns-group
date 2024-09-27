@@ -62,13 +62,7 @@ const pageAccessHOC = <P extends object>(Component: React.FC<P>) => {
         if (status === "unauthenticated") {
           setLabel(Label.NONE);
         } else {
-          try {
-            const response = await fetch(`/api/users/${data?.user._id}`);
-            const responseData = await response.json();
-            setLabel(responseData.label as Label);
-          } catch (error) {
-            console.error("Error fetching user status");
-          }
+          setLabel(data?.user.label as Label);
         }
       };
 

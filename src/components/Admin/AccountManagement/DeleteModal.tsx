@@ -48,18 +48,11 @@ function DeleteModal({ open, setOpen, admin }: Props) {
     return <div></div>;
   }
 
-  const isCurrUser = async () => {
-    try {
-      const response = await fetch(`../api/users/${data?.user._id}`);
-      const responseData = await response.json();
-      const email = responseData.email;
-      if (email === admin.email) {
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error("Error fetching user status");
+  const isCurrUser = () => {
+    if (data?.user.email === admin.email) {
+      return true;
     }
+    return false;
   };
 
   const handleUpdateRole = async () => {

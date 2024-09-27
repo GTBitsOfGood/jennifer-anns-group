@@ -2,17 +2,25 @@ import { Button } from "@/components/ui/button";
 import cn from "classnames";
 import { useEffect, useRef, useState } from "react";
 import { Play } from "lucide-react";
-
+import { useAnalytics } from "@/context/AnalyticsContext";
+import { userDataSchema } from "@/components/ProfileModal/ProfileModal";
+import { z } from "zod";
 interface EmbeddedGameProps {
   gameId: string;
+  userData: z.infer<typeof userDataSchema>;
+  gameName: string;
 }
 
-export default function EmbeddedGame({ gameId }: EmbeddedGameProps) {
+export default function EmbeddedGame({
+  gameId,
+  userData,
+  gameName,
+}: EmbeddedGameProps) {
   const ref = useRef<HTMLIFrameElement | null>(null);
   const [height, setHeight] = useState("0px");
   // const [loadGame, setLoadGame] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
-
+  const { analyticsLogger } = useAnalytics();
   const updateHeight = () => {
     const iframe = ref.current;
     if (!iframe) return;
@@ -37,6 +45,17 @@ export default function EmbeddedGame({ gameId }: EmbeddedGameProps) {
         subtree: true,
       });
     }
+    //Analytics stuff
+    const properties = {
+      userId: userData._id,
+      userGroup: userData.label,
+      createdDate: Date(),
+      gameName: gameName,
+      resourceName: "webgl",
+      resourceUrl: "",
+      downloadSrc: window.location.href,
+    };
+    analyticsLogger.logCustomEvent("Download", "game", properties);
     return () => {
       observer.disconnect();
     };
