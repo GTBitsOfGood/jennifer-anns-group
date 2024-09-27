@@ -24,7 +24,7 @@ const dummyData = Array.from({ length: 100 }, (_, i) => ({
 }));
 
 const CMSDashboardPage = () => {
-  const [selectedRow, setSelectedRow] = useState<number>(0); // TO DO: implement triangle
+  const [selectedRow, setSelectedRow] = useState<number>(0);
   const itemsPerPage = 8;
 
   return (
