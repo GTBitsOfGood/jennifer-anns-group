@@ -24,26 +24,22 @@ import chakraTheme from "@/styles/chakraTheme";
 import { Button } from "@/components/ui/button";
 import wrapPromise from "../wrapPromise";
 
-// Function to fetch game data and wrap the promise
+// Fetch game data and wrap the promise for Suspense
 function fetchGameData(gameId: string) {
-  console.log("fetching", gameId);
   if (!gameId) {
     return wrapPromise(
-      new Promise((_, reject) => {
-        reject(new Error("No game ID provided"));
+      new Promise<void>((resolve) => {
+        resolve();
       }),
     );
   }
   const promise = fetch(`/api/games/${gameId}`).then((res) => {
-    if (!res.ok) {
-      throw new Error("Failed to fetch game");
-    }
     return res.json();
   });
   return wrapPromise(promise);
 }
 
-const gameDataResource: { [key: string]: ReturnType<typeof wrapPromise> } = {}; // To cache wrapped promises
+let gameDataResource: { [key: string]: ReturnType<typeof wrapPromise> } = {};
 
 export type GameDataState = populatedGameWithId & {
   parentingGuideFile: File | undefined;
@@ -59,27 +55,7 @@ const GamePage = ({ mode }: Props) => {
   const router = useRouter();
   const gameId = router.query.id as string;
 
-  // // Fetch game data if not already cached
-  // if (!gameDataResource[gameId]) {
-  //   console.log(gameId);
-
-  // }
   const [gameData, setGameData] = useState<GameDataState | undefined>();
-
-  useEffect(() => {
-    if (gameId) {
-      if (!gameDataResource[gameId]) {
-        gameDataResource[gameId] = fetchGameData(gameId);
-      }
-    }
-  }, [gameId]);
-
-  if (gameId && gameDataResource[gameId]) {
-    const data = gameDataResource[gameId].read();
-    if (!gameData) {
-      setGameData(data);
-    }
-  }
 
   const [visibleAnswer, setVisibleAnswer] = useState(false);
   const { data: session } = useSession();
@@ -190,62 +166,80 @@ const GamePage = ({ mode }: Props) => {
 
   const loaded = userData && userId;
 
+  useEffect(() => {
+    gameDataResource[gameId] = fetchGameData(gameId);
+  }, [gameId]);
+
+  const data = gameDataResource[gameId]?.read();
+  if (!gameData && data) {
+    if (!data.name) {
+      deleteOnRouteChange.current = false;
+      router.replace("/");
+    }
+    if (!data.preview && mode == "preview") {
+      deleteOnRouteChange.current = false;
+      router.replace(`/games/${gameId}`);
+    } else {
+      setGameData(data);
+    }
+  }
+
   if (!gameData) {
-    return <div>Game does not exist</div>;
+    return null;
   }
 
   return (
-    <div>
-      {mode === "preview" && (
-        <div className="flex h-fit w-full flex-col items-center justify-center bg-blue-bg py-2 font-sans">
-          <p className="font-bold">🔍 You are in preview mode.</p>
-          <p>Note: Leaving this page will discard your progress.</p>
-        </div>
-      )}
-      <h1 className="mt-[32px] text-center font-sans text-[56px] font-semibold">
-        {gameData.name}
-      </h1>
-      {loaded && (
-        <>
-          {userData.label === "administrator" && (
-            <AdminEditButton
-              gameId={gameId}
-              deleteOnRouteChange={deleteOnRouteChange}
-            />
-          )}
-        </>
-      )}
-      <EmbeddedGame
-        gameId={gameId as string}
-        userData={currentUser}
-        gameName={gameData.name}
-      />
-      <TabsComponent
-        mode="view"
-        gameData={gameData}
-        setGameData={setGameData}
-        authorized={visibleAnswer}
-        userData={currentUser}
-      />
-      {loaded && userData.label !== "administrator" && (
-        <NotesComponent gameId={gameId} userId={userId} />
-      )}
-      {loaded && userData.label !== "administrator" && (
-        <ContactComponent
+    <ChakraProvider theme={chakraTheme}>
+      <div>
+        {mode === "preview" && (
+          <div className="flex h-fit w-full flex-col items-center justify-center bg-blue-bg py-2 font-sans">
+            <p className="font-bold">🔍 You are in preview mode.</p>
+            <p>Note: Leaving this page will discard your progress.</p>
+          </div>
+        )}
+        <h1 className="mt-[32px] text-center font-sans text-[56px] font-semibold">
+          {gameData.name}
+        </h1>
+        {loaded && (
+          <>
+            {userData.label === "administrator" && (
+              <AdminEditButton
+                gameId={gameId}
+                deleteOnRouteChange={deleteOnRouteChange}
+              />
+            )}
+          </>
+        )}
+        <EmbeddedGame
+          gameId={gameId as string}
+          userData={currentUser}
           gameName={gameData.name}
-          userId={userId}
-          firstName={userData.firstName}
         />
-      )}
-      <TagsComponent
-        mode="view"
-        gameData={gameData}
-        setGameData={setGameData}
-        admin={visibleAnswer}
-      />
-      {loaded && mode === "preview" && (
-        <div className="relative my-10 flex w-11/12 justify-end gap-6 font-sans">
-          <ChakraProvider theme={chakraTheme}>
+        <TabsComponent
+          mode="view"
+          gameData={gameData}
+          setGameData={setGameData}
+          authorized={visibleAnswer}
+          userData={currentUser}
+        />
+        {loaded && userData.label !== "administrator" && (
+          <NotesComponent gameId={gameId} userId={userId} />
+        )}
+        {loaded && userData.label !== "administrator" && (
+          <ContactComponent
+            gameName={gameData.name}
+            userId={userId}
+            firstName={userData.firstName}
+          />
+        )}
+        <TagsComponent
+          mode="view"
+          gameData={gameData}
+          setGameData={setGameData}
+          admin={visibleAnswer}
+        />
+        {loaded && mode === "preview" && (
+          <div className="relative my-10 flex w-11/12 justify-end gap-6 font-sans">
             <div>
               <Button
                 type="button"
@@ -309,19 +303,18 @@ const GamePage = ({ mode }: Props) => {
                 </AlertDialogContent>
               </AlertDialog>
             </div>
-          </ChakraProvider>
-
-          <Button
-            type="button"
-            variant="mainblue"
-            className="px-6 py-6 text-2xl font-semibold"
-            onClick={publishGame}
-          >
-            Publish
-          </Button>
-        </div>
-      )}
-    </div>
+            <Button
+              type="button"
+              variant="mainblue"
+              className="px-6 py-6 text-2xl font-semibold"
+              onClick={publishGame}
+            >
+              Publish
+            </Button>
+          </div>
+        )}
+      </div>
+    </ChakraProvider>
   );
 };
 

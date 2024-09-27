@@ -18,8 +18,6 @@ function wrapPromise<T>(promise: Promise<T>) {
       throw suspender;
     },
     error: () => {
-      console.log("err");
-
       throw response;
     },
     default: () => response,

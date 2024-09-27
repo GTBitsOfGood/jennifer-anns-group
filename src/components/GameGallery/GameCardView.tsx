@@ -15,18 +15,9 @@ export const gameDataSchema = gameSchema.extend({
 
 const filterGames = (filters: PageRequiredGameQuery) => {
   const promise = fetch(generateQueryUrl(filters)).then((res) => {
-    if (!res.ok) {
-      throw new Error("Failed to fetch game");
-    }
     return res.json();
   });
   return wrapPromise(promise);
-};
-
-let gameResultsResource: ReturnType<typeof wrapPromise> = {
-  read: () => {
-    return null;
-  },
 };
 
 interface Props {
@@ -34,18 +25,24 @@ interface Props {
 }
 
 export default function GameCardView({ filters }: Props) {
+  const [gameResultsResource, setGameResultsResource] = useState({
+    read: () => {
+      return null;
+    },
+  });
+
   useEffect(() => {
-    gameResultsResource = filterGames(filters);
+    setGameResultsResource(filterGames(filters));
   }, [filters]);
 
-  // const [results, setResults] = useState<z.infer<typeof gameDataSchema>[]>([]);
-  const data = gameResultsResource.read();
-
+  const data = gameResultsResource.read() as {
+    games: z.infer<typeof gameDataSchema>[];
+  } | null;
   return (
     <div className="ml-6 flex w-full flex-row flex-wrap">
       {data &&
         (data.games?.length > 0 ? (
-          data.games.map((game) => {
+          data.games.map((game: z.infer<typeof gameDataSchema>) => {
             return (
               <div key={game.name} className="mb-6 ml-6">
                 <GameCard game={game} />

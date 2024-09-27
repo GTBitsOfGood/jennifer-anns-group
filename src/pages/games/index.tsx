@@ -43,7 +43,6 @@ export default function Games() {
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [results, setResults] = useState<z.infer<typeof gameDataSchema>[]>([]);
 
   const [currPage, setCurrPage] = useState(1);
   const [numPages, setNumPages] = useState(0);
@@ -170,8 +169,8 @@ export default function Games() {
               <ThemeSidebar filters={filters} setFilters={setFilters} />
               <Suspense
                 fallback={
-                  <div className="flex h-screen items-center justify-center">
-                    <div className="h-24 w-24 animate-ping rounded-full bg-orange-primary"></div>
+                  <div className="flex h-full w-full items-center justify-center">
+                    <div className="h-14 w-14 animate-ping rounded-full bg-orange-primary"></div>
                   </div>
                 }
               >
