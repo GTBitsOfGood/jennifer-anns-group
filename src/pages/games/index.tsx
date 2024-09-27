@@ -168,7 +168,13 @@ export default function Games() {
                   </div>
                 }
               >
-                <GameCardView filters={filters} />
+                <GameCardView
+                  filters={filters}
+                  setCurrPage={setCurrPage}
+                  setNumPages={setNumPages}
+                  numPages={numPages}
+                  currPage={currPage}
+                />
               </Suspense>
             </div>
           </div>

@@ -6,7 +6,7 @@ import {
   generateQueryUrl,
 } from "@/components/ThemesTags/GamesSection";
 import wrapPromise from "@/components/wrapPromise";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const idSchema = z.string().length(24);
 export const gameDataSchema = gameSchema.extend({
@@ -21,23 +21,54 @@ const filterGames = (filters: PageRequiredGameQuery) => {
 };
 
 interface Props {
+  setNumPages: React.Dispatch<React.SetStateAction<number>>;
+  setCurrPage: React.Dispatch<React.SetStateAction<number>>;
+  numPages: number;
+  currPage: number;
   filters: PageRequiredGameQuery;
 }
 
-export default function GameCardView({ filters }: Props) {
+export default function GameCardView({
+  setNumPages,
+  setCurrPage,
+  numPages,
+  currPage,
+  filters,
+}: Props) {
   const [gameResultsResource, setGameResultsResource] = useState({
     read: () => {
       return null;
     },
   });
 
+  const numPagesRef = useRef<number>(numPages);
+  const currPageRef = useRef<number>(currPage);
+
   useEffect(() => {
     setGameResultsResource(filterGames(filters));
+    const data = gameResultsResource.read() as {
+      games: z.infer<typeof gameDataSchema>[];
+      numPages: number;
+      page: number;
+    } | null;
   }, [filters]);
 
   const data = gameResultsResource.read() as {
     games: z.infer<typeof gameDataSchema>[];
+    numPages: number;
+    page: number;
   } | null;
+
+  if (data?.numPages && data?.numPages !== numPagesRef.current) {
+    setNumPages(data.numPages);
+    numPagesRef.current = data.numPages;
+  }
+
+  if (data?.page && data?.page !== currPageRef.current) {
+    setCurrPage(data.page);
+    currPageRef.current = data.page;
+  }
+
   return (
     <>
       {data ? (
