@@ -8,7 +8,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "../../ui/pagination";
-import { DataTable } from "../Table/data-table";
+import { DataTable } from "./DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 
@@ -20,6 +20,7 @@ interface PaginatedTableProps<TData, TValue> {
   data?: TData[];
   itemsPerPage: number;
   setSelectedRow?: React.Dispatch<React.SetStateAction<number>>;
+  selectedRow?: number;
 }
 
 export function PaginatedTable<TData, TValue>({
@@ -27,6 +28,7 @@ export function PaginatedTable<TData, TValue>({
   data,
   itemsPerPage,
   setSelectedRow,
+  selectedRow,
 }: PaginatedTableProps<TData, TValue>) {
   const numPages = data && Math.ceil(data.length / itemsPerPage);
   const [paginatedData, setPaginatedData] = useState<TData[]>(
@@ -101,13 +103,14 @@ export function PaginatedTable<TData, TValue>({
   return (
     <>
       {data ? (
-        <div>
+        <div className="flex h-full flex-col justify-between">
           <div className="my-6 w-full">
             <DataTable
               columns={columns}
               data={paginatedData}
               minRowIndex={(currPage - 1) * itemsPerPage}
               setSelectedRow={setSelectedRow}
+              selectedRow={selectedRow}
             />
           </div>
           <Pagination className="mt-6">
@@ -170,7 +173,7 @@ export function PaginatedTable<TData, TValue>({
           <div className="mt-4 text-center text-2xl font-semibold text-orange-primary">
             Sorry, no {setSelectedRow ? "game info" : "user leaderboard"}!
           </div>
-          <div className="text-center text-gray-text">
+          <div className="text-gray-text text-center">
             No users{" "}
             {setSelectedRow
               ? "visited the site"

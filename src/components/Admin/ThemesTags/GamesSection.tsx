@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "../../ui/input";
-import { DataTable } from "../Table/data-table";
-import { columns } from "../Table/themes-columns";
+import { DataTable } from "../Table/DataTable";
+import { columns } from "../Table/ThemesColumns";
 import { useCallback, useEffect, useState } from "react";
 import { GameQuery, GetGamesOutput } from "@/pages/api/games";
 import {

@@ -13,12 +13,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import cn from "classnames";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   minRowIndex?: number;
   setSelectedRow?: React.Dispatch<React.SetStateAction<number>>;
+  selectedRow?: number;
 }
 
 export function DataTable<TData, TValue>({
@@ -26,6 +28,7 @@ export function DataTable<TData, TValue>({
   data,
   minRowIndex,
   setSelectedRow,
+  selectedRow,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -64,7 +67,11 @@ export function DataTable<TData, TValue>({
                 {row.getVisibleCells().map((cell) => (
                   <TableCell
                     key={cell.id}
-                    className={cell.column.columnDef.meta?.toString()}
+                    className={cn(
+                      cell.column.columnDef.meta?.toString(),
+                      selectedRow === (minRowIndex ?? 0) + row.index &&
+                        "bg-[#FFF5E6]",
+                    )}
                     onClick={() => {
                       setSelectedRow &&
                         setSelectedRow((minRowIndex ?? 0) + row.index);
