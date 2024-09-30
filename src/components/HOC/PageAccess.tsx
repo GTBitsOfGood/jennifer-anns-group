@@ -19,6 +19,7 @@ const pageRequiredAuthentication: Record<
   [Pages.CREATEGAME]: "authenticated",
   [Pages.EDITGAME]: "authenticated",
   [Pages.PREVIEWGAME]: "authenticated",
+  [Pages.CMSDASHBOARD]: "authenticated",
   [Pages.ACCOUNTMANAGEMENT]: "authenticated",
   [Pages.THEMES]: "authenticated",
 };
@@ -45,6 +46,7 @@ const pageRequiredLabels: Record<Pages, Array<Label>> = {
   [Pages.CREATEGAME]: [Label.ADMINISTRATOR], // Only allow administrator role
   [Pages.EDITGAME]: [Label.ADMINISTRATOR], // Only allow administrator role
   [Pages.PREVIEWGAME]: [Label.ADMINISTRATOR], // Only allow administrator role
+  [Pages.CMSDASHBOARD]: [Label.ADMINISTRATOR], // Only allow administrator role
   [Pages.ACCOUNTMANAGEMENT]: [Label.ADMINISTRATOR],
   [Pages.THEMES]: [Label.ADMINISTRATOR],
 };

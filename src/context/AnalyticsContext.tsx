@@ -1,14 +1,21 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import { AnalyticsLogger, EventEnvironment } from "bog-analytics";
+import {
+  AnalyticsLogger,
+  AnalyticsViewer,
+  EventEnvironment,
+} from "bog-analytics";
 interface AnalyticsContextType {
   analyticsLogger: AnalyticsLogger;
-  // can add manager / viewer in the future
+  analyticsViewer: AnalyticsViewer;
 }
 // Create context for provider
 const AnalyticsContext = createContext<AnalyticsContextType | null>(null);
 
 const clientApiKey = process.env
   .NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY as string;
+const serverApiKey = process.env.BOG_BOG_ANALYTICS_SERVER_API_KEY as string;
+
+// LOGGERS
 
 const devLogger = new AnalyticsLogger({
   apiBaseUrl: "https://data.bitsofgood.org",
@@ -25,6 +32,23 @@ export function getLogger() {
   // add options for other environments later
 }
 const logger = getLogger;
+
+// VIEWERS
+
+const devViewer = new AnalyticsViewer({
+  apiBaseUrl: "https://data.bitsofgood.org",
+  environment: EventEnvironment.DEVELOPMENT,
+});
+
+async function authenticateViewers() {
+  await devViewer.authenticate(serverApiKey);
+}
+authenticateViewers();
+export function getViewer() {
+  return devViewer;
+}
+const viewer = getViewer;
+
 interface AnalyticsProviderProps {
   children: ReactNode;
 }
@@ -33,8 +57,9 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
   children,
 }) => {
   const [analyticsLogger] = useState<AnalyticsLogger>(logger);
+  const [analyticsViewer] = useState<AnalyticsViewer>(viewer);
   return (
-    <AnalyticsContext.Provider value={{ analyticsLogger }}>
+    <AnalyticsContext.Provider value={{ analyticsLogger, analyticsViewer }}>
       {children}
     </AnalyticsContext.Provider>
   );

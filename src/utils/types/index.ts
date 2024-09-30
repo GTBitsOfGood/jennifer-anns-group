@@ -1,3 +1,4 @@
+import { CustomEvent } from "bog-analytics";
 import { z } from "zod";
 
 const verifyObjectId = (value: string) => {
@@ -175,3 +176,13 @@ export const changePWSchema = z.object({
   password: z.string().min(8, "Password must contain at least 8 characters."),
   passwordConfirm: z.string(),
 });
+
+export interface CustomVisitEvent extends CustomEvent {
+  properties: {
+    referrer: string;
+    createdDate: string;
+    userGroup: string; // TODO, use enum
+    userId: string;
+    browserAgent: string;
+  };
+}

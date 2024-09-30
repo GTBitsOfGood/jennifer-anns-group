@@ -29,7 +29,7 @@ import ThemeSidebar from "@/components/GameGallery/ThemeSidebar";
 import SelectedFilters from "@/components/GameGallery/SelectedFilters";
 import GameCardView from "@/components/GameGallery/GameCardView";
 import GamesPagination from "@/components/GameGallery/GamesPagination";
-import { PageRequiredGameQuery } from "@/components/ThemesTags/GamesSection";
+import { PageRequiredGameQuery } from "@/components/Admin/ThemesTags/GamesSection";
 
 export default function Games() {
   const { data: session } = useSession();
