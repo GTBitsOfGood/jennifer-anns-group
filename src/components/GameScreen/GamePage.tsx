@@ -8,8 +8,8 @@ import { useSession } from "next-auth/react";
 import { userSchema } from "@/utils/types";
 import EmbeddedGame from "@/components/GameScreen/WebGL/EmbeddedGame";
 import NotesComponent from "@/components/Tabs/NotesComponent";
-import { populatedGameWithId } from "@/server/db/models/GameModel";
 import AdminEditButton from "@/components/GameScreen/AdminEditButton";
+import { populatedGameWithId } from "@/server/db/models/GameModel";
 import {
   AlertDialog,
   AlertDialogFooter,
@@ -27,21 +27,22 @@ export type GameDataState = populatedGameWithId & {
   parentingGuideFile: File | undefined;
   answerKeyFile: File | undefined;
   lessonFile: File | undefined;
+  _id: string;
+  preview: boolean;
 };
 
 interface Props {
   mode: "view" | "preview";
+  gameData: GameDataState;
 }
 
-const GamePage = ({ mode }: Props) => {
-  const gameId = useRouter().query.id as string;
-  const [gameData, setGameData] = useState<GameDataState | undefined>();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+const GamePage = ({ mode, gameData }: Props) => {
   const router = useRouter();
+  const [curData, setCurData] = useState<GameDataState>(gameData);
+  const [error, setError] = useState("");
+  const [visibleAnswer, setVisibleAnswer] = useState(false);
   const { data: session } = useSession();
   const idSchema = z.string().length(24);
-  const [visibleAnswer, setVisibleAnswer] = useState(false);
   const userDataSchema = userSchema
     .extend({
       _id: idSchema,
@@ -57,6 +58,12 @@ const GamePage = ({ mode }: Props) => {
   const deleteOnRouteChange = useRef<boolean>(true);
 
   useEffect(() => {
+    if (currentUser) {
+      setUserData(currentUser);
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
     if (userData && userData.label !== "student") {
       setVisibleAnswer(true);
     } else {
@@ -64,63 +71,22 @@ const GamePage = ({ mode }: Props) => {
     }
   }, [userData]);
 
-  useEffect(() => {
-    if (currentUser) {
-      getUserData();
-    }
-  }, [currentUser]);
-
-  function getUserData() {
-    setUserData(currentUser);
-  }
-
-  const getGame = async () => {
-    try {
-      const response = await fetch(`/api/games/${gameId}`);
-      if (!response.ok) {
-        deleteOnRouteChange.current = false;
-        setError("Failed to fetch game");
-        router.push("/");
-      }
-      const data = await response.json();
-      if (!data.preview && mode == "preview") {
-        deleteOnRouteChange.current = false;
-        router.replace(`/games/${gameId}`);
-      } else {
-        setGameData(data);
-        setLoading(false);
-      }
-    } catch (error: any) {
-      setError(error.message);
-    }
-  };
-
-  useEffect(() => {
-    if (gameId && loading) {
-      getGame();
-    }
-  }, [gameId, loading]);
-
   const publishGame = async () => {
     try {
-      const themeIds = gameData?.themes.map((theme) => {
-        return theme._id;
-      });
-      const tagIds = gameData?.tags.map((tag) => {
-        return tag._id;
-      });
+      const themeIds = curData?.themes.map((theme) => theme._id);
+      const tagIds = curData?.tags.map((tag) => tag._id);
 
       const putData = {
         tags: tagIds,
         themes: themeIds,
-        description: gameData?.description,
-        name: gameData?.name,
-        builds: gameData?.builds,
-        videoTrailer: gameData?.videoTrailer,
+        description: curData?.description,
+        name: curData?.name,
+        builds: curData?.builds,
+        videoTrailer: curData?.videoTrailer,
         preview: false,
       };
 
-      const response = await fetch(`/api/games/${gameId}`, {
+      const response = await fetch(`/api/games/${gameData._id}`, {
         method: "PUT",
         body: JSON.stringify(putData),
       });
@@ -129,16 +95,16 @@ const GamePage = ({ mode }: Props) => {
         setError("Failed to publish game.");
       } else {
         deleteOnRouteChange.current = false;
-        router.replace(`/games/${gameId}`);
+        router.replace(`/games/${gameData._id}`);
       }
     } catch (error) {
-      console.error("Error setting game as preview:", error);
+      console.error("Error publishing game:", error);
     }
   };
 
   const handleCancel = async () => {
     try {
-      const response = await fetch(`/api/games/${gameId}`, {
+      const response = await fetch(`/api/games/${gameData._id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -181,72 +147,77 @@ const GamePage = ({ mode }: Props) => {
     }
   }, []);
 
+  const loaded = userData && userId;
+
+  useEffect(() => {
+    if (!gameData) {
+      deleteOnRouteChange.current = false;
+      router.replace("/");
+    }
+    if (!gameData.preview && mode == "preview") {
+      deleteOnRouteChange.current = false;
+      router.replace(`/games/${gameData._id}`);
+    } else {
+      setCurData(gameData);
+    }
+  }, [gameData]);
+
   if (error) {
     return <div>{error}</div>;
   }
 
-  if (loading) {
-    return <></>;
-  }
-
-  if (!gameData) {
-    return <div>Game does not exist</div>;
-  }
-
-  const loaded = userData && userId;
-
   return (
-    <div>
-      {mode === "preview" && (
-        <div className="flex h-fit w-full flex-col items-center justify-center bg-blue-bg py-2 font-sans">
-          <p className="font-bold">🔍 You are in preview mode.</p>
-          <p>Note: Leaving this page will discard your progress.</p>
-        </div>
-      )}
-      <h1 className="mt-[32px] text-center font-sans text-[56px] font-semibold">
-        {gameData.name}
-      </h1>
-      {loaded && (
-        <>
-          {userData.label === "administrator" && (
-            <AdminEditButton
-              gameId={gameId}
-              deleteOnRouteChange={deleteOnRouteChange}
-            />
-          )}
-        </>
-      )}
-      <EmbeddedGame
-        gameId={gameId as string}
-        userData={currentUser}
-        gameName={gameData.name}
-      />
-      <TabsComponent
-        mode="view"
-        gameData={gameData}
-        setGameData={setGameData}
-        authorized={visibleAnswer}
-        userData={currentUser}
-      />
-      {loaded && userData.label !== "administrator" && (
-        <NotesComponent gameId={gameId} userId={userId} />
-      )}
-      {loaded && userData.label !== "administrator" && (
-        <ContactComponent
-          gameName={gameData.name}
-          userId={userId}
-          firstName={userData.firstName}
+    <ChakraProvider theme={chakraTheme}>
+      <div>
+        {mode === "preview" && (
+          <div className="flex h-fit w-full flex-col items-center justify-center bg-blue-bg py-2 font-sans">
+            <p className="font-bold">🔍 You are in preview mode.</p>
+            <p>Note: Leaving this page will discard your progress.</p>
+          </div>
+        )}
+        <h1 className="mt-[32px] text-center font-sans text-[56px] font-semibold">
+          {curData.name}
+        </h1>
+        {loaded && (
+          <>
+            {userData.label === "administrator" && (
+              <AdminEditButton
+                gameId={gameData._id}
+                deleteOnRouteChange={deleteOnRouteChange}
+              />
+            )}
+          </>
+        )}
+        <EmbeddedGame
+          gameId={gameData._id as string}
+          userData={currentUser}
+          gameName={curData.name}
         />
-      )}
-      <TagsComponent
-        mode="view"
-        gameData={gameData}
-        setGameData={setGameData}
-        admin={visibleAnswer}
-      />
-      {loaded && mode === "preview" && (
-        <div className="relative my-10 flex w-11/12 justify-end gap-6 font-sans">
-          <ChakraProvider theme={chakraTheme}>
+        <TabsComponent
+          mode="view"
+          gameData={curData}
+          setGameData={setCurData}
+          authorized={visibleAnswer}
+          userData={currentUser}
+        />
+        {loaded && userData.label !== "administrator" && (
+          <NotesComponent gameId={gameData._id} userId={userId} />
+        )}
+        {loaded && userData.label !== "administrator" && (
+          <ContactComponent
+            gameName={curData.name}
+            userId={userId}
+            firstName={userData.firstName}
+          />
+        )}
+        <TagsComponent
+          mode="view"
+          gameData={curData}
+          setGameData={setCurData}
+          admin={visibleAnswer}
+        />
+        {loaded && mode === "preview" && (
+          <div className="relative my-10 flex w-11/12 justify-end gap-6 font-sans">
             <div>
               <Button
                 type="button"
@@ -310,19 +281,18 @@ const GamePage = ({ mode }: Props) => {
                 </AlertDialogContent>
               </AlertDialog>
             </div>
-          </ChakraProvider>
-
-          <Button
-            type="button"
-            variant="mainblue"
-            className="px-6 py-6 text-2xl font-semibold"
-            onClick={publishGame}
-          >
-            Publish
-          </Button>
-        </div>
-      )}
-    </div>
+            <Button
+              type="button"
+              variant="mainblue"
+              className="px-6 py-6 text-2xl font-semibold"
+              onClick={publishGame}
+            >
+              Publish
+            </Button>
+          </div>
+        )}
+      </div>
+    </ChakraProvider>
   );
 };
 

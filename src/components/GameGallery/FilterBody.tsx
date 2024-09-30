@@ -2,7 +2,7 @@ import { UserLabel, tagSchema } from "@/utils/types";
 import { Tag, VStack } from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { z } from "zod";
-import { PageRequiredGameQuery } from "../ThemesTags/GamesSection";
+import { PageRequiredGameQuery } from "../Admin/ThemesTags/GamesSection";
 
 interface Props {
   setFilters: Dispatch<SetStateAction<PageRequiredGameQuery>>;

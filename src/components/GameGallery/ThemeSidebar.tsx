@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { PageRequiredGameQuery } from "../ThemesTags/GamesSection";
+import { PageRequiredGameQuery } from "../Admin/ThemesTags/GamesSection";
 import { themeSchema } from "@/utils/types";
 import { z } from "zod";
 
