@@ -5,6 +5,7 @@ import { Pages } from "@/utils/consts";
 import { columns as GameInfoColumns } from "@/components/Admin/Table/GameInfoColumns";
 import { columns as UserLeaderboardColumns } from "@/components/Admin/Table/UserLeaderboardColumns";
 import { PaginatedTable } from "@/components/Admin/Table/PaginatedTable";
+import UserTraffic from "@/components/Admin/CMSDashboard/UserTraffic";
 
 // TO DO: replace dummy data with actual data
 const dummyData = Array.from({ length: 100 }, (_, i) => ({
@@ -33,8 +34,7 @@ const CMSDashboardPage = () => {
       <div className="bg-orange-light-bg my-6 flex items-stretch rounded-2xl p-12">
         <div className="flex w-3/5 flex-col gap-6">
           <div className="rounded-2xl bg-white p-6 text-2xl text-black">
-            User Traffic
-            <div className="h-24"></div> {/* Placeholder; remove later */}
+            <UserTraffic />
           </div>
           <div className="flex h-full flex-col rounded-2xl bg-white p-6 text-2xl text-black">
             <p>Game Info</p>

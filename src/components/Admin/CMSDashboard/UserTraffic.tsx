@@ -1,37 +1,42 @@
 import { useState, useEffect } from "react";
 import PieChart, { PieChartDataProps } from "./PieChart";
 import { useAnalytics } from "@/context/AnalyticsContext";
-import { CustomEvent } from "bog-analytics";
 import Image from "next/image";
+import { CustomVisitEvent } from "@/utils/types";
+import { Spinner } from "@chakra-ui/react";
 
 const UserTraffic = () => {
   const [currentTab, setCurrentTab] = useState("Major Sources");
   const [sourceData, setSourceData] = useState<PieChartDataProps[]>([]);
   const [groupsData, setGroupsData] = useState<PieChartDataProps[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const { analyticsViewer } = useAnalytics();
 
   const getData = async () => {
     try {
+      setLoading(true);
       const today = new Date();
       today.setHours(0, 0, 0, 0); // beginning of the day today
-      const visitEvents = await analyticsViewer.getAllCustomEvents(
+      console.log("test");
+      const visitEvents = (await analyticsViewer.getAllCustomEvents(
         "Jennifer Ann's",
         "Visit",
         "Visit",
         today,
-      );
+      )) as CustomVisitEvent[];
 
-      if (visitEvents.length === 0) {
+      if (!visitEvents || (visitEvents && visitEvents.length === 0)) {
         setSourceData([]);
         setGroupsData([]);
+        setLoading(false);
         return;
       }
 
       // SOURCE DATA
       const referrerCount: Record<string, number> = {};
 
-      visitEvents.forEach((event: CustomEvent) => {
+      visitEvents.forEach((event: CustomVisitEvent) => {
         const referrer = event.properties.referrer;
 
         if (referrer in referrerCount) {
@@ -66,7 +71,7 @@ const UserTraffic = () => {
         Admin: 0,
       };
 
-      visitEvents.forEach((event: CustomEvent) => {
+      visitEvents.forEach((event: CustomVisitEvent) => {
         const group = groupMap[event.properties.userGroup];
         if (
           group === "Student" ||
@@ -89,6 +94,8 @@ const UserTraffic = () => {
       setGroupsData(groupChartData);
     } catch (e) {
       console.error("Error fetching data:", e);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -97,6 +104,19 @@ const UserTraffic = () => {
   }, []);
 
   const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center py-10">
+          <Spinner
+            className="mb-5 h-10 w-10"
+            thickness="4px"
+            emptyColor="#98A2B3"
+            color="#164C96"
+          />
+        </div>
+      );
+    }
+
     if (sourceData.length === 0) {
       return (
         <div className="flex flex-col items-center self-stretch">

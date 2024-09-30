@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import dynamic from "next/dynamic";
-import { Tooltip } from "react-tooltip";
 
 const DynamicResponsivePie = dynamic(
   () => import("@nivo/pie").then((mod) => mod.ResponsivePie),
@@ -87,14 +86,28 @@ const PieChart: React.FC<PieChartProps> = ({ data, type }) => {
                 },
               },
             ],
-            onClick: (legendItem: { id: string }) => {
+            onClick: (legendItem: { id: string | number }) => {
               if (type === "sources") {
-                const url = legendItem.id;
+                const url = (legendItem.id as string).trim();
+
+                // Check for empty, "None", or invalid URL patterns
+                if (!url || url === "None" || url === "about:client") {
+                  console.warn("Invalid URL detected:", url);
+                  return;
+                }
+
                 const fullUrl =
                   url.startsWith("http://") || url.startsWith("https://")
                     ? url
                     : `https://${url}`;
-                window.open(fullUrl);
+
+                const urlPattern =
+                  /^(https?:\/\/)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}.*$/;
+                if (urlPattern.test(fullUrl)) {
+                  window.open(fullUrl);
+                } else {
+                  console.warn("Invalid URL format:", fullUrl);
+                }
               }
             },
           },
