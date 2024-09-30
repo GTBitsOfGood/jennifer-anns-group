@@ -29,6 +29,7 @@ const CMSDashboardPage = () => {
 
   return (
     <AdminTabs page={Pages.CMSDASHBOARD}>
+      {/* prettier-ignore */}
       <div className="bg-orange-light-bg my-6 flex items-stretch rounded-2xl p-12">
         <div className="flex w-3/5 flex-col gap-6">
           <div className="rounded-2xl bg-white p-6 text-2xl text-black">
@@ -48,6 +49,7 @@ const CMSDashboardPage = () => {
             </div>
           </div>
         </div>
+         {/* prettier-ignore */}
         <div className="bg-orange-light-bg relative h-64 w-6">
           {/* White triangle to indicate which game's detailed info is being displayed */}
           <div

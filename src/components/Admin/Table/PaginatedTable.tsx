@@ -11,6 +11,7 @@ import {
 import { DataTable } from "./DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
+import React from "react";
 
 type IncDecInput = { type: "inc" | "dec" };
 type DirectInput = { desiredPage: number };
@@ -173,6 +174,7 @@ export function PaginatedTable<TData, TValue>({
           <div className="mt-4 text-center text-2xl font-semibold text-orange-primary">
             Sorry, no {setSelectedRow ? "game info" : "user leaderboard"}!
           </div>
+          {/* prettier-ignore */}
           <div className="text-gray-text text-center">
             No users{" "}
             {setSelectedRow
