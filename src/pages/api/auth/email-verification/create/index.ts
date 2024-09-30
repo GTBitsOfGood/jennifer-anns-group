@@ -2,9 +2,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 import z from "zod";
 
 import { HTTP_STATUS_CODE } from "@/utils/consts";
-import { getUserByEmail } from "@/server/db/actions/UserAction";
-import { createPasswordResetLog } from "@/server/db/actions/VerificationLogAction";
-import { sendPasswordResetEmail } from "@/server/db/actions/EmailAction";
+import { createEmailVerificationLog } from "@/server/db/actions/VerificationLogAction";
+import { sendEmailVerificationEmail } from "@/server/db/actions/EmailAction";
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,7 +11,7 @@ export default async function handler(
 ) {
   switch (req.method) {
     case "POST":
-      return sendPasswordResetEmailHandler(req, res);
+      return sendEmailVerificationEmailHandler(req, res);
     default:
       return res.status(HTTP_STATUS_CODE.METHOD_NOT_ALLOWED).json({
         error: `Request method ${req.method} is not allowed`,
@@ -25,27 +24,18 @@ const emailObject = z.object({
 });
 
 export type EmailData = z.infer<typeof emailObject>;
-async function sendPasswordResetEmailHandler(
+async function sendEmailVerificationEmailHandler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
   try {
     const { email } = emailObject.parse(JSON.parse(req.body));
-
-    try {
-      const user = await getUserByEmail(email); // This function will throw an error if the user does not exist
-    } catch (e) {
-      throw new Error(
-        "Something failed on our end. Check that you have entered a valid email.",
-      ); // be a little less obvious about this user enumeration vuln
-    }
-
-    const passwordResetLog = await createPasswordResetLog(email);
-    await sendPasswordResetEmail(email, passwordResetLog.token);
+    const emailVerificationLog = await createEmailVerificationLog(email);
+    await sendEmailVerificationEmail(email, emailVerificationLog.token);
 
     return res
       .status(HTTP_STATUS_CODE.CREATED)
-      .send({ message: "Succesfully sent password reset email" });
+      .send({ message: "Succesfully sent email verification email" });
   } catch (e: any) {
     console.error(e);
     return res
