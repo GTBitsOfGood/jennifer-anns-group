@@ -14,7 +14,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "../ui/pagination";
-import { PageRequiredGameQuery } from "../ThemesTags/GamesSection";
+import { PageRequiredGameQuery } from "../Admin/ThemesTags/GamesSection";
 
 type IncDecInput = { type: "inc" | "dec" };
 type DirectInput = { desiredPage: number };

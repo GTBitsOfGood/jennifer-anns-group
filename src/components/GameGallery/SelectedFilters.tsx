@@ -1,5 +1,5 @@
 import { Tag } from "@chakra-ui/react";
-import { PageRequiredGameQuery } from "../ThemesTags/GamesSection";
+import { PageRequiredGameQuery } from "../Admin/ThemesTags/GamesSection";
 import { gameContentsMap, gameBuildsMap } from "./FilterBody";
 
 interface Props {
