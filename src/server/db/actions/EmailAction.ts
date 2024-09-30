@@ -42,7 +42,10 @@ export async function sendContactEmail(data: ContactData) {
 }
 
 export async function sendPasswordResetEmail(email: string, otpCode: string) {
-  const sentFrom = new Sender(`randomemail@${MAIL_SEND_DOMAIN}`);
+  const sentFrom = new Sender(
+    `randomemail@${MAIL_SEND_DOMAIN}`,
+    "Jennifer Ann's Group",
+  );
 
   const emailParams = new EmailParams()
     .setFrom(sentFrom)
