@@ -91,7 +91,7 @@ export default function PasswordResetVerification({
             variant="outline"
             size="lg"
           >
-            Send Confirmation Code
+            Verify Confirmation Code
           </Button>
         </div>
       </form>
