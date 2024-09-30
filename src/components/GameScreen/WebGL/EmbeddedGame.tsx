@@ -46,8 +46,8 @@ export default function EmbeddedGame({
     }
     //Analytics stuff
     const properties = {
-      userId: userData._id,
-      userGroup: userData.label,
+      userId: userData._id ?? "Unauthenticated",
+      userGroup: userData.label ?? "None",
       createdDate: Date(),
       gameName: gameName,
       resourceName: "webgl",

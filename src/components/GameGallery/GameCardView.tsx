@@ -1,12 +1,12 @@
 import { z } from "zod";
 import GameCard from "./GameCard";
 import { gameSchema } from "@/utils/types";
-import {
-  PageRequiredGameQuery,
-  generateQueryUrl,
-} from "@/components/ThemesTags/GamesSection";
 import wrapPromise from "@/components/wrapPromise";
 import { useEffect, useRef, useState } from "react";
+import {
+  generateQueryUrl,
+  PageRequiredGameQuery,
+} from "@/components/Admin/ThemesTags/GamesSection";
 
 const idSchema = z.string().length(24);
 export const gameDataSchema = gameSchema.extend({
