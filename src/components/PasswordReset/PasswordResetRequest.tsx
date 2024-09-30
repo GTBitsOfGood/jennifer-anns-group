@@ -1,4 +1,3 @@
-import pageAccessHOC from "@/components/HOC/PageAccess";
 import Link from "next/link";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -10,7 +9,7 @@ interface Props {
   emailRef: React.MutableRefObject<string>;
 }
 
-function PasswordResetRequest({ onSuccess, emailRef }: Props) {
+export default function PasswordResetRequest({ onSuccess, emailRef }: Props) {
   const [validationError, setValidationError] = useState<string | null>(null);
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -94,5 +93,3 @@ function PasswordResetRequest({ onSuccess, emailRef }: Props) {
     </div>
   );
 }
-
-export default pageAccessHOC(PasswordResetRequest);

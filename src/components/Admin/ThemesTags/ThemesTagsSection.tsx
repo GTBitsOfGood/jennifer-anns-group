@@ -6,8 +6,8 @@ import { useState } from "react";
 import AddModal from "./Modals/AddModal";
 import DeleteModal from "./Modals/DeleteModal";
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "../ui/button";
-import { Tag } from "../ui/tag";
+import { Button } from "../../ui/button";
+import { Tag } from "../../ui/tag";
 
 type SelectedDeleteSubject = {
   subjectType: "theme" | "tag";

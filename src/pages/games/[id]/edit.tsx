@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import TagsComponent from "@/components/Tags/TagsComponent";
 import TabsComponent from "@/components/Tabs/TabsComponent";
 import React from "react";
@@ -14,42 +14,54 @@ import { useMutation } from "@tanstack/react-query";
 import { uploadApplicationFile } from "@/utils/file";
 import { v4 as uuidv4 } from "uuid";
 import { GameDataState } from "@/components/GameScreen/GamePage";
+import { InferGetServerSidePropsType, GetServerSideProps } from "next";
+import { getGameById } from "@/server/db/actions/GameAction";
 
-const EditGamePage = () => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  try {
+    const data = await getGameById(ctx.query.id as string);
+    const gameData = JSON.parse(JSON.stringify(data));
+    return {
+      props: {
+        gameData,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching game data:", error);
+    return {
+      props: {
+        gameData: null,
+      },
+    };
+  }
+};
+
+const EditGamePage = ({
+  gameData,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
   const gameID = router.query.id;
-  const [gameData, setGameData] = useState<GameDataState | undefined>();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [name, setName] = useState("");
+  const [curData, setCurData] = useState<GameDataState>(gameData);
+  const [name, setName] = useState(gameData.name);
 
   const { mutateAsync: getDirectUpload } = useMutation({
     mutationFn: (file: File) => fetch("/api/file").then((res) => res.json()),
   });
 
-  const getGame = async () => {
-    try {
-      const response = await fetch(`/api/games/${gameID}`);
-      if (!response.ok || response.status !== 200) {
-        setError("Failed to fetch game");
-        router.push("/");
-      }
-      const data = await response.json();
-      setGameData(data);
-      setName(data.name);
-      setLoading(false);
-    } catch (error: any) {
-      setError(error.message);
+  useEffect(() => {
+    if (!gameData) {
+      router.replace("/");
     }
-  };
+    setCurData(gameData);
+  }, [gameData]);
 
   const changeName = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setName(newValue);
-    if (gameData) {
-      setGameData({
-        ...gameData,
+    if (curData) {
+      setCurData({
+        ...curData,
         name: newValue,
       });
     }
@@ -60,17 +72,17 @@ const EditGamePage = () => {
       "parentingGuide" | "answerKey" | "lesson",
       string | undefined
     > = {
-      parentingGuide: gameData?.parentingGuide,
-      answerKey: gameData?.answerKey,
-      lesson: gameData?.lesson,
+      parentingGuide: curData?.parentingGuide,
+      answerKey: curData?.answerKey,
+      lesson: curData?.lesson,
     };
     const pdfInputs: Record<
       "parentingGuide" | "answerKey" | "lesson",
       File | undefined
     > = {
-      parentingGuide: gameData?.parentingGuideFile,
-      answerKey: gameData?.answerKeyFile,
-      lesson: gameData?.lessonFile,
+      parentingGuide: curData?.parentingGuideFile,
+      answerKey: curData?.answerKeyFile,
+      lesson: curData?.lessonFile,
     };
 
     const pdfInputsKeys = Object.keys(pdfInputs);
@@ -120,20 +132,20 @@ const EditGamePage = () => {
       };
     }, {});
 
-    const themeIds = gameData?.themes.map((theme) => {
+    const themeIds = curData?.themes.map((theme) => {
       return theme._id;
     });
-    const tagIds = gameData?.tags.map((tag) => {
+    const tagIds = curData?.tags.map((tag) => {
       return tag._id;
     });
 
     const putData = {
       tags: tagIds,
       themes: themeIds,
-      description: gameData?.description,
-      name: gameData?.name,
-      builds: gameData?.builds,
-      videoTrailer: gameData?.videoTrailer,
+      description: curData?.description,
+      name: curData?.name,
+      builds: curData?.builds,
+      videoTrailer: curData?.videoTrailer,
       ...nullPdfInputsNewValues,
       ...fieldStoredUrls,
     };
@@ -143,28 +155,12 @@ const EditGamePage = () => {
       body: JSON.stringify(putData),
     });
 
-    if (gameData?.preview) {
+    if (curData?.preview) {
       router.push(`/games/${gameID}/preview`);
     } else {
       router.push(`/games/${gameID}`);
     }
   };
-
-  if (gameID && loading) {
-    getGame();
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!gameData) {
-    return <div>Game does not exist</div>;
-  }
 
   return (
     <div>
@@ -176,7 +172,7 @@ const EditGamePage = () => {
           onChange={changeName}
         />
       </div>
-      {!gameData.preview && (
+      {!curData.preview && (
         <div className="mx-auto flex w-[75vw] justify-end">
           <button
             onClick={onOpen}
@@ -188,33 +184,33 @@ const EditGamePage = () => {
             deleteType="game"
             isOpen={isOpen}
             onClose={onClose}
-            gameData={gameData}
-            setGameData={setGameData}
+            gameData={curData}
+            setGameData={setCurData}
           />
         </div>
       )}
 
       <div className="mx-auto my-8 h-[75vh] w-[75vw]">
-        <AddEditWebGLComponent gameData={gameData} />
+        <AddEditWebGLComponent gameData={curData} />
       </div>
       <TabsComponent
         mode="edit"
-        gameData={gameData}
-        setGameData={setGameData}
+        gameData={curData}
+        setGameData={setCurData}
         authorized={true}
         userData={undefined}
       />
-      {gameData.tags && gameData.themes ? (
+      {curData.tags && curData.themes ? (
         <TagsComponent
           mode="edit"
-          gameData={gameData}
-          setGameData={setGameData}
+          gameData={curData}
+          setGameData={setCurData}
           admin={true}
         />
       ) : null}
       <div className="mx-auto mb-40 mt-24 flex w-[80vw] justify-end">
         <div className="absolute flex flex-row gap-10">
-          <DiscardChanges gameID={gameID} preview={gameData.preview} />
+          <DiscardChanges gameID={gameID} preview={curData.preview} />
           <Button
             onClick={saveChanges}
             variant="mainblue"

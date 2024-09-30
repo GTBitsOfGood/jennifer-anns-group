@@ -25,7 +25,7 @@ const tagDataSchema = tagSchema.extend({
 interface Props {
   mode: string;
   gameData: GameDataState;
-  setGameData: Dispatch<React.SetStateAction<GameDataState | undefined>>;
+  setGameData: Dispatch<React.SetStateAction<GameDataState>>;
   admin?: boolean;
 }
 

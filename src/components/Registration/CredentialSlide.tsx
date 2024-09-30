@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { z } from "zod";
-import { FormSlide, accountSchema } from "@/pages/signup";
+import { accountSchema } from "@/pages/signup";
 
 const EMAIL_FORM_KEY = "email";
 const PASSWORD_FORM_KEY = "password";
@@ -23,7 +23,7 @@ export const passwordConfirmValidation = (schema: typeof credentialSchema) =>
 const validatedCredentialSchema = passwordConfirmValidation(credentialSchema);
 
 interface Props {
-  setFormSlide: React.Dispatch<React.SetStateAction<FormSlide>>;
+  onSuccess: () => void;
   setAccountData: React.Dispatch<
     React.SetStateAction<
       Partial<Record<keyof z.infer<typeof accountSchema>, string | undefined>>
@@ -31,7 +31,7 @@ interface Props {
   >;
 }
 
-function CredentialSlide({ setFormSlide, setAccountData }: Props) {
+function CredentialSlide({ onSuccess, setAccountData }: Props) {
   const [validationErrors, setValidationErrors] = useState<
     Record<keyof z.input<typeof validatedCredentialSchema>, string | undefined>
   >({
@@ -40,7 +40,9 @@ function CredentialSlide({ setFormSlide, setAccountData }: Props) {
     passwordConfirm: undefined,
   });
 
-  function handleCredentialFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleCredentialFormSubmit(
+    e: React.FormEvent<HTMLFormElement>,
+  ) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const input = {
@@ -50,8 +52,23 @@ function CredentialSlide({ setFormSlide, setAccountData }: Props) {
     };
     const parse = validatedCredentialSchema.safeParse(input);
     if (parse.success) {
+      const res = await fetch("/api/auth/email-verification/create", {
+        method: "POST",
+        body: JSON.stringify({ email: input.email }),
+      });
+
+      const json = await res.json();
+      if (!res?.ok) {
+        setValidationErrors({
+          email: json.error,
+          password: undefined,
+          passwordConfirm: undefined,
+        });
+        return;
+      }
+
       setAccountData(parse.data);
-      setFormSlide(FormSlide.Information);
+      onSuccess();
     } else {
       const errors = parse.error.formErrors.fieldErrors;
       setValidationErrors({

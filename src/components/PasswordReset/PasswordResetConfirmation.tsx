@@ -1,8 +1,7 @@
-import pageAccessHOC from "@/components/HOC/PageAccess";
 import { Button } from "../ui/button";
 import { useRouter } from "next/router";
 
-function PasswordResetUpdate() {
+export default function PasswordResetUpdate() {
   const router = useRouter();
 
   return (
@@ -23,5 +22,3 @@ function PasswordResetUpdate() {
     </div>
   );
 }
-
-export default pageAccessHOC(PasswordResetUpdate);

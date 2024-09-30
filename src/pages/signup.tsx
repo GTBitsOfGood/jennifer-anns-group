@@ -3,6 +3,7 @@ import HeroImage from "@/components/HeroImage";
 import CredentialSlide, {
   credentialSchema,
 } from "@/components/Registration/CredentialSlide";
+import EmailVerificationSlide from "@/components/Registration/EmailVerificationSlide";
 import InformationSlide, {
   informationSchema,
 } from "@/components/Registration/InformationSlide";
@@ -42,8 +43,9 @@ const alertTypeMap = {
 export type AlertKeys = keyof typeof alertTypeMap | undefined;
 
 export enum FormSlide {
-  Credentials = 0,
-  Information = 1,
+  Credentials,
+  EmailVerification,
+  Information,
 }
 
 export const accountSchema = informationSchema.merge(credentialSchema);
@@ -69,8 +71,14 @@ function Signup() {
   const formSlideComponentMap: Record<FormSlide, React.JSX.Element> = {
     [FormSlide.Credentials]: (
       <CredentialSlide
-        setFormSlide={setFormSlide}
+        onSuccess={() => setFormSlide(FormSlide.EmailVerification)}
         setAccountData={setAccountData}
+      />
+    ),
+    [FormSlide.EmailVerification]: (
+      <EmailVerificationSlide
+        email={accountData.email ?? ""}
+        onSuccess={() => setFormSlide(FormSlide.Information)}
       />
     ),
     [FormSlide.Information]: (

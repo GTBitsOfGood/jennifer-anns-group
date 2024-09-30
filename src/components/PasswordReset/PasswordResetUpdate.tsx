@@ -1,4 +1,3 @@
-import pageAccessHOC from "@/components/HOC/PageAccess";
 import Link from "next/link";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -10,7 +9,7 @@ interface Props {
   onSuccess: () => void;
 }
 
-function PasswordResetUpdate({ onSuccess }: Props) {
+export default function PasswordResetUpdate({ onSuccess }: Props) {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -99,5 +98,3 @@ function PasswordResetUpdate({ onSuccess }: Props) {
     </div>
   );
 }
-
-export default pageAccessHOC(PasswordResetUpdate);

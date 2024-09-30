@@ -1,20 +1,16 @@
-import Link from "next/link";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useCallback, useRef, useState } from "react";
 import { z } from "zod";
-import ErrorNotification from "./ErrorNotification";
-import EmailSentNotification from "./EmailSentNotification";
+import ErrorNotification from "../PasswordReset/ErrorNotification";
+import EmailSentNotification from "../PasswordReset/EmailSentNotification";
 
 interface Props {
   onSuccess: () => void;
-  emailRef: React.RefObject<string>;
+  email: string;
 }
 
-export default function PasswordResetVerification({
-  onSuccess,
-  emailRef,
-}: Props) {
+export default function EmailVerificationSlide({ onSuccess, email }: Props) {
   const [showEmailNotification, setShowEmailNotification] = useState(true);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const confirmationCodeRef = useRef<HTMLInputElement>(null);
@@ -25,7 +21,6 @@ export default function PasswordResetVerification({
       setShowEmailNotification(false);
       setShowErrorNotification(false);
 
-      const email = emailRef.current;
       const confirmationCode = confirmationCodeRef.current?.value;
 
       const parse = z.string().length(6).safeParse(confirmationCode);
@@ -33,7 +28,7 @@ export default function PasswordResetVerification({
         setShowErrorNotification(true);
         return;
       }
-      const res = await fetch("/api/auth/password-reset/verify", {
+      const res = await fetch("/api/auth/email-verification/verify", {
         method: "POST",
         body: JSON.stringify({ email, token: confirmationCode }),
       });
@@ -44,26 +39,23 @@ export default function PasswordResetVerification({
       }
       onSuccess();
     },
-    [onSuccess, emailRef],
+    [onSuccess, email],
   );
 
   return (
-    <div className="relative flex w-[40%] min-w-[15em] flex-col items-center gap-6">
+    <div className="flex flex-col items-center gap-6">
       {showEmailNotification ? (
         <EmailSentNotification
           onClick={() => setShowEmailNotification(false)}
         />
       ) : showErrorNotification ? (
         <ErrorNotification
-          errorMessage="We ran into an error while verifying your password reset token. Your
+          errorMessage="We ran into an error while verifying your email verification token. Your
           token might have expired or is invalid. Please try again later."
           onClick={() => setShowErrorNotification(false)}
         />
       ) : null}
 
-      <h2 className="w-[100%] text-3xl font-bold text-blue-primary">
-        Reset Your Password
-      </h2>
       <form className="flex w-[100%] flex-col gap-8" onSubmit={handleSubmit}>
         <div className="relative flex flex-col">
           <label htmlFor="confirmation-code">
@@ -91,21 +83,10 @@ export default function PasswordResetVerification({
             variant="outline"
             size="lg"
           >
-            Verify Confirmation Code
+            Send Confirmation Code
           </Button>
         </div>
       </form>
-      <div className="flex flex-col items-center gap-2">
-        <p>
-          Have an account?{" "}
-          <Link
-            href="/login"
-            className="text-blue-primary underline hover:cursor-pointer"
-          >
-            Sign in here
-          </Link>
-        </p>
-      </div>
     </div>
   );
 }
