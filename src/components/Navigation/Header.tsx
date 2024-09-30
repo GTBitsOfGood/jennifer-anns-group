@@ -9,12 +9,7 @@ import { UserLabel } from "@/utils/types";
 import Select from "react-select";
 import { log } from "util";
 
-type TabName =
-  | "Home"
-  | "Game Gallery"
-  | "Donate"
-  | "Account Management"
-  | "Themes and Tags";
+type TabName = "Home" | "Game Gallery" | "Donate" | "Admin";
 
 enum UserType {
   Public = "Public",
@@ -29,24 +24,17 @@ const userLabelToType: Record<UserLabel, UserType> = {
   [UserLabel.Administrator]: UserType.Admin,
 };
 
-const tabLinks: Record<TabName, string> = {
-  Home: "/",
-  "Game Gallery": "/games",
-  Donate: "https://www.paypal.com/paypalme/stopTDV",
-  "Account Management": "/admin/account-management",
-  "Themes and Tags": "/admin/themes",
+const tabLinks: Record<TabName, string[]> = {
+  Home: ["/"],
+  "Game Gallery": ["/games"],
+  Donate: ["https://www.paypal.com/paypalme/stopTDV"],
+  Admin: ["/admin/cms-dashboard", "/admin/account-management", "/admin/themes"],
 };
 
 const tabData: Record<UserType, TabName[]> = {
   [UserType.Public]: ["Home", "Game Gallery", "Donate"],
   [UserType.AccountHolder]: ["Home", "Game Gallery", "Donate"],
-  [UserType.Admin]: [
-    "Home",
-    "Game Gallery",
-    "Donate",
-    "Account Management",
-    "Themes and Tags",
-  ],
+  [UserType.Admin]: ["Home", "Game Gallery", "Donate", "Admin"],
 };
 
 const Header = () => {
@@ -69,7 +57,9 @@ const Header = () => {
     }
     const pathname = router.pathname;
     const tabNames = Object.keys(tabLinks) as TabName[];
-    const index = tabNames.findIndex((name) => tabLinks[name] === pathname); // this might need to be changed later on, pathname could be dynamic
+    const index = tabNames.findIndex((name) =>
+      tabLinks[name].includes(pathname),
+    ); // this might need to be changed later on, pathname could be dynamic
     setSelectedTab(index !== -1 ? index : 1); // set default to game gallery (for game screen, create game, edit game)
   }, [status, router.pathname]);
 
@@ -91,9 +81,9 @@ const Header = () => {
     const tabLink = tabLinks[tabData[userType][i]];
     if (tabName !== "Donate") {
       setSelectedTab(i);
-      router.push(tabLink);
+      router.push(tabLink[0]);
     } else {
-      window.open(tabLink, "_blank");
+      window.open(tabLink[0], "_blank");
     }
   }
 
@@ -106,7 +96,7 @@ const Header = () => {
         {tabData[userType].map((tabName, index) => (
           <div
             key={index}
-            className={`ml-8 cursor-pointer text-nowrap text-center font-sans text-sm ${
+            className={`ml-8 cursor-pointer text-nowrap text-center font-sans text-lg ${
               selectedTab === index
                 ? "relative font-bold text-orange-primary"
                 : "font-normal text-stone-900 opacity-50"
@@ -127,11 +117,11 @@ const Header = () => {
         className={`relative m-2 ${userType === UserType.Admin ? "2xl:hidden" : "lg:hidden"}`}
         classNames={{
           control: () =>
-            `${userType === UserType.Admin ? "w-56" : "w-40"} cursor-pointer rounded-md outline-none ring-0 text-nowrap font-sans font-semibold text-sm bg-orange-bg border-none`,
+            `${userType === UserType.Admin ? "w-56" : "w-40"} cursor-pointer rounded-md outline-none ring-0 text-nowrap font-sans font-semibold text-lg bg-orange-bg border-none`,
           singleValue: () => "text-neutral-600",
           menu: () => `cursor-pointer rounded-md bg-input-bg m-0 ring-0`,
           option: () =>
-            "cursor-pointer text-nowrap font-sans text-sm bg-input-bg text-neutral-600",
+            "cursor-pointer text-nowrap font-sans text-lg bg-input-bg text-neutral-600",
           indicatorSeparator: () => "hidden",
           dropdownIndicator: () => "text-neutral-600",
         }}
@@ -158,6 +148,7 @@ const Header = () => {
       {userType === UserType.Public ? (
         <Button
           variant="mainorange"
+          className="text-lg"
           onClick={() => {
             router.push("/login");
           }}
@@ -167,7 +158,7 @@ const Header = () => {
       ) : (
         <ProfileModal userData={userData} setUserData={setUserData} />
       )}
-      <Button variant="gray" onClick={handleSignUpLogOut}>
+      <Button variant="gray" className="text-lg" onClick={handleSignUpLogOut}>
         {userType === UserType.Public ? "Sign up" : "Log out"}
       </Button>
     </div>

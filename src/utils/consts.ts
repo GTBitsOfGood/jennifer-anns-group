@@ -17,6 +17,7 @@ export enum Pages {
   CREATEGAME = "/games/create",
   EDITGAME = "/games/[id]/edit",
   PREVIEWGAME = "/games/[id]/preview",
+  CMSDASHBOARD = "/admin/cms-dashboard",
   ACCOUNTMANAGEMENT = "/admin/account-management",
   THEMES = "/admin/themes",
 }
