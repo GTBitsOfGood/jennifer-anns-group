@@ -1,14 +1,17 @@
 import pageAccessHOC from "@/components/HOC/PageAccess";
-import GamesSection from "@/components/ThemesTags/GamesSection";
-import ThemesTagsSection from "@/components/ThemesTags/ThemesTagsSection";
+import GamesSection from "@/components/Admin/ThemesTags/GamesSection";
+import ThemesTagsSection from "@/components/Admin/ThemesTags/ThemesTagsSection";
+import AdminTabs from "@/components/Admin/AdminTabs";
+import { Pages } from "@/utils/consts";
 
 function Themes() {
   return (
-    <div className="flex flex-col items-center gap-10 px-[10em] py-8">
-      <h1 className="text-6xl font-semibold">Themes and Tags</h1>
-      <ThemesTagsSection />
-      <GamesSection />
-    </div>
+    <AdminTabs page={Pages.THEMES}>
+      <div className="my-6 flex flex-col items-center gap-10 px-28">
+        <ThemesTagsSection />
+        <GamesSection />
+      </div>
+    </AdminTabs>
   );
 }
 
