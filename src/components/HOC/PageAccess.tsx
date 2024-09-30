@@ -16,6 +16,7 @@ const pageRequiredAuthentication: Record<
   [Pages.HOME]: undefined,
   [Pages.LOGIN]: "unauthenticated",
   [Pages.SIGNUP]: "unauthenticated",
+  [Pages.PASSWORD_RESET]: "unauthenticated",
   [Pages.CREATEGAME]: "authenticated",
   [Pages.EDITGAME]: "authenticated",
   [Pages.PREVIEWGAME]: "authenticated",
@@ -43,6 +44,7 @@ const pageRequiredLabels: Record<Pages, Array<Label>> = {
   ], // Allow all users
   [Pages.LOGIN]: [Label.NONE], // Only allow public users
   [Pages.SIGNUP]: [Label.NONE], // Only allow public users
+  [Pages.PASSWORD_RESET]: [Label.NONE], // Only allow public users
   [Pages.CREATEGAME]: [Label.ADMINISTRATOR], // Only allow administrator role
   [Pages.EDITGAME]: [Label.ADMINISTRATOR], // Only allow administrator role
   [Pages.PREVIEWGAME]: [Label.ADMINISTRATOR], // Only allow administrator role
