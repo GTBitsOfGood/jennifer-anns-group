@@ -25,7 +25,7 @@ import { GameException } from "@/utils/exceptions/game";
 interface Props {
   mode: string;
   gameData: GameDataState;
-  setGameData: Dispatch<React.SetStateAction<GameDataState | undefined>>;
+  setGameData: Dispatch<React.SetStateAction<GameDataState>>;
   authorized?: boolean;
   userData: z.infer<typeof userDataSchema> | undefined;
 }

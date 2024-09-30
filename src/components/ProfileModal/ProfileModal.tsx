@@ -86,7 +86,11 @@ export function ProfileModal(props: ProfileProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="mainorange" onClick={() => setProfileState("view")}>
+        <Button
+          variant="mainorange"
+          className="text-lg"
+          onClick={() => setProfileState("view")}
+        >
           Your profile
         </Button>
       </DialogTrigger>

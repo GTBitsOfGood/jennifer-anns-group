@@ -4,6 +4,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const EMAIL_FORM_KEY = "email";
 const PASSWORD_FORM_KEY = "password";
@@ -99,9 +100,12 @@ function LoginForm() {
         </p>
       </div>
       <div className="flex flex-row justify-end">
-        <a className="text-sm font-light text-blue-primary hover:cursor-pointer">
+        <Link
+          className="text-sm font-light text-blue-primary hover:cursor-pointer"
+          href="/password-reset"
+        >
           Forgot Password?
-        </a>
+        </Link>
       </div>
       <div className="flex flex-row justify-center">
         <Button type="submit" variant="outline" size="lg">

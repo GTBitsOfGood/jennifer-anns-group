@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Edit2Icon } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { IHomePage } from "@/server/db/models/HomePageModel";
+import { IGameBoy, IHomePage } from "@/server/db/models/HomePageModel";
 import MdEditor from "react-markdown-editor-lite";
 import MarkdownIt from "markdown-it";
 import Markdown from "react-markdown";
@@ -20,11 +20,34 @@ import cx from "classnames";
 import EditGameBoyModal from "@/components/HomePage/EditGameBoyModal";
 import GameBoy from "@/components/HomePage/GameBoy";
 import MarkdownRenderer from "@/components/HomePage/MarkdownRenderer";
+import { InferGetServerSidePropsType, GetServerSideProps } from "next";
+import { getHomePage } from "@/server/db/actions/HomePageAction";
 
 // const mdPlugins = ["font-bold", "font-italic", "font-underline"];
 const mdParser = new MarkdownIt().use(insert);
 
-const Home = () => {
+export const getServerSideProps: GetServerSideProps = async () => {
+  try {
+    const data = await getHomePage();
+    const pageData = JSON.parse(JSON.stringify(data));
+    return {
+      props: {
+        pageData,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching homepage data:", error);
+    return {
+      props: {
+        pageData: null,
+      },
+    };
+  }
+};
+
+const Home = ({
+  pageData,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { data: session } = useSession();
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
@@ -33,11 +56,7 @@ const Home = () => {
   const [editDescription, setEditDescription] = useState("");
   const [editError, setEditError] = useState("");
 
-  const {
-    data: pageData,
-    refetch,
-    isLoading,
-  } = useQuery({
+  const { refetch, isLoading } = useQuery({
     queryKey: ["homepage"],
     queryFn: async () => {
       const response = await fetch("/api/homepage");
@@ -83,10 +102,6 @@ const Home = () => {
 
   function getUserData() {
     setUserData(currentUser);
-  }
-
-  if (isLoading) {
-    return <></>;
   }
 
   if (!pageData) {
@@ -201,7 +216,7 @@ const Home = () => {
             {pageData.gameBoyTitle}
           </h1>
           <div className="flex w-full max-w-7xl justify-center space-x-20 px-16">
-            {pageData.gameBoys.map((gameBoy, index) => {
+            {pageData.gameBoys.map((gameBoy: IGameBoy, index: number) => {
               if (!gameBoy.gameId) {
                 return <></>;
               }

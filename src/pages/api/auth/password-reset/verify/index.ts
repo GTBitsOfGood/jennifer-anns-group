@@ -31,12 +31,21 @@ async function verifyPasswordResetHandler(
   res: NextApiResponse,
 ) {
   try {
-    const { email, token } = passwordResetParams.parse(JSON.parse(req.body));
+    const parsed = passwordResetParams.safeParse(JSON.parse(req.body));
+    if (!parsed.success) {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .send({ error: parsed.error.errors[0].message });
+    }
+
+    const { email, token } = parsed.data;
     const user = await getUserByEmail(email); // This function will throw an error if the user does not exist
 
     const success = await verifyPasswordResetLog(email, token);
     if (!success) {
-      return res.status(HTTP_STATUS_CODE.NOT_FOUND).send("Invalid token");
+      return res
+        .status(HTTP_STATUS_CODE.NOT_FOUND)
+        .send({ error: "Invalid password reset token provided" });
     }
 
     // Set a temporary cookie with the signed email to be used in the API endpoint to reset the password
@@ -55,7 +64,7 @@ async function verifyPasswordResetHandler(
     return res
       .status(HTTP_STATUS_CODE.OK)
       .setHeader("Set-Cookie", serializedCookie)
-      .send("Succesfully verified token");
+      .send({ message: "Succesfully verified token" });
   } catch (e: any) {
     console.error(e);
     return res

@@ -16,7 +16,7 @@ interface Props {
   field: keyof GameDataState;
   fileField: keyof GameDataState;
   gameData: GameDataState;
-  setGameData: React.Dispatch<React.SetStateAction<GameDataState | undefined>>;
+  setGameData: React.Dispatch<React.SetStateAction<GameDataState>>;
 }
 
 function UploadModal(props: Props) {

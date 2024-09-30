@@ -47,6 +47,10 @@ export async function sendPasswordResetEmail(email: string, otpCode: string) {
     "Jennifer Ann's Group",
   );
 
+  if (!process.env.PASSWORD_RESET_TEMPLATE_ID) {
+    throw new Error("Password Reset Template Id not set");
+  }
+
   const emailParams = new EmailParams()
     .setFrom(sentFrom)
     .setTo([new Recipient(email)])
