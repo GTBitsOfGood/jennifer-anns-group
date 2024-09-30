@@ -49,7 +49,7 @@ function PasswordResetRequest({ onSuccess, emailRef }: Props) {
           a confirmation code.
         </p>
       </div>
-      <form className="flex w-[100%] flex-col gap-8" onSubmit={handleSubmit}>
+      <form className="flex w-[100%] flex-col" onSubmit={handleSubmit}>
         <div className="relative flex flex-col">
           <label htmlFor="email" className="text-l">
             Email*
@@ -65,7 +65,7 @@ function PasswordResetRequest({ onSuccess, emailRef }: Props) {
             }
             onChange={(e) => (emailRef.current = e.target.value)}
           />
-          <p className="absolute bottom-[-2em] w-[100%] text-xs text-red-500">
+          <p className="py-2 text-xs text-red-500">
             {validationError}
           </p>
         </div>

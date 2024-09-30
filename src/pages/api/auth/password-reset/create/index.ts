@@ -31,7 +31,14 @@ async function sendPasswordResetEmailHandler(
 ) {
   try {
     const { email } = emailObject.parse(JSON.parse(req.body));
-    const user = await getUserByEmail(email); // This function will throw an error if the user does not exist
+
+    try {
+      const user = await getUserByEmail(email); // This function will throw an error if the user does not exist
+    } catch (e) {
+      throw new Error(
+        "Something failed on our end. Check that you have entered a valid email.",
+      ); // be a little less obvious about this user enumeration vuln
+    }
 
     const passwordResetLog = await createPasswordResetLog(email);
     await sendPasswordResetEmail(email, passwordResetLog.token);
