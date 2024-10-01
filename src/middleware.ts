@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
     await logger.authenticate(
       process.env.NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY as string,
     );
-    const referrer = request.referrer;
+    const referrer = request.headers.get("referer");
     let user_agent = request.headers.get("user-agent");
     if (user_agent == null) {
       user_agent = "";
