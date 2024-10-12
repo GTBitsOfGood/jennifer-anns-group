@@ -121,12 +121,27 @@ export async function editUser(
   const existingUser = await UserModel.findOne({ email: userInfo.email });
 
   if (existingUser && existingUser.toObject()._id.toString() != userInfo._id) {
-    throw new UserAlreadyExistsException();
+    if (existingUser.markedToDelete) {
+      //Transfer notes info and delete old user
+      if (!userInfo.notes) {
+        userInfo.notes = [];
+      }
+      userInfo.notes = [...userInfo.notes, ...existingUser.notes];
+      console.log(existingUser.id);
+      await UserModel.findByIdAndDelete(existingUser.id);
+    } else {
+      throw new UserAlreadyExistsException();
+    }
   }
-
-  const result = await UserModel.findByIdAndUpdate(userInfo._id, userInfo, {
-    new: true,
-  }).select("-hashedPassword");
+  //Ensures new notes don't overide old ones
+  const { notes, ...newUserInfo } = userInfo;
+  const result = await UserModel.findByIdAndUpdate(
+    userInfo._id,
+    { $set: newUserInfo, $push: { notes: { $each: notes } } },
+    {
+      new: true,
+    },
+  ).select("-hashedPassword");
 
   if (!result) {
     throw new UserDoesNotExistException();
@@ -219,18 +234,20 @@ export async function deleteUser(id: z.infer<typeof idSchema>) {
   const date = new Date();
   date.setDate(date.getDate() + 30); //Expiration date is 30 days from when the account has been deleted.
   //Also needs to set markedToDelete flag on all of the items in the notes list
-  console.log(date);
   const user = await UserModel.findByIdAndUpdate(
     id,
     {
       $set: {
         markedToDelete: date,
-        "notes.$[].markedToDelete": date,
+        "notes.$[elem].markedToDelete": date,
       },
     },
-    { new: true, runValidators: true },
+    {
+      new: true,
+      runValidators: true,
+      arrayFilters: [{ "elem.markedToDelete": { $exists: false } }],
+    },
   ).select("-hashedPassword");
-  console.log(user);
   if (!user) {
     throw new UserDoesNotExistException();
   }
