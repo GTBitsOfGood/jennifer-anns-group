@@ -127,7 +127,6 @@ export async function editUser(
         userInfo.notes = [];
       }
       userInfo.notes = [...userInfo.notes, ...existingUser.notes];
-      console.log(existingUser.id);
       await UserModel.findByIdAndDelete(existingUser.id);
     } else {
       throw new UserAlreadyExistsException();
