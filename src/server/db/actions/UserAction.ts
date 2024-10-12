@@ -11,6 +11,7 @@ import {
   UserCredentialsIncorrectException,
   GenericUserErrorException,
 } from "@/utils/exceptions/user";
+import { InvalidAPIException } from "@/utils/exceptions/external";
 
 const SALT_ROUNDS = 10;
 const DUP_KEY_ERROR_CODE = 11000;
@@ -35,6 +36,23 @@ export async function createUser(data: z.infer<typeof createUserSchema>) {
       mongoErr.name === "MongoServerError" &&
       mongoErr.code === DUP_KEY_ERROR_CODE
     ) {
+      //Determine if that existing user was deleted or not.
+      const existingUser = await UserModel.findOne({ email: userData.email });
+      if (existingUser && existingUser.markedToDelete) {
+        userData.notes = existingUser.notes; //Transfer deleted notes
+        //Update old account
+        const result = await UserModel.findByIdAndUpdate(
+          existingUser._id,
+          { $set: userData, $unset: { markedToDelete: null } },
+          {
+            new: true,
+          },
+        ).select("-hashedPassword");
+
+        if (result) {
+          return result;
+        }
+      }
       throw new UserAlreadyExistsException();
     }
     throw e;
@@ -45,7 +63,7 @@ export async function verifyUser(email: string, password: string) {
   await connectMongoDB();
 
   const user = await UserModel.findOne({ email: email }, { __v: 0 });
-  if (!user) throw new UserDoesNotExistException();
+  if (!user || user.markedToDelete) throw new UserDoesNotExistException();
 
   const match = await bcrypt.compare(password, user.hashedPassword);
   if (!match) throw new UserCredentialsIncorrectException();
@@ -66,7 +84,7 @@ export async function verifyUser(email: string, password: string) {
 export async function getUser(id: z.infer<typeof idSchema>) {
   await connectMongoDB();
   const user = await UserModel.findById(id).select("-hashedPassword");
-  if (!user) {
+  if (!user || user.markedToDelete) {
     throw new UserDoesNotExistException();
   }
   return user;
@@ -82,7 +100,7 @@ export async function getUserByEmail(email: string) {
   const user = await UserModel.findOne({ email: email }).select(
     "-hashedPassword",
   );
-  if (!user) {
+  if (!user || user.markedToDelete) {
     throw new UserDoesNotExistException();
   }
   return user;
@@ -130,7 +148,7 @@ export async function editPassword(
 ) {
   await connectMongoDB();
   const user = await UserModel.findById(id);
-  if (!user) {
+  if (!user || user.markedToDelete) {
     throw new UserDoesNotExistException();
   }
 
@@ -174,7 +192,7 @@ export async function resetPassword(newPassword: string, id: string) {
   await connectMongoDB();
 
   const user = await UserModel.findById(id);
-  if (!user) {
+  if (!user || user.markedToDelete) {
     throw new UserDoesNotExistException();
   }
 
@@ -198,9 +216,44 @@ export async function resetPassword(newPassword: string, id: string) {
  */
 export async function deleteUser(id: z.infer<typeof idSchema>) {
   await connectMongoDB();
-  const user = await UserModel.findByIdAndDelete(id).select("-hashedPassword");
+  const date = new Date();
+  date.setDate(date.getDate() + 30); //Expiration date is 30 days from when the account has been deleted.
+  //Also needs to set markedToDelete flag on all of the items in the notes list
+  console.log(date);
+  const user = await UserModel.findByIdAndUpdate(
+    id,
+    {
+      $set: {
+        markedToDelete: date,
+        "notes.$[].markedToDelete": date,
+      },
+    },
+    { new: true, runValidators: true },
+  ).select("-hashedPassword");
+  console.log(user);
   if (!user) {
     throw new UserDoesNotExistException();
   }
   return user;
+}
+
+/**
+ * Permanently deletes all users and notes that should have been deleted 30 days ago.
+ */
+export async function deleteUsersGDPR() {
+  await connectMongoDB();
+  //Delete all users where curr_date is gt than expiration date
+  const curr_date = new Date();
+  const deletedUsers = await UserModel.deleteMany({
+    markedToDelete: { $lte: curr_date },
+  }); //Replace with findMany for testing.
+  //Delete all notes in users where curr_dae is gt than expiration date
+  //This only occurs for users that have been recreated but still have notes that must be deleted
+  const deletedNotes = await UserModel.updateMany({
+    $pull: { notes: { markedToDelete: { $lte: curr_date } } },
+  });
+  return {
+    deletedUsersCount: deletedUsers.deletedCount,
+    usersWithDeletedNotesCount: deletedNotes.modifiedCount,
+  };
 }

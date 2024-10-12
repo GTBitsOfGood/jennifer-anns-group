@@ -12,6 +12,7 @@ const UserSchema = new Schema<IUser>({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   label: { type: String, required: true },
+  markedToDelete: { type: Date, default: undefined },
   notes: {
     type: [NoteSchema],
     default: [],

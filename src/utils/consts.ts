@@ -34,4 +34,6 @@ export const UNDELETABLE_EMAILS = [
 ];
 export const DEV_ADMIN_CONTACT = "bogjenniferanns@gmail.com";
 
-export const MAIL_SEND_DOMAIN = "gatech.lol";
+//export const MAIL_SEND_DOMAIN = "gatech.lol";
+
+export const MAIL_SEND_DOMAIN = "trial-x2p0347rew9gzdrn.mlsender.net";
