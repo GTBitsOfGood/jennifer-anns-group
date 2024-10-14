@@ -24,6 +24,13 @@ async function updatePopularityHandler(
   res: NextApiResponse,
 ) {
   try {
+    const requestKey = req.headers["x-api-key"];
+    if (requestKey !== process.env.GAME_POPULARITY_CRON_KEY) {
+      return res
+        .status(HTTP_STATUS_CODE.UNAUTHORIZED)
+        .send({ error: "Invalid secret provided." });
+    }
+
     await resetGamesPopularity();
     await updateGamesPopularity();
 
