@@ -31,7 +31,6 @@ async function updatePopularityHandler(
         .send({ error: "Invalid secret provided." });
     }
 
-    await resetGamesPopularity();
     await updateGamesPopularity();
 
     return res.status(HTTP_STATUS_CODE.OK).send({ message: "Success" });

@@ -424,5 +424,13 @@ export async function updateGamesPopularity() {
     }),
   );
 
-  await GameModel.bulkWrite(bulkOps);
+  await GameModel.bulkWrite([
+    ...bulkOps,
+    {
+      updateMany: {
+        filter: { name: { $nin: Array.from(popularityMap.keys()) } },
+        update: { popularity: 0 },
+      },
+    },
+  ]);
 }
