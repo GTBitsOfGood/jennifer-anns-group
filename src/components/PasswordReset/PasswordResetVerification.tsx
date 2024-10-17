@@ -68,7 +68,7 @@ export default function PasswordResetVerification({
         <div className="relative flex flex-col">
           <label htmlFor="confirmation-code">
             <span className="text-l">Confirmation Code</span>
-            <span className="text-xs text-[#2352A0]">
+            <span className="text-xs text-blue-primary">
               &nbsp;&nbsp;&nbsp;(Sent to your email)
             </span>
           </label>

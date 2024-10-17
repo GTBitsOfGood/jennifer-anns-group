@@ -16,11 +16,7 @@ import {
   Button,
   PopoverCloseButton,
 } from "@chakra-ui/react";
-import {
-  Search2Icon,
-  TriangleDownIcon,
-  TriangleUpIcon,
-} from "@chakra-ui/icons";
+import { Search2Icon } from "@chakra-ui/icons";
 import { Input } from "@chakra-ui/react";
 import FilterBody from "@/components/GameGallery/FilterBody";
 import chakraTheme from "@/styles/chakraTheme";
@@ -30,13 +26,31 @@ import SelectedFilters from "@/components/GameGallery/SelectedFilters";
 import GameCardView from "@/components/GameGallery/GameCardView";
 import GamesPagination from "@/components/GameGallery/GamesPagination";
 import { PageRequiredGameQuery } from "@/components/Admin/ThemesTags/GamesSection";
+import { Filter, ChevronsUpDown } from "lucide-react";
+import cx from "classnames";
+
+enum SortType {
+  AtoZ = "A-Z",
+  MostPopular = "Most Popular",
+  LastCreated = "Last Created",
+  FirstCreated = "First Created",
+}
 
 export default function Games() {
   const { data: session } = useSession();
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
   const router = useRouter();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isOpenFilterModal,
+    onOpen: onOpenFilterModal,
+    onClose: onCloseFilterModal,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenSortModal,
+    onOpen: onOpenSortModal,
+    onClose: onCloseSortModal,
+  } = useDisclosure();
 
   const [currPage, setCurrPage] = useState(1);
   const [numPages, setNumPages] = useState(0);
@@ -44,6 +58,10 @@ export default function Games() {
     page: 1,
     theme: [],
   });
+  const [name, setName] = useState("");
+  const [selectedSort, setSelectedSort] = useState<SortType>(
+    SortType.MostPopular,
+  );
 
   useEffect(() => {
     if (currentUser) {
@@ -51,23 +69,32 @@ export default function Games() {
     }
   }, [currentUser, userData?.label]);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (name.length > 0) {
+        setFilters({
+          ...filters,
+          name: name,
+          page: 1,
+        });
+      } else {
+        const { name, ...rest } = filters;
+        setFilters(rest);
+      }
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [name, 500]);
+
   function getUserData() {
     setUserData(currentUser);
   }
 
-  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, ...rest } = filters;
-    const value = event.target.value;
-    if (value.length === 0) {
-      setFilters(rest);
-    }
-    if (value.length < 3 || value.length > 50) return;
-    setFilters({
-      ...rest,
-      name: event.target.value,
-      page: 1,
-    });
-  };
+  const hasFilters =
+    (filters.accessibility?.length ?? 0) > 0 ||
+    (filters.tags?.length ?? 0) > 0 ||
+    (filters.gameContent?.length ?? 0) > 0 ||
+    (filters.gameBuilds?.length ?? 0) > 0 ||
+    (filters.theme?.length ?? 0) > 0;
 
   return (
     <div>
@@ -76,7 +103,7 @@ export default function Games() {
           Game Gallery
         </h1>
 
-        <div className="m-auto mb-11 flex w-[80vw] flex-row justify-between">
+        <div className="m-auto mb-6 flex w-[85vw] flex-row justify-between">
           <div className="flex flex-row">
             <InputGroup w="200px">
               <InputLeftElement pointerEvents="none">
@@ -87,7 +114,7 @@ export default function Games() {
               </InputLeftElement>
               <Input
                 height="36px"
-                onChange={handleNameChange}
+                onChange={(e) => setName(e.target.value)}
                 borderColor="gray.500"
                 bg="gray.50"
                 color="gray.500"
@@ -95,29 +122,39 @@ export default function Games() {
                 minW="200px"
               />
             </InputGroup>
+            {/* filter button and popover */}
             <Popover
               placement="bottom-start"
-              onOpen={onOpen}
-              onClose={onClose}
-              isOpen={isOpen}
+              onOpen={onOpenFilterModal}
+              onClose={onCloseFilterModal}
+              isOpen={isOpenFilterModal}
             >
               <PopoverTrigger>
                 <Button
-                  borderRadius="100px"
-                  bg="brand.800"
-                  _hover={{ bg: "brand.800" }}
-                  minW="96px"
-                  height="36px"
-                  className="ml-5 mr-5 flex flex-row items-center justify-center space-x-1 border border-[#A9CBEB]"
+                  className={cx(
+                    "mx-5 flex h-9 items-center justify-center space-x-1 rounded-full border",
+                    {
+                      "bg-brand-800 border-blue-bg": hasFilters,
+                      "border-gray-300 bg-white hover:bg-light-gray":
+                        !hasFilters,
+                    },
+                  )}
                 >
-                  <Text className="select-none font-inter text-sm font-bold text-[#2352A0]">
+                  <Text
+                    className={cx(
+                      "select-none font-inter text-sm font-bold text-black",
+                      {
+                        "text-blue-primary": hasFilters,
+                      },
+                    )}
+                  >
                     Filter
                   </Text>
-                  {isOpen ? (
-                    <TriangleUpIcon color="brand.600" height="9px" />
-                  ) : (
-                    <TriangleDownIcon color="brand.600" height="9px" />
-                  )}
+                  <Filter
+                    className={cx("h-4 text-black", {
+                      "text-blue-primary": hasFilters,
+                    })}
+                  />
                 </Button>
               </PopoverTrigger>
               <PopoverContent mt="10px" w="750px" minH="870px">
@@ -132,14 +169,49 @@ export default function Games() {
                     setFilters={setFilters}
                     filters={filters}
                     userLabel={userData?.label}
-                    onClose={onClose}
+                    onClose={onCloseFilterModal}
                   />
                 </PopoverBody>
               </PopoverContent>
             </Popover>
-            <div className="flex flex-row flex-wrap">
-              <SelectedFilters filters={filters} />
-            </div>
+            {/* sort button and popover */}
+            <Popover
+              placement="bottom-start"
+              onOpen={onOpenSortModal}
+              onClose={onCloseSortModal}
+              isOpen={isOpenSortModal}
+            >
+              <PopoverTrigger>
+                <Button className="bg-brand-800 flex h-9 items-center justify-center space-x-1 rounded-full border border-blue-bg">
+                  <Text className="select-none font-inter text-sm font-bold text-blue-primary">
+                    {selectedSort}
+                  </Text>
+                  <ChevronsUpDown className="h-4 text-blue-primary" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-fit">
+                <PopoverBody>
+                  <div className="m-2 flex flex-col">
+                    {Object.values(SortType).map((item, index) => {
+                      return (
+                        <button
+                          key={index}
+                          className={cx("mb-2 text-left text-black", {
+                            "text-blue-primary": selectedSort === item,
+                          })}
+                          onClick={() => {
+                            setSelectedSort(item as SortType);
+                            onCloseSortModal();
+                          }}
+                        >
+                          {item}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </PopoverBody>
+              </PopoverContent>
+            </Popover>
           </div>
           {userData?.label === "administrator" ? (
             <button
@@ -152,6 +224,11 @@ export default function Games() {
             </button>
           ) : null}
         </div>
+        {hasFilters && (
+          <div className="m-auto mb-6 flex h-9 w-[85vw] flex-row flex-wrap justify-between">
+            <SelectedFilters setFilters={setFilters} filters={filters} />
+          </div>
+        )}
 
         <div className="m-auto w-[85vw]">
           <Divider borderColor="brand.700" borderWidth="1px" />

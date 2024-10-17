@@ -1,12 +1,15 @@
 import { Tag } from "@chakra-ui/react";
 import { PageRequiredGameQuery } from "../Admin/ThemesTags/GamesSection";
 import { gameContentsMap, gameBuildsMap } from "./FilterBody";
+import { X } from "lucide-react";
+import { Dispatch, SetStateAction } from "react";
 
 interface Props {
+  setFilters: Dispatch<SetStateAction<PageRequiredGameQuery>>;
   filters: PageRequiredGameQuery;
 }
 
-export default function SelectedFilters({ filters }: Props) {
+export default function SelectedFilters({ setFilters, filters }: Props) {
   const { gameBuilds, gameContent, accessibility, tags } = filters;
 
   return (
@@ -14,28 +17,72 @@ export default function SelectedFilters({ filters }: Props) {
       {gameBuilds?.map((item) => {
         return (
           <Tag key={item} height="36px" variant="filter_selected">
-            {gameBuildsMap[item]}
+            <div className="flex flex-row items-center gap-2">
+              {gameBuildsMap[item]}
+              <X
+                size={18}
+                onClick={() =>
+                  setFilters({
+                    ...filters,
+                    gameBuilds: gameBuilds.filter((i) => i != item),
+                  })
+                }
+              />
+            </div>
           </Tag>
         );
       })}
       {gameContent?.map((item) => {
         return (
           <Tag key={item} height="36px" variant="filter_selected">
-            {gameContentsMap[item]}
+            <div className="flex flex-row items-center gap-2">
+              {gameContentsMap[item]}
+              <X
+                size={18}
+                onClick={() =>
+                  setFilters({
+                    ...filters,
+                    gameContent: gameContent.filter((i) => i != item),
+                  })
+                }
+              />
+            </div>
           </Tag>
         );
       })}
       {accessibility?.map((item) => {
         return (
           <Tag key={item} height="36px" variant="filter_selected">
-            {item}
+            <div className="flex flex-row items-center gap-2">
+              {item}
+              <X
+                size={18}
+                onClick={() =>
+                  setFilters({
+                    ...filters,
+                    accessibility: accessibility.filter((i) => i != item),
+                  })
+                }
+              />
+            </div>
           </Tag>
         );
       })}
       {tags?.map((item) => {
         return (
           <Tag key={item} height="36px" variant="filter_selected">
-            {item}
+            <div className="flex flex-row items-center gap-2">
+              {item}
+              <X
+                size={18}
+                onClick={() =>
+                  setFilters({
+                    ...filters,
+                    tags: tags.filter((i) => i != item),
+                  })
+                }
+              />
+            </div>
           </Tag>
         );
       })}
