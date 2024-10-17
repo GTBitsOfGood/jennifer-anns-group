@@ -5,6 +5,14 @@ import Image from "next/image";
 import { CustomVisitEvent } from "@/utils/types";
 import { Spinner } from "@chakra-ui/react";
 
+// GROUP DATA
+export const groupMap: Record<string, string> = {
+  student: "Student",
+  educator: "Educator",
+  parent: "Parent",
+  administrator: "Admin",
+};
+
 const UserTraffic = () => {
   const [currentTab, setCurrentTab] = useState("Major Sources");
   const [sourceData, setSourceData] = useState<PieChartDataProps[]>([]);
@@ -25,6 +33,8 @@ const UserTraffic = () => {
         "Visit",
         today,
       )) as CustomVisitEvent[];
+
+      console.log("visiitevents", visitEvents);
 
       if (!visitEvents || (visitEvents && visitEvents.length === 0)) {
         setSourceData([]);
@@ -55,14 +65,6 @@ const UserTraffic = () => {
       );
 
       setSourceData(referrerChartData);
-
-      // GROUP DATA
-      const groupMap: Record<string, string> = {
-        student: "Student",
-        educator: "Educator",
-        parent: "Parent",
-        administrator: "Admin",
-      };
 
       const userGroupCount: Record<string, number> = {
         Student: 0,
@@ -148,10 +150,8 @@ const UserTraffic = () => {
   };
 
   return (
-    <div className="flex flex-col items-start gap-4 self-stretch rounded-2xl p-6">
-      <h1 className="self-stretch font-inter text-2xl text-stone-700">
-        User Traffic
-      </h1>
+    <div className="flex flex-col items-start gap-4 self-stretch rounded-2xl">
+      <h1 className="self-stretch text-2xl">User Traffic</h1>
       <div className="flex space-x-4 self-stretch border-b-2 border-orange-primary">
         <button
           className={`rounded-t-md px-3 py-2 text-xs ${
