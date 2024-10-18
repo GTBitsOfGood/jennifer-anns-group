@@ -42,18 +42,16 @@ export function DataTable<TData, TValue>({
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                );
-              })}
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                </TableHead>
+              ))}
             </TableRow>
           ))}
         </TableHeader>
@@ -63,21 +61,29 @@ export function DataTable<TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                className="h-10" // Set a fixed height for each row
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell
                     key={cell.id}
                     className={cn(
+                      "overflow-hidden text-ellipsis whitespace-nowrap",
                       cell.column.columnDef.meta?.toString(),
                       selectedRow === (minRowIndex ?? 0) + row.index &&
                         "bg-[#FFF5E6]",
+                      setSelectedRow && "cursor-pointer",
                     )}
                     onClick={() => {
                       setSelectedRow &&
                         setSelectedRow((minRowIndex ?? 0) + row.index);
                     }}
                   >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <div className="overflow-x-auto">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </div>
                   </TableCell>
                 ))}
               </TableRow>

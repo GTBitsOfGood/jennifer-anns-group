@@ -41,7 +41,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, type }) => {
         data={processed_data}
         theme={{
           legends: {
-            text: { fontSize: 14 },
+            text: { fontSize: 14, fontFamily: "Poppins" },
           },
         }}
         margin={{ top: 5, bottom: 5, right: type === "sources" ? 405 : 266 }}
