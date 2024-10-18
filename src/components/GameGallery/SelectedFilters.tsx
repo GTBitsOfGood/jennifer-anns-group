@@ -20,12 +20,13 @@ export default function SelectedFilters({ setFilters, filters }: Props) {
             <div className="flex flex-row items-center gap-2">
               {gameBuildsMap[item]}
               <X
+                className="hover:cursor-pointer"
                 size={18}
                 onClick={() =>
-                  setFilters({
+                  setFilters((filters) => ({
                     ...filters,
                     gameBuilds: gameBuilds.filter((i) => i != item),
-                  })
+                  }))
                 }
               />
             </div>
@@ -38,12 +39,13 @@ export default function SelectedFilters({ setFilters, filters }: Props) {
             <div className="flex flex-row items-center gap-2">
               {gameContentsMap[item]}
               <X
+                className="hover:cursor-pointer"
                 size={18}
                 onClick={() =>
-                  setFilters({
+                  setFilters((filters) => ({
                     ...filters,
                     gameContent: gameContent.filter((i) => i != item),
-                  })
+                  }))
                 }
               />
             </div>
@@ -56,12 +58,13 @@ export default function SelectedFilters({ setFilters, filters }: Props) {
             <div className="flex flex-row items-center gap-2">
               {item}
               <X
+                className="hover:cursor-pointer"
                 size={18}
                 onClick={() =>
-                  setFilters({
+                  setFilters((filters) => ({
                     ...filters,
                     accessibility: accessibility.filter((i) => i != item),
-                  })
+                  }))
                 }
               />
             </div>
@@ -74,12 +77,13 @@ export default function SelectedFilters({ setFilters, filters }: Props) {
             <div className="flex flex-row items-center gap-2">
               {item}
               <X
+                className="hover:cursor-pointer"
                 size={18}
                 onClick={() =>
-                  setFilters({
+                  setFilters((filters) => ({
                     ...filters,
                     tags: tags.filter((i) => i != item),
-                  })
+                  }))
                 }
               />
             </div>

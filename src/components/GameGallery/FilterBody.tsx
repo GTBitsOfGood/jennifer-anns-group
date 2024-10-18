@@ -48,6 +48,7 @@ export default function FilterBody({
   }, []);
 
   useEffect(() => {
+    console.log(filters);
     filters.gameBuilds && setSelectedGameBuilds(filters.gameBuilds);
     filters.accessibility && setSelectedAccessibility(filters.accessibility);
     filters.tags && setSelectedTags(filters.tags);

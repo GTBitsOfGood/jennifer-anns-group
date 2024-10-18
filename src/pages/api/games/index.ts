@@ -21,6 +21,7 @@ import {
 import { ITag } from "@/server/db/models/TagModel";
 import { ITheme } from "@/server/db/models/ThemeModel";
 import { IBuild, IGame } from "@/server/db/models/GameModel";
+import { SortType } from "@/utils/types";
 
 export default async function handler(
   req: NextApiRequest,
@@ -152,5 +153,6 @@ export const GetGameQuerySchema = z.object({
     .or(z.nativeEnum(GameContentEnum).transform(putSingleStringInArray)) //In this case where only thing is passed into gameContent.
     .optional(),
   page: z.string().transform(convertINT).pipe(z.number().gte(1)).optional(),
+  sort: z.nativeEnum(SortType).optional(),
 });
 export type GameQuery = z.infer<typeof GetGameQuerySchema>;

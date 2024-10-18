@@ -28,13 +28,7 @@ import GamesPagination from "@/components/GameGallery/GamesPagination";
 import { PageRequiredGameQuery } from "@/components/Admin/ThemesTags/GamesSection";
 import { Filter, ChevronsUpDown } from "lucide-react";
 import cx from "classnames";
-
-enum SortType {
-  AtoZ = "A-Z",
-  MostPopular = "Most Popular",
-  LastCreated = "Last Created",
-  FirstCreated = "First Created",
-}
+import { SortType } from "@/utils/types";
 
 export default function Games() {
   const { data: session } = useSession();
@@ -200,6 +194,7 @@ export default function Games() {
                             "text-blue-primary": selectedSort === item,
                           })}
                           onClick={() => {
+                            setFilters({ ...filters, sort: item as SortType });
                             setSelectedSort(item as SortType);
                             onCloseSortModal();
                           }}
