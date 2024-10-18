@@ -380,3 +380,19 @@ export async function getGameById(id: string) {
     throw e;
   }
 }
+
+export async function fetchGameNames(gameIds: string[]) {
+  await connectMongoDB();
+  const games = await GameModel.find(
+    { _id: { $in: gameIds } },
+    { _id: 1, name: 1 },
+  );
+
+  const gameNames: Record<string, string> = {};
+
+  games.forEach((game) => {
+    gameNames[game.name] = game._id.toString(); // Map game ID to game name
+  });
+
+  return gameNames;
+}

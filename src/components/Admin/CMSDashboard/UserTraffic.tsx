@@ -26,15 +26,12 @@ const UserTraffic = () => {
       setLoading(true);
       const today = new Date();
       today.setHours(0, 0, 0, 0); // beginning of the day today
-      console.log("test");
       const visitEvents = (await analyticsViewer.getAllCustomEvents(
         "Jennifer Ann's",
         "Visit",
         "Visit",
         today,
       )) as CustomVisitEvent[];
-
-      console.log("visiitevents", visitEvents);
 
       if (!visitEvents || (visitEvents && visitEvents.length === 0)) {
         setSourceData([]);

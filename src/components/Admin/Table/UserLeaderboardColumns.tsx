@@ -20,7 +20,7 @@ export const columns: ColumnDef<any>[] = [
   },
   {
     id: "playsDownloads",
-    header: "Plays/Downloads",
+    header: "Downloads",
     meta: "w-1/3",
     cell: ({ row }) => {
       return (
