@@ -51,6 +51,7 @@ const GameSchema = new Schema<IGame>(
     videoTrailer: { type: String },
     preview: { type: Boolean, required: true },
     image: { type: String, required: true },
+    popularity: { type: Number, default: 0 },
   },
   { versionKey: false },
 );

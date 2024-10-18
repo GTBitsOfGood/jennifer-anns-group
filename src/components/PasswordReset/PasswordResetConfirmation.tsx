@@ -11,7 +11,7 @@ export default function PasswordResetUpdate() {
       </h2>
 
       <Button
-        className="w-[100%] bg-[#2352A0]"
+        className="w-[100%] bg-blue-primary"
         type="submit"
         variant="default"
         size="lg"

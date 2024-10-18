@@ -171,7 +171,7 @@ const exported = {
     const allowedOrigins = [
       "http://localhost:3000",
       "https://jennifer-anns.netlify.app",
-      "https://main--jennifer-anns.netlify.app",
+      "https://dev--jennifer-anns.netlify.app",
     ];
 
     if (allowedOrigins.includes(origin)) {

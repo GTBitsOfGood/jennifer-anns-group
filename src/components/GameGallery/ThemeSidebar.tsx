@@ -33,7 +33,7 @@ export default function ThemeSidebar({ setFilters, filters }: Props) {
         }}
         className={
           filters.theme?.length === 0
-            ? "mb-[26px] cursor-pointer font-sans text-2xl font-bold text-[#2352A0]"
+            ? "mb-[26px] cursor-pointer font-sans text-2xl font-bold text-blue-primary"
             : "mb-[26px] cursor-pointer font-sans text-2xl text-neutral-500"
         }
       >
@@ -49,7 +49,7 @@ export default function ThemeSidebar({ setFilters, filters }: Props) {
                 }}
                 className={
                   filters.theme?.includes(theme)
-                    ? "mb-[26px] cursor-pointer font-sans text-2xl font-bold text-[#2352A0]"
+                    ? "mb-[26px] cursor-pointer font-sans text-2xl font-bold text-blue-primary"
                     : "mb-[26px] cursor-pointer font-sans text-2xl text-neutral-500"
                 }
               >

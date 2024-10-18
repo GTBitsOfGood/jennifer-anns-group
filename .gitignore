@@ -38,3 +38,5 @@ next-env.d.ts
 # linting / formatting
 .eslintcache
 settings.json
+# Local Netlify folder
+.netlify
