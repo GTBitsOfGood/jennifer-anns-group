@@ -18,9 +18,7 @@ export default async function handler(
   }
 
   try {
-    console.log("NAMMSMSMS", gameIds);
     const gameNames = await fetchGameNames(gameIds);
-    console.log("api", gameNames);
     return res.status(200).json({ gameNames });
   } catch (error) {
     console.error("Error fetching game names:", error);
