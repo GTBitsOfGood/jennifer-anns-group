@@ -45,16 +45,18 @@ export default function EmbeddedGame({
       });
     }
     //Analytics stuff
-    const properties = {
-      userId: userData._id ?? "Unauthenticated",
-      userGroup: userData.label ?? "None",
-      createdDate: Date(),
-      gameName: gameName,
-      resourceName: "webgl",
-      resourceUrl: "",
-      downloadSrc: window.location.href,
-    };
-    analyticsLogger.logCustomEvent("Download", "game", properties);
+    if (userData.tracked) {
+      const properties = {
+        userId: userData._id ?? "Unauthenticated",
+        userGroup: userData.label ?? "None",
+        createdDate: Date(),
+        gameName: gameName,
+        resourceName: "webgl",
+        resourceUrl: "",
+        downloadSrc: window.location.href,
+      };
+      analyticsLogger.logCustomEvent("Download", "game", properties);
+    }
     return () => {
       observer.disconnect();
     };

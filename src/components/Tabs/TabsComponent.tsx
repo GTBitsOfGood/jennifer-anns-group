@@ -71,7 +71,7 @@ export default function TabsComponent({
   const [visitedAnswerKey, setVisitedAnswerKey] = useState(false);
 
   const loadedFile = (resourceUrl: string, resourceName: string) => {
-    if (userData != undefined) {
+    if (userData != undefined && userData.tracked) {
       const properties = {
         userId: userData._id,
         userGroup: userData.label,

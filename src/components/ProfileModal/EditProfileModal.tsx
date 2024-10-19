@@ -30,6 +30,7 @@ function EditProfileModal(props: EditProps) {
   const FNAME_FORM_KEY = "firstName";
   const LNAME_FORM_KEY = "lastName";
   const EMAIL_FORM_KEY = "email";
+  const TRACKING_FORM_KEY = "tracking";
 
   const [invalidEmail, setInvalidEmail] = useState("");
 
@@ -41,6 +42,7 @@ function EditProfileModal(props: EditProps) {
       lastName: formData.get(LNAME_FORM_KEY),
       email: formData.get(EMAIL_FORM_KEY),
       label: props.userData?.label,
+      tracked: formData.get(TRACKING_FORM_KEY) === "on",
     };
     const parse = formUserSchema.safeParse(input);
     if (parse.success) {
@@ -140,6 +142,21 @@ function EditProfileModal(props: EditProps) {
               : ""}
           </p>
         </div>
+
+        <div className="col-span-8 items-center">
+          <input
+            name={TRACKING_FORM_KEY}
+            type="checkbox"
+            defaultChecked={props.userData?.tracked}
+          />
+          <Label
+            htmlFor={TRACKING_FORM_KEY}
+            className="ml-3 text-right text-sm font-normal"
+          >
+            Allow tracking
+          </Label>
+        </div>
+
         <div className="col-span-8 items-center">
           <p
             onClick={() => props.setProfileState("changePw")}
