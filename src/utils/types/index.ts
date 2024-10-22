@@ -110,6 +110,7 @@ export const gameSchema = z.object({
     z.string().url().optional(),
   ),
   preview: z.boolean(),
+  popularity: z.number().int(),
 });
 //Since arrays from req.query are just strings, and need to be converted into arrays.
 

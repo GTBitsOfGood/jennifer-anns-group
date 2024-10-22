@@ -41,7 +41,7 @@ const GamePage = ({ mode, gameData }: Props) => {
   const [curData, setCurData] = useState<GameDataState>(gameData);
   const [error, setError] = useState("");
   const [visibleAnswer, setVisibleAnswer] = useState(false);
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const idSchema = z.string().length(24);
   const userDataSchema = userSchema
     .extend({
