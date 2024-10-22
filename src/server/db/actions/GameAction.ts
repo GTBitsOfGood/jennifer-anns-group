@@ -5,7 +5,7 @@ import connectMongoDB from "../mongodb";
 import { deleteBuild } from "./BuildAction";
 import mongoose, { FilterQuery, Aggregate, Types } from "mongoose";
 import { z } from "zod";
-import { AllBuilds, ExtendId, editGameSchema } from "@/utils/types";
+import { AllBuilds, ExtendId, UserLabel, editGameSchema } from "@/utils/types";
 import { GameQuery, GetGameQuerySchema } from "@/pages/api/games";
 import {
   GameNotFoundException,
@@ -14,6 +14,7 @@ import {
 } from "@/utils/exceptions/game";
 import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
+import { getViewer } from "@/context/AnalyticsContext";
 
 export const RESULTS_PER_PAGE = 6;
 
@@ -395,4 +396,57 @@ export async function fetchGameNames(gameIds: string[]) {
   });
 
   return gameNames;
+}
+
+export async function resetGamesPopularity() {
+  await connectMongoDB();
+  await GameModel.updateMany({}, { popularity: 0 });
+}
+
+interface GameVisitProperties {
+  userId: string;
+  userGroup: UserLabel;
+  createdDate: string;
+  gameName: string;
+}
+
+export async function updateGamesPopularity() {
+  await connectMongoDB();
+
+  const popularityMap = new Map<string, number>();
+  const viewer = getViewer();
+  await viewer.authenticate(
+    process.env.NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY as string,
+  );
+
+  const gameVisits = await viewer.getAllCustomEvents(
+    "Jennifer Ann's",
+    "Visit",
+    "game",
+    new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
+  );
+
+  gameVisits?.forEach((gameVisit) => {
+    const gameName = (gameVisit.properties as GameVisitProperties).gameName;
+    popularityMap.set(gameName, (popularityMap.get(gameName) ?? 0) + 1);
+  });
+
+  const bulkOps = Array.from(popularityMap.entries()).map(
+    ([gameName, count]) => ({
+      updateOne: {
+        filter: { name: gameName },
+        update: { popularity: count },
+      },
+    }),
+  );
+
+  await GameModel.bulkWrite([
+    ...bulkOps,
+    {
+      updateMany: {
+        filter: { name: { $nin: Array.from(popularityMap.keys()) } },
+        update: { popularity: 0 },
+      },
+    },
+  ]);
 }

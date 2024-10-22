@@ -26,8 +26,8 @@ async function getNotesHandler(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     const gameId = req.query.gameId as string | undefined;
-    const notes = await getNotes(id, gameId);
-
+    let notes = await getNotes(id, gameId);
+    notes = notes.filter((note) => !note.markedToDelete);
     return res.status(200).send({
       data: notes,
     });

@@ -8,9 +8,9 @@ interface AnalyticsContextType {
   analyticsLogger: AnalyticsLogger;
   analyticsViewer: AnalyticsViewer;
 }
+
 // Create context for provider
 const AnalyticsContext = createContext<AnalyticsContextType | null>(null);
-
 const clientApiKey = process.env
   .NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY as string;
 const serverApiKey = process.env.BOG_BOG_ANALYTICS_SERVER_API_KEY as string;
@@ -26,6 +26,7 @@ export async function authenticateLoggers() {
   await devLogger.authenticate(clientApiKey);
 }
 authenticateLoggers(); //Specifically for front-end
+
 export function getLogger() {
   // return logger corresponding to current environment
   return devLogger;
@@ -34,7 +35,6 @@ export function getLogger() {
 const logger = getLogger;
 
 // VIEWERS
-
 const devViewer = new AnalyticsViewer({
   apiBaseUrl: "https://data.bitsofgood.org",
   environment: EventEnvironment.DEVELOPMENT,

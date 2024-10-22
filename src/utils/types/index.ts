@@ -110,6 +110,7 @@ export const gameSchema = z.object({
     z.string().url().optional(),
   ),
   preview: z.boolean(),
+  popularity: z.number().int(),
 });
 //Since arrays from req.query are just strings, and need to be converted into arrays.
 
@@ -137,6 +138,7 @@ export const noteSchema = z.object({
   date: z.string().pipe(z.coerce.date()),
   description: z.string(),
   gameId: z.string().refine(verifyObjectId).optional(),
+  markedToDelete: z.date().optional(),
 });
 
 export enum UserLabel {
@@ -152,8 +154,10 @@ export const userSchema = z.object({
   hashedPassword: z.string(),
   firstName: z.string(),
   lastName: z.string(),
+  markedToDelete: z.date().optional(),
   notes: z.array(noteSchema),
   label: z.nativeEnum(UserLabel),
+  tracked: z.boolean(),
 });
 
 // Admin

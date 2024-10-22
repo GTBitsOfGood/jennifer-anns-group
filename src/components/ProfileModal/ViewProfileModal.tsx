@@ -53,6 +53,16 @@ function ViewProfileModal(props: ViewProps) {
             ********
           </p>
         </div>
+
+        <div className="col-span-8 items-center">
+          <Label className="text-right text-lg font-normal">
+            Optional Data Collection
+          </Label>
+
+          <p className="col-span-3 py-2 text-sm font-light text-blue-primary">
+            {props.userData?.tracked ? "On" : "Off"}
+          </p>
+        </div>
       </div>
       <DialogFooter>
         <div className="relative mt-10 w-full">
