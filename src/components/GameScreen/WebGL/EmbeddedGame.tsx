@@ -45,7 +45,7 @@ export default function EmbeddedGame({
       });
     }
     //Analytics stuff
-    if (userData.tracked) {
+    if (userData?.tracked) {
       const properties = {
         userId: userData._id ?? "Unauthenticated",
         userGroup: userData.label ?? "None",

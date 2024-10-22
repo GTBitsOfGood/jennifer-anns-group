@@ -39,7 +39,7 @@ const tabData: Record<UserType, TabName[]> = {
 
 const Header = () => {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
   const [selectedTab, setSelectedTab] = useState(0);
@@ -156,7 +156,12 @@ const Header = () => {
           Log in
         </Button>
       ) : (
-        <ProfileModal userData={userData} setUserData={setUserData} />
+        <ProfileModal
+          userData={userData}
+          setUserData={setUserData}
+          updateSession={update}
+          sessionData={session}
+        />
       )}
       <Button variant="gray" className="text-lg" onClick={handleSignUpLogOut}>
         {userType === UserType.Public ? "Sign up" : "Log out"}

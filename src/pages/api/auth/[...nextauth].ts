@@ -12,20 +12,36 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, user, account }) {
-      if (account) {
-        token = { ...token, ...user };
+    async jwt({ token, user, account, trigger, session }) {
+      // If "update" is triggered, update token with session.user properties
+      if (trigger === "update" && session?.user) {
+        token = {
+          ...token,
+          ...session.user, // Overwrite token properties with session.user properties
+        };
       }
+
+      // If there is an account, merge the user properties into the token
+      if (account) {
+        token = {
+          ...token,
+          ...user, // Include user properties from authentication
+        };
+      }
+
       return token;
     },
-    async session({ session, token }) {
-      const { iat, exp, jti, ...otherUser } = token;
 
-      const user = {
-        _id: token._id,
-        ...otherUser,
+    async session({ session, token, trigger }) {
+      // Extract all the relevant user properties from token, excluding technical ones like iat, exp, jti
+      const { iat, exp, jti, ...userTokenProperties } = token;
+
+      // Create the user object for the session
+      session.user = {
+        ...session.user, // Ensure previous session.user properties (if any) are retained
+        ...userTokenProperties, // Populate session.user with properties from token
       };
-      session.user = user;
+
       return session;
     },
   },

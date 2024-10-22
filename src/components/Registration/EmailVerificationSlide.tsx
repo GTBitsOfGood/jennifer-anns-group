@@ -83,7 +83,7 @@ export default function EmailVerificationSlide({ onSuccess, email }: Props) {
             variant="outline"
             size="lg"
           >
-            Send Confirmation Code
+            Verify Confirmation Code
           </Button>
         </div>
       </form>

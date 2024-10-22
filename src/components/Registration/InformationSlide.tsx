@@ -87,6 +87,7 @@ function InformationSlide({
     lastName: undefined,
     label: undefined,
     age: undefined,
+    tracked: undefined,
   });
 
   const [trackedChecked, setTrackedChecked] = useState<boolean>(true);
@@ -248,8 +249,8 @@ function InformationSlide({
         <input
           name={TRACKED_FORM_KEY}
           type="checkbox"
-          defaultChecked={true}
-          onChange={() => setTrackedChecked(!trackedChecked)}
+          checked={trackedChecked}
+          onChange={(e) => setTrackedChecked(e.target.checked)}
         />
         <label
           htmlFor={TRACKED_FORM_KEY}
@@ -261,9 +262,7 @@ function InformationSlide({
           Learn more about Jennifer Ann&apos;s{" "}
           <span
             onClick={() => setModalOpen(true)}
-            className={`text-blue-primary ${
-              trackedChecked ? "underline" : "no-underline"
-            }`}
+            className={`text-blue-primary underline`}
           >
             privacy policy
           </span>

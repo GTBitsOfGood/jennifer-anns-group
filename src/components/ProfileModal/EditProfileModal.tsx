@@ -6,7 +6,7 @@ import WarningIcon from "@/components/ui/icons/warningicon";
 import { userSchema } from "@/utils/types";
 import cn from "classnames";
 import { z } from "zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ProfileState,
   userDataSchema,
@@ -24,6 +24,7 @@ type EditProps = {
   >;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   editUser: (...args: EditUserParams) => EditUserReturnValue;
+  setPrivacyPolicyModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 function EditProfileModal(props: EditProps) {
@@ -33,6 +34,13 @@ function EditProfileModal(props: EditProps) {
   const TRACKING_FORM_KEY = "tracking";
 
   const [invalidEmail, setInvalidEmail] = useState("");
+  const [trackedChecked, setTrackedChecked] = useState<boolean>(
+    props.userData?.tracked ?? false,
+  );
+
+  useEffect(() => {
+    setTrackedChecked(props.userData?.tracked ?? false);
+  }, [props.userData?.tracked]);
 
   async function handleProfileFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -147,16 +155,23 @@ function EditProfileModal(props: EditProps) {
           <input
             name={TRACKING_FORM_KEY}
             type="checkbox"
-            defaultChecked={props.userData?.tracked}
+            checked={trackedChecked}
+            onChange={(e) => setTrackedChecked(e.target.checked)}
           />
           <Label
             htmlFor={TRACKING_FORM_KEY}
-            className="ml-3 text-right text-sm font-normal"
+            className={`ml-3 text-right text-sm font-normal`}
           >
-            Allow tracking
+            I would like my data to help improve this site (Optional).
+            {/* Learn more about Jennifer Ann&apos;s{" "}
+            <span
+              onClick={() => props.setPrivacyPolicyModalOpen(true)}
+              className={`text-blue-primary underline`}
+            >
+              privacy policy
+            </span> */}
           </Label>
         </div>
-
         <div className="col-span-8 items-center">
           <p
             onClick={() => props.setProfileState("changePw")}
