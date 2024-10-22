@@ -4,7 +4,6 @@ import {
   AnalyticsViewer,
   EventEnvironment,
 } from "bog-analytics";
-import { useSession } from "next-auth/react";
 interface AnalyticsContextType {
   analyticsLogger: AnalyticsLogger;
   analyticsViewer: AnalyticsViewer;
@@ -68,11 +67,6 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
 
 export const useAnalytics = () => {
   const context = useContext(AnalyticsContext);
-  const { data, status } = useSession();
-  if (!data?.user?.tracked) {
-    // context.analyticsLogger.logCustomEvent = () => new Promise() => {null};
-    // DISABLE WHEN SAMRAT ADDS THAT
-  }
   if (!context) {
     throw new Error("useAnalytics has to be used within an AnalyticsProvider");
   }
