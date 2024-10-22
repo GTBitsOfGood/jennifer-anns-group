@@ -382,6 +382,22 @@ export async function getGameById(id: string) {
   }
 }
 
+export async function fetchGameNames(gameIds: string[]) {
+  await connectMongoDB();
+  const games = await GameModel.find(
+    { _id: { $in: gameIds } },
+    { _id: 1, name: 1 },
+  );
+
+  const gameNames: Record<string, string> = {};
+
+  games.forEach((game) => {
+    gameNames[game.name] = game._id.toString(); // Map game ID to game name
+  });
+
+  return gameNames;
+}
+
 export async function resetGamesPopularity() {
   await connectMongoDB();
   await GameModel.updateMany({}, { popularity: 0 });

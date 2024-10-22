@@ -106,6 +106,29 @@ export async function getUserByEmail(email: string) {
 }
 
 /**
+ * Gets user names from list of IDs.
+ * @param {string[]} userIds Array of user IDs.
+ */
+export async function getUserNames(userIds: string[]) {
+  await connectMongoDB();
+
+  const users = await UserModel.find(
+    { _id: { $in: userIds } },
+    { _id: 1, firstName: 1, lastName: 1 },
+  );
+
+  const names = users.reduce(
+    (acc, user) => {
+      acc[user._id.toString()] = `${user.firstName} ${user.lastName}`;
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
+
+  return names;
+}
+
+/**
  * Edits a user.
  * @param {z.infer<typeof userSchema> & { _id: z.infer<typeof idSchema> }} userInfo Info of the user to find/update.
  * @throws {GenericUserErrorException} If changing email to an email that corresponds to a pre-existing account

@@ -48,16 +48,16 @@ export const columns: ColumnDef<any>[] = [
       );
     },
   },
-  {
-    id: "plays",
-    header: "Plays",
-    meta: "w-1/5",
-    cell: ({ row }) => {
-      return (
-        <div className="flex flex-row items-center gap-2">
-          <div className="flex flex-row flex-wrap">{row.original.plays}</div>
-        </div>
-      );
-    },
-  },
+  // {
+  //   id: "plays",
+  //   header: "Plays",
+  //   meta: "w-1/5",
+  //   cell: ({ row }) => {
+  //     return (
+  //       <div className="flex flex-row items-center gap-2">
+  //         <div className="flex flex-row flex-wrap">{row.original.plays}</div>
+  //       </div>
+  //     );
+  //   },
+  // },
 ];
