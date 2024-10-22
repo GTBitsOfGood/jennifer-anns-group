@@ -138,6 +138,7 @@ export const noteSchema = z.object({
   date: z.string().pipe(z.coerce.date()),
   description: z.string(),
   gameId: z.string().refine(verifyObjectId).optional(),
+  markedToDelete: z.date().optional(),
 });
 
 export enum UserLabel {
@@ -153,6 +154,7 @@ export const userSchema = z.object({
   hashedPassword: z.string(),
   firstName: z.string(),
   lastName: z.string(),
+  markedToDelete: z.date().optional(),
   notes: z.array(noteSchema),
   label: z.nativeEnum(UserLabel),
 });

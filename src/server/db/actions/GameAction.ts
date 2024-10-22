@@ -14,8 +14,8 @@ import {
 } from "@/utils/exceptions/game";
 import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
-import { getViewer } from "@/context/AnalyticsContext";
 import { SortType } from "@/utils/types";
+import { getViewer } from "@/context/AnalyticsContext";
 
 export const RESULTS_PER_PAGE = 6;
 
