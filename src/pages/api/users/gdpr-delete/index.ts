@@ -1,8 +1,8 @@
-import { z } from "zod";
 import { deleteUsersGDPR } from "@/server/db/actions/UserAction";
 import { NextApiRequest, NextApiResponse } from "next";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { InvalidAPIException } from "@/utils/exceptions/external";
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -23,7 +23,6 @@ async function deleteUsersGDPRHandler(
 ) {
   try {
     const api_key = req.headers["x-api-key"];
-    //Verify API_KEY
     if (api_key != process.env.GDPR_DELETE_API_KEY) {
       throw new InvalidAPIException();
     }

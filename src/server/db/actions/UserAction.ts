@@ -11,7 +11,6 @@ import {
   UserCredentialsIncorrectException,
   GenericUserErrorException,
 } from "@/utils/exceptions/user";
-import { InvalidAPIException } from "@/utils/exceptions/external";
 
 const SALT_ROUNDS = 10;
 const DUP_KEY_ERROR_CODE = 11000;
@@ -36,11 +35,11 @@ export async function createUser(data: z.infer<typeof createUserSchema>) {
       mongoErr.name === "MongoServerError" &&
       mongoErr.code === DUP_KEY_ERROR_CODE
     ) {
-      //Determine if that existing user was deleted or not.
+      // Determine if that existing user was deleted or not.
       const existingUser = await UserModel.findOne({ email: userData.email });
       if (existingUser && existingUser.markedToDelete) {
         userData.notes = existingUser.notes; //Transfer deleted notes
-        //Update old account
+        // Update old account
         const result = await UserModel.findByIdAndUpdate(
           existingUser._id,
           { $set: userData, $unset: { markedToDelete: null } },
@@ -122,7 +121,7 @@ export async function editUser(
 
   if (existingUser && existingUser.toObject()._id.toString() != userInfo._id) {
     if (existingUser.markedToDelete) {
-      //Transfer notes info and delete old user
+      // Transfer notes info and delete old user
       if (!userInfo.notes) {
         userInfo.notes = [];
       }
@@ -132,7 +131,7 @@ export async function editUser(
       throw new UserAlreadyExistsException();
     }
   }
-  //Ensures new notes don't overide old ones
+  // Ensures new notes don't overide old ones
   const { notes, ...newUserInfo } = userInfo;
   const result = await UserModel.findByIdAndUpdate(
     userInfo._id,
