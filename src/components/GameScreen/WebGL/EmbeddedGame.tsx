@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAnalytics } from "@/context/AnalyticsContext";
 import { userDataSchema } from "@/components/ProfileModal/ProfileModal";
 import { z } from "zod";
+import { useSession } from "next-auth/react";
 
 interface EmbeddedGameProps {
   gameId: string;
@@ -17,7 +18,7 @@ export default function EmbeddedGame({
 }: EmbeddedGameProps) {
   const ref = useRef<HTMLIFrameElement | null>(null);
   const [height, setHeight] = useState("725px");
-  // const [loadGame, setLoadGame] = useState(false);
+  const { data: session, status: sessionStatus } = useSession();
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const { analyticsLogger } = useAnalytics();
   const updateHeight = () => {
@@ -44,19 +45,24 @@ export default function EmbeddedGame({
         subtree: true,
       });
     }
-    //Analytics stuff
-    const properties = {
-      userId: userData?._id ?? "Unauthenticated",
-      userGroup: userData?.label ?? "None",
-      createdDate: Date(),
-      gameName: gameName,
-    };
-    analyticsLogger.logCustomEvent("Visit", "game", properties);
 
     return () => {
       observer.disconnect();
     };
   };
+
+  useEffect(() => {
+    if (iframeLoaded && sessionStatus == "authenticated") {
+      // Analytics stuff
+      const properties = {
+        userId: userData?._id ?? "Unauthenticated",
+        userGroup: userData?.label ?? "None",
+        createdDate: Date(),
+        gameName: gameName,
+      };
+      analyticsLogger.logCustomEvent("Visit", "game", properties);
+    }
+  }, [iframeLoaded, sessionStatus]);
 
   useEffect(() => {
     if (iframeLoaded) {

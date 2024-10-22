@@ -188,13 +188,11 @@ const GamePage = ({ mode, gameData }: Props) => {
             )}
           </>
         )}
-        {sessionStatus !== "loading" && (
-          <EmbeddedGame
-            gameId={gameData._id as string}
-            userData={currentUser}
-            gameName={curData.name}
-          />
-        )}
+        <EmbeddedGame
+          gameId={gameData._id as string}
+          userData={currentUser}
+          gameName={curData.name}
+        />
         <TabsComponent
           mode="view"
           gameData={curData}
