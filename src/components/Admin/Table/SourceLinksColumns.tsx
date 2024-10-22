@@ -18,7 +18,7 @@ export const columns: ColumnDef<any>[] = [
     header: "Hits from Page",
     meta: "w-1/3",
     cell: ({ row }) => {
-        console.log(row);
+      console.log(row);
       return (
         <div className="flex flex-row items-center gap-2">
           <div className="flex flex-row flex-wrap">{row.original.value}</div>
@@ -33,9 +33,7 @@ export const columns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex flex-row items-center gap-2">
-          <div className="flex flex-row flex-wrap">
-            {row.original.ratio}%
-          </div>
+          <div className="flex flex-row flex-wrap">{row.original.ratio}%</div>
         </div>
       );
     },
