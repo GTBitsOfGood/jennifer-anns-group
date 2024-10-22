@@ -205,3 +205,10 @@ export interface CustomVisitEvent extends CustomEvent {
     browserAgent: string;
   };
 }
+
+export enum SortType {
+  AtoZ = "A-Z",
+  MostPopular = "Most Popular",
+  LastCreated = "Last Created",
+  FirstCreated = "First Created",
+}

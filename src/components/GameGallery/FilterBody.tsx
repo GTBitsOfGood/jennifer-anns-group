@@ -47,6 +47,14 @@ export default function FilterBody({
     getAllTags();
   }, []);
 
+  useEffect(() => {
+    console.log(filters);
+    filters.gameBuilds && setSelectedGameBuilds(filters.gameBuilds);
+    filters.accessibility && setSelectedAccessibility(filters.accessibility);
+    filters.tags && setSelectedTags(filters.tags);
+    filters.gameContent && setSelectedGameContent(filters.gameContent);
+  }, [filters]);
+
   async function getAllTags() {
     const response = await fetch(`/api/tags`);
     const data = await response.json();

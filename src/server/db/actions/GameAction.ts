@@ -14,6 +14,7 @@ import {
 } from "@/utils/exceptions/game";
 import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
+import { SortType } from "@/utils/types";
 import { getViewer } from "@/context/AnalyticsContext";
 
 export const RESULTS_PER_PAGE = 6;
@@ -190,6 +191,7 @@ export async function getSelectedGames(
     page,
     initialFilterAnd,
     initialFilterOr,
+    query.sort ?? SortType.MostPopular,
   );
   const results = (await aggregate.exec())[0];
   return results;
@@ -211,11 +213,12 @@ type QueryFieldHandlers<T> = {
     field: number | undefined,
     filterFieldsAnd: FilterQuery<IGame>,
     filterFieldsOr: FilterQuery<IGame>,
+    sort: SortType,
   ) => Aggregate<{ games: GamesFilterOutput; count: number }[]>;
 };
 
 const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
-  page: (pageNum, filterFieldsAnd, filterFieldsOr) => {
+  page: (pageNum, filterFieldsAnd, filterFieldsOr, sort) => {
     const andFilters = Object.entries(filterFieldsAnd).map(([k, v]) => ({
       [k]: v,
     }));
@@ -236,7 +239,17 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
     aggregate.match({
       ...(allSteps.length > 0 && { $and: allSteps }),
     });
-    aggregate.sort({ lowercaseName: 1 });
+
+    if (sort === SortType.AtoZ) {
+      aggregate.sort({ lowercaseName: 1 });
+    } else if (sort === SortType.LastCreated) {
+      aggregate.sort({ _id: -1 });
+    } else if (sort === SortType.FirstCreated) {
+      aggregate.sort({ _id: 1 });
+    } else {
+      aggregate.sort({ popularity: -1 });
+    }
+
     aggregate.lookup({
       from: "themes",
       localField: "themes",
