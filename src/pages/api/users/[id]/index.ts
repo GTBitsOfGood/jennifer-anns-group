@@ -39,6 +39,7 @@ async function getUserHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const user = await getUser(id);
     if (!user) throw new UserDoesNotExistException();
+    user.notes = user.notes.filter((note) => !note.markedToDelete);
     res.status(HTTP_STATUS_CODE.OK).send(user);
   } catch (e: any) {
     if (e instanceof UserException) {
