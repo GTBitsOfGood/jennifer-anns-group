@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
   //Only takes in pages
   const secret = process.env.NEXTAUTH_SECRET;
   const token = await getToken({ req: request, secret });
-  if (token) {
+  if (token && token.tracked) {
     const user_label = token.label;
     const current_date = Date();
     const logger = getLogger();

@@ -12,6 +12,7 @@ import { z } from "zod";
 import { AlertKeys, accountSchema } from "@/pages/signup";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
+import PrivacyPolicyModal from "./PrivacyPolicyModal";
 
 export enum Label {
   Student = "student",
@@ -41,6 +42,7 @@ const FIRST_NAME_FORM_KEY = "firstName";
 const LAST_NAME_FORM_KEY = "lastName";
 const LABEL_FORM_KEY = "label";
 const AGE_FORM_KEY = "age";
+const TRACKED_FORM_KEY = "tracked";
 
 export const informationSchema = z.object({
   firstName: z.string().min(1, { message: "This field is required" }),
@@ -60,6 +62,7 @@ export const informationSchema = z.object({
       path: [AGE_FORM_KEY],
       message: "Sorry, you are not old enough to create an account",
     }),
+  tracked: z.boolean(),
 });
 
 interface Props {
@@ -84,7 +87,11 @@ function InformationSlide({
     lastName: undefined,
     label: undefined,
     age: undefined,
+    tracked: undefined,
   });
+
+  const [trackedChecked, setTrackedChecked] = useState<boolean>(true);
+  const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
   async function handleInformationFormSubmit(
     e: React.FormEvent<HTMLFormElement>,
@@ -96,6 +103,7 @@ function InformationSlide({
       lastName: formData.get(LAST_NAME_FORM_KEY),
       label: formData.get(LABEL_FORM_KEY),
       age: formData.get(AGE_FORM_KEY),
+      tracked: formData.get(TRACKED_FORM_KEY) === "on",
     };
     const parse = informationSchema.safeParse(input);
     if (!parse.success) {
@@ -105,6 +113,7 @@ function InformationSlide({
         lastName: errors.lastName?.at(0),
         label: errors.label?.at(0),
         age: errors.age?.at(0),
+        tracked: errors.tracked?.at(0),
       });
       return;
     }
@@ -236,6 +245,34 @@ function InformationSlide({
           {validationErrors.age}
         </p>
       </div>
+      <div className="relative col-span-2 w-full">
+        <input
+          name={TRACKED_FORM_KEY}
+          type="checkbox"
+          checked={trackedChecked}
+          onChange={(e) => setTrackedChecked(e.target.checked)}
+        />
+        <label
+          htmlFor={TRACKED_FORM_KEY}
+          className={`ml-2 text-sm ${
+            trackedChecked ? "text-blue-primary" : "text-[#7A8086]"
+          }`}
+        >
+          &#40;Optional&#41; I would like my data to help improve this site.
+          Learn more about Jennifer Ann&apos;s{" "}
+          <span
+            onClick={() => setModalOpen(true)}
+            className={`text-blue-primary underline`}
+          >
+            privacy policy
+          </span>
+          .
+        </label>
+      </div>
+      <PrivacyPolicyModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+      />
       <div className="col-span-2 flex flex-row justify-center">
         <Button type="submit" variant="outline" size="lg" className="w-fit">
           Register

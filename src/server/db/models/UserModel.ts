@@ -17,6 +17,7 @@ const UserSchema = new Schema<IUser>({
     type: [NoteSchema],
     default: [],
   },
+  tracked: { type: Boolean, default: true },
 });
 
 const UserModel =

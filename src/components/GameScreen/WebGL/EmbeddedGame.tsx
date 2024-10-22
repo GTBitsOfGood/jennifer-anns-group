@@ -52,7 +52,7 @@ export default function EmbeddedGame({
   };
 
   useEffect(() => {
-    if (iframeLoaded && sessionStatus == "authenticated") {
+    if (iframeLoaded && sessionStatus == "authenticated" && userData?.tracked) {
       // Analytics stuff
       const properties = {
         userId: userData?._id ?? "Unauthenticated",

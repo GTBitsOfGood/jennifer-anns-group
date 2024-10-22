@@ -6,7 +6,7 @@ import WarningIcon from "@/components/ui/icons/warningicon";
 import { userSchema } from "@/utils/types";
 import cn from "classnames";
 import { z } from "zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ProfileState,
   userDataSchema,
@@ -24,14 +24,23 @@ type EditProps = {
   >;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   editUser: (...args: EditUserParams) => EditUserReturnValue;
+  setPrivacyPolicyModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 function EditProfileModal(props: EditProps) {
   const FNAME_FORM_KEY = "firstName";
   const LNAME_FORM_KEY = "lastName";
   const EMAIL_FORM_KEY = "email";
+  const TRACKING_FORM_KEY = "tracking";
 
   const [invalidEmail, setInvalidEmail] = useState("");
+  const [trackedChecked, setTrackedChecked] = useState<boolean>(
+    props.userData?.tracked ?? false,
+  );
+
+  useEffect(() => {
+    setTrackedChecked(props.userData?.tracked ?? false);
+  }, [props.userData?.tracked]);
 
   async function handleProfileFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -41,6 +50,7 @@ function EditProfileModal(props: EditProps) {
       lastName: formData.get(LNAME_FORM_KEY),
       email: formData.get(EMAIL_FORM_KEY),
       label: props.userData?.label,
+      tracked: formData.get(TRACKING_FORM_KEY) === "on",
     };
     const parse = formUserSchema.safeParse(input);
     if (parse.success) {
@@ -139,6 +149,28 @@ function EditProfileModal(props: EditProps) {
                 props.userData?.label.slice(1)
               : ""}
           </p>
+        </div>
+
+        <div className="col-span-8 items-center">
+          <input
+            name={TRACKING_FORM_KEY}
+            type="checkbox"
+            checked={trackedChecked}
+            onChange={(e) => setTrackedChecked(e.target.checked)}
+          />
+          <Label
+            htmlFor={TRACKING_FORM_KEY}
+            className={`ml-3 text-right text-sm font-normal`}
+          >
+            I would like my data to help improve this site (Optional).
+            {/* Learn more about Jennifer Ann&apos;s{" "}
+            <span
+              onClick={() => props.setPrivacyPolicyModalOpen(true)}
+              className={`text-blue-primary underline`}
+            >
+              privacy policy
+            </span> */}
+          </Label>
         </div>
         <div className="col-span-8 items-center">
           <p

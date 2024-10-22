@@ -157,6 +157,7 @@ export const userSchema = z.object({
   markedToDelete: z.date().optional(),
   notes: z.array(noteSchema),
   label: z.nativeEnum(UserLabel),
+  tracked: z.boolean(),
 });
 
 // Admin

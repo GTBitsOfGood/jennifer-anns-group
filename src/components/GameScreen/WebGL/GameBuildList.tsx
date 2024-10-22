@@ -179,7 +179,7 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
         newSet.add(gameBuildName);
         return newSet;
       });
-      if (userData != undefined) {
+      if (userData != undefined && userData.tracked) {
         const properties = {
           userId: userData._id,
           userGroup: userData.label,
