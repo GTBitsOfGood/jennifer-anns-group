@@ -329,11 +329,11 @@ const CMSDashboardPage = () => {
                   </div>
                   :  
                   <PaginatedTable
-                  columns={GameInfoColumns}
-                  data={allGameData}
-                  itemsPerPage={itemsPerPage}
-                  setSelectedRow={setSelectedGameInfoRow}
-                  selectedRow={selectedGameInfoRow}
+                    columns={GameInfoColumns}
+                    data={allGameData}
+                    itemsPerPage={itemsPerPage}
+                    setSelectedRow={setSelectedGameInfoRow}
+                    selectedRow={selectedGameInfoRow}
                   />
               }
             </div>

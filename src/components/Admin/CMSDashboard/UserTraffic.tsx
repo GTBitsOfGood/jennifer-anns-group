@@ -4,6 +4,9 @@ import { useAnalytics } from "@/context/AnalyticsContext";
 import Image from "next/image";
 import { CustomVisitEvent } from "@/utils/types";
 import { Spinner } from "@chakra-ui/react";
+import { DataTable } from "../Table/DataTable";
+import { PaginatedTable } from "../Table/PaginatedTable";
+import { columns } from "../Table/SourceLinksColumns";
 
 // GROUP DATA
 export const groupMap: Record<string, string> = {
@@ -53,13 +56,16 @@ const UserTraffic = () => {
         }
       });
 
-      const referrerChartData = Object.entries(referrerCount).map(
+      let referrerChartData = Object.entries(referrerCount).map(
         ([referrer, count]) => ({
           id: referrer,
           label: referrer,
           value: count,
+          ratio: ((count / visitEvents.length) * 100).toFixed(2)
         }),
       );
+      referrerChartData = referrerChartData.filter(data => data.label != "None");
+      // We'll have to implement proper filtering later to remove local urls, but they're useful for testing
 
       setSourceData(referrerChartData);
 
@@ -138,7 +144,7 @@ const UserTraffic = () => {
       case "Major Sources":
         return <PieChart data={sourceData} type="sources" />;
       case "Links":
-        return <div>Content for Links</div>;
+        return <PaginatedTable columns={columns} itemsPerPage={12} data={sourceData} />
       case "User Groups":
         return <PieChart data={groupsData} type="groups" />;
       default:
