@@ -61,10 +61,12 @@ const UserTraffic = () => {
           id: referrer,
           label: referrer,
           value: count,
-          ratio: ((count / visitEvents.length) * 100).toFixed(2)
+          ratio: ((count / visitEvents.length) * 100).toFixed(2),
         }),
       );
-      referrerChartData = referrerChartData.filter(data => data.label != "None");
+      referrerChartData = referrerChartData.filter(
+        (data) => data.label != "None",
+      );
       // We'll have to implement proper filtering later to remove local urls, but they're useful for testing
 
       setSourceData(referrerChartData);
@@ -144,7 +146,13 @@ const UserTraffic = () => {
       case "Major Sources":
         return <PieChart data={sourceData} type="sources" />;
       case "Links":
-        return <PaginatedTable columns={columns} itemsPerPage={12} data={sourceData} />
+        return (
+          <PaginatedTable
+            columns={columns}
+            itemsPerPage={12}
+            data={sourceData}
+          />
+        );
       case "User Groups":
         return <PieChart data={groupsData} type="groups" />;
       default:
