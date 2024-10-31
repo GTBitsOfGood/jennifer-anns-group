@@ -11,6 +11,7 @@ import {
   UserException,
   UserDoesNotExistException,
 } from "@/utils/exceptions/user";
+import jwt from "jsonwebtoken";
 
 export const createUserSchema = userSchema
   .omit({ hashedPassword: true, notes: true })
@@ -50,10 +51,23 @@ async function getUserHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
+const emailObjectWithVerification = z.object({
+  email: z.string().email("Email has not been verified"),
+  emailVerified: z.boolean(),
+});
 async function createUserHandler(req: NextApiRequest, res: NextApiResponse) {
+  //Ensure verification for key
+
   try {
+    const { email, emailVerified } = emailObjectWithVerification.parse(
+      jwt.decode(req.cookies.emailVerificationJwt || ""),
+    );
     const parsedData = createUserSchema.safeParse(JSON.parse(req.body));
     if (!parsedData.success) {
+      throw new UserInvalidInputException();
+    }
+    //Invalid cookie in this case
+    if (!emailVerified || email !== parsedData.data.email) {
       throw new UserInvalidInputException();
     }
 

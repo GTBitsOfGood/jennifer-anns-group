@@ -65,6 +65,15 @@ async function editUserHandler(req: NextApiRequest, res: NextApiResponse) {
       .status(HTTP_STATUS_CODE.UNAUTHORIZED)
       .send({ error: "User has not been validated." });
   }
+
+  //Vaidate Admin if modifying password,, or email
+  if (req.body.email || req.body.hashedPassword) {
+    if (!session.user.isAdmin) {
+      return res
+        .status(HTTP_STATUS_CODE.UNAUTHORIZED)
+        .send({ error: "Admin authorization required. " });
+    }
+  }
   if (type === "info") {
     return editProfileHandler(req, res);
   } else if (type === "password") {
