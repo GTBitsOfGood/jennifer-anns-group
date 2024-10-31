@@ -34,7 +34,7 @@ async function sendPasswordResetEmailHandler(
     const user = await getUserByEmail(email); // This function will throw an error if the user does not exist
 
     const passwordResetLog = await createPasswordResetLog(email);
-    await sendPasswordResetEmail(email, passwordResetLog.token);
+    await sendPasswordResetEmail(user, passwordResetLog.token);
 
     return res
       .status(HTTP_STATUS_CODE.CREATED)

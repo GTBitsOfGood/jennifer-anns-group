@@ -62,6 +62,7 @@
     "jest": "^29.7.0",
     "jose": "^5.9.2",
     "jsonwebtoken": "^9.0.2",
+    "juno-sdk": "^0.0.5",
     "lucide-react": "^0.316.0",
     "mailersend": "^2.2.0",
     "markdown-it": "^14.0.0",
