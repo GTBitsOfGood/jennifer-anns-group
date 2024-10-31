@@ -154,7 +154,7 @@ export async function editUser(
       throw new UserAlreadyExistsException();
     }
   }
-  // Ensures new notes don't overide old ones
+  // Ensures new notes don't overide old ones //Found bug in my old
   const { notes, ...newUserInfo } = userInfo;
   const result = await UserModel.findByIdAndUpdate(
     userInfo._id,

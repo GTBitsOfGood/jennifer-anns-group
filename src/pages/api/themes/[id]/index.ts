@@ -7,7 +7,7 @@ import {
   ThemeException,
 } from "@/utils/exceptions/theme";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
-import { authenticate } from "@/middleware";
+import { authenticate } from "../../auth/[...nextauth]";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

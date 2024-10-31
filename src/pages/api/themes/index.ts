@@ -7,7 +7,8 @@ import {
 } from "@/server/db/actions/ThemeAction";
 import { z } from "zod";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
-import { authenticate } from "@/middleware";
+
+import { authenticate } from "../auth/[...nextauth]";
 import {
   ThemeException,
   ThemeInvalidInputException,

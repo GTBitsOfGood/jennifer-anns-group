@@ -11,14 +11,18 @@ import {
   editHomePage,
   getHomePage,
 } from "@/server/db/actions/HomePageAction";
-
+import { authenticate } from "../auth/[...nextauth]";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
   try {
     const homePage = await getHomePage();
-
+    //Authentication
+    const authenticated = await authenticate(req, res, ["PUT"], true);
+    if (authenticated !== true) {
+      return authenticated;
+    }
     switch (req.method) {
       case "PUT":
         if (homePage) {

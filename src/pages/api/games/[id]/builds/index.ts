@@ -10,8 +10,18 @@ import {
 import { NextApiResponse } from "next";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { BucketType, getDirectUploadUrl } from "@/utils/file";
-
+import { authenticate } from "@/pages/api/auth/[...nextauth]";
 export default async function handler(req: any, res: NextApiResponse) {
+  //Authentication
+  const authenticated = await authenticate(
+    req,
+    res,
+    ["POST", "DELETE", "PUT"],
+    true,
+  ); //For now only admins can interact with builds, not sure what other rules may be allowed to do so
+  if (authenticated !== true) {
+    return authenticated;
+  }
   switch (req.method) {
     case "POST":
       return createBuildHandler(req, res);

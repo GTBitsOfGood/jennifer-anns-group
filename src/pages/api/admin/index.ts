@@ -10,7 +10,7 @@ import {
 } from "@/utils/exceptions/admin";
 import { adminSchema } from "@/utils/types";
 import { NextApiRequest, NextApiResponse } from "next";
-import { authenticate } from "@/middleware";
+import { authenticate } from "../auth/[...nextauth]";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

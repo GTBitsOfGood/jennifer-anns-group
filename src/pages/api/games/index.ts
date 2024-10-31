@@ -22,11 +22,16 @@ import { ITag } from "@/server/db/models/TagModel";
 import { ITheme } from "@/server/db/models/ThemeModel";
 import { IBuild, IGame } from "@/server/db/models/GameModel";
 import { SortType } from "@/utils/types";
-
+import { authenticate } from "../auth/[...nextauth]";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
+  //Authentication
+  const authenticated = await authenticate(req, res, ["POST"], true);
+  if (authenticated !== true) {
+    return authenticated;
+  }
   switch (req.method) {
     case "GET":
       return getGamesHandler(req, res);

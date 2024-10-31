@@ -54,6 +54,17 @@ async function getUserHandler(req: NextApiRequest, res: NextApiResponse) {
 async function editUserHandler(req: NextApiRequest, res: NextApiResponse) {
   const type = req.query.type;
 
+  //Either admin or same user
+
+  const session = await getServerSession(req, res, authOptions);
+  if (
+    !session ||
+    (session.user._id !== req.body._id && !session.user.isAdmin)
+  ) {
+    return res
+      .status(HTTP_STATUS_CODE.UNAUTHORIZED)
+      .send({ error: "User has not been validated." });
+  }
   if (type === "info") {
     return editProfileHandler(req, res);
   } else if (type === "password") {
