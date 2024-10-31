@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
+import { NextApiRequest, NextApiResponse } from "next";
 import { getToken } from "next-auth/jwt";
 import {
   getBrowserName,
   getLogger,
   logVisitEventServer,
 } from "./context/AnalyticsContext";
-
+import { authOptions } from "./pages/api/auth/[...nextauth]";
+import { getServerSession } from "next-auth";
+import { HTTP_STATUS_CODE } from "./utils/consts";
 export async function middleware(request: NextRequest) {
   //Only takes in pages
   const secret = process.env.NEXTAUTH_SECRET;
@@ -34,6 +37,28 @@ export async function middleware(request: NextRequest) {
   }
   return NextResponse.next();
 }
+
+export const authenticate = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  methods: string[],
+  adminRequired: boolean = false,
+) => {
+  if (req.method == undefined) {
+    return res.status(HTTP_STATUS_CODE.METHOD_NOT_ALLOWED).json({
+      error: `No request method provided`,
+    });
+  }
+  if (methods.includes(req.method)) {
+    const session = await getServerSession(req, res, authOptions);
+    if (!session || !(session.user.label == "administrator" && adminRequired)) {
+      return res
+        .status(HTTP_STATUS_CODE.UNAUTHORIZED)
+        .send({ error: "Unauthorized" });
+    }
+  }
+  return true;
+};
 
 export const config = {
   // routes that middleware applies to, exclude api, static, raw files, etc.
