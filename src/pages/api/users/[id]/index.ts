@@ -15,11 +15,21 @@ import {
 import AdminModel from "@/server/db/models/AdminModel";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]";
-
+import { authenticateAdminOrSameUser } from "../../auth/[...nextauth]";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
+  //Endpoints only accessible by admin or same user
+  const authenticated = await authenticateAdminOrSameUser(
+    req,
+    res,
+    req.body._id,
+  );
+  if (authenticated !== true) {
+    return authenticated;
+  }
+
   switch (req.method) {
     case "GET":
       return getUserHandler(req, res);
@@ -53,22 +63,14 @@ async function getUserHandler(req: NextApiRequest, res: NextApiResponse) {
 
 async function editUserHandler(req: NextApiRequest, res: NextApiResponse) {
   const type = req.query.type;
-
-  //Either admin or same user
-
   const session = await getServerSession(req, res, authOptions);
-  if (
-    !session ||
-    (session.user._id !== req.body._id && !session.user.isAdmin)
-  ) {
-    return res
-      .status(HTTP_STATUS_CODE.UNAUTHORIZED)
-      .send({ error: "User has not been validated." });
-  }
-
   //Vaidate Admin if modifying password,, or email
-  if (req.body.email || req.body.hashedPassword) {
-    if (!session.user.isAdmin) {
+  if (
+    req.body.email !== session?.user.email ||
+    type === "password" ||
+    type === "resetpassword"
+  ) {
+    if (!session || !session.user.isAdmin) {
       return res
         .status(HTTP_STATUS_CODE.UNAUTHORIZED)
         .send({ error: "Admin authorization required. " });

@@ -2,11 +2,15 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getUserNames } from "../../../../server/db/actions/UserAction";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { UserDoesNotExistException } from "@/utils/exceptions/user";
-
+import { authenticate } from "../../auth/[...nextauth]";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
+  const authenticated = await authenticate(req, res, ["POST"], true);
+  if (authenticated !== true) {
+    return authenticated;
+  }
   if (req.method === "POST") {
     return getUserNamesHandler(req, res);
   }

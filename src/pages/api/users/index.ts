@@ -34,7 +34,7 @@ export default async function handler(
       });
   }
 }
-
+//Needs to be insecure but also is a weekendpoint
 async function getUserHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const email = String(req.query.email);
