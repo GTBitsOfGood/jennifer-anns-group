@@ -27,7 +27,6 @@ async function getUserNamesHandler(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     const names = await getUserNames(userIds);
-    console.log("names", names);
     res.status(HTTP_STATUS_CODE.OK).send({ names });
   } catch (e: any) {
     if (e instanceof UserDoesNotExistException) {
