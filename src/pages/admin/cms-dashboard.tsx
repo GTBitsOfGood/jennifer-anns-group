@@ -14,6 +14,10 @@ import { CustomVisitEvent } from "@/utils/types";
 import { EventEnvironment } from "bog-analytics";
 import { Spinner } from "@chakra-ui/react";
 import { set } from "mongoose";
+import Papa from "papaparse";
+import { Button } from "@/components/ui/button";
+import { ArrowDownToLine, Download } from "lucide-react";
+import * as XLSX from "xlsx";
 
 interface PieChartDataProps {
   id: string;
@@ -307,18 +311,61 @@ const CMSDashboardPage = () => {
     updateLeaderboardNames();
   }, [selectedGameInfoRow, userLeaderboard]);
 
+  function downloadDataXLSX() {
+    let gameInfo = allGameData.map(
+      ({ gameTitle, hitsToPage, hitsToPDF, downloads }) => ({
+        "Game Title": gameTitle,
+        "Hits To Page": hitsToPage,
+        "Hits To PDF": hitsToPDF,
+        Downloads: downloads,
+      }),
+    );
+    // let csv = Papa.unparse(processedData);
+    // const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+
+    // const link = document.createElement("a");
+
+    // if (link.download !== undefined) {
+    //   const url = URL.createObjectURL(blob);
+    //   link.setAttribute("href", url);
+    //   link.setAttribute("download", "GameInfo.csv");
+
+    //   document.body.appendChild(link);
+
+    //   link.click();
+
+    //   document.body.removeChild(link);
+    //   URL.revokeObjectURL(url);
+    // }
+    let wb = XLSX.utils.book_new();
+    let ws = XLSX.utils.json_to_sheet(gameInfo);
+    XLSX.utils.book_append_sheet(wb, ws, "Game Info");
+    userLeaderboard.map((entry, i) => {
+      let ws = XLSX.utils.json_to_sheet(entry);
+      let gameName = gameInfo[i]["Game Title"];
+      if (gameName.length > 15) {
+        gameName = gameName.substring(0, 11) + "...";
+      }
+      let name = "Leaderboard " + (i + 1) + " (" + gameName + ")";
+
+      XLSX.utils.book_append_sheet(wb, ws, name);
+    });
+    XLSX.writeFile(wb, `DashboardAnalytics.xlsx`);
+  }
+
   return (
     <AdminTabs page={Pages.CMSDASHBOARD}>
-      {/* prettier-ignore */}
-      <div className="bg-orange-light-bg my-6 flex items-stretch rounded-2xl p-12">
-        <div className="flex w-3/5 flex-col gap-6">
-          <div className="rounded-2xl bg-white p-6 text-2xl text-black">
-            <UserTraffic />
-          </div>
-          <div className="flex h-full flex-col rounded-2xl bg-white p-6 text-2xl text-black">
-            <p>Game Info</p>
-            <div className="flex-grow overflow-auto">
-              {loading ? 
+      <div className="my-6 flex flex-col gap-6 rounded-2xl bg-orange-light-bg p-12">
+        <div className="flex items-stretch">
+          <div className="flex w-3/5 flex-col gap-6">
+            <div className="flex flex-col rounded-2xl bg-white p-6 text-2xl text-black">
+              <UserTraffic />
+              {/* <Button variant="primary" onClick={downloadCSV}>Download</Button> */}
+            </div>
+            <div className="flex h-full flex-col rounded-2xl bg-white p-6 text-2xl text-black">
+              <p>Game Info</p>
+              <div className="flex-grow overflow-auto">
+                {loading ? (
                   <div className="flex items-center justify-center py-10">
                     <Spinner
                       className="mb-5 h-10 w-10"
@@ -327,7 +374,7 @@ const CMSDashboardPage = () => {
                       color="#164C96"
                     />
                   </div>
-                  :  
+                ) : (
                   <PaginatedTable
                     columns={GameInfoColumns}
                     data={allGameData}
@@ -335,57 +382,66 @@ const CMSDashboardPage = () => {
                     setSelectedRow={setSelectedGameInfoRow}
                     selectedRow={selectedGameInfoRow}
                   />
-              }
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="relative h-64 w-6 bg-orange-light-bg">
+            {/* White triangle to indicate which game's detailed info is being displayed */}
+            <div
+              className="h-0 w-0 border-b-[15px] border-r-[25px] border-t-[15px] border-b-transparent border-r-white border-t-transparent"
+              style={{
+                transform: `translateY(${(selectedGameInfoRow % itemsPerPage) * 53 + 505}px)`,
+              }}
+            ></div>
+          </div>
+          <div className="flex w-2/5 flex-col gap-6 rounded-2xl bg-white p-6 text-2xl text-black">
+            {allGameData[selectedGameInfoRow]?.gameTitle ?? ""}
+            <div className="rounded-2xl border-[1px] border-orange-primary p-4 text-base text-black">
+              User Groups
+              {loading ? (
+                <div className="flex items-center justify-center py-10">
+                  <Spinner
+                    className="mb-5 h-10 w-10"
+                    thickness="4px"
+                    emptyColor="#98A2B3"
+                    color="#164C96"
+                  />
+                </div>
+              ) : (
+                <UserGroupsByGame
+                  data={allGameData[selectedGameInfoRow]?.userGroupsData ?? []}
+                />
+              )}
+            </div>
+            <div className="flex flex-grow flex-col rounded-2xl border-[1px] border-orange-primary p-4 text-base text-black">
+              <p>User Leaderboard</p>
+              {loading ? (
+                <div className="flex items-center justify-center py-10">
+                  <Spinner
+                    className="mb-5 h-10 w-10"
+                    thickness="4px"
+                    emptyColor="#98A2B3"
+                    color="#164C96"
+                  />
+                </div>
+              ) : (
+                <PaginatedTable
+                  columns={UserLeaderboardColumns}
+                  data={userLeaderboard[selectedGameInfoRow] ?? []}
+                  itemsPerPage={itemsPerPage}
+                />
+              )}
             </div>
           </div>
         </div>
-         {/* prettier-ignore */}
-        <div className="bg-orange-light-bg relative h-64 w-6">
-          {/* White triangle to indicate which game's detailed info is being displayed */}
-          <div
-            className="h-0 w-0 border-b-[15px] border-r-[25px] border-t-[15px] border-b-transparent border-r-white border-t-transparent"
-            style={{
-              transform: `translateY(${(selectedGameInfoRow % itemsPerPage) * 53 + 500}px)`,
-            }}
-          ></div>
-        </div>
-        <div className="flex w-2/5 flex-col gap-6 rounded-2xl bg-white p-6 text-2xl text-black">
-          {allGameData[selectedGameInfoRow]?.gameTitle ?? ""}
-          <div className="rounded-2xl border-[1px] border-orange-primary p-4 text-base text-black">
-            User Groups
-            {loading ? 
-              <div className="flex items-center justify-center py-10">
-                <Spinner
-                  className="mb-5 h-10 w-10"
-                  thickness="4px"
-                  emptyColor="#98A2B3"
-                  color="#164C96"
-                />
-              </div>
-              :  
-              <UserGroupsByGame data={allGameData[selectedGameInfoRow]?.userGroupsData ?? []}/>
-            }
-          </div>
-          <div className="flex flex-grow flex-col rounded-2xl border-[1px] border-orange-primary p-4 text-base text-black">
-            <p>User Leaderboard</p>
-            {loading ? 
-              <div className="flex items-center justify-center py-10">
-                <Spinner
-                  className="mb-5 h-10 w-10"
-                  thickness="4px"
-                  emptyColor="#98A2B3"
-                  color="#164C96"
-                />
-              </div>
-              :  
-              <PaginatedTable
-              columns={UserLeaderboardColumns}
-              data={userLeaderboard[selectedGameInfoRow] ?? []}
-              itemsPerPage={itemsPerPage}
-              />
-            }
-          </div>
-        </div>
+        <Button
+          className="flex min-h-14 gap-2 text-xl"
+          variant="primary"
+          onClick={downloadDataXLSX}
+        >
+          Download XLSX <ArrowDownToLine size={24} />
+        </Button>
       </div>
     </AdminTabs>
   );
