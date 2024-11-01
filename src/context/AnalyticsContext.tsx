@@ -8,6 +8,7 @@ interface AnalyticsContextType {
   analyticsLogger: AnalyticsLogger;
   analyticsViewer: AnalyticsViewer;
 }
+import { useSession } from "next-auth/react";
 
 // Create context for provider
 const AnalyticsContext = createContext<AnalyticsContextType | null>(null);
@@ -96,6 +97,12 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
 }) => {
   const [analyticsLogger] = useState<AnalyticsLogger>(logger);
   const [analyticsViewer] = useState<AnalyticsViewer>(viewer);
+  const { data: session } = useSession();
+  if (session?.user?.tracked) {
+    analyticsLogger.enable();
+  } else {
+    analyticsLogger.disable();
+  }
   return (
     <AnalyticsContext.Provider value={{ analyticsLogger, analyticsViewer }}>
       {children}
