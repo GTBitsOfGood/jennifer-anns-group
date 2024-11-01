@@ -172,6 +172,9 @@ const exported = {
       "http://localhost:3000",
       "https://jennifer-anns.netlify.app",
       "https://dev--jennifer-anns.netlify.app",
+      "https://production--jennifer-anns.netlify.app",
+      "https://main--jennifer-anns.netlify.app",
+      "https://selgames.org/",
     ];
 
     if (allowedOrigins.includes(origin)) {

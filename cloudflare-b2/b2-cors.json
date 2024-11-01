@@ -1,12 +1,14 @@
 [
   {
     "allowedHeaders": ["*"],
-    "allowedOperations": ["b2_upload_file"],
+    "allowedOperations": ["b2_upload_file", "b2_download_file_by_id", "b2_download_file_by_name"],
     "allowedOrigins": [
       "http://localhost:3000",
       "https://jennifer-anns.netlify.app",
       "https://dev--jennifer-anns.netlify.app",
-      "https://production--jennifer-anns.netlify.app"
+      "https://main--jennifer-anns.netlify.app",
+      "https://production--jennifer-anns.netlify.app",
+      "https://selgames.org"
     ],
     "corsRuleName": "uploadFromLocalhostNetlify",
     "exposeHeaders": null,

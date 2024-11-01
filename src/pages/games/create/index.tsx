@@ -113,30 +113,24 @@ function CreateGame() {
   const hiddenImagePreviewRef = useRef<HTMLInputElement>(null);
   const [themes, setThemes] = useState<ExtendId<ITheme>[]>([]);
   const [selectedThemes, setSelectedThemes] = useState<ExtendId<ITheme>[]>([]);
-
   const [uploadedWebGL, setUploadedWebGL] = useState(false);
-
   const [accessibilityTags, setAccessibilityTags] = useState<ExtendId<ITag>[]>(
     [],
   );
   const [selectedAccessibilityTags, setSelectedAccessibilityTags] = useState<
     ExtendId<ITag>[]
   >([]);
-
   const [customTags, setCustomTags] = useState<ExtendId<ITag>[]>([]);
   const [selectedCustomTags, setSelectedCustomTags] = useState<
     ExtendId<ITag>[]
   >([]);
-
   const [builds, setBuilds] = useState<z.infer<typeof buildSchema>[]>([]);
-
+  const [submitting, setSubmitting] = useState<boolean>(false);
   const [loaderFile, setLoaderFile] = useState<null | File>(null);
   const [dataFile, setDataFile] = useState<null | File>(null);
   const [codeFile, setCodeFile] = useState<null | File>(null);
   const [frameworkFile, setFrameworkFile] = useState<null | File>(null);
-
   const [imagePreviewFile, setImagePreviewFile] = useState<null | File>(null);
-
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string | undefined>
   >({
@@ -146,7 +140,6 @@ function CreateGame() {
     description: undefined,
     builds: undefined,
   });
-
   const [uploadGameComponents, setUploadGameComponents] = useState<
     React.JSX.Element[]
   >([
@@ -301,7 +294,7 @@ function CreateGame() {
     return true;
   }
 
-  function validateImage() {
+  async function validateImage(): Promise<boolean> {
     if (imagePreviewFile) {
       if (
         imagePreviewFile.type !== "image/png" &&
@@ -314,27 +307,32 @@ function CreateGame() {
         }));
         return false;
       }
-      const img = new Image();
-      img.src = URL.createObjectURL(imagePreviewFile);
-      img.onload = () => {
-        const naturalWidth = img.naturalWidth;
-        const naturalHeight = img.naturalHeight;
-        URL.revokeObjectURL(img.src);
-        if (naturalWidth !== 630 || naturalHeight !== 500) {
+
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = URL.createObjectURL(imagePreviewFile);
+        img.onload = () => {
+          const naturalWidth = img.naturalWidth;
+          const naturalHeight = img.naturalHeight;
+          URL.revokeObjectURL(img.src);
+          if (naturalWidth !== 630 || naturalHeight !== 500) {
+            setValidationErrors((prevValidationErrors) => ({
+              ...prevValidationErrors,
+              image: "Image must have dimensions 630x500 pixels.",
+            }));
+            resolve(false);
+          } else {
+            resolve(true);
+          }
+        };
+        img.onerror = () => {
           setValidationErrors((prevValidationErrors) => ({
             ...prevValidationErrors,
-            image: "Image must have dimensions 630x500 pixels.",
+            image: "Image failed to load",
           }));
-          return false;
-        }
-      };
-      img.onerror = () => {
-        setValidationErrors((prevValidationErrors) => ({
-          ...prevValidationErrors,
-          image: "Image failed to load",
-        }));
-        return false;
-      };
+          resolve(false);
+        };
+      });
     }
     return true;
   }
@@ -387,7 +385,7 @@ function CreateGame() {
     };
     const parse = gameSchema.safeParse(input);
 
-    const validImage = validateImage();
+    const validImage = await validateImage();
     const validVideo = validateVideoTrailer(
       formData.get(TRAILER_FORM_KEY) as string,
     );
@@ -398,7 +396,14 @@ function CreateGame() {
       return;
     }
 
-    if (parse.success) {
+    if (
+      validationErrors &&
+      Object.values(validationErrors).some((value) => value !== undefined)
+    ) {
+      return;
+    }
+
+    if (parse.success && !submitting) {
       setValidationErrors({
         name: undefined,
         image: undefined,
@@ -425,18 +430,18 @@ function CreateGame() {
       }
     } else {
       setSubmitting(false);
-      const errors = parse.error.formErrors.fieldErrors;
-      setValidationErrors({
-        name: errors.name?.at(0),
-        image: errors.image?.at(0),
-        videoTrailer: errors.videoTrailer?.at(0),
-        description: errors.description?.at(0),
-        builds: errors.builds?.at(0),
-      });
+      if ((parse as { error: any }).error) {
+        const errors = (parse as { error: any }).error.formErrors.fieldErrors;
+        setValidationErrors({
+          name: errors.name?.at(0),
+          image: errors.image?.at(0),
+          videoTrailer: errors.videoTrailer?.at(0),
+          description: errors.description?.at(0),
+          builds: errors.builds?.at(0),
+        });
+      }
     }
   }
-
-  const [submitting, setSubmitting] = useState<boolean>(false);
 
   const handleWebGLSubmit = async (gameId: string): Promise<boolean> => {
     if (

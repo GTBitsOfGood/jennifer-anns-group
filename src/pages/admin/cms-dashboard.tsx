@@ -41,6 +41,77 @@ type GameData = {
   userGroupsData: PieChartDataProps[];
 };
 
+const formatUserTrafficData = (
+  visitEvents: any[],
+): {
+  sourceData: PieChartDataProps[];
+  groupsData: PieChartDataProps[];
+} => {
+  // No data
+  if (!visitEvents || (visitEvents && visitEvents.length === 0)) {
+    const sourceData: PieChartDataProps[] = [];
+    const groupsData: PieChartDataProps[] = [];
+    return { sourceData, groupsData };
+  }
+
+  // SOURCE DATA
+  const referrerCount: Record<string, number> = {};
+
+  visitEvents.forEach((event: CustomVisitEvent) => {
+    const referrer = event.properties.referrer;
+    if (referrer in referrerCount) {
+      referrerCount[referrer]++;
+    } else {
+      referrerCount[referrer] = 1;
+    }
+  });
+
+  let referrerChartData = Object.entries(referrerCount).map(
+    ([referrer, count]) => ({
+      id: referrer,
+      label: referrer,
+      value: count,
+      ratio: ((count / visitEvents.length) * 100).toFixed(2),
+    }),
+  );
+  referrerChartData = referrerChartData.filter((data) => data.label != "None");
+  // We'll have to implement proper filtering later to remove local urls, but they're useful for testing
+
+  const sourceData = referrerChartData;
+
+  // GROUP DATA
+  const userGroupCount: Record<string, number> = {
+    Student: 0,
+    Educator: 0,
+    Parent: 0,
+    Admin: 0,
+  };
+
+  visitEvents.forEach((event: CustomVisitEvent) => {
+    const group = groupMap[event.properties.userGroup];
+    if (
+      group === "Student" ||
+      group === "Educator" ||
+      group === "Parent" ||
+      group === "Admin"
+    ) {
+      userGroupCount[group]++;
+    }
+  });
+
+  const groupChartData = Object.entries(userGroupCount).map(
+    ([group, count]) => ({
+      id: group,
+      label: group,
+      value: count,
+    }),
+  );
+
+  const groupsData = groupChartData;
+
+  return { sourceData, groupsData };
+};
+
 const formatGameEventsData = async (
   gameEvents?: any[],
   pdfEvents?: any[],
@@ -186,12 +257,20 @@ const formatGameEventsData = async (
 
   return { gameData, leaderboardData };
 };
+
 const CMSDashboardPage = () => {
+  const [dataAge, setDataAge] = useState("day");
   const [selectedGameInfoRow, setSelectedGameInfoRow] = useState<number>(2);
   const itemsPerPage = 8;
 
   const { analyticsViewer } = useAnalytics();
   const [loading, setLoading] = useState(true);
+  const [trafficSourceData, setTrafficSourceData] = useState<
+    PieChartDataProps[]
+  >([]);
+  const [trafficGroupsData, setTrafficGroupsData] = useState<
+    PieChartDataProps[]
+  >([]);
   const [allGameData, setAllGameData] = useState<GameData[]>([]);
   const [userLeaderboard, setUserLeaderboard] = useState<
     UserLeaderboardEntry[][]
@@ -200,6 +279,36 @@ const CMSDashboardPage = () => {
   const getData = async () => {
     try {
       setLoading(true);
+
+      const afterTime = new Date();
+      switch (dataAge) {
+        case "day":
+          afterTime.setDate(afterTime.getDate() - 1);
+          break;
+        case "week":
+          afterTime.setDate(afterTime.getDate() - 7);
+          break;
+        case "month":
+          afterTime.setDate(afterTime.getDate() - 30);
+          break;
+      }
+
+      const visitQueryParams = {
+        projectName: "Jennifer Ann's",
+        environment: EventEnvironment.DEVELOPMENT,
+        category: "Visit",
+        subcategory: "Visit",
+        limit: 50000,
+        afterId: undefined,
+        afterTime: afterTime.toString(),
+      };
+      const visitEvents =
+        await analyticsViewer.getCustomEventsPaginated(visitQueryParams);
+
+      const { sourceData, groupsData } = formatUserTrafficData(
+        visitEvents ? visitEvents.events : [],
+      );
+
       const downloadQueryParams = {
         projectName: "Jennifer Ann's",
         environment: EventEnvironment.DEVELOPMENT,
@@ -222,23 +331,14 @@ const CMSDashboardPage = () => {
       const pdfEvents =
         await analyticsViewer.getCustomEventsPaginated(pdfQueryParams);
 
-      const visitQueryParams = {
-        projectName: "Jennifer Ann's",
-        environment: EventEnvironment.DEVELOPMENT,
-        category: "Visit",
-        subcategory: "Visit",
-        limit: 50000,
-        afterId: undefined,
-      };
-      const visitEvents =
-        await analyticsViewer.getCustomEventsPaginated(visitQueryParams);
-
       const { gameData, leaderboardData } = await formatGameEventsData(
         gameEvents?.events,
         pdfEvents?.events,
         visitEvents?.events,
       );
 
+      setTrafficSourceData(sourceData);
+      setTrafficGroupsData(groupsData);
       setAllGameData(gameData);
       setUserLeaderboard(leaderboardData);
     } catch (e) {
@@ -250,7 +350,7 @@ const CMSDashboardPage = () => {
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [dataAge]); // re-fetch data when data age limit is changed
 
   useEffect(() => {
     const initialSelectedRow = selectedGameInfoRow;
@@ -355,67 +455,44 @@ const CMSDashboardPage = () => {
 
   return (
     <AdminTabs page={Pages.CMSDASHBOARD}>
-      <div className="my-6 flex flex-col gap-6 rounded-2xl bg-orange-light-bg p-12">
-        <div className="flex items-stretch">
-          <div className="flex w-3/5 flex-col gap-6">
-            <div className="flex flex-col rounded-2xl bg-white p-6 text-2xl text-black">
-              <UserTraffic />
-              {/* <Button variant="primary" onClick={downloadCSV}>Download</Button> */}
-            </div>
-            <div className="flex h-full flex-col rounded-2xl bg-white p-6 text-2xl text-black">
-              <p>Game Info</p>
-              <div className="flex-grow overflow-auto">
-                {loading ? (
-                  <div className="flex items-center justify-center py-10">
-                    <Spinner
-                      className="mb-5 h-10 w-10"
-                      thickness="4px"
-                      emptyColor="#98A2B3"
-                      color="#164C96"
-                    />
-                  </div>
-                ) : (
-                  <PaginatedTable
-                    columns={GameInfoColumns}
-                    data={allGameData}
-                    itemsPerPage={itemsPerPage}
-                    setSelectedRow={setSelectedGameInfoRow}
-                    selectedRow={selectedGameInfoRow}
-                  />
-                )}
-              </div>
-            </div>
+      <div className="flex">
+        <button
+          className={
+            dataAge === "day" ? "p-6 text-orange-primary" : "p-6 text-black"
+          }
+          onClick={() => setDataAge("day")}
+        >
+          Day
+        </button>
+        <button
+          className={
+            dataAge === "week" ? "p-6 text-orange-primary" : "p-6 text-black"
+          }
+          onClick={() => setDataAge("week")}
+        >
+          Week
+        </button>
+        <button
+          className={
+            dataAge === "month" ? "p-6 text-orange-primary" : "p-6 text-black"
+          }
+          onClick={() => setDataAge("month")}
+        >
+          Month
+        </button>
+      </div>
+      <div className="my-6 flex items-stretch rounded-2xl bg-orange-light-bg p-12">
+        <div className="flex w-3/5 flex-col gap-6">
+          <div className="rounded-2xl bg-white p-6 text-2xl text-black">
+            <UserTraffic
+              trafficSourceData={trafficSourceData}
+              trafficGroupsData={trafficGroupsData}
+              loading={loading}
+            />
           </div>
-          <div className="relative h-64 w-6 bg-orange-light-bg">
-            {/* White triangle to indicate which game's detailed info is being displayed */}
-            <div
-              className="h-0 w-0 border-b-[15px] border-r-[25px] border-t-[15px] border-b-transparent border-r-white border-t-transparent"
-              style={{
-                transform: `translateY(${(selectedGameInfoRow % itemsPerPage) * 53 + 505}px)`,
-              }}
-            ></div>
-          </div>
-          <div className="flex w-2/5 flex-col gap-6 rounded-2xl bg-white p-6 text-2xl text-black">
-            {allGameData[selectedGameInfoRow]?.gameTitle ?? ""}
-            <div className="rounded-2xl border-[1px] border-orange-primary p-4 text-base text-black">
-              User Groups
-              {loading ? (
-                <div className="flex items-center justify-center py-10">
-                  <Spinner
-                    className="mb-5 h-10 w-10"
-                    thickness="4px"
-                    emptyColor="#98A2B3"
-                    color="#164C96"
-                  />
-                </div>
-              ) : (
-                <UserGroupsByGame
-                  data={allGameData[selectedGameInfoRow]?.userGroupsData ?? []}
-                />
-              )}
-            </div>
-            <div className="flex flex-grow flex-col rounded-2xl border-[1px] border-orange-primary p-4 text-base text-black">
-              <p>User Leaderboard</p>
+          <div className="flex h-full flex-col rounded-2xl bg-white p-6 text-2xl text-black">
+            <p>Game Info</p>
+            <div className="flex-grow overflow-auto">
               {loading ? (
                 <div className="flex items-center justify-center py-10">
                   <Spinner
@@ -427,21 +504,65 @@ const CMSDashboardPage = () => {
                 </div>
               ) : (
                 <PaginatedTable
-                  columns={UserLeaderboardColumns}
-                  data={userLeaderboard[selectedGameInfoRow] ?? []}
+                  columns={GameInfoColumns}
+                  data={allGameData}
                   itemsPerPage={itemsPerPage}
+                  setSelectedRow={setSelectedGameInfoRow}
+                  selectedRow={selectedGameInfoRow}
                 />
               )}
             </div>
           </div>
         </div>
-        <Button
-          className="flex min-h-14 gap-2 text-xl"
-          variant="primary"
-          onClick={downloadDataXLSX}
-        >
-          Download XLSX <ArrowDownToLine size={24} />
-        </Button>
+
+        <div className="relative h-64 w-6 bg-orange-light-bg">
+          {/* White triangle to indicate which game's detailed info is being displayed */}
+          <div
+            className="h-0 w-0 border-b-[15px] border-r-[25px] border-t-[15px] border-b-transparent border-r-white border-t-transparent"
+            style={{
+              transform: `translateY(${(selectedGameInfoRow % itemsPerPage) * 53 + 500}px)`,
+            }}
+          ></div>
+        </div>
+        <div className="flex w-2/5 flex-col gap-6 rounded-2xl bg-white p-6 text-2xl text-black">
+          {allGameData[selectedGameInfoRow]?.gameTitle ?? ""}
+          <div className="rounded-2xl border-[1px] border-orange-primary p-4 text-base text-black">
+            User Groups
+            {loading ? (
+              <div className="flex items-center justify-center py-10">
+                <Spinner
+                  className="mb-5 h-10 w-10"
+                  thickness="4px"
+                  emptyColor="#98A2B3"
+                  color="#164C96"
+                />
+              </div>
+            ) : (
+              <UserGroupsByGame
+                data={allGameData[selectedGameInfoRow]?.userGroupsData ?? []}
+              />
+            )}
+          </div>
+          <div className="flex flex-grow flex-col rounded-2xl border-[1px] border-orange-primary p-4 text-base text-black">
+            <p>User Leaderboard</p>
+            {loading ? (
+              <div className="flex items-center justify-center py-10">
+                <Spinner
+                  className="mb-5 h-10 w-10"
+                  thickness="4px"
+                  emptyColor="#98A2B3"
+                  color="#164C96"
+                />
+              </div>
+            ) : (
+              <PaginatedTable
+                columns={UserLeaderboardColumns}
+                data={userLeaderboard[selectedGameInfoRow] ?? []}
+                itemsPerPage={itemsPerPage}
+              />
+            )}
+          </div>
+        </div>
       </div>
     </AdminTabs>
   );
