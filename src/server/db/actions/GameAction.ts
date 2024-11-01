@@ -16,6 +16,7 @@ import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
 import { SortType } from "@/utils/types";
 import { getViewer } from "@/context/AnalyticsContext";
+import connectB2 from "../b2";
 
 export const RESULTS_PER_PAGE = 6;
 
@@ -66,6 +67,7 @@ export async function deleteGame(data: mongoose.Types.ObjectId) {
     if (!deletedGame) {
       throw new GameNotFoundException();
     }
+    await deleteApplicationFiles(deletedGame);
     if (deletedGame?.webGLBuild) {
       await deleteBuild(data.toString());
     }
@@ -74,6 +76,47 @@ export async function deleteGame(data: mongoose.Types.ObjectId) {
     throw e;
   }
 }
+
+async function deleteApplicationFiles(game: IGame | null) {
+  const fields: Array<keyof IGame> = [
+    "image",
+    "lesson",
+    "parentingGuide",
+    "answerKey",
+  ];
+  const deletedFiles: any[] = [];
+
+  for (const field of fields) {
+    if (game && game[field]) {
+      // get last part after / which is file name in backblaze
+      const urlParts = (game[field] as string).split("/");
+      const lastPart = urlParts[urlParts.length - 1];
+
+      const b2 = await connectB2();
+
+      const bucketId = process.env.B2_BUCKET_ID_APPLICATION;
+      const response = await b2.listFileNames({
+        bucketId,
+        prefix: lastPart,
+        delimiter: "",
+        startFileName: "",
+        maxFileCount: 1000,
+      });
+      deletedFiles.push(...response.data.files);
+
+      const deletePromises = response.data.files.map(
+        async (file: { fileId: string; fileName: string }) =>
+          b2.deleteFileVersion({
+            fileId: file.fileId,
+            fileName: file.fileName,
+          }),
+      );
+      await Promise.all(deletePromises);
+    }
+  }
+  return deletedFiles;
+}
+
 interface IEditGame extends z.infer<typeof editGameSchema> {}
 interface nextEditGame {
   data: IEditGame;

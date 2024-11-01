@@ -17,10 +17,8 @@ import UploadModal from "./UploadModal";
 import DeleteComponentModal from "../DeleteComponentModal";
 import { GameDataState } from "../GameScreen/GamePage";
 import { userDataSchema } from "../ProfileModal/ProfileModal";
-import { useContext } from "react";
 import { z } from "zod";
-import { authenticateLoggers, useAnalytics } from "@/context/AnalyticsContext";
-import { GameException } from "@/utils/exceptions/game";
+import { useAnalytics } from "@/context/AnalyticsContext";
 
 interface Props {
   mode: string;

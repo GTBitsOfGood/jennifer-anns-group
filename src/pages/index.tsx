@@ -9,7 +9,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { IGameBoy, IHomePage } from "@/server/db/models/HomePageModel";
 import MdEditor from "react-markdown-editor-lite";
 import MarkdownIt from "markdown-it";
-import Markdown from "react-markdown";
 import insert from "markdown-it-ins";
 import "react-markdown-editor-lite/lib/index.css";
 import { Input } from "@/components/ui/input";
@@ -55,6 +54,7 @@ const Home = ({
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editError, setEditError] = useState("");
+  const [images, setImages] = useState<{ [key: string]: string | null }>({});
 
   const { refetch, isLoading } = useQuery({
     queryKey: ["homepage"],
@@ -68,6 +68,38 @@ const Home = ({
     },
     retry: 3,
   });
+
+  async function fetchImage(gameId: string) {
+    if (gameId) {
+      try {
+        const response = await fetch(`/api/games/${gameId}`);
+        const data = await response.json();
+        return data.image;
+      } catch (error) {
+        console.error("Error fetching game data:", error);
+      }
+    }
+    return null;
+  }
+
+  useEffect(() => {
+    async function fetchImages() {
+      const fetchedImages: { [key: string]: string | null } = {};
+
+      await Promise.all(
+        pageData.gameBoys.map(async (gameBoy: { gameId: string }) => {
+          if (gameBoy.gameId) {
+            const image = await fetchImage(gameBoy.gameId);
+            fetchedImages[gameBoy.gameId] = image;
+          }
+        }),
+      );
+
+      setImages(fetchedImages);
+    }
+
+    fetchImages();
+  }, [pageData.gameBoys]);
 
   const editTitleDescription = useMutation({
     mutationFn: () => {
@@ -223,8 +255,7 @@ const Home = ({
 
               return (
                 <div key={index} className="max-w-xs flex-1">
-                  {/* replace "/imgpreviewexample.jpeg" with image preview once implemented */}
-                  <GameBoy image="/imgpreviewexample.jpeg" />
+                  <GameBoy imageUrl={images[gameBoy.gameId] || null} />
                   <p className="mt-12 text-center text-gray-500">
                     {gameBoy.description}
                   </p>
