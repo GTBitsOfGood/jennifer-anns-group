@@ -255,7 +255,7 @@ function InformationSlide({
         <label
           htmlFor={TRACKED_FORM_KEY}
           className={`ml-2 text-sm ${
-            trackedChecked ? "text-blue-primary" : "text-[#7A8086]"
+            trackedChecked ? "text-blue-primary" : "text-unselected"
           }`}
         >
           &#40;Optional&#41; I would like my data to help improve this site.

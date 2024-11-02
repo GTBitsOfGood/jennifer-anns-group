@@ -26,7 +26,7 @@ import SelectedFilters from "@/components/GameGallery/SelectedFilters";
 import GameCardView from "@/components/GameGallery/GameCardView";
 import GamesPagination from "@/components/GameGallery/GamesPagination";
 import { PageRequiredGameQuery } from "@/components/Admin/ThemesTags/GamesSection";
-import { Filter, ChevronsUpDown } from "lucide-react";
+import { Filter, ChevronsUpDown, Check } from "lucide-react";
 import cx from "classnames";
 import { SortType } from "@/utils/types";
 
@@ -87,18 +87,32 @@ export default function Games() {
     (filters.accessibility?.length ?? 0) > 0 ||
     (filters.tags?.length ?? 0) > 0 ||
     (filters.gameContent?.length ?? 0) > 0 ||
-    (filters.gameBuilds?.length ?? 0) > 0 ||
-    (filters.theme?.length ?? 0) > 0;
+    (filters.gameBuilds?.length ?? 0) > 0;
 
   return (
     <div className="m-[72px]">
       <ChakraProvider theme={chakraTheme} resetCSS={false}>
-        <h1 className="mb-16 mt-10 text-center font-sans text-6xl font-semibold">
-          Game Gallery
-        </h1>
+        <div className="flex items-center justify-center">
+          <div className="flex-1"></div>
+          <h1 className="mb-16 mt-10 text-center font-sans text-6xl font-semibold">
+            Game Gallery
+          </h1>
+          <div className="relative flex flex-1 justify-end">
+            {userData?.label === "administrator" ? (
+              <button
+                onClick={() => {
+                  router.push("/games/create");
+                }}
+                className="rounded-md bg-blue-primary px-4 py-3 font-sans text-lg text-white hover:bg-[#4F75B3]"
+              >
+                Create Game
+              </button>
+            ) : null}
+          </div>
+        </div>
 
-        <div className="mb-6 flex flex-row justify-between">
-          <div className="flex flex-row">
+        <div className="mb-6 flex flex-row items-center justify-between">
+          <div className="flex flex-row items-center gap-6">
             <InputGroup className="w-[400px]">
               <InputLeftElement pointerEvents="none">
                 <Search2Icon className="text-input-stroke" />
@@ -109,56 +123,6 @@ export default function Games() {
                 placeholder="Search games"
               />
             </InputGroup>
-            {/* filter button and popover */}
-            <Popover
-              placement="bottom-start"
-              onOpen={onOpenFilterModal}
-              onClose={onCloseFilterModal}
-              isOpen={isOpenFilterModal}
-            >
-              <PopoverTrigger>
-                <Button
-                  className={cx(
-                    "mx-5 flex h-9 items-center justify-center space-x-1 rounded-full border",
-                    {
-                      "bg-brand-800 border-blue-bg": hasFilters,
-                      "border-gray-300 bg-white hover:bg-light-gray":
-                        !hasFilters,
-                    },
-                  )}
-                >
-                  <Text
-                    className={cx(
-                      "select-none font-inter text-sm font-bold text-black",
-                      {
-                        "text-blue-primary": hasFilters,
-                      },
-                    )}
-                  >
-                    Filter
-                  </Text>
-                  <Filter
-                    className={cx("h-4 text-black", {
-                      "text-blue-primary": hasFilters,
-                    })}
-                  />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="min-h-[500px] w-[730px] rounded-lg">
-                <PopoverCloseButton
-                  className="mr-11 mt-11 h-6 w-6 p-0 font-semibold text-blue-primary"
-                  size="md"
-                />
-                <PopoverBody className="m-12 p-0">
-                  <FilterBody
-                    setFilters={setFilters}
-                    filters={filters}
-                    userLabel={userData?.label}
-                    onClose={onCloseFilterModal}
-                  />
-                </PopoverBody>
-              </PopoverContent>
-            </Popover>
             {/* sort button and popover */}
             <Popover
               placement="bottom-start"
@@ -167,23 +131,27 @@ export default function Games() {
               isOpen={isOpenSortModal}
             >
               <PopoverTrigger>
-                <Button className="bg-brand-800 flex h-9 items-center justify-center space-x-1 rounded-full border border-blue-bg">
-                  <Text className="select-none font-inter text-sm font-bold text-blue-primary">
+                <Button className="flex h-9 items-center justify-center rounded-full bg-white p-0">
+                  <Text className="select-none pr-1 font-inter">Sort by:</Text>
+                  <Text className="select-none font-inter font-bold text-blue-primary">
                     {selectedSort}
                   </Text>
                   <ChevronsUpDown className="h-4 text-blue-primary" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-fit">
-                <PopoverBody>
-                  <div className="m-2 flex flex-col">
+              <PopoverContent className="w-fit p-0">
+                <PopoverBody className="my-2 p-0">
+                  <div className="flex w-52 flex-col">
                     {Object.values(SortType).map((item, index) => {
                       return (
                         <button
                           key={index}
-                          className={cx("mb-2 text-left text-black", {
-                            "text-blue-primary": selectedSort === item,
-                          })}
+                          className={cx(
+                            "flex flex-row justify-between px-4 py-2 text-left font-inter text-sm text-black hover:bg-menu-item-hover",
+                            {
+                              "text-blue-primary": selectedSort === item,
+                            },
+                          )}
                           onClick={() => {
                             setFilters({ ...filters, sort: item as SortType });
                             setSelectedSort(item as SortType);
@@ -191,6 +159,7 @@ export default function Games() {
                           }}
                         >
                           {item}
+                          <Check className="flex justify-end" size="16" />
                         </button>
                       );
                     })}
@@ -199,50 +168,82 @@ export default function Games() {
               </PopoverContent>
             </Popover>
           </div>
-          {userData?.label === "administrator" ? (
-            <button
-              onClick={() => {
-                router.push("/games/create");
-              }}
-              className="ml-5 h-10 min-w-[150px] rounded-md bg-blue-primary	font-sans font-semibold text-[#FAFBFC]"
-            >
-              Create Game
-            </button>
-          ) : null}
+          {/* filter button and popover */}
+          <Popover
+            placement="bottom-end"
+            onOpen={onOpenFilterModal}
+            onClose={onCloseFilterModal}
+            isOpen={isOpenFilterModal}
+          >
+            <PopoverTrigger>
+              <Button
+                className={cx(
+                  "mx-5 my-2.5 flex items-center justify-center rounded-full border",
+                  {
+                    "bg-brand-800 border-blue-bg": hasFilters,
+                    "border-gray-300 bg-white hover:bg-light-gray": !hasFilters,
+                  },
+                )}
+              >
+                <Text
+                  className={cx("select-none font-inter font-bold text-black", {
+                    "text-blue-primary": hasFilters,
+                  })}
+                >
+                  Filters
+                </Text>
+                <Filter
+                  className={cx("ml-1 h-4 text-black", {
+                    "text-blue-primary": hasFilters,
+                  })}
+                />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="min-h-[500px] w-[730px] rounded-lg">
+              <PopoverCloseButton
+                className="mr-11 mt-11 h-6 w-6 p-0 font-semibold text-blue-primary"
+                size="md"
+              />
+              <PopoverBody className="m-12 p-0">
+                <FilterBody
+                  setFilters={setFilters}
+                  filters={filters}
+                  userLabel={userData?.label}
+                  onClose={onCloseFilterModal}
+                />
+              </PopoverBody>
+            </PopoverContent>
+          </Popover>
         </div>
         {hasFilters && (
-          <div className="mb-6 flex h-9 flex-row flex-wrap justify-between">
-            <SelectedFilters setFilters={setFilters} filters={filters} />
-          </div>
+          <SelectedFilters setFilters={setFilters} filters={filters} />
         )}
 
         <div>
-          <Divider borderColor="brand.700" borderWidth="1px" />
+          <Divider className="border border-border" />
         </div>
 
-        <div>
-          <div className="flex flex-row justify-center">
-            <div className="mt-[60px] flex flex-row">
-              <ThemeSidebar filters={filters} setFilters={setFilters} />
-              <Suspense
-                fallback={
-                  <div className="flex h-96 w-full items-center justify-center">
-                    <div className="h-14 w-14 animate-ping rounded-full bg-orange-primary"></div>
-                  </div>
-                }
-              >
-                <GameCardView
-                  filters={filters}
-                  setCurrPage={setCurrPage}
-                  setNumPages={setNumPages}
-                  numPages={numPages}
-                  currPage={currPage}
-                />
-              </Suspense>
-            </div>
+        <div className="mt-12">
+          <div className="justify-left flex flex-row">
+            <ThemeSidebar filters={filters} setFilters={setFilters} />
+            <Suspense
+              fallback={
+                <div className="flex h-96 w-full items-center justify-center">
+                  <div className="h-14 w-14 animate-ping rounded-full bg-orange-primary"></div>
+                </div>
+              }
+            >
+              <GameCardView
+                filters={filters}
+                setCurrPage={setCurrPage}
+                setNumPages={setNumPages}
+                numPages={numPages}
+                currPage={currPage}
+              />
+            </Suspense>
           </div>
           {numPages ? (
-            <div className="mb-32 mt-20">
+            <div className="mb-14 mt-6">
               <GamesPagination
                 setCurrPage={setCurrPage}
                 numPages={numPages}

@@ -208,8 +208,8 @@ export interface CustomVisitEvent extends CustomEvent {
 }
 
 export enum SortType {
-  AtoZ = "A-Z",
   MostPopular = "Most Popular",
+  AtoZ = "A-Z",
   LastCreated = "Last Created",
   FirstCreated = "First Created",
 }

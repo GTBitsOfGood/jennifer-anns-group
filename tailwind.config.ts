@@ -38,6 +38,9 @@ const config = {
         "stone-primary": "#535353",
         black: "#4C4B4B",
         "font-1000": "#1A222B",
+        border: "#E1E4ED",
+        unselected: "#7A8086",
+        "menu-item-hover": "#F1F3F7",
       },
       fontFamily: {
         sans: ["Poppins", "sans-serif"], // Default `Poppins` font family to sans
@@ -46,6 +49,12 @@ const config = {
         "dm-sans": ['"DM Sans"', "sans-serif"],
         inter: ["Inter", "sans-serif"],
         rubik: ["Rubik", "Poppins", "sans-serif"],
+      },
+      fontSize: {
+        "2halfxl": "34px",
+      },
+      margin: {
+        "30": "120px",
       },
       keyframes: {
         "accordion-down": {
