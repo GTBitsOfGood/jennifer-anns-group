@@ -228,7 +228,7 @@ function AddEditWebGLComponent(props: Props) {
             <Button
               type="button"
               variant="mainblue"
-              className="flex hidden h-12 rounded-xl text-lg font-semibold text-white group-hover:block "
+              className="flex h-12 rounded-xl text-lg font-semibold text-white group-hover:block "
             >
               <div className="flex items-center gap-2 font-sans">
                 <p>{addOrEdit} WebGL Game</p>

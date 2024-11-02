@@ -27,6 +27,7 @@ const config = {
         "orange-light-bg": "#FFF4E5",
         "input-bg": "#FAFBFC",
         "input-border": "#D9D9D9",
+        "input-stroke": "#6D758F",
         "delete-red": "#8B0000",
         grey: "#666666",
         "gray-500": "#667085",
@@ -40,6 +41,7 @@ const config = {
         "gray-tab-hover": "#E1E4ED",
         "black-title": "#38414B",
         "gray-table-head": "#7A8086",
+        "font-1000": "#1A222B",
       },
       fontFamily: {
         sans: ["Poppins", "sans-serif"], // Default `Poppins` font family to sans

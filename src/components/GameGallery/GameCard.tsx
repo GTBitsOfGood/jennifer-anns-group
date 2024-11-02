@@ -42,10 +42,10 @@ export default function GameCard({ game }: Props) {
           <div className="h-[200px] w-full rounded-t-lg bg-placeholder"></div>
         )}
         <Stack mt="4" mr="5" ml="5" mb="5" spacing="2">
-          <p className="font-sans text-xl font-extrabold text-[#6D758F]">
+          <p className="font-sans text-xl font-extrabold text-input-stroke">
             {game.name}
           </p>
-          <p className="line-clamp-4 font-inter text-[#6D758F]">
+          <p className="line-clamp-4 font-inter text-input-stroke">
             {game.description}
           </p>
         </Stack>

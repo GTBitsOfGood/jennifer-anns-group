@@ -11,19 +11,21 @@ interface Props {
   onClose: () => void;
 }
 export const gameBuildsMap: Record<string, string> = {
-  amazon: "Amazon",
+  amazon: "Amazon Appstore",
+  apple: "Apple Appstore",
   android: "Android",
-  appstore: "App Store",
+  browser: "Browser",
   linux: "Linux",
   mac: "Mac",
-  webgl: "WebGL",
+  tabletop: "Tabletop",
+  steam: "Steam",
   windows: "Windows",
 };
 export const gameContentsMap: Record<string, string> = {
-  parentingGuide: "Parenting guide",
-  lessonPlan: "Lesson plan",
-  videoTrailer: "Video trailer",
-  answerKey: "Answer key",
+  parentingGuide: "Parenting Guide",
+  lessonPlan: "Lesson Plan",
+  answerKey: "Answer Key",
+  videoTrailer: "Video Trailer",
 };
 
 export default function FilterBody({
@@ -91,11 +93,12 @@ export default function FilterBody({
   }
 
   return (
-    <div className="ml-16">
-      <p className="mb-5 mt-[93px] font-sans font-extrabold text-gray-500">
-        Game builds
+    <div className="grid gap-6">
+      <p className="font-sans text-lg font-semibold text-blue-primary">
+        Filters
       </p>
-      <div className="mb-[52px] mr-[52px]">
+      <div>
+        <p className="mb-3 font-sans text-font-1000">Builds</p>
         {Object.keys(gameBuildsMap).map((gameBuild) => {
           return (
             <Tag
@@ -103,7 +106,7 @@ export default function FilterBody({
               variant={
                 !selectedGameBuilds.includes(gameBuild)
                   ? "filter"
-                  : "filter_selected"
+                  : "filter_selected_other"
               }
               onClick={() => {
                 if (selectedGameBuilds.includes(gameBuild)) {
@@ -124,52 +127,43 @@ export default function FilterBody({
         })}
       </div>
 
-      <p className="mb-5 font-sans font-extrabold text-gray-500">
-        Game content
-      </p>
-      <VStack align="start" mb="52px">
+      <div>
+        <p className="mb-3 font-sans text-font-1000">Supplementary Content</p>
         {Object.keys(gameContentsMap).map((content) => {
           return (
             (content !== "answerKey" ||
               userLabel === "administrator" ||
               userLabel === "parent" ||
               userLabel === "educator") && (
-              <div key={content} className="flex items-center align-baseline">
-                <input
-                  id={content}
-                  value={content}
-                  onChange={() => {
-                    if (selectedGameContent.includes(content)) {
-                      setSelectedGameContent(
-                        selectedGameContent.filter((gc) => {
-                          return gc !== content;
-                        }),
-                      );
-                    } else {
-                      setSelectedGameContent([...selectedGameContent, content]);
-                    }
-                  }}
-                  className="peer mr-2 h-4 w-4 cursor-pointer rounded-none transition-colors duration-200 checked:text-blue-primary"
-                  name={content}
-                  type="checkbox"
-                  checked={selectedGameContent.includes(content)}
-                />
-                <label
-                  htmlFor={content}
-                  className="ml-2 cursor-pointer font-sans text-sm text-gray-500 peer-checked:text-blue-primary"
-                >
-                  {gameContentsMap[content]}
-                </label>
-              </div>
+              <Tag
+                key={content}
+                variant={
+                  !selectedGameContent.includes(content)
+                    ? "filter"
+                    : "filter_selected_other"
+                }
+                onClick={() => {
+                  if (selectedGameContent.includes(content)) {
+                    setSelectedGameContent(
+                      selectedGameContent.filter((c) => {
+                        return c !== content;
+                      }),
+                    );
+                  } else {
+                    setSelectedGameContent([...selectedGameContent, content]);
+                  }
+                }}
+                cursor="pointer"
+              >
+                {gameContentsMap[content]}
+              </Tag>
             )
           );
         })}
-      </VStack>
+      </div>
 
-      <p className="mb-5 font-sans font-extrabold text-gray-500">
-        Accessibility
-      </p>
-      <div className="mb-[52px]">
+      <div>
+        <p className="mb-3 font-sans text-font-1000">Accessibility</p>
         {accessibilityOptions.map((a) => {
           return (
             <Tag
@@ -177,7 +171,7 @@ export default function FilterBody({
               variant={
                 !selectedAccessibility.includes(a)
                   ? "filter"
-                  : "filter_selected"
+                  : "filter_selected_accessibility"
               }
               onClick={() => {
                 if (selectedAccessibility.includes(a)) {
@@ -198,13 +192,15 @@ export default function FilterBody({
         })}
       </div>
 
-      <p className="mb-5 font-sans font-extrabold text-gray-500">Tags</p>
-      <div className="mb-[52px]">
+      <div>
+        <p className="mb-3 font-sans text-font-1000">Tags</p>
         {tagsOptions?.map((t) => {
           return (
             <Tag
               key={t}
-              variant={!selectedTags.includes(t) ? "filter" : "filter_selected"}
+              variant={
+                !selectedTags.includes(t) ? "filter" : "filter_selected_other"
+              }
               onClick={() => {
                 if (selectedTags.includes(t)) {
                   setSelectedTags(
@@ -224,16 +220,16 @@ export default function FilterBody({
         })}
       </div>
 
-      <div className=" mb-[60px] mr-[52px] flex flex-row justify-between">
+      <div className="flex flex-row gap-4">
         <button
           onClick={clearSelections}
-          className="font-sans font-semibold text-blue-primary"
+          className="w-full rounded-md border border-[#E1E4ED] px-3 py-4 font-sans font-medium text-blue-primary"
         >
           Clear
         </button>
         <button
           onClick={applyFilters}
-          className="h-12 w-28 rounded-md bg-blue-primary font-sans font-semibold text-white"
+          className="w-full rounded-md bg-blue-primary px-3 py-4 font-sans font-medium text-white"
         >
           Apply
         </button>
