@@ -91,29 +91,22 @@ export default function Games() {
     (filters.theme?.length ?? 0) > 0;
 
   return (
-    <div>
+    <div className="m-[72px]">
       <ChakraProvider theme={chakraTheme} resetCSS={false}>
         <h1 className="mb-16 mt-10 text-center font-sans text-6xl font-semibold">
           Game Gallery
         </h1>
 
-        <div className="m-auto mb-6 flex w-[85vw] flex-row justify-between">
+        <div className="mb-6 flex flex-row justify-between">
           <div className="flex flex-row">
-            <InputGroup w="200px">
+            <InputGroup className="w-[400px]">
               <InputLeftElement pointerEvents="none">
-                <Search2Icon
-                  style={{ transform: "translateY(-2px)" }}
-                  color="gray.500"
-                />
+                <Search2Icon className="text-input-stroke" />
               </InputLeftElement>
               <Input
-                height="36px"
+                className="h-auto rounded-md border-input-stroke bg-input-bg py-2 pl-9 pr-3 font-inter text-base text-input-stroke placeholder-input-stroke"
                 onChange={(e) => setName(e.target.value)}
-                borderColor="gray.500"
-                bg="gray.50"
-                color="gray.500"
-                placeholder="Filter by name"
-                minW="200px"
+                placeholder="Search games"
               />
             </InputGroup>
             {/* filter button and popover */}
@@ -151,14 +144,12 @@ export default function Games() {
                   />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent mt="10px" w="750px" minH="870px">
+              <PopoverContent className="min-h-[500px] w-[730px] rounded-lg">
                 <PopoverCloseButton
+                  className="mr-11 mt-11 h-6 w-6 p-0 font-semibold text-blue-primary"
                   size="md"
-                  mr="52px"
-                  mt="38px"
-                  color="brand.600"
                 />
-                <PopoverBody>
+                <PopoverBody className="m-12 p-0">
                   <FilterBody
                     setFilters={setFilters}
                     filters={filters}
@@ -220,18 +211,18 @@ export default function Games() {
           ) : null}
         </div>
         {hasFilters && (
-          <div className="m-auto mb-6 flex h-9 w-[85vw] flex-row flex-wrap justify-between">
+          <div className="mb-6 flex h-9 flex-row flex-wrap justify-between">
             <SelectedFilters setFilters={setFilters} filters={filters} />
           </div>
         )}
 
-        <div className="m-auto w-[85vw]">
+        <div>
           <Divider borderColor="brand.700" borderWidth="1px" />
         </div>
 
         <div>
-          <div className="m-auto flex flex-row justify-center">
-            <div className="m-auto mt-[60px] flex w-[85vw] flex-row">
+          <div className="flex flex-row justify-center">
+            <div className="mt-[60px] flex flex-row">
               <ThemeSidebar filters={filters} setFilters={setFilters} />
               <Suspense
                 fallback={

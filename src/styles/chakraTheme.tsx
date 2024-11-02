@@ -32,23 +32,40 @@ const Tag = tagHelper.defineMultiStyleConfig({
   baseStyle: {
     container: {
       mr: "12px",
-      px: "18px",
+      px: "16px",
       py: "8px",
       mb: "12px",
       borderRadius: "full",
+      fontSize: "14px",
+      fontFamily: "Inter",
+      fontWeight: "normal",
+      color: "#38414B",
     },
   },
   variants: {
     filter: {
       container: {
-        color: "#535353",
-        bg: "#F6F6F6",
+        bg: "#F1F3F7",
       },
     },
-    filter_selected: {
+    filter_selected_theme: {
       container: {
-        color: "#535353",
-        bg: "#B0CAE8",
+        bg: "#E2EFFF",
+      },
+    },
+    filter_selected_accessibility: {
+      container: {
+        bg: "#FEE9CC",
+      },
+    },
+    filter_selected_other: {
+      container: {
+        bg: "#E2DED5",
+      },
+    },
+    filter_selected_game: {
+      container: {
+        bg: "#E1E4ED",
       },
     },
   },
