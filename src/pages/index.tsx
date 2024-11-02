@@ -250,19 +250,19 @@ const Home = ({
               refetchHomePage={refetch}
             />
           )}
-          <h1 className="mb-12 text-center text-4xl font-semibold text-orange-primary">
+          <h1 className="mb-12 text-center text-4xl font-bold text-orange-primary">
             {pageData.gameBoyTitle}
           </h1>
-          <div className="flex w-full max-w-7xl justify-center space-x-20 px-16">
+          <div className="flex w-full max-w-[96rem] justify-center space-x-14 px-16">
             {pageData.gameBoys.map((gameBoy: IGameBoy, index: number) => {
               if (!gameBoy.gameId) {
                 return <></>;
               }
 
               return (
-                <div key={index} className="max-w-xs flex-1">
+                <div key={index} className="max-w-l flex-1">
                   <GameBoy imageUrl={images[gameBoy.gameId] || null} />
-                  <p className="text-s text-black-1000 mt-12 text-center">
+                  <p className="text-s text-black-1000 mt-12 text-center leading-7">
                     {gameBoy.description}
                   </p>
                 </div>
