@@ -103,8 +103,9 @@ export default function Games() {
               <InputLeftElement pointerEvents="none">
                 <Search2Icon className="text-input-stroke" />
               </InputLeftElement>
+              {/* prettier-ignore */}
               <Input
-                className="h-auto rounded-md border-input-stroke bg-input-bg py-2 pl-9 pr-3 font-inter text-base text-input-stroke placeholder-input-stroke"
+                className="border-input-stroke text-input-stroke placeholder-input-stroke h-auto rounded-md bg-input-bg py-2 pl-9 pr-3 font-inter text-base"
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Search games"
               />
