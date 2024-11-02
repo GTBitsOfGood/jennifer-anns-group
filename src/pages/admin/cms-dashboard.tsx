@@ -437,7 +437,7 @@ const CMSDashboardPage = () => {
     let groupSheet = XLSX.utils.json_to_sheet(groupsInfo);
     let gameSheet = XLSX.utils.json_to_sheet(gameInfo);
 
-    XLSX.utils.book_append_sheet(wb, sourceSheet, "Major Sources");
+    XLSX.utils.book_append_sheet(wb, sourceSheet, "Referrer Breakdown");
     XLSX.utils.book_append_sheet(wb, groupSheet, "User Groups");
     XLSX.utils.book_append_sheet(wb, gameSheet, "Game Info");
 
