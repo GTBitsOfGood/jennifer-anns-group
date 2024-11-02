@@ -86,6 +86,7 @@ export const authenticate = async (
   }
   if (methods.includes(req.method)) {
     const session = await getServerSession(req, res, authOptions);
+
     if (session && (session.user.label == "administator" || !adminRequired)) {
       return true;
     } else {
@@ -103,7 +104,10 @@ export const authenticateAdminOrSameUser = async (
   id: string,
 ) => {
   const session = await getServerSession(req, res, authOptions);
-  if (!session || (session.user._id !== id && !session.user.isAdmin)) {
+  if (
+    !session ||
+    (session.user._id !== id && !(session.user.label == "administrator"))
+  ) {
     return res
       .status(HTTP_STATUS_CODE.UNAUTHORIZED)
       .send({ error: "Unvalidated or invalid user." });

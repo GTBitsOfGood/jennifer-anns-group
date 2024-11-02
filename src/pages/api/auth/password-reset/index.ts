@@ -36,7 +36,10 @@ async function updatePasswordHandler(
 ) {
   try {
     const { email } = emailObject.parse(
-      jwt.decode(req.cookies.passwordResetJwt || ""),
+      jwt.verify(
+        req.cookies.passwordResetJwt || "",
+        process.env.NEXTAUTH_SECRET,
+      ),
     );
     const user = await getUserByEmail(email);
     if (!user) {

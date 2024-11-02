@@ -46,7 +46,7 @@ async function verifyEmailVerificationHandler(
     //Create JWT token indicating it's verified
     const serializedCookie = cookie.serialize(
       "emailVerificationJwt",
-      jwt.sign({ email, emailVerified: true }, process.env.NEXTAUTH_SECRET),
+      jwt.sign({ email }, process.env.NEXTAUTH_SECRET),
       {
         httpOnly: true,
         secure: true,

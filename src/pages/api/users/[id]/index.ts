@@ -7,10 +7,14 @@ import {
 } from "../../../../server/db/actions/UserAction";
 import { NextApiRequest, NextApiResponse } from "next";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
+import cookie from "cookie";
+import jwt from "jsonwebtoken";
+import { z } from "zod";
 import {
   UserDoesNotExistException,
   UserException,
   UserInvalidInputException,
+  GenericUserErrorException,
 } from "@/utils/exceptions/user";
 import AdminModel from "@/server/db/models/AdminModel";
 import { getServerSession } from "next-auth";
@@ -24,7 +28,7 @@ export default async function handler(
   const authenticated = await authenticateAdminOrSameUser(
     req,
     res,
-    req.body._id,
+    req.query.id as string,
   );
   if (authenticated !== true) {
     return authenticated;
@@ -63,18 +67,12 @@ async function getUserHandler(req: NextApiRequest, res: NextApiResponse) {
 
 async function editUserHandler(req: NextApiRequest, res: NextApiResponse) {
   const type = req.query.type;
-  const session = await getServerSession(req, res, authOptions);
-  //Vaidate Admin if modifying password,, or email
-  if (
-    req.body.email !== session?.user.email ||
-    type === "password" ||
-    type === "resetpassword"
-  ) {
-    if (!session || !session.user.isAdmin) {
-      return res
-        .status(HTTP_STATUS_CODE.UNAUTHORIZED)
-        .send({ error: "Admin authorization required. " });
-    }
+
+  if (req.body._id != req.query.id) {
+    //Bad request, cannot change id
+    return res.status(HTTP_STATUS_CODE.BAD_REQUEST).send({
+      error: "Changing the id is not allowed.",
+    });
   }
   if (type === "info") {
     return editProfileHandler(req, res);
@@ -91,7 +89,44 @@ async function editUserHandler(req: NextApiRequest, res: NextApiResponse) {
 
 async function editProfileHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const session = await getServerSession(req, res, authOptions);
+    const emailModified = req.body.email !== session?.user.email;
+    if (emailModified) {
+      //Email is being changed, verify cookie exists. if it does, delete it.
+      if (!req.cookies.emailVerificationJwt) {
+        throw new GenericUserErrorException(
+          "Email Verification Process incomplete.",
+        );
+      }
+      const { email } = emailObject.parse(
+        jwt.verify(
+          req.cookies.emailVerificationJwt,
+          process.env.NEXTAUTH_SECRET,
+        ),
+      );
+      if (email !== req.body.email) {
+        throw new UserInvalidInputException();
+      }
+    }
     const result = await editUser(req.body);
+    if (emailModified) {
+      //Delete the cookie
+      const serializedCookie = cookie.serialize(
+        "emailVerificationJwt",
+        "invalidValue",
+        {
+          httpOnly: true,
+          secure: true,
+          sameSite: "strict",
+          maxAge: 0, // Expire the cookie
+          path: "/",
+        },
+      );
+      return res
+        .status(HTTP_STATUS_CODE.OK)
+        .setHeader("Set-Cookie", serializedCookie)
+        .send({ result });
+    }
     return res.status(HTTP_STATUS_CODE.OK).send({ result });
   } catch (e: any) {
     if (e instanceof UserException) {
@@ -117,17 +152,28 @@ async function editPasswordHandler(req: NextApiRequest, res: NextApiResponse) {
       .send({ error: e.message });
   }
 }
+const emailObject = z.object({
+  email: z.string().email("User has not been verified for password reset"),
+});
 
 async function resetPasswordHandler(req: NextApiRequest, res: NextApiResponse) {
-  const id = req.query.id;
+  //Check for cookie like for other api at /api/auth/password-reset
 
   try {
-    const session = await getServerSession(req, res, authOptions);
+    const id = req.query.id;
 
-    if (!session || session.user._id !== id) {
+    const { email } = emailObject.parse(
+      jwt.verify(
+        req.cookies.passwordResetJwt || "",
+        process.env.NEXTAUTH_SECRET,
+      ),
+    );
+    //Call and verify the email equals
+    const user = await getUser(id as string);
+    if (user.email !== email) {
       return res
-        .status(HTTP_STATUS_CODE.UNAUTHORIZED)
-        .send({ error: "User has not been validated." });
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .send({ error: "Invalid cookie" });
     }
     const { newPassword } = req.body;
     if (!newPassword) {
@@ -136,8 +182,22 @@ async function resetPasswordHandler(req: NextApiRequest, res: NextApiResponse) {
         .send({ error: "New password is required" });
     }
     await resetPassword(newPassword, String(id));
+
+    //Invalidate cookie
+    const serializedCookie = cookie.serialize(
+      "passwordResetJwt",
+      "invalidValue",
+      {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 0, // Expire the cookie
+        path: "/",
+      },
+    );
     return res
       .status(HTTP_STATUS_CODE.CREATED)
+      .setHeader("Set-Cookie", serializedCookie)
       .send({ message: "Password reset successfully" });
   } catch (e: any) {
     return res

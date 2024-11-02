@@ -6,13 +6,14 @@ import WarningIcon from "@/components/ui/icons/warningicon";
 import { userSchema } from "@/utils/types";
 import cn from "classnames";
 import { z } from "zod";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   ProfileState,
   userDataSchema,
   EditUserParams,
   EditUserReturnValue,
 } from "./ProfileModal";
+import { set } from "mongoose";
 
 const formUserSchema = userSchema.omit({ hashedPassword: true, notes: true });
 
@@ -32,8 +33,15 @@ function EditProfileModal(props: EditProps) {
   const LNAME_FORM_KEY = "lastName";
   const EMAIL_FORM_KEY = "email";
   const TRACKING_FORM_KEY = "tracking";
+  const VERIFICATION_CODE_KEY = "verification_code";
 
+  const confirmationCodeRef = useRef<HTMLInputElement>(null);
   const [invalidEmail, setInvalidEmail] = useState("");
+  const [email, setEmail] = useState(props.userData?.email);
+  const [emailChanged, setEmailChanged] = useState(false);
+  const [emailChangeLocked, setEmailChangeLocked] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [verified, setVerified] = useState(false);
   const [trackedChecked, setTrackedChecked] = useState<boolean>(
     props.userData?.tracked ?? false,
   );
@@ -42,13 +50,59 @@ function EditProfileModal(props: EditProps) {
     setTrackedChecked(props.userData?.tracked ?? false);
   }, [props.userData?.tracked]);
 
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    setEmailChanged(e.target.value !== props.userData?.email);
+    setInvalidEmail("");
+  };
+  const sendVerification = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    //Call api to send verification
+    const res = await fetch("/api/auth/email-verification/create", {
+      method: "POST",
+      body: JSON.stringify({ email: email }),
+    });
+    const json = await res.json();
+    if (res?.ok) {
+      setVerificationSent(true);
+      setEmailChangeLocked(true);
+      setInvalidEmail("");
+    } else {
+      if (json.message) {
+        setInvalidEmail(json.message);
+      } else {
+        setInvalidEmail("Something went Wrong.");
+      }
+
+      //Set vall errors
+    }
+  };
+  const checkVerification = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const res = await fetch("/api/auth/email-verification/verify", {
+      method: "POST",
+      body: JSON.stringify({
+        email,
+        token: confirmationCodeRef.current?.value,
+      }),
+    });
+    console.log(res?.ok);
+    if (res?.ok) {
+      setVerified(true);
+      setInvalidEmail("");
+    } else {
+      //Incorrect verification code
+      setInvalidEmail("Invalid code");
+    }
+  };
+
   async function handleProfileFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const input = {
       firstName: formData.get(FNAME_FORM_KEY),
       lastName: formData.get(LNAME_FORM_KEY),
-      email: formData.get(EMAIL_FORM_KEY),
+      email: email,
       label: props.userData?.label,
       tracked: formData.get(TRACKING_FORM_KEY) === "on",
     };
@@ -129,8 +183,10 @@ function EditProfileModal(props: EditProps) {
           <Input
             name={EMAIL_FORM_KEY}
             id="email"
-            defaultValue={props.userData?.email}
+            defaultValue={email}
             autoComplete="email"
+            onChange={handleEmailChange}
+            disabled={emailChangeLocked}
             className={cn("col-span-8 text-xs font-light text-black", {
               "border-red-500": invalidEmail !== "",
             })}
@@ -138,6 +194,45 @@ function EditProfileModal(props: EditProps) {
           <div className="mt-1 flex gap-1">
             {invalidEmail && <WarningIcon />}
             <p className="text-xs text-red-500">{invalidEmail}</p>
+          </div>
+          <div className="mt-1 flex gap-1">
+            {emailChanged && !verificationSent && !verified && (
+              <Button
+                variant="outline2"
+                className="px-4"
+                onClick={sendVerification}
+              >
+                Send Verification Code to <br />
+                {email}?
+              </Button>
+            )}
+          </div>
+          <div className="mt-1 flex gap-1">
+            {verificationSent && !verified && (
+              <div>
+                <Label
+                  htmlFor={EMAIL_FORM_KEY}
+                  className="text-right text-lg font-normal"
+                >
+                  Verification Code:
+                </Label>
+                <Input
+                  name={VERIFICATION_CODE_KEY}
+                  ref={confirmationCodeRef}
+                  autoComplete="Verification Code"
+                  className={cn("col-span-8 text-xs font-light text-black", {
+                    "": verificationSent,
+                  })}
+                />
+                <Button
+                  variant="outline2"
+                  className="px-4"
+                  onClick={checkVerification}
+                >
+                  Submit Code?
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 

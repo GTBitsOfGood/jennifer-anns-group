@@ -3,6 +3,8 @@ import {
   createUser,
   getUserByEmail,
 } from "../../../server/db/actions/UserAction";
+import cookie from "cookie";
+
 import { userSchema } from "../../../utils/types";
 import { NextApiRequest, NextApiResponse } from "next";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
@@ -10,6 +12,7 @@ import {
   UserInvalidInputException,
   UserException,
   UserDoesNotExistException,
+  GenericUserErrorException,
 } from "@/utils/exceptions/user";
 import jwt from "jsonwebtoken";
 
@@ -51,30 +54,49 @@ async function getUserHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const emailObjectWithVerification = z.object({
+const emailObject = z.object({
   email: z.string().email("Email has not been verified"),
-  emailVerified: z.boolean(),
 });
 async function createUserHandler(req: NextApiRequest, res: NextApiResponse) {
   //Ensure verification for key
 
   try {
-    const { email, emailVerified } = emailObjectWithVerification.parse(
-      jwt.decode(req.cookies.emailVerificationJwt || ""),
+    if (!req.cookies.emailVerificationJwt) {
+      throw new GenericUserErrorException(
+        "Email Verification Process incomplete.",
+      );
+    }
+    const { email } = emailObject.parse(
+      jwt.verify(req.cookies.emailVerificationJwt, process.env.NEXTAUTH_SECRET),
     );
     const parsedData = createUserSchema.safeParse(JSON.parse(req.body));
     if (!parsedData.success) {
       throw new UserInvalidInputException();
     }
     //Invalid cookie in this case
-    if (!emailVerified || email !== parsedData.data.email) {
+    if (email !== parsedData.data.email) {
       throw new UserInvalidInputException();
     }
 
     const newUser = await createUser(parsedData.data);
-    return res.status(HTTP_STATUS_CODE.CREATED).send({
-      _id: newUser._id,
-    });
+    //Invalidate Cookie
+    const serializedCookie = cookie.serialize(
+      "emailVerificationJwt",
+      "invalidValue",
+      {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 0, // Expire the cookie
+        path: "/",
+      },
+    );
+    return res
+      .status(HTTP_STATUS_CODE.CREATED)
+      .setHeader("Set-Cookie", serializedCookie)
+      .send({
+        _id: newUser._id,
+      });
   } catch (e: any) {
     if (e instanceof UserException) {
       return res.status(e.code).send({ error: e.message });
