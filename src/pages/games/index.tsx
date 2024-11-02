@@ -110,7 +110,6 @@ export default function Games() {
             ) : null}
           </div>
         </div>
-
         <div className="mb-6 flex flex-row items-center justify-between">
           <div className="flex flex-row items-center gap-6">
             <InputGroup className="w-[400px]">
