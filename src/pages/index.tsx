@@ -90,13 +90,11 @@ const Home = ({
       const fetchedImages: { [key: string]: string | null } = {};
 
       await Promise.all(
-        pageData.gameBoys.map((gameBoy) => {
-          return async () => {
-            if (gameBoy.gameId) {
-              const image = await fetchImage(gameBoy.gameId);
-              fetchedImages[gameBoy.gameId] = image;
-            }
-          };
+        pageData.gameBoys.map(async (gameBoy) => {
+          if (gameBoy.gameId) {
+            const image = await fetchImage(gameBoy.gameId);
+            fetchedImages[gameBoy.gameId] = image;
+          }
         }),
       );
 
