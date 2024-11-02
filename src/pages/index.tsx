@@ -31,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     const pageData = JSON.parse(JSON.stringify(data));
     return {
       props: {
-        pageData,
+        pageDataProp: pageData,
       },
     };
   } catch (error) {
@@ -45,8 +45,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
 };
 
 const Home = ({
-  pageData,
+  pageDataProp,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const [pageData, setPageData] = useState<IHomePage>(pageDataProp);
   const { data: session } = useSession();
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
@@ -65,6 +66,7 @@ const Home = ({
         throw new Error("Failed to fetch homepage");
       }
       const data = await response.json();
+      setPageData(data);
       return data as IHomePage;
     },
     retry: 3,
@@ -88,11 +90,13 @@ const Home = ({
       const fetchedImages: { [key: string]: string | null } = {};
 
       await Promise.all(
-        pageData.gameBoys.map(async (gameBoy: { gameId: string }) => {
-          if (gameBoy.gameId) {
-            const image = await fetchImage(gameBoy.gameId);
-            fetchedImages[gameBoy.gameId] = image;
-          }
+        pageData.gameBoys.map((gameBoy) => {
+          return async () => {
+            if (gameBoy.gameId) {
+              const image = await fetchImage(gameBoy.gameId);
+              fetchedImages[gameBoy.gameId] = image;
+            }
+          };
         }),
       );
 
