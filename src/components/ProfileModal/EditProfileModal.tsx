@@ -58,6 +58,7 @@ function EditProfileModal(props: EditProps) {
   const sendVerification = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     //Call api to send verification
+    setInvalidEmail("Sending code...");
     const res = await fetch("/api/auth/email-verification/create", {
       method: "POST",
       body: JSON.stringify({ email: email }),
