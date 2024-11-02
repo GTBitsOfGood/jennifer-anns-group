@@ -1,7 +1,4 @@
-import {
-  resetGamesPopularity,
-  updateGamesPopularity,
-} from "@/server/db/actions/GameAction";
+import { updateGamesPopularity } from "@/server/db/actions/GameAction";
 import { NextApiRequest, NextApiResponse } from "next";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 

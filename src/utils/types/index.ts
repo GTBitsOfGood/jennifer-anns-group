@@ -110,7 +110,7 @@ export const gameSchema = z.object({
     z.string().url().optional(),
   ),
   preview: z.boolean(),
-  popularity: z.number().int(),
+  popularity: z.number().int().optional(),
 });
 //Since arrays from req.query are just strings, and need to be converted into arrays.
 
@@ -130,6 +130,7 @@ export const editGameSchema = z.object({
   lesson: z.literal("").or(z.string().url()).optional(),
   answerKey: z.literal("").or(z.string().url()).optional(),
   videoTrailer: z.string().url().or(z.literal("")).optional(),
+  image: z.literal("").or(z.string().url()).optional(),
   preview: z.boolean().optional(),
 });
 

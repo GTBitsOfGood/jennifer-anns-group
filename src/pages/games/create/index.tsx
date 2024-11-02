@@ -25,6 +25,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useMutation } from "@tanstack/react-query";
 import { uploadApplicationFile } from "@/utils/file";
 import UploadPDF from "@/components/CreateGameScreen/UploadPDF";
+import UploadImage from "@/components/CreateGameScreen/UploadImage";
 
 const NAME_FORM_KEY = "name";
 const TRAILER_FORM_KEY = "videoTrailer";
@@ -110,33 +111,25 @@ async function uploadBuildFiles(gameId: string, files: Map<string, File>) {
 
 function CreateGame() {
   const router = useRouter();
-  const hiddenImagePreviewRef = useRef<HTMLInputElement>(null);
   const [themes, setThemes] = useState<ExtendId<ITheme>[]>([]);
   const [selectedThemes, setSelectedThemes] = useState<ExtendId<ITheme>[]>([]);
-
   const [uploadedWebGL, setUploadedWebGL] = useState(false);
-
   const [accessibilityTags, setAccessibilityTags] = useState<ExtendId<ITag>[]>(
     [],
   );
   const [selectedAccessibilityTags, setSelectedAccessibilityTags] = useState<
     ExtendId<ITag>[]
   >([]);
-
   const [customTags, setCustomTags] = useState<ExtendId<ITag>[]>([]);
   const [selectedCustomTags, setSelectedCustomTags] = useState<
     ExtendId<ITag>[]
   >([]);
-
   const [builds, setBuilds] = useState<z.infer<typeof buildSchema>[]>([]);
-
+  const [submitting, setSubmitting] = useState<boolean>(false);
   const [loaderFile, setLoaderFile] = useState<null | File>(null);
   const [dataFile, setDataFile] = useState<null | File>(null);
   const [codeFile, setCodeFile] = useState<null | File>(null);
   const [frameworkFile, setFrameworkFile] = useState<null | File>(null);
-
-  const [imagePreviewFile, setImagePreviewFile] = useState<null | File>(null);
-
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string | undefined>
   >({
@@ -146,7 +139,6 @@ function CreateGame() {
     description: undefined,
     builds: undefined,
   });
-
   const [uploadGameComponents, setUploadGameComponents] = useState<
     React.JSX.Element[]
   >([
@@ -301,40 +293,57 @@ function CreateGame() {
     return true;
   }
 
-  function validateImage() {
-    if (imagePreviewFile) {
+  async function uploadImage(image: File) {
+    const directUploadUrl = await getDirectUpload(image);
+    const storedUrl = await uploadApplicationFile(
+      directUploadUrl.uploadUrl,
+      image,
+      directUploadUrl.uploadAuthToken,
+      uuidv4(),
+    );
+    return storedUrl;
+  }
+
+  async function validateImage(image: File | null): Promise<boolean> {
+    if (image) {
       if (
-        imagePreviewFile.type !== "image/png" &&
-        imagePreviewFile.type !== "image/jpg" &&
-        imagePreviewFile.type !== "image/jpeg"
+        image.type !== "image/png" &&
+        image.type !== "image/jpg" &&
+        image.type !== "image/jpeg" &&
+        image.type !== "image/webp"
       ) {
         setValidationErrors((prevValidationErrors) => ({
           ...prevValidationErrors,
-          image: "Invalid Image: Only PNG, JPG, or JPEG permitted.",
+          image: "Invalid Image: Only PNG, JPG, JPEG, or WEBP permitted.",
         }));
         return false;
       }
-      const img = new Image();
-      img.src = URL.createObjectURL(imagePreviewFile);
-      img.onload = () => {
-        const naturalWidth = img.naturalWidth;
-        const naturalHeight = img.naturalHeight;
-        URL.revokeObjectURL(img.src);
-        if (naturalWidth !== 630 || naturalHeight !== 500) {
+
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = URL.createObjectURL(image);
+        img.onload = () => {
+          const naturalWidth = img.naturalWidth;
+          const naturalHeight = img.naturalHeight;
+          URL.revokeObjectURL(img.src);
+          if (naturalWidth !== 630 || naturalHeight !== 500) {
+            setValidationErrors((prevValidationErrors) => ({
+              ...prevValidationErrors,
+              image: "Image must have dimensions 630x500 pixels.",
+            }));
+            resolve(false);
+          } else {
+            resolve(true);
+          }
+        };
+        img.onerror = () => {
           setValidationErrors((prevValidationErrors) => ({
             ...prevValidationErrors,
-            image: "Image must have dimensions 630x500 pixels.",
+            image: "Image failed to load",
           }));
-          return false;
-        }
-      };
-      img.onerror = () => {
-        setValidationErrors((prevValidationErrors) => ({
-          ...prevValidationErrors,
-          image: "Image failed to load",
-        }));
-        return false;
-      };
+          resolve(false);
+        };
+      });
     }
     return true;
   }
@@ -372,12 +381,26 @@ function CreateGame() {
 
     const PDFUrls = await uploadPDFs(formData);
 
+    const validImage = await validateImage(
+      formData.get(IMAGE_FORM_KEY) as File,
+    );
+    const validVideo = validateVideoTrailer(
+      formData.get(TRAILER_FORM_KEY) as string,
+    );
+    const validBuilds = validateBuilds();
+    if (!validImage || !validVideo || !validBuilds) {
+      setSubmitting(false);
+      return;
+    }
+
+    const imageUrl = await uploadImage(formData.get(IMAGE_FORM_KEY) as File);
+
     const input = {
       name: formData.get(NAME_FORM_KEY),
       videoTrailer: formData.get(TRAILER_FORM_KEY),
       description: formData.get(DESCR_FORM_KEY),
       builds: builds,
-      image: imagePreviewFile ? "http://dummy-image-url.com" : "", // Temporary image
+      image: imageUrl,
       themes: selectedThemes.map((theme) => theme._id),
       tags: [...selectedAccessibilityTags, ...selectedCustomTags].map(
         (tag) => tag._id,
@@ -385,20 +408,17 @@ function CreateGame() {
       preview: true,
       ...PDFUrls,
     };
+
     const parse = gameSchema.safeParse(input);
 
-    const validImage = validateImage();
-    const validVideo = validateVideoTrailer(
-      formData.get(TRAILER_FORM_KEY) as string,
-    );
-    const validBuilds = validateBuilds();
-
-    if (!validImage || !validVideo || !validBuilds) {
-      setSubmitting(false);
+    if (
+      validationErrors &&
+      Object.values(validationErrors).some((value) => value !== undefined)
+    ) {
       return;
     }
 
-    if (parse.success) {
+    if (parse.success && !submitting) {
       setValidationErrors({
         name: undefined,
         image: undefined,
@@ -425,18 +445,18 @@ function CreateGame() {
       }
     } else {
       setSubmitting(false);
-      const errors = parse.error.formErrors.fieldErrors;
-      setValidationErrors({
-        name: errors.name?.at(0),
-        image: errors.image?.at(0),
-        videoTrailer: errors.videoTrailer?.at(0),
-        description: errors.description?.at(0),
-        builds: errors.builds?.at(0),
-      });
+      if ((parse as { error: any }).error) {
+        const errors = (parse as { error: any }).error.formErrors.fieldErrors;
+        setValidationErrors({
+          name: errors.name?.at(0),
+          image: errors.image?.at(0),
+          videoTrailer: errors.videoTrailer?.at(0),
+          description: errors.description?.at(0),
+          builds: errors.builds?.at(0),
+        });
+      }
     }
   }
-
-  const [submitting, setSubmitting] = useState<boolean>(false);
 
   const handleWebGLSubmit = async (gameId: string): Promise<boolean> => {
     if (
@@ -509,61 +529,11 @@ function CreateGame() {
           />
         </div>
 
-        <div className="relative flex w-full flex-col gap-3 md:w-2/5">
-          <label htmlFor={IMAGE_FORM_KEY} className="text-xl font-semibold">
-            Image Preview
-            <span className="text-orange-primary">*</span>
-          </label>
-          <div className="flex gap-6">
-            <Button
-              name={IMAGE_FORM_KEY}
-              variant="upload"
-              className={cn(
-                validationErrors.image
-                  ? "border-red-500 focus-visible:ring-red-500"
-                  : "",
-                "flex h-12 w-32 flex-row gap-3 self-start",
-              )}
-              type="button"
-              onClick={() => {
-                setValidationErrors({ ...validationErrors, image: undefined });
-                if (hiddenImagePreviewRef.current !== null) {
-                  hiddenImagePreviewRef.current.click();
-                }
-              }}
-            >
-              <Upload className="h-6 w-6" />
-              <p>Upload</p>
-            </Button>
-            {imagePreviewFile ? (
-              <div className="flex flex-row items-center gap-3">
-                <p>{imagePreviewFile.name}</p>
-                <X
-                  className="cursor-pointer text-orange-primary"
-                  type="button"
-                  size={18}
-                  onClick={() => {
-                    setImagePreviewFile(null);
-                  }}
-                />
-              </div>
-            ) : null}
-          </div>
-          <Input
-            type="file"
-            ref={hiddenImagePreviewRef}
-            accept=".jpg,.jpeg,.png"
-            className="hidden"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              if (
-                event.target.files === null ||
-                event.target.files.length === 0
-              )
-                return;
-              setImagePreviewFile(event.target.files[0]);
-            }}
-          ></Input>
-        </div>
+        <UploadImage
+          imageFormKey={IMAGE_FORM_KEY}
+          validationErrors={validationErrors}
+          setValidationErrors={setValidationErrors}
+        />
         <div className="relative flex w-full flex-col gap-3 md:w-2/3">
           <label className="text-xl font-semibold">
             Game Build
