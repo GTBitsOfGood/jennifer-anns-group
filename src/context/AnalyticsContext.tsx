@@ -155,3 +155,7 @@ export function getBrowserName(userAgent: string) {
     return "unknown";
   }
 }
+
+export const config = {
+  runtime: "nodejs",
+};
