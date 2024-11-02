@@ -250,7 +250,7 @@ const Home = ({
               refetchHomePage={refetch}
             />
           )}
-          <h1 className="mb-12 text-center text-5xl font-semibold text-orange-primary">
+          <h1 className="mb-12 text-center text-4xl font-semibold text-orange-primary">
             {pageData.gameBoyTitle}
           </h1>
           <div className="flex w-full max-w-7xl justify-center space-x-20 px-16">
@@ -262,7 +262,7 @@ const Home = ({
               return (
                 <div key={index} className="max-w-xs flex-1">
                   <GameBoy imageUrl={images[gameBoy.gameId] || null} />
-                  <p className="mt-12 text-center text-gray-500">
+                  <p className="text-s text-black-1000 mt-12 text-center">
                     {gameBoy.description}
                   </p>
                 </div>
@@ -320,7 +320,7 @@ const Home = ({
                   <ul>
                     <li>Uma Anand</li>
                     <li>Hayden Carpenter</li>
-                    <li>Samarth Chanda</li>
+                    <li>Samarth Chandna</li>
                     <li>Katsuki Chan</li>
                   </ul>
                   <ul>
