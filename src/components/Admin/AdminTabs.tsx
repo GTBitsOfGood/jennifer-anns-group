@@ -14,7 +14,7 @@ const AdminTabs = ({ page, children }: Props) => {
     [Pages.ACCOUNTMANAGEMENT]: "Account Management",
   };
   return (
-    <div className="mx-6">
+    <div className="mx-auto w-[calc(100%-4rem)] max-w-[90%]">
       <ul className="flex flex-wrap border-b-2 border-orange-primary text-center text-sm font-medium">
         {Object.entries(tabs).map(([key, tab]) => (
           <li key={key} className="me-2">

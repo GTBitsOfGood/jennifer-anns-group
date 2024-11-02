@@ -113,28 +113,23 @@ function CreateGame() {
   const router = useRouter();
   const [themes, setThemes] = useState<ExtendId<ITheme>[]>([]);
   const [selectedThemes, setSelectedThemes] = useState<ExtendId<ITheme>[]>([]);
-
   const [uploadedWebGL, setUploadedWebGL] = useState(false);
-
   const [accessibilityTags, setAccessibilityTags] = useState<ExtendId<ITag>[]>(
     [],
   );
   const [selectedAccessibilityTags, setSelectedAccessibilityTags] = useState<
     ExtendId<ITag>[]
   >([]);
-
   const [customTags, setCustomTags] = useState<ExtendId<ITag>[]>([]);
   const [selectedCustomTags, setSelectedCustomTags] = useState<
     ExtendId<ITag>[]
   >([]);
-
   const [builds, setBuilds] = useState<z.infer<typeof buildSchema>[]>([]);
-
+  const [submitting, setSubmitting] = useState<boolean>(false);
   const [loaderFile, setLoaderFile] = useState<null | File>(null);
   const [dataFile, setDataFile] = useState<null | File>(null);
   const [codeFile, setCodeFile] = useState<null | File>(null);
   const [frameworkFile, setFrameworkFile] = useState<null | File>(null);
-
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string | undefined>
   >({
@@ -144,7 +139,6 @@ function CreateGame() {
     description: undefined,
     builds: undefined,
   });
-
   const [uploadGameComponents, setUploadGameComponents] = useState<
     React.JSX.Element[]
   >([
@@ -286,17 +280,6 @@ function CreateGame() {
     return fieldStoredUrls;
   }
 
-  async function uploadImage(image: File) {
-    const directUploadUrl = await getDirectUpload(image);
-    const storedUrl = await uploadApplicationFile(
-      directUploadUrl.uploadUrl,
-      image,
-      directUploadUrl.uploadAuthToken,
-      uuidv4(),
-    );
-    return storedUrl;
-  }
-
   function validateVideoTrailer(link: string) {
     if (link && link !== "") {
       if (!youtubeREGEX.test(link) && !vimeoREGEX.test(link)) {
@@ -310,51 +293,59 @@ function CreateGame() {
     return true;
   }
 
-  async function validateImage(image: File | null) {
+  async function uploadImage(image: File) {
+    const directUploadUrl = await getDirectUpload(image);
+    const storedUrl = await uploadApplicationFile(
+      directUploadUrl.uploadUrl,
+      image,
+      directUploadUrl.uploadAuthToken,
+      uuidv4(),
+    );
+    return storedUrl;
+  }
+
+  async function validateImage(image: File | null): Promise<boolean> {
     if (image) {
-      const checkImageDimensions = async (imgSrc: string): Promise<boolean> => {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.src = imgSrc;
-
-          img.onload = () => {
-            const naturalWidth = img.naturalWidth;
-            const naturalHeight = img.naturalHeight;
-            URL.revokeObjectURL(img.src);
-
-            if (naturalWidth !== 630 || naturalHeight !== 500) {
-              setValidationErrors((prevValidationErrors) => ({
-                ...prevValidationErrors,
-                image: "Image must have dimensions 630x500 pixels.",
-              }));
-              reject(false); // Invalid dimensions
-            } else {
-              resolve(true); // Valid dimensions
-            }
-          };
-
-          img.onerror = () => {
-            setValidationErrors((prevValidationErrors) => ({
-              ...prevValidationErrors,
-              image: "Image failed to load",
-            }));
-            reject(false); // Loading failed
-          };
-        });
-      };
-      try {
-        const imgSrc = URL.createObjectURL(image);
-        await checkImageDimensions(imgSrc);
-      } catch {
+      if (
+        image.type !== "image/png" &&
+        image.type !== "image/jpg" &&
+        image.type !== "image/jpeg" &&
+        image.type !== "image/webp"
+      ) {
+        setValidationErrors((prevValidationErrors) => ({
+          ...prevValidationErrors,
+          image: "Invalid Image: Only PNG, JPG, JPEG, or WEBP permitted.",
+        }));
         return false;
       }
-      return true;
+
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = URL.createObjectURL(image);
+        img.onload = () => {
+          const naturalWidth = img.naturalWidth;
+          const naturalHeight = img.naturalHeight;
+          URL.revokeObjectURL(img.src);
+          if (naturalWidth !== 630 || naturalHeight !== 500) {
+            setValidationErrors((prevValidationErrors) => ({
+              ...prevValidationErrors,
+              image: "Image must have dimensions 630x500 pixels.",
+            }));
+            resolve(false);
+          } else {
+            resolve(true);
+          }
+        };
+        img.onerror = () => {
+          setValidationErrors((prevValidationErrors) => ({
+            ...prevValidationErrors,
+            image: "Image failed to load",
+          }));
+          resolve(false);
+        };
+      });
     }
-    setValidationErrors((prevValidationErrors) => ({
-      ...prevValidationErrors,
-      image: "Please upload an image.",
-    }));
-    return false;
+    return true;
   }
 
   function validateBuilds() {
@@ -388,7 +379,8 @@ function CreateGame() {
 
     const formData = new FormData(e.currentTarget);
 
-    // validate image, video, builds
+    const PDFUrls = await uploadPDFs(formData);
+
     const validImage = await validateImage(
       formData.get(IMAGE_FORM_KEY) as File,
     );
@@ -403,8 +395,6 @@ function CreateGame() {
 
     const imageUrl = await uploadImage(formData.get(IMAGE_FORM_KEY) as File);
 
-    const PDFUrls = await uploadPDFs(formData);
-
     const input = {
       name: formData.get(NAME_FORM_KEY),
       videoTrailer: formData.get(TRAILER_FORM_KEY),
@@ -418,9 +408,17 @@ function CreateGame() {
       preview: true,
       ...PDFUrls,
     };
+
     const parse = gameSchema.safeParse(input);
 
-    if (parse.success) {
+    if (
+      validationErrors &&
+      Object.values(validationErrors).some((value) => value !== undefined)
+    ) {
+      return;
+    }
+
+    if (parse.success && !submitting) {
       setValidationErrors({
         name: undefined,
         image: undefined,
@@ -447,18 +445,18 @@ function CreateGame() {
       }
     } else {
       setSubmitting(false);
-      const errors = parse.error.formErrors.fieldErrors;
-      setValidationErrors({
-        name: errors.name?.at(0),
-        image: errors.image?.at(0),
-        videoTrailer: errors.videoTrailer?.at(0),
-        description: errors.description?.at(0),
-        builds: errors.builds?.at(0),
-      });
+      if ((parse as { error: any }).error) {
+        const errors = (parse as { error: any }).error.formErrors.fieldErrors;
+        setValidationErrors({
+          name: errors.name?.at(0),
+          image: errors.image?.at(0),
+          videoTrailer: errors.videoTrailer?.at(0),
+          description: errors.description?.at(0),
+          builds: errors.builds?.at(0),
+        });
+      }
     }
   }
-
-  const [submitting, setSubmitting] = useState<boolean>(false);
 
   const handleWebGLSubmit = async (gameId: string): Promise<boolean> => {
     if (
@@ -530,6 +528,7 @@ function CreateGame() {
             }}
           />
         </div>
+
         <UploadImage
           imageFormKey={IMAGE_FORM_KEY}
           validationErrors={validationErrors}
