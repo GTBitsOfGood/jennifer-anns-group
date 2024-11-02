@@ -21,7 +21,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, type }) => {
   const processed_data = data.map((item) => ({
     ...item,
     label:
-      item.label.length > 40 ? item.label.substring(0, 40) + "..." : item.label,
+      item.label.length > 40 ? item.label.substring(0, 35) + "..." : item.label,
   }));
 
   const totalCount = data.reduce((sum, item) => sum + item.value, 0);

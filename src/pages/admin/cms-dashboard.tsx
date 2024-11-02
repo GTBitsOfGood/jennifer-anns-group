@@ -13,12 +13,15 @@ import { useAnalytics } from "@/context/AnalyticsContext";
 import { CustomVisitEvent } from "@/utils/types";
 import { EventEnvironment } from "bog-analytics";
 import { Spinner } from "@chakra-ui/react";
-import { set } from "mongoose";
+import { Button } from "@/components/ui/button";
+import { ArrowDownToLine } from "lucide-react";
+import * as XLSX from "xlsx";
 
 interface PieChartDataProps {
   id: string;
   label: string;
   value: number;
+  ratio?: string;
 }
 
 type UserLeaderboardEntry = {
@@ -35,6 +38,77 @@ type GameData = {
   downloads: number;
   // plays: number; removed plays for now as it's not being logged
   userGroupsData: PieChartDataProps[];
+};
+
+const formatUserTrafficData = (
+  visitEvents: any[],
+): {
+  sourceData: PieChartDataProps[];
+  groupsData: PieChartDataProps[];
+} => {
+  // No data
+  if (!visitEvents || (visitEvents && visitEvents.length === 0)) {
+    const sourceData: PieChartDataProps[] = [];
+    const groupsData: PieChartDataProps[] = [];
+    return { sourceData, groupsData };
+  }
+
+  // SOURCE DATA
+  const referrerCount: Record<string, number> = {};
+
+  visitEvents.forEach((event: CustomVisitEvent) => {
+    const referrer = event.properties.referrer;
+    if (referrer in referrerCount) {
+      referrerCount[referrer]++;
+    } else {
+      referrerCount[referrer] = 1;
+    }
+  });
+
+  let referrerChartData = Object.entries(referrerCount).map(
+    ([referrer, count]) => ({
+      id: referrer,
+      label: referrer,
+      value: count,
+      ratio: ((count / visitEvents.length) * 100).toFixed(2),
+    }),
+  );
+  referrerChartData = referrerChartData.filter((data) => data.label != "None");
+  // We'll have to implement proper filtering later to remove local urls, but they're useful for testing
+
+  const sourceData = referrerChartData;
+
+  // GROUP DATA
+  const userGroupCount: Record<string, number> = {
+    Student: 0,
+    Educator: 0,
+    Parent: 0,
+    Admin: 0,
+  };
+
+  visitEvents.forEach((event: CustomVisitEvent) => {
+    const group = groupMap[event.properties.userGroup];
+    if (
+      group === "Student" ||
+      group === "Educator" ||
+      group === "Parent" ||
+      group === "Admin"
+    ) {
+      userGroupCount[group]++;
+    }
+  });
+
+  const groupChartData = Object.entries(userGroupCount).map(
+    ([group, count]) => ({
+      id: group,
+      label: group,
+      value: count,
+    }),
+  );
+
+  const groupsData = groupChartData;
+
+  return { sourceData, groupsData };
 };
 
 const formatGameEventsData = async (
@@ -182,12 +256,20 @@ const formatGameEventsData = async (
 
   return { gameData, leaderboardData };
 };
+
 const CMSDashboardPage = () => {
+  const [dataAge, setDataAge] = useState<"Day" | "Week" | "Month">("Day");
   const [selectedGameInfoRow, setSelectedGameInfoRow] = useState<number>(2);
   const itemsPerPage = 8;
 
   const { analyticsViewer } = useAnalytics();
   const [loading, setLoading] = useState(true);
+  const [trafficSourceData, setTrafficSourceData] = useState<
+    PieChartDataProps[]
+  >([]);
+  const [trafficGroupsData, setTrafficGroupsData] = useState<
+    PieChartDataProps[]
+  >([]);
   const [allGameData, setAllGameData] = useState<GameData[]>([]);
   const [userLeaderboard, setUserLeaderboard] = useState<
     UserLeaderboardEntry[][]
@@ -196,6 +278,36 @@ const CMSDashboardPage = () => {
   const getData = async () => {
     try {
       setLoading(true);
+
+      const afterTime = new Date();
+      switch (dataAge) {
+        case "Day":
+          afterTime.setDate(afterTime.getDate() - 1);
+          break;
+        case "Week":
+          afterTime.setDate(afterTime.getDate() - 7);
+          break;
+        case "Month":
+          afterTime.setDate(afterTime.getDate() - 30);
+          break;
+      }
+
+      const visitQueryParams = {
+        projectName: "Jennifer Ann's",
+        environment: EventEnvironment.DEVELOPMENT,
+        category: "Visit",
+        subcategory: "Visit",
+        limit: 50000,
+        afterId: undefined,
+        afterTime: afterTime.toString(),
+      };
+      const visitEvents =
+        await analyticsViewer.getCustomEventsPaginated(visitQueryParams);
+
+      const { sourceData, groupsData } = formatUserTrafficData(
+        visitEvents ? visitEvents.events : [],
+      );
+
       const downloadQueryParams = {
         projectName: "Jennifer Ann's",
         environment: EventEnvironment.DEVELOPMENT,
@@ -218,107 +330,178 @@ const CMSDashboardPage = () => {
       const pdfEvents =
         await analyticsViewer.getCustomEventsPaginated(pdfQueryParams);
 
-      const visitQueryParams = {
-        projectName: "Jennifer Ann's",
-        environment: EventEnvironment.DEVELOPMENT,
-        category: "Visit",
-        subcategory: "Visit",
-        limit: 50000,
-        afterId: undefined,
-      };
-      const visitEvents =
-        await analyticsViewer.getCustomEventsPaginated(visitQueryParams);
-
       const { gameData, leaderboardData } = await formatGameEventsData(
         gameEvents?.events,
         pdfEvents?.events,
         visitEvents?.events,
       );
 
+      setTrafficSourceData(sourceData);
+      setTrafficGroupsData(groupsData);
       setAllGameData(gameData);
       setUserLeaderboard(leaderboardData);
     } catch (e) {
       console.error("Error fetching data:", e);
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [dataAge]); // re-fetch data when data age limit is changed
 
   useEffect(() => {
-    const initialSelectedRow = selectedGameInfoRow;
-    const currentLeaderboard = userLeaderboard;
+    const fetchAllUserNames = async () => {
+      if (!userLeaderboard || userLeaderboard.length === 0) {
+        return;
+      }
 
-    if (!userLeaderboard || userLeaderboard.length === 0) {
-      return;
-    }
+      const shouldFetchNames = userLeaderboard.some((gameRow) =>
+        gameRow.some((entry) => entry.name === "Loading..."),
+      );
 
-    const userIds = currentLeaderboard[initialSelectedRow].map(
-      (entry) => entry.id,
-    );
+      if (!shouldFetchNames) {
+        return;
+      }
 
-    const shouldFetchNames = currentLeaderboard[initialSelectedRow].some(
-      (entry) => entry.name === "Loading...",
-    );
+      // Collect all unique user IDs from the leaderboard
+      const allUserIds = Array.from(
+        new Set(
+          userLeaderboard.flatMap((gameRow) =>
+            gameRow.map((entry) => entry.id),
+          ),
+        ),
+      );
 
-    if (!shouldFetchNames) {
-      return;
-    }
-
-    const fetchUserNames = async (userIds: string[]) => {
       try {
         const response = await fetch("/api/users/names", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userIds }),
+          body: JSON.stringify({ userIds: allUserIds }),
         });
 
-        if (!response.ok) throw new Error("Failed to fetch user names");
+        if (!response.ok) return;
+
         const data = await response.json();
-        return data.names;
+        const userNames = data.names;
+
+        // Update the leaderboard with fetched names
+        setUserLeaderboard((prevData) =>
+          prevData.map((gameRow) =>
+            gameRow.map((entry) => ({
+              ...entry,
+              name: userNames[entry.id] || "Unknown",
+            })),
+          ),
+        );
       } catch (error) {
         console.error("Error fetching user names:", error);
-        return {};
+      } finally {
+        setLoading(false);
       }
     };
 
-    const updateLeaderboardNames = async () => {
-      const userNames = await fetchUserNames(userIds);
+    fetchAllUserNames();
+  }, [userLeaderboard]);
 
-      setUserLeaderboard((prevData) => {
-        const newData = [...prevData];
+  function downloadDataXLSX() {
+    // cleaning data objects for spreadsheet
+    let sourceInfo = trafficSourceData.map(({ label, value, ratio }) => ({
+      URL: label,
+      "Hits from Page": value,
+      "Percent of Hits": ratio,
+    }));
 
-        if (newData[initialSelectedRow]) {
-          newData[initialSelectedRow] = newData[initialSelectedRow].map(
-            (entry) => ({
-              ...entry,
-              name: userNames[entry.id] || "Unknown",
-            }),
-          );
-        }
+    const totalCount = trafficGroupsData.reduce(
+      (sum, item) => sum + item.value,
+      0,
+    );
 
-        return newData;
-      });
-    };
+    const groupsInfo = trafficGroupsData.map((item) => ({
+      "User Group": item.id,
+      Percentage:
+        Math.round((item.value / totalCount) * 100.0).toString() + "%",
+    }));
 
-    updateLeaderboardNames();
-  }, [selectedGameInfoRow, userLeaderboard]);
+    let gameInfo = allGameData.map(
+      ({ gameTitle, hitsToPage, hitsToPDF, downloads }) => ({
+        "Game Title": gameTitle,
+        "Hits To Page": hitsToPage,
+        "Hits To PDF": hitsToPDF,
+        Downloads: downloads,
+      }),
+    );
+
+    let wb = XLSX.utils.book_new();
+
+    let sourceSheet = XLSX.utils.json_to_sheet(sourceInfo);
+    let groupSheet = XLSX.utils.json_to_sheet(groupsInfo);
+    let gameSheet = XLSX.utils.json_to_sheet(gameInfo);
+
+    XLSX.utils.book_append_sheet(wb, sourceSheet, "Referrer Breakdown");
+    XLSX.utils.book_append_sheet(wb, groupSheet, "User Groups");
+    XLSX.utils.book_append_sheet(wb, gameSheet, "Game Info");
+
+    userLeaderboard.map((leaderboard, i) => {
+      let entryInfo = leaderboard.map(({ name, type, playsDownloads }) => ({
+        Name: name,
+        Type: type,
+        Downloads: playsDownloads,
+      }));
+
+      let ws = XLSX.utils.json_to_sheet(entryInfo);
+      let gameName = gameInfo[i]["Game Title"];
+      if (gameName.length > 15) {
+        gameName = gameName.substring(0, 11) + "...";
+      }
+      let name = "Leaderboard " + (i + 1) + " (" + gameName + ")";
+
+      XLSX.utils.book_append_sheet(wb, ws, name);
+    });
+    XLSX.writeFile(wb, `Dashboard Analytics (1 ${dataAge}).xlsx`);
+  }
 
   return (
     <AdminTabs page={Pages.CMSDASHBOARD}>
-      {/* prettier-ignore */}
-      <div className="bg-orange-light-bg my-6 flex items-stretch rounded-2xl p-12">
-        <div className="flex w-3/5 flex-col gap-6">
-          <div className="rounded-2xl bg-white p-6 text-2xl text-black">
-            <UserTraffic />
-          </div>
-          <div className="flex h-full flex-col rounded-2xl bg-white p-6 text-2xl text-black">
-            <p>Game Info</p>
-            <div className="flex-grow overflow-auto">
-              {loading ? 
+      <div className="flex">
+        <button
+          className={
+            dataAge === "Day" ? "p-6 text-orange-primary" : "p-6 text-black"
+          }
+          onClick={() => setDataAge("Day")}
+        >
+          Day
+        </button>
+        <button
+          className={
+            dataAge === "Week" ? "p-6 text-orange-primary" : "p-6 text-black"
+          }
+          onClick={() => setDataAge("Week")}
+        >
+          Week
+        </button>
+        <button
+          className={
+            dataAge === "Month" ? "p-6 text-orange-primary" : "p-6 text-black"
+          }
+          onClick={() => setDataAge("Month")}
+        >
+          Month
+        </button>
+      </div>
+      <div className="my-6 flex flex-col items-stretch gap-6 rounded-2xl bg-orange-light-bg p-8">
+        <div className="flex">
+          <div className="flex w-3/5 flex-col gap-6">
+            <div className="rounded-2xl bg-white p-6 text-2xl text-black">
+              <UserTraffic
+                trafficSourceData={trafficSourceData}
+                trafficGroupsData={trafficGroupsData}
+                loading={loading}
+              />
+            </div>
+            <div className="flex h-full flex-col rounded-2xl bg-white p-6 text-2xl text-black">
+              <p>Game Info</p>
+              <div className="flex-grow overflow-auto">
+                {loading ? (
                   <div className="flex items-center justify-center py-10">
                     <Spinner
                       className="mb-5 h-10 w-10"
@@ -327,7 +510,7 @@ const CMSDashboardPage = () => {
                       color="#164C96"
                     />
                   </div>
-                  :  
+                ) : (
                   <PaginatedTable
                     columns={GameInfoColumns}
                     data={allGameData}
@@ -335,57 +518,69 @@ const CMSDashboardPage = () => {
                     setSelectedRow={setSelectedGameInfoRow}
                     selectedRow={selectedGameInfoRow}
                   />
-              }
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="relative h-64 w-6 bg-orange-light-bg">
+            {/* White triangle to indicate which game's detailed info is being displayed */}
+            <div
+              className="h-0 w-0 border-b-[15px] border-r-[25px] border-t-[15px] border-b-transparent border-r-white border-t-transparent"
+              style={{
+                transform: `translateY(${(selectedGameInfoRow % itemsPerPage) * 53 + 500}px)`,
+              }}
+            ></div>
+          </div>
+          <div className="max-w-2/5 flex w-2/5 flex-col gap-6 truncate text-wrap rounded-2xl bg-white p-6 text-2xl text-black">
+            {allGameData[selectedGameInfoRow]?.gameTitle ?? ""}
+            <div className="rounded-2xl border-[1px] border-orange-primary p-4 text-base text-black">
+              User Groups
+              {loading ? (
+                <div className="flex items-center justify-center py-10">
+                  <Spinner
+                    className="mb-5 h-10 w-10"
+                    thickness="4px"
+                    emptyColor="#98A2B3"
+                    color="#164C96"
+                  />
+                </div>
+              ) : (
+                <UserGroupsByGame
+                  data={allGameData[selectedGameInfoRow]?.userGroupsData ?? []}
+                />
+              )}
+            </div>
+            <div className="flex flex-grow flex-col rounded-2xl border-[1px] border-orange-primary p-4 text-base text-black">
+              <p>User Leaderboard</p>
+              {loading ? (
+                <div className="flex items-center justify-center py-10">
+                  <Spinner
+                    className="mb-5 h-10 w-10"
+                    thickness="4px"
+                    emptyColor="#98A2B3"
+                    color="#164C96"
+                  />
+                </div>
+              ) : (
+                <PaginatedTable
+                  columns={UserLeaderboardColumns}
+                  data={userLeaderboard[selectedGameInfoRow] ?? []}
+                  itemsPerPage={itemsPerPage}
+                />
+              )}
             </div>
           </div>
         </div>
-         {/* prettier-ignore */}
-        <div className="bg-orange-light-bg relative h-64 w-6">
-          {/* White triangle to indicate which game's detailed info is being displayed */}
-          <div
-            className="h-0 w-0 border-b-[15px] border-r-[25px] border-t-[15px] border-b-transparent border-r-white border-t-transparent"
-            style={{
-              transform: `translateY(${(selectedGameInfoRow % itemsPerPage) * 53 + 500}px)`,
-            }}
-          ></div>
-        </div>
-        <div className="flex w-2/5 flex-col gap-6 rounded-2xl bg-white p-6 text-2xl text-black">
-          {allGameData[selectedGameInfoRow]?.gameTitle ?? ""}
-          <div className="rounded-2xl border-[1px] border-orange-primary p-4 text-base text-black">
-            User Groups
-            {loading ? 
-              <div className="flex items-center justify-center py-10">
-                <Spinner
-                  className="mb-5 h-10 w-10"
-                  thickness="4px"
-                  emptyColor="#98A2B3"
-                  color="#164C96"
-                />
-              </div>
-              :  
-              <UserGroupsByGame data={allGameData[selectedGameInfoRow]?.userGroupsData ?? []}/>
-            }
-          </div>
-          <div className="flex flex-grow flex-col rounded-2xl border-[1px] border-orange-primary p-4 text-base text-black">
-            <p>User Leaderboard</p>
-            {loading ? 
-              <div className="flex items-center justify-center py-10">
-                <Spinner
-                  className="mb-5 h-10 w-10"
-                  thickness="4px"
-                  emptyColor="#98A2B3"
-                  color="#164C96"
-                />
-              </div>
-              :  
-              <PaginatedTable
-              columns={UserLeaderboardColumns}
-              data={userLeaderboard[selectedGameInfoRow] ?? []}
-              itemsPerPage={itemsPerPage}
-              />
-            }
-          </div>
-        </div>
+        {!loading && (
+          <Button
+            variant="mainblue"
+            className="text-md gap-2"
+            onClick={downloadDataXLSX}
+          >
+            Download XLSX <ArrowDownToLine size={18} />
+          </Button>
+        )}
       </div>
     </AdminTabs>
   );

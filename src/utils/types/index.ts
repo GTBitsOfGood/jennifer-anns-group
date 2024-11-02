@@ -130,6 +130,7 @@ export const editGameSchema = z.object({
   lesson: z.literal("").or(z.string().url()).optional(),
   answerKey: z.literal("").or(z.string().url()).optional(),
   videoTrailer: z.string().url().or(z.literal("")).optional(),
+  image: z.literal("").or(z.string().url()).optional(),
   preview: z.boolean().optional(),
 });
 

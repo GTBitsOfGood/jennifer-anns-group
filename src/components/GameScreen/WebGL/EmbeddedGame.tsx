@@ -4,17 +4,19 @@ import { useAnalytics } from "@/context/AnalyticsContext";
 import { userDataSchema } from "@/components/ProfileModal/ProfileModal";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
+import { GameDataState } from "@/components/GameScreen/GamePage";
+import Image from "next/image";
 
 interface EmbeddedGameProps {
   gameId: string;
   userData: z.infer<typeof userDataSchema>;
-  gameName: string;
+  gameData: GameDataState;
 }
 
 export default function EmbeddedGame({
   gameId,
   userData,
-  gameName,
+  gameData,
 }: EmbeddedGameProps) {
   const ref = useRef<HTMLIFrameElement | null>(null);
   const [height, setHeight] = useState("725px");
@@ -58,7 +60,7 @@ export default function EmbeddedGame({
         userId: userData?._id ?? "Unauthenticated",
         userGroup: userData?.label ?? "None",
         createdDate: Date(),
-        gameName: gameName,
+        gameName: gameData.name,
       };
       analyticsLogger.logCustomEvent("Visit", "game", properties);
     }
@@ -81,25 +83,7 @@ export default function EmbeddedGame({
     };
   }, []);
 
-  // const RunGame = () => (
-  //   <div className="m-auto my-6 flex aspect-video w-10/12 items-center justify-center border-2 border-solid border-black">
-  //     <Button
-  //       type="button"
-  //       variant="mainblue"
-  //       className="flex h-12 rounded-xl text-lg font-semibold text-white"
-  //       onClick={() => {
-  //         setLoadGame(true);
-  //       }}
-  //     >
-  //       <div className="flex items-center gap-2 font-sans">
-  //         <p>Run Game</p>
-  //         <Play />
-  //       </div>
-  //     </Button>
-  //   </div>
-  // );
-
-  return (
+  return gameData.webGLBuild ? (
     <iframe
       ref={ref}
       onLoad={handleLoad}
@@ -109,5 +93,15 @@ export default function EmbeddedGame({
         "border-2 border-solid border-black": height !== "0px",
       })}
     />
+  ) : (
+    <div className="m-auto my-6 flex h-[600px] w-10/12 flex-col items-center justify-center border-2 border-solid border-black">
+      <Image src={`/orange_heart.svg`} alt="No data" width={90} height={70} />
+      <div className="mt-4 text-center text-2xl font-semibold text-orange-primary">
+        This game is not playable from the browser.
+      </div>
+      <div className="text-center text-gray-text">
+        Find download files in the <b>Game Builds</b> tab below.
+      </div>
+    </div>
   );
 }

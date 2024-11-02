@@ -27,6 +27,7 @@ export type GameDataState = populatedGameWithId & {
   parentingGuideFile: File | undefined;
   answerKeyFile: File | undefined;
   lessonFile: File | undefined;
+  imageFile: File | undefined;
   _id: string;
   preview: boolean;
 };
@@ -192,7 +193,7 @@ const GamePage = ({ mode, gameData }: Props) => {
           <EmbeddedGame
             gameId={gameData._id as string}
             userData={currentUser}
-            gameName={curData.name}
+            gameData={curData}
           />
         )}
         <TabsComponent

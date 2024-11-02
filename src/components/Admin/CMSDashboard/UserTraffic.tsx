@@ -16,99 +16,18 @@ export const groupMap: Record<string, string> = {
   administrator: "Admin",
 };
 
-const UserTraffic = () => {
+interface UserTrafficProps {
+  trafficSourceData: PieChartDataProps[];
+  trafficGroupsData: PieChartDataProps[];
+  loading: boolean;
+}
+
+const UserTraffic = ({
+  trafficSourceData,
+  trafficGroupsData,
+  loading,
+}: UserTrafficProps) => {
   const [currentTab, setCurrentTab] = useState("Major Sources");
-  const [sourceData, setSourceData] = useState<PieChartDataProps[]>([]);
-  const [groupsData, setGroupsData] = useState<PieChartDataProps[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const { analyticsViewer } = useAnalytics();
-
-  const getData = async () => {
-    try {
-      setLoading(true);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); // beginning of the day today
-      const visitEvents = (await analyticsViewer.getAllCustomEvents(
-        "Jennifer Ann's",
-        "Visit",
-        "Visit",
-        today,
-      )) as CustomVisitEvent[];
-
-      if (!visitEvents || (visitEvents && visitEvents.length === 0)) {
-        setSourceData([]);
-        setGroupsData([]);
-        setLoading(false);
-        return;
-      }
-
-      // SOURCE DATA
-      const referrerCount: Record<string, number> = {};
-
-      visitEvents.forEach((event: CustomVisitEvent) => {
-        const referrer = event.properties.referrer;
-
-        if (referrer in referrerCount) {
-          referrerCount[referrer]++;
-        } else {
-          referrerCount[referrer] = 1;
-        }
-      });
-
-      let referrerChartData = Object.entries(referrerCount).map(
-        ([referrer, count]) => ({
-          id: referrer,
-          label: referrer,
-          value: count,
-          ratio: ((count / visitEvents.length) * 100).toFixed(2),
-        }),
-      );
-      referrerChartData = referrerChartData.filter(
-        (data) => data.label != "None",
-      );
-      // We'll have to implement proper filtering later to remove local urls, but they're useful for testing
-
-      setSourceData(referrerChartData);
-
-      const userGroupCount: Record<string, number> = {
-        Student: 0,
-        Educator: 0,
-        Parent: 0,
-        Admin: 0,
-      };
-
-      visitEvents.forEach((event: CustomVisitEvent) => {
-        const group = groupMap[event.properties.userGroup];
-        if (
-          group === "Student" ||
-          group === "Educator" ||
-          group === "Parent" ||
-          group === "Admin"
-        ) {
-          userGroupCount[group]++;
-        }
-      });
-
-      const groupChartData = Object.entries(userGroupCount).map(
-        ([group, count]) => ({
-          id: group,
-          label: group,
-          value: count,
-        }),
-      );
-
-      setGroupsData(groupChartData);
-    } catch (e) {
-      console.error("Error fetching data:", e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    getData();
-  }, []);
 
   const renderContent = () => {
     if (loading) {
@@ -124,7 +43,7 @@ const UserTraffic = () => {
       );
     }
 
-    if (sourceData.length === 0) {
+    if (trafficSourceData.length === 0) {
       return (
         <div className="flex flex-col items-center self-stretch">
           <Image
@@ -144,17 +63,17 @@ const UserTraffic = () => {
     }
     switch (currentTab) {
       case "Major Sources":
-        return <PieChart data={sourceData} type="sources" />;
+        return <PieChart data={trafficSourceData} type="sources" />;
       case "Links":
         return (
           <PaginatedTable
             columns={columns}
             itemsPerPage={12}
-            data={sourceData}
+            data={trafficSourceData}
           />
         );
       case "User Groups":
-        return <PieChart data={groupsData} type="groups" />;
+        return <PieChart data={trafficGroupsData} type="groups" />;
       default:
         return null;
     }
