@@ -242,7 +242,7 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
                 {editing && (
                   <div className="flex flex-row items-center gap-4 text-sm">
                     <Pencil
-                      className="cursor-pointer"
+                      className="cursor-pointer text-blue-primary"
                       onClick={() => {
                         setEditData(data);
                         setOpenIndex(index);
@@ -252,7 +252,7 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
                       }}
                     />
                     <Trash
-                      className="cursor-pointer"
+                      className="cursor-pointer text-delete-red"
                       onClick={() => handleDeleteConfirmation(index)}
                     />
 
@@ -477,27 +477,27 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
                     >
                       <DialogContent className="border-4 border-solid border-blue-primary p-14 sm:max-w-[500px]">
                         <div className="mx-auto flex w-full flex-col items-center">
-                          <div className="text-center font-sans text-xl font-bold text-blue-primary">
+                          <div className="mt-12 w-80 p-0 text-center font-sans text-lg font-semibold text-blue-primary">
                             Are you sure you want to delete this {gameData.name}{" "}
                             {data.type.toUpperCase()} build?
                           </div>
                         </div>
-                        <p className="mt-1 text-center font-sans text-sm">
+                        <div className="mt-6 text-center font-sans text-base">
                           Deleting a game build is final and cannot be undone.
-                        </p>
-                        <div className="mx-auto mt-4 flex flex-row items-center gap-4">
-                          <button
-                            onClick={() => handleDeleteBuild(data)}
-                            className="text-md rounded-xl bg-delete-red px-4 py-2 font-sans font-semibold text-white"
-                          >
-                            Yes, delete build
-                          </button>
+                        </div>
+                        <div className="mt-12 flex w-full items-center justify-center gap-4">
                           <button
                             ref={cancelRef}
                             onClick={() => setOpenIndex(null)}
-                            className="text-md rounded-xl border-[1px] border-solid border-black px-4 py-2 font-sans font-semibold"
+                            className="w-full rounded-md border border-border px-4 py-3 font-sans text-xl font-medium hover:border-gray-tab hover:bg-gray-tab"
                           >
-                            No, return
+                            Cancel
+                          </button>
+                          <button
+                            onClick={() => handleDeleteBuild(data)}
+                            className="w-full rounded-md bg-delete-red px-4 py-3 font-sans text-xl font-medium text-white hover:bg-dark-red-hover"
+                          >
+                            Yes, delete
                           </button>
                         </div>
                       </DialogContent>
@@ -521,16 +521,13 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
         )}
       {editing && !(gameData.builds && gameData.builds.length >= 6) && (
         <div className="mt-12">
-          <Button
-            type="button"
+          <button
             onClick={() => setAddDialogOpen(true)}
-            className="rounded-xl border border-black bg-white px-4 py-2 font-sans text-lg text-xl font-semibold text-black hover:bg-gray-100"
+            className="flex items-center gap-1 rounded-md border border-font-1000 bg-white px-4 py-3 font-sans text-lg font-medium text-font-1000 hover:bg-gray-100"
           >
-            <div className="flex items-center gap-2">
-              <p>Add Game Build</p>
-              <Plus />
-            </div>
-          </Button>
+            Add Game Build
+            <Plus />
+          </button>
 
           <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
             <DialogContent
@@ -672,10 +669,8 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
                   </div>
                 )}
                 <div className="flex-end mt-5 flex w-full justify-end gap-3">
-                  <Button
-                    variant="white"
-                    className="px-4 text-lg"
-                    type="button"
+                  <button
+                    className="w-full rounded-md border border-border px-4 py-3 font-sans text-xl font-medium hover:border-gray-tab hover:bg-gray-tab"
                     onClick={() => {
                       setAddDialogOpen(false);
                       setUrl("");
@@ -684,16 +679,15 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
                     }}
                   >
                     Cancel
-                  </Button>
+                  </button>
 
-                  <Button
-                    type="button"
+                  <button
+                    className="w-full rounded-md bg-blue-primary px-4 py-3 font-sans text-xl font-medium text-white hover:bg-blue-hover"
+                    type="submit"
                     onClick={handleAddBuild}
-                    variant="mainblue"
-                    className="px-4 text-lg"
                   >
                     Done
-                  </Button>
+                  </button>
                 </div>
               </div>
             </DialogContent>

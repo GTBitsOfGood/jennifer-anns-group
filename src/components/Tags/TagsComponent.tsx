@@ -1,7 +1,7 @@
 import {
   Tag,
   TagCloseButton,
-  TagRightIcon,
+  TagLeftIcon,
   ChakraProvider,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
@@ -136,22 +136,20 @@ export default function TagsComponent({
                 setSearch(true);
               }}
             >
+              <TagLeftIcon color="white" boxSize="12px" as={AddIcon} />
               Add
-              <TagRightIcon color="white" boxSize="12px" as={AddIcon} />
             </Tag>
           ) : null}
         </div>
         {mode === "edit" && search && themes && tags ? (
-          <div className="mb-32 ml-[10vw] mt-7 font-sans">
-            <div className="absolute">
-              <SearchTagsComponent
-                setSearch={setSearch}
-                currThemes={themes}
-                setCurrThemes={setThemes}
-                currTags={tags}
-                setCurrTags={setTags}
-              />
-            </div>
+          <div className="mt-10">
+            <SearchTagsComponent
+              setSearch={setSearch}
+              currThemes={themes}
+              setCurrThemes={setThemes}
+              currTags={tags}
+              setCurrTags={setTags}
+            />
           </div>
         ) : null}
       </div>

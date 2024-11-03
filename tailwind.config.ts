@@ -48,10 +48,12 @@ const config = {
         "menu-item-hover": "#F1F3F7",
         "font-600": "#7A8086",
         "font-900": "#38414B",
+        "light-red-hover": "#F3E5E5",
+        "dark-red-hover": "#A23333",
       },
       fontSize: {
         "5.5xl": "56px",
-        "2halfxl": "34px",
+        "2.5xl": "34px",
       },
       height: {
         game: "600px",
@@ -65,6 +67,7 @@ const config = {
         rubik: ["Rubik", "Poppins", "sans-serif"],
       },
       margin: {
+        "18": "72px",
         "30": "120px",
       },
       keyframes: {

@@ -22,6 +22,7 @@ import {
 import chakraTheme from "@/styles/chakraTheme";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
+import DeleteComponentModal from "@/components/DeleteComponentModal";
 
 export type GameDataState = populatedGameWithId & {
   parentingGuideFile: File | undefined;
@@ -178,7 +179,7 @@ const GamePage = ({ mode, gameData }: Props) => {
 
   return (
     <ChakraProvider theme={chakraTheme}>
-      <div className="m-14 flex flex-col gap-14">
+      <div className="mx-18 my-14 flex flex-col gap-14">
         {mode === "preview" && (
           <div className="flex h-fit w-full flex-col items-center justify-center bg-blue-bg py-2 font-sans">
             <p className="font-bold">🔍 You are in preview mode.</p>
@@ -202,10 +203,29 @@ const GamePage = ({ mode, gameData }: Props) => {
           {loaded && (
             <>
               {userData.label === "administrator" ? (
-                <AdminEditButton
-                  gameId={gameData._id}
-                  deleteOnRouteChange={deleteOnRouteChange}
-                />
+                <div className="flex justify-end gap-4">
+                  {!curData.preview && (
+                    <>
+                      <button
+                        onClick={onOpen}
+                        className="rounded-md px-4 py-3 font-sans text-xl font-medium text-delete-red hover:bg-light-red-hover"
+                      >
+                        Delete Game
+                      </button>
+                      <DeleteComponentModal
+                        deleteType="game"
+                        isOpen={isOpen}
+                        onClose={onClose}
+                        gameData={curData}
+                        setGameData={setCurData}
+                      />
+                    </>
+                  )}
+                  <AdminEditButton
+                    gameId={gameData._id}
+                    deleteOnRouteChange={deleteOnRouteChange}
+                  />
+                </div>
               ) : (
                 <div className="w-48"></div>
               )}

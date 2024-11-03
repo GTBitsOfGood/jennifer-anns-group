@@ -1,9 +1,9 @@
 import ReactPlayer from "react-player/lazy";
-import { Flex, Button, useDisclosure } from "@chakra-ui/react";
+import { Flex, useDisclosure } from "@chakra-ui/react";
 import DeleteComponentModal from "@/components/DeleteComponentModal";
 import AddEditVideoTrailer from "../GameScreen/AddEditVideoTrailerComponent";
 import { Dispatch, useEffect, useState } from "react";
-import { CloseIcon } from "@chakra-ui/icons";
+import { Trash } from "lucide-react";
 import { GameDataState } from "../GameScreen/GamePage";
 
 interface Props {
@@ -23,7 +23,10 @@ export default function VideoComponent({ gameData, edit, setGameData }: Props) {
   return (
     <div className="flex flex-col justify-center">
       {isClient && gameData.videoTrailer && gameData.videoTrailer !== "" ? (
-        <div style={{ paddingTop: "56.25%", position: "relative" }}>
+        <div
+          className="mb-6"
+          style={{ paddingTop: "56.25%", position: "relative" }}
+        >
           <ReactPlayer
             url={gameData.videoTrailer}
             controls={true}
@@ -39,19 +42,17 @@ export default function VideoComponent({ gameData, edit, setGameData }: Props) {
       ) : null}
 
       {edit && setGameData && (
-        <Flex className="flex-row">
+        <Flex className="flex flex-row gap-4">
           <AddEditVideoTrailer gameData={gameData} setGameData={setGameData} />
           {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
             <div>
-              <Button
+              <button
                 onClick={onOpen}
-                rightIcon={<CloseIcon color="deleteRed" boxSize="10px" />}
-                bg="white"
-                color="deleteRed"
-                className="w-183 h-46 mt-5 rounded-md border border-delete-red bg-white px-[17px] py-2 font-sans text-xl font-semibold text-delete-red"
+                className="flex items-center gap-1 rounded-md border border-delete-red px-4 py-3  font-sans text-lg font-medium text-delete-red hover:bg-dark-red-hover hover:text-white"
               >
                 Delete Trailer
-              </Button>
+                <Trash size={18} />
+              </button>
               <DeleteComponentModal
                 deleteType="trailer"
                 isOpen={isOpen}

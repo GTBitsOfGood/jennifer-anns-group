@@ -11,8 +11,7 @@ import chakraTheme from "@/styles/chakraTheme";
 import { ChangeEvent, Dispatch, useState } from "react";
 import GameBuildList from "../GameScreen/WebGL/GameBuildList";
 import VideoComponent from "./VideoComponent";
-import { Button } from "../ui/button";
-import { X } from "lucide-react";
+import { Trash } from "lucide-react";
 import UploadModal from "./UploadModal";
 import DeleteComponentModal from "../DeleteComponentModal";
 import { GameDataState } from "../GameScreen/GamePage";
@@ -135,13 +134,11 @@ export default function TabsComponent({
             {/** description tab display depends on edit or view mode */}
             <TabPanel className="p-0">
               {mode === "edit" ? (
-                <div className="rounded-[20px] border border-solid border-grey bg-input-bg">
-                  <textarea
-                    className="h-52 w-full !resize-none rounded-[20px] border-[20px] border-solid border-transparent bg-input-bg font-sans !outline-none"
-                    value={description}
-                    onChange={handleChange}
-                  />
-                </div>
+                <textarea
+                  className="border-lg h-52 w-full !resize-none rounded-lg border border-unselected bg-input-bg px-4 py-3 font-sans text-input-stroke !outline-none"
+                  value={description}
+                  onChange={handleChange}
+                />
               ) : (
                 <p className="font-sans text-input-stroke">
                   {gameData.description}
@@ -151,7 +148,7 @@ export default function TabsComponent({
             {/** other tabs render if field exists or in edit mode */}
             {((gameData.videoTrailer && gameData.videoTrailer !== "") ||
               mode === "edit") && (
-              <TabPanel>
+              <TabPanel className="p-0">
                 <VideoComponent
                   gameData={gameData}
                   edit={mode === "edit"}
@@ -161,7 +158,7 @@ export default function TabsComponent({
             )}
             {((gameData.lesson && gameData.lesson !== "") ||
               mode === "edit") && (
-              <TabPanel className="p-0" display="flex" flexDir="column" gap={2}>
+              <TabPanel className="p-0" display="flex" flexDir="column" gap={8}>
                 {((gameData.lesson && gameData.lesson !== "") ||
                   gameData.lessonFile) && (
                   <iframe
@@ -175,9 +172,8 @@ export default function TabsComponent({
                   />
                 )}
                 {mode === "edit" && (
-                  <div className="flex flex-row gap-2">
+                  <div className="flex flex-row gap-4">
                     <UploadModal
-                      title="Lesson Plan"
                       field="lesson"
                       fileField="lessonFile"
                       gameData={gameData}
@@ -185,14 +181,12 @@ export default function TabsComponent({
                     />
                     {((gameData.lesson && gameData.lesson !== "") ||
                       gameData.lessonFile) && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="items-center gap-1 border-red-700 text-red-700 hover:bg-red-700"
+                      <button
+                        className="flex items-center gap-1 rounded-md border border-delete-red px-4 py-3  font-sans text-lg font-medium text-delete-red hover:bg-dark-red-hover hover:text-white"
                         onClick={onDeleteLessonOpen}
                       >
-                        Delete Lesson Plan <X size={18} />
-                      </Button>
+                        Delete PDF <Trash size={18} />
+                      </button>
                     )}
                     <DeleteComponentModal
                       isOpen={isDeleteLessonOpen}
@@ -207,7 +201,7 @@ export default function TabsComponent({
             )}
             {((gameData.parentingGuide && gameData.parentingGuide !== "") ||
               mode === "edit") && (
-              <TabPanel className="p-0" display="flex" flexDir="column" gap={2}>
+              <TabPanel className="p-0" display="flex" flexDir="column" gap={8}>
                 {((gameData.parentingGuide && gameData.parentingGuide !== "") ||
                   gameData.parentingGuideFile) && (
                   <iframe
@@ -224,9 +218,8 @@ export default function TabsComponent({
                 )}
 
                 {mode === "edit" && (
-                  <div className="flex flex-row gap-2">
+                  <div className="flex flex-row gap-4">
                     <UploadModal
-                      title="Parenting Guide"
                       field="parentingGuide"
                       fileField="parentingGuideFile"
                       gameData={gameData}
@@ -235,14 +228,12 @@ export default function TabsComponent({
                     {((gameData.parentingGuide &&
                       gameData.parentingGuide !== "") ||
                       gameData.parentingGuideFile) && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="items-center gap-1 border-red-700 text-red-700 hover:bg-red-700"
+                      <button
+                        className="flex items-center gap-1 rounded-md border border-delete-red px-4 py-3  font-sans text-lg font-medium text-delete-red hover:bg-dark-red-hover hover:text-white"
                         onClick={onDeleteParentingGuideOpen}
                       >
-                        Delete Parenting Guide <X size={18} />
-                      </Button>
+                        Delete PDF <Trash size={18} />
+                      </button>
                     )}
                     <DeleteComponentModal
                       isOpen={isDeleteParentingGuideOpen}
@@ -257,7 +248,7 @@ export default function TabsComponent({
             )}
             {((gameData.answerKey && gameData.answerKey !== "" && authorized) ||
               mode === "edit") && (
-              <TabPanel className="p-0" display="flex" flexDir="column" gap={2}>
+              <TabPanel className="p-0" display="flex" flexDir="column" gap={8}>
                 {((gameData.answerKey && gameData.answerKey !== "") ||
                   gameData.answerKeyFile) && (
                   <iframe
@@ -271,9 +262,8 @@ export default function TabsComponent({
                   />
                 )}
                 {mode === "edit" && (
-                  <div className="flex flex-row gap-2">
+                  <div className="flex flex-row gap-4">
                     <UploadModal
-                      title="Answer Key"
                       field="answerKey"
                       fileField="answerKeyFile"
                       gameData={gameData}
@@ -281,14 +271,12 @@ export default function TabsComponent({
                     />
                     {((gameData.answerKey && gameData.answerKey !== "") ||
                       gameData.answerKeyFile) && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="items-center gap-1 border-red-700 text-red-700 hover:bg-red-700"
+                      <button
+                        className="flex items-center gap-1 rounded-md border border-delete-red px-4 py-3  font-sans text-lg font-medium text-delete-red hover:bg-dark-red-hover hover:text-white"
                         onClick={onDeleteAnswerKeyOpen}
                       >
-                        Delete Answer Key <X size={18} />
-                      </Button>
+                        Delete PDF <Trash size={18} />
+                      </button>
                     )}
                     <DeleteComponentModal
                       isOpen={isDeleteAnswerKeyOpen}

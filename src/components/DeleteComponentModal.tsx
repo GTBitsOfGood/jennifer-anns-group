@@ -6,7 +6,6 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   AlertDialogCloseButton,
-  useDisclosure,
   ChakraProvider,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
@@ -38,19 +37,11 @@ export default function DeleteComponentModal(props: Props) {
   };
 
   const subtitle: Record<string, string> = {
-    game: "a game page",
+    game: "a game ",
     answerKey: "an answer key",
     parentingGuide: "a parenting guide",
     lessonPlan: "a lesson plan",
     trailer: "a trailer",
-  };
-
-  const button: Record<string, string> = {
-    game: "page",
-    answerKey: "key",
-    parentingGuide: "guide",
-    lessonPlan: "plan",
-    trailer: "trailer",
   };
 
   const deleteFunction: Record<string, () => Promise<void>> = {
@@ -118,37 +109,35 @@ export default function DeleteComponentModal(props: Props) {
           <AlertDialogOverlay />
 
           <AlertDialogContent
+            className="items-center border-blue-primary p-12"
             border="4px"
-            borderColor="brand.600"
-            height="444"
-            maxWidth="585"
+            minHeight="250px"
+            minWidth="480px"
           >
             <div>
-              <AlertDialogCloseButton mr="50px" mt="50px" color="brand.600" />
+              <AlertDialogCloseButton className="mr-11 mt-11 text-sm text-blue-primary" />
             </div>
-            <AlertDialogHeader p="0">
-              <div className="mx-[110px] mt-[100px] text-center text-[26px] font-bold leading-tight text-blue-primary">
-                Are you sure you want to delete {title[deleteType]}?
-              </div>
+            <AlertDialogHeader className="mt-12 w-80 p-0 text-center font-sans text-lg font-semibold text-blue-primary">
+              Are you sure you want to delete &quot;{title[deleteType]}&quot;?
             </AlertDialogHeader>
-            <AlertDialogBody p="0" mt="50px">
-              <div className="mb-10 text-center font-sans text-base font-normal">
+            <AlertDialogBody p="0">
+              <div className="mt-6 text-center font-sans text-base">
                 Deleting {subtitle[deleteType]} is final and cannot be undone.
               </div>
             </AlertDialogBody>
-            <AlertDialogFooter p="0" justifyContent="center">
-              <button
-                onClick={handleDelete}
-                className="mb-24 mr-[22px] h-[47px] w-[198px] rounded-[10px] bg-delete-red font-sans font-semibold text-white"
-              >
-                Yes, delete {button[deleteType]}
-              </button>
+            <AlertDialogFooter className="mt-12 w-full justify-center gap-4 p-0">
               <button
                 ref={cancelRef}
                 onClick={props.onClose}
-                className="mb-24 ml-[22px] h-[47px] w-[198px] rounded-[10px] border-[1px] border-solid border-black font-sans font-semibold"
+                className="w-full rounded-md border border-border px-4 py-3 font-sans text-xl font-medium hover:border-gray-tab hover:bg-gray-tab"
               >
-                No, return
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="w-full rounded-md bg-delete-red px-4 py-3 font-sans text-xl font-medium text-white hover:bg-dark-red-hover"
+              >
+                Yes, delete
               </button>
             </AlertDialogFooter>
           </AlertDialogContent>
