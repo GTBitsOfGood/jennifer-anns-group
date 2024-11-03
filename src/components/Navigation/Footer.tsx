@@ -19,9 +19,9 @@ export const Footer = () => {
 
   return (
     <div>
-      <div className="flex w-full justify-between overflow-hidden border-t border-zinc-200">
-        <div className="flex w-full flex-row justify-between px-16 py-16">
-          <div className="">
+      <div className="flex w-full overflow-hidden border-t border-zinc-200 md:justify-between">
+        <div className="flex w-full flex-col justify-between gap-8 px-8 pb-8 md:flex-row md:gap-4 md:px-16 md:py-16">
+          <div className="w-full">
             <img
               src="/logo_gray.svg"
               className="mb-5 h-36 w-36"
@@ -55,7 +55,7 @@ export const Footer = () => {
               )}
             </div>
           </div>
-          <div className="lg:max-w-xs">
+          <div className="w-full">
             <div className="mb-4 font-dm-sans text-lg font-bold leading-snug text-indigo-950">
               Mission
             </div>
@@ -64,7 +64,7 @@ export const Footer = () => {
               advocacy.
             </div>
           </div>
-          <div>
+          <div className="w-full">
             <div className="mb-4 font-dm-sans text-lg font-bold leading-snug text-indigo-950">
               Contact us
             </div>
@@ -104,7 +104,7 @@ export const Footer = () => {
           </div>
         </div>
       </div>
-      <div className="px-16 pb-16">
+      <div className="px-8 pb-16 md:px-16">
         <div className="flex items-center gap-4">
           <img src="/footer/Netlify.svg" width={"40px"}></img>
           <p className="text-base text-slate-500">

@@ -15,7 +15,7 @@ export default function MarkdownRenderer({
   const reactElement = htmlToReactParser.parse(html);
 
   return (
-    <div className="prose max-w-none text-lg text-[#2352A0]">
+    <div className="prose max-w-none text-base text-[#2352A0] md:text-lg">
       {reactElement}
     </div>
   );

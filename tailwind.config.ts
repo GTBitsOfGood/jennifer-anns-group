@@ -19,6 +19,9 @@ const config = {
       },
     },
     extend: {
+      screens: {
+        xs: "460px",
+      },
       colors: {
         "blue-primary": "#2352A0",
         "blue-bg": "#A9CBEB",
