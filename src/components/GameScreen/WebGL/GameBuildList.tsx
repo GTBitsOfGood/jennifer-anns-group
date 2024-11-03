@@ -1,7 +1,14 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { NonWebGLBuilds, buildSchema } from "@/utils/types";
-import { AlertTriangleIcon, Download, Pencil, Plus, Trash } from "lucide-react";
+import {
+  AlertTriangleIcon,
+  Download,
+  ExternalLink,
+  Pencil,
+  Plus,
+  Trash,
+} from "lucide-react";
 import { z } from "zod";
 import { Label } from "@/components/ui/label";
 import { useAnalytics } from "@/context/AnalyticsContext";
@@ -218,8 +225,17 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
                         window.open(data.link, "_blank");
                       }}
                     >
-                      <Download />
-                      Download
+                      {data.type == "remote" ? (
+                        <>
+                          <ExternalLink />
+                          Itch.io Zone
+                        </>
+                      ) : (
+                        <>
+                          <Download />
+                          Download
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -343,6 +359,17 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
                                     </SelectItem>
                                     <SelectItem
                                       disabled={
+                                        !(data.type == "remote") &&
+                                        gameData?.builds?.some(
+                                          (build) => build.type === "remote",
+                                        )
+                                      }
+                                      value="remote"
+                                    >
+                                      Remote URL (iframe src)
+                                    </SelectItem>
+                                    <SelectItem
+                                      disabled={
                                         !(data.type == "windows") &&
                                         gameData?.builds?.some(
                                           (build) => build.type === "windows",
@@ -384,25 +411,28 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
                               </div>
                             </span>
                           </div>
-
-                          <div className="flex w-full flex-col items-start gap-3 md:flex-row md:gap-8">
-                            <Label
-                              htmlFor="instructions"
-                              className="text-md min-w-21 font-semibold"
-                            >
-                              Instructions
-                            </Label>
-                            <span className="w-full">
-                              <TextArea
-                                id="instructions"
-                                className="min-h-24 shrink text-xs font-light"
-                                value={instructions}
-                                onChange={(
-                                  e: React.ChangeEvent<HTMLTextAreaElement>,
-                                ) => setInstructions(e.target.value)}
-                              />
-                            </span>
-                          </div>
+                          {data.type != "remote" ? (
+                            <div className="flex w-full flex-col items-start gap-3 md:flex-row md:gap-8">
+                              <Label
+                                htmlFor="instructions"
+                                className="text-md min-w-21 font-semibold"
+                              >
+                                Instructions
+                              </Label>
+                              <span className="w-full">
+                                <TextArea
+                                  id="instructions"
+                                  className="min-h-24 shrink text-xs font-light"
+                                  value={instructions}
+                                  onChange={(
+                                    e: React.ChangeEvent<HTMLTextAreaElement>,
+                                  ) => setInstructions(e.target.value)}
+                                />
+                              </span>
+                            </div>
+                          ) : (
+                            <></>
+                          )}
                           {validationErrors.link && (
                             <div className="mt-2 flex h-10 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
                               <AlertTriangleIcon className="h-5 w-5" />

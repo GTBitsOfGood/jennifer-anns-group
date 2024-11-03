@@ -297,7 +297,7 @@ function UploadGameBuild(props: Props) {
                         )}
                         value="remote"
                       >
-                        Remote URL (iframe, temporary)
+                        Remote URL (iframe src)
                       </SelectItem>
                       <SelectItem disabled={props.uploadedWebGL} value="webgl">
                         WebGL (Unity)
