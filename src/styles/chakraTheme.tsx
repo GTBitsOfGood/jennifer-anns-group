@@ -8,13 +8,12 @@ const Tabs = tabsHelper.defineMultiStyleConfig({
   baseStyle: {
     tab: {
       borderBottom: "4px solid",
-      color: "#98A2B3",
+      color: "#A3AED0",
       borderColor: "#EAECF0",
       mb: "-4px",
       fontWeight: "400",
       _selected: {
         color: "#164C96",
-        fontWeight: "600",
         borderColor: "#164C96",
         borderBottomWidth: "4px",
         mb: "-4px",
@@ -96,6 +95,13 @@ const Checkbox = checkboxHelper.defineMultiStyleConfig({
 });
 
 const chakraTheme = extendTheme({
+  styles: {
+    global: {
+      ":root": {
+        "--tabs-color": "#A3AED0",
+      },
+    },
+  },
   colors: {
     brand: {
       300: "#FDD299",

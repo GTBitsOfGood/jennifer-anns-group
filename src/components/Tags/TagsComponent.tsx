@@ -9,7 +9,6 @@ import { AddIcon } from "@chakra-ui/icons";
 import { z } from "zod";
 import { Dispatch, useEffect, useState } from "react";
 import SearchTagsComponent from "./SearchTagsComponent";
-import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { tagSchema, themeSchema } from "@/utils/types";
 import { GameDataState } from "../GameScreen/GamePage";
 import { gameBuildsMap } from "@/components/GameGallery/FilterBody";
@@ -94,7 +93,7 @@ export default function TagsComponent({
   return (
     <ChakraProvider theme={chakraTheme}>
       <div>
-        <div className="m-auto flex w-5/6 flex-row flex-wrap pb-3 pt-6 font-inter text-base">
+        <div className="flex flex-row flex-wrap font-inter text-base">
           {gameData.videoTrailer ? <Tag>Video Trailer</Tag> : null}
           {gameData.parentingGuide ? <Tag>Parenting Guide</Tag> : null}
           {gameData.lesson ? <Tag>Lesson Plan</Tag> : null}

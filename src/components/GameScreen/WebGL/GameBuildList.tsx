@@ -200,7 +200,7 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
           (data: z.infer<typeof buildSchema>, index: number) => (
             <div key={index} className="mb-4">
               <div className="flex flex-row items-center justify-between">
-                <div key={index} className="mb-2 flex flex-row gap-5">
+                <div key={index} className="flex flex-row gap-5">
                   <div className="flex max-h-14 min-h-14 w-14 min-w-14 max-w-14">
                     <Image
                       src={`/gamebuilds/${data.type}.png`}

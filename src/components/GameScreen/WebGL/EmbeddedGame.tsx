@@ -89,12 +89,12 @@ export default function EmbeddedGame({
       onLoad={handleLoad}
       height={height}
       src={`/games/${gameId}/raw`}
-      className={cn("m-auto my-6 w-10/12", {
+      className={cn("", {
         "border-2 border-solid border-black": height !== "0px",
       })}
     />
   ) : (
-    <div className="m-auto my-6 flex h-[600px] w-10/12 flex-col items-center justify-center border-2 border-solid border-black">
+    <div className="flex h-game flex-col items-center justify-center border-2 border-solid border-black">
       <Image src={`/orange_heart.svg`} alt="No data" width={90} height={70} />
       <div className="mt-4 text-center text-2xl font-semibold text-orange-primary">
         This game is not playable from the browser.

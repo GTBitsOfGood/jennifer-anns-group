@@ -164,7 +164,7 @@ const EditGamePage = ({
 
   return (
     <div>
-      <div className="mx-auto mt-32 flex w-[75vw] items-center justify-center gap-3">
+      <div className="m-14 flex items-center justify-center gap-3">
         <div className="flex-1"></div>
         <input
           className="flex-1 rounded-[20px] border border-solid border-grey bg-input-bg py-2.5 text-center font-sans text-[56px] font-semibold !outline-none"

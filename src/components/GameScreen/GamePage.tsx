@@ -2,12 +2,11 @@ import { useRouter } from "next/router";
 import { useEffect, useState, useRef } from "react";
 import TabsComponent from "../Tabs/TabsComponent";
 import TagsComponent from "../Tags/TagsComponent";
-import ContactComponent from "../Tabs/ContactComponent";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { userSchema } from "@/utils/types";
 import EmbeddedGame from "@/components/GameScreen/WebGL/EmbeddedGame";
-import NotesComponent from "@/components/Tabs/NotesComponent";
+import NotesContactComponent from "@/components/Tabs/NotesContactComponent";
 import AdminEditButton from "@/components/GameScreen/AdminEditButton";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import {
@@ -22,6 +21,7 @@ import {
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
 
 export type GameDataState = populatedGameWithId & {
   parentingGuideFile: File | undefined;
@@ -120,6 +120,13 @@ const GamePage = ({ mode, gameData }: Props) => {
     }
   };
 
+  const returnToGallery = () => {
+    if (mode === "preview") {
+      deleteOnRouteChange.current = true;
+    }
+    router.push("/games");
+  };
+
   useEffect(() => {
     if (mode === "preview") {
       const routeChangeStart = (url: string) => {
@@ -169,26 +176,40 @@ const GamePage = ({ mode, gameData }: Props) => {
 
   return (
     <ChakraProvider theme={chakraTheme}>
-      <div>
+      <div className="m-14 flex flex-col gap-14">
         {mode === "preview" && (
           <div className="flex h-fit w-full flex-col items-center justify-center bg-blue-bg py-2 font-sans">
             <p className="font-bold">🔍 You are in preview mode.</p>
             <p>Note: Leaving this page will discard your progress.</p>
           </div>
         )}
-        <h1 className="mt-[32px] text-center font-sans text-[56px] font-semibold">
-          {curData.name}
-        </h1>
-        {loaded && (
-          <>
-            {userData.label === "administrator" && (
-              <AdminEditButton
-                gameId={gameData._id}
-                deleteOnRouteChange={deleteOnRouteChange}
-              />
-            )}
-          </>
-        )}
+        <div className="flex items-center justify-between">
+          <button
+            className="group flex flex-row items-center"
+            onClick={returnToGallery}
+          >
+            <ChevronLeft className="text-font-600 group-hover:text-font-900" />
+            <p className="ml-2 font-sans text-2xl text-font-600 group-hover:text-font-900">
+              Game Gallery
+            </p>
+          </button>
+
+          <h1 className="text-center font-sans text-5.5xl font-semibold text-font-1000">
+            {curData.name}
+          </h1>
+          {loaded && (
+            <>
+              {userData.label === "administrator" ? (
+                <AdminEditButton
+                  gameId={gameData._id}
+                  deleteOnRouteChange={deleteOnRouteChange}
+                />
+              ) : (
+                <div className="w-48"></div>
+              )}
+            </>
+          )}
+        </div>
         {sessionStatus !== "loading" && (
           <EmbeddedGame
             gameId={gameData._id as string}
@@ -204,12 +225,10 @@ const GamePage = ({ mode, gameData }: Props) => {
           userData={currentUser}
         />
         {loaded && userData.label !== "administrator" && (
-          <NotesComponent gameId={gameData._id} userId={userId} />
-        )}
-        {loaded && userData.label !== "administrator" && (
-          <ContactComponent
-            gameName={curData.name}
+          <NotesContactComponent
+            gameId={gameData._id}
             userId={userId}
+            gameName={curData.name}
             firstName={userData.firstName}
           />
         )}

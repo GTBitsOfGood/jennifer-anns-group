@@ -97,11 +97,7 @@ export default function TabsComponent({
   return (
     <ChakraProvider theme={chakraTheme}>
       <div>
-        <Tabs
-          colorScheme="brand"
-          className="m-auto w-5/6 font-sans"
-          onChange={onTabChange}
-        >
+        <Tabs colorScheme="brand" className="font-sans" onChange={onTabChange}>
           <TabList>
             {mode === "view" ? (
               <>
@@ -135,9 +131,9 @@ export default function TabsComponent({
               </>
             )}
           </TabList>
-          <TabPanels className="mb-12 mt-8  text-gray-500">
+          <TabPanels className="mt-8 text-gray-500">
             {/** description tab display depends on edit or view mode */}
-            <TabPanel p="0px">
+            <TabPanel className="p-0">
               {mode === "edit" ? (
                 <div className="rounded-[20px] border border-solid border-grey bg-input-bg">
                   <textarea
@@ -147,7 +143,9 @@ export default function TabsComponent({
                   />
                 </div>
               ) : (
-                <p>{gameData.description}</p>
+                <p className="font-sans text-input-stroke">
+                  {gameData.description}
+                </p>
               )}
             </TabPanel>
             {/** other tabs render if field exists or in edit mode */}
@@ -163,7 +161,7 @@ export default function TabsComponent({
             )}
             {((gameData.lesson && gameData.lesson !== "") ||
               mode === "edit") && (
-              <TabPanel display="flex" flexDir="column" gap={2}>
+              <TabPanel className="p-0" display="flex" flexDir="column" gap={2}>
                 {((gameData.lesson && gameData.lesson !== "") ||
                   gameData.lessonFile) && (
                   <iframe
@@ -209,7 +207,7 @@ export default function TabsComponent({
             )}
             {((gameData.parentingGuide && gameData.parentingGuide !== "") ||
               mode === "edit") && (
-              <TabPanel display="flex" flexDir="column" gap={2}>
+              <TabPanel className="p-0" display="flex" flexDir="column" gap={2}>
                 {((gameData.parentingGuide && gameData.parentingGuide !== "") ||
                   gameData.parentingGuideFile) && (
                   <iframe
@@ -259,7 +257,7 @@ export default function TabsComponent({
             )}
             {((gameData.answerKey && gameData.answerKey !== "" && authorized) ||
               mode === "edit") && (
-              <TabPanel display="flex" flexDir="column" gap={2}>
+              <TabPanel className="p-0" display="flex" flexDir="column" gap={2}>
                 {((gameData.answerKey && gameData.answerKey !== "") ||
                   gameData.answerKeyFile) && (
                   <iframe
@@ -305,7 +303,7 @@ export default function TabsComponent({
             )}
             {((gameData?.builds && gameData.builds.length > 0) ||
               mode === "edit") && (
-              <TabPanel>
+              <TabPanel className="p-0">
                 <GameBuildList
                   gameData={gameData}
                   editing={mode === "edit"}

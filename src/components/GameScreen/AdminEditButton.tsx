@@ -19,7 +19,7 @@ export default function AdminEditButton({
   };
 
   return (
-    <div className="mx-auto flex w-[80vw] justify-end">
+    <div className="justify-end">
       <button
         className="rounded-full bg-input-border"
         onClick={handleEditClick}

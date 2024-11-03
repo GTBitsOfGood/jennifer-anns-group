@@ -22,6 +22,7 @@ const config = {
       colors: {
         "blue-primary": "#2352A0",
         "blue-bg": "#A9CBEB",
+        "blue-hover": "#4F75B3",
         "orange-primary": "#FC9300",
         "orange-bg": "#FFDFB3",
         "orange-light-bg": "#FFF5E6",
@@ -38,6 +39,14 @@ const config = {
         "stone-primary": "#535353",
         black: "#4C4B4B",
         "font-1000": "#1A222B",
+        "font-600": "#7A8086",
+        "font-900": "#38414B",
+      },
+      fontSize: {
+        "5.5xl": "56px",
+      },
+      height: {
+        game: "600px",
       },
       fontFamily: {
         sans: ["Poppins", "sans-serif"], // Default `Poppins` font family to sans
