@@ -280,10 +280,10 @@ const Home = ({
               alt="Discord Icon"
             />
             <div>
-              <h2 className="mb-4 text-3xl font-semibold text-blue-primary">
+              <h2 className="mb-4 text-4xl font-semibold text-blue-primary">
                 Want to learn more about Gaming Against Violence?
               </h2>
-              <p className="text-3xl italic text-blue-primary">
+              <p className="text-2xl italic text-blue-primary">
                 Join our{" "}
                 <Link className="underline" href="" target="_blank">
                   Jennifer Ann&apos;s Group&apos;s discord!
@@ -297,7 +297,7 @@ const Home = ({
             <img src={`/bog_logo_2.svg`} alt="Bits of Good Logo" />
             <div className="ml-12">
               <img src={`/bog_logo_1.svg`} alt="Bits of Good Logo" />
-              <p className="mt-3 text-2xl font-semibold text-orange-primary">
+              <p className="mt-3 text-3xl font-semibold text-orange-primary">
                 Thanks to Bits of Good for helping create our site!
               </p>
             </div>

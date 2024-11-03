@@ -13,24 +13,21 @@ export const Footer = () => {
     Instagram: ["https://www.instagram.com", "19", "19"],
     LinkedIn: ["https://www.linkedin.com", "19", "18"],
     YouTube: ["https://www.youtube.com", "21", "15"],
-    Mastodon: ["https://joinmastodon.org/", "19", "15"],
-    Pinterest: ["https://www.pinterest.com", "19", "19"],
+    // Mastodon: ["https://joinmastodon.org/", "19", "15"],
+    // Pinterest: ["https://www.pinterest.com", "19", "19"],
   };
 
   return (
     <div>
-      <div className="flex w-full justify-center overflow-hidden border-t border-zinc-200">
-        <div className="flex w-[calc(100%-4rem)] max-w-7xl flex-row justify-between py-24">
-          <div className="mb-5 ml-5 mr-5 shrink-0">
+      <div className="flex w-full justify-between overflow-hidden border-t border-zinc-200">
+        <div className="flex w-full flex-row justify-between px-16 py-16">
+          <div className="">
             <img
               src="/logo_gray.svg"
               className="mb-5 h-36 w-36"
               alt="Logo"
             ></img>
             <div className="flex flex-col items-start justify-center gap-2">
-              <div className="font-dm-sans text-sm font-normal text-slate-500">
-                Jennifer Ann&apos;s Group&reg;
-              </div>
               <div className="font-dm-sans text-sm font-normal text-slate-500">
                 #stopTDV
               </div>
@@ -58,54 +55,63 @@ export const Footer = () => {
               )}
             </div>
           </div>
-          <div className="m-5 shrink lg:ml-[5vw] lg:mr-[5vw] lg:max-w-xs">
-            <div className="mb-10 font-dm-sans text-xl font-bold leading-snug text-indigo-950">
+          <div className="lg:max-w-xs">
+            <div className="mb-4 font-dm-sans text-lg font-bold leading-snug text-indigo-950">
               Mission
             </div>
-            <div className="font-dm-sans text-lg font-normal text-slate-500">
+            <div className="font-dm-sans text-base font-normal text-slate-500">
               Preventing teen dating violence through awareness, education, and
               advocacy.
             </div>
           </div>
-          <div className="m-5 flex shrink-0 flex-col gap-6 lg:max-w-xs">
-            <div className="mb-[14px] font-dm-sans text-xl font-bold leading-snug text-indigo-950">
+          <div>
+            <div className="mb-4 font-dm-sans text-lg font-bold leading-snug text-indigo-950">
               Contact us
             </div>
-            <div className="flex gap-[6px]">
-              <img src="/footer/Website.svg"></img>
-              <Link
-                className="font-dm-sans text-lg font-normal leading-tight text-slate-500 hover:underline"
-                href="https://jenniferann.org/"
-                target="_blank"
-              >
-                JenniferAnn.org
-              </Link>
-            </div>
-            <img
-              src="/footer/Email_Contact.png"
-              className="h-5 w-[245px]"
-            ></img>
-            <div className="flex gap-[6px]">
-              <img src="/footer/Phone.svg"></img>
-              <div className="font-dm-sans text-lg font-normal leading-tight text-slate-500">
-                877-786-7838 (877 STOP TDV)
+            <div className="flex shrink-0 flex-col gap-3 text-base lg:max-w-xs">
+              <div className="flex gap-2">
+                <img src="/footer/Website.svg" width={"20px"}></img>
+                <Link
+                  className="font-dm-sans font-normal leading-tight text-slate-500 hover:underline"
+                  href="https://jenniferann.org/"
+                  target="_blank"
+                >
+                  JenniferAnn.org
+                </Link>
               </div>
+              <div className="flex gap-2 font-dm-sans font-normal leading-tight text-slate-500">
+                <img src="/footer/Email.svg" width={"20px"}></img>
+                <p>contact@JenniferAnn.org</p>
+              </div>
+              <div className="flex gap-2">
+                <img src="/footer/Phone.svg" width={"20px"}></img>
+                <div className="font-dm-sans font-normal leading-tight text-slate-500">
+                  877-786-7838 (877 STOP TDV)
+                </div>
+              </div>
+              <div className="mt-4 text-base text-slate-500">
+                For details about how we use your information, please see our{" "}
+                <span onClick={() => setModalOpen(true)} className="underline">
+                  privacy policy
+                </span>
+                .
+              </div>
+              <PrivacyPolicyModal
+                isOpen={isModalOpen}
+                onClose={() => setModalOpen(false)}
+              />
             </div>
-            <div className="text-slate-500">
-              For details about how we use your information, please see our{" "}
-              <span onClick={() => setModalOpen(true)} className="underline">
-                privacy policy
-              </span>
-              .
-            </div>
-            <PrivacyPolicyModal
-              isOpen={isModalOpen}
-              onClose={() => setModalOpen(false)}
-            />
           </div>
         </div>
       </div>
-      <div className="mx-auto mb-20 w-11/12 border-t border-zinc-200"></div>
+      <div className="px-16 pb-16">
+        <div className="flex items-center gap-4">
+          <img src="/footer/Netlify.svg" width={"40px"}></img>
+          <p className="text-base text-slate-500">
+            This site is powered by Netlify
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
