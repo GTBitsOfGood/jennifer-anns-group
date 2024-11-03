@@ -14,6 +14,7 @@ import {
   EditUserReturnValue,
 } from "./ProfileModal";
 import { set } from "mongoose";
+import { Check } from "lucide-react";
 
 const formUserSchema = userSchema.omit({ hashedPassword: true, notes: true });
 
@@ -38,10 +39,10 @@ function EditProfileModal(props: EditProps) {
   const confirmationCodeRef = useRef<HTMLInputElement>(null);
   const [invalidEmail, setInvalidEmail] = useState("");
   const [email, setEmail] = useState(props.userData?.email);
-  const [emailChanged, setEmailChanged] = useState(false);
-  const [emailChangeLocked, setEmailChangeLocked] = useState(false);
-  const [verificationSent, setVerificationSent] = useState(false);
-  const [verified, setVerified] = useState(false);
+
+  const [verificationState, setVerificationState] = useState("");
+  //Condense , no email changed (null) emailChanged,verification_being_sent,verificationSent, verified, to one state.
+  // "", email-changed, sending, sent, verified.
   const [trackedChecked, setTrackedChecked] = useState<boolean>(
     props.userData?.tracked ?? false,
   );
@@ -52,23 +53,27 @@ function EditProfileModal(props: EditProps) {
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
-    setEmailChanged(e.target.value !== props.userData?.email);
+    if (e.target.value !== props.userData?.email) {
+      setVerificationState("email-changed");
+    } else {
+      setVerificationState("");
+    }
     setInvalidEmail("");
   };
   const sendVerification = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     //Call api to send verification
-    setInvalidEmail("Sending code...");
+    setVerificationState("sending");
     const res = await fetch("/api/auth/email-verification/create", {
       method: "POST",
       body: JSON.stringify({ email: email }),
     });
     const json = await res.json();
     if (res?.ok) {
-      setVerificationSent(true);
-      setEmailChangeLocked(true);
+      setVerificationState("sent");
       setInvalidEmail("");
     } else {
+      setVerificationState("email-changed");
       if (json.message) {
         setInvalidEmail(json.message);
       } else {
@@ -89,11 +94,14 @@ function EditProfileModal(props: EditProps) {
     });
     console.log(res?.ok);
     if (res?.ok) {
-      setVerified(true);
+      setVerificationState("verified");
       setInvalidEmail("");
     } else {
       //Incorrect verification code
-      setInvalidEmail("Invalid code");
+      setVerificationState("sent");
+      setInvalidEmail(
+        'Code verification failed. Re-enter code or click "Cancel" to try again. ',
+      );
     }
   };
 
@@ -187,53 +195,60 @@ function EditProfileModal(props: EditProps) {
             defaultValue={email}
             autoComplete="email"
             onChange={handleEmailChange}
-            disabled={emailChangeLocked}
+            disabled={
+              verificationState !== "" && verificationState !== "email-changed"
+            }
             className={cn("col-span-8 text-xs font-light text-black", {
-              "border-red-500": invalidEmail !== "",
+              "border-red-500":
+                invalidEmail !== "" && verificationState == "email-changed",
             })}
           />
           <div className="mt-1 flex gap-1">
-            {invalidEmail && <WarningIcon />}
-            <p className="text-xs text-red-500">{invalidEmail}</p>
-          </div>
-          <div className="mt-1 flex gap-1">
-            {emailChanged && !verificationSent && !verified && (
+            {verificationState == "email-changed" && (
               <Button
-                variant="outline2"
-                className="px-4"
+                variant="outline"
+                className="flex-grow px-4 text-black"
                 onClick={sendVerification}
               >
-                Send Verification Code to <br />
-                {email}?
+                Send Verification Code
               </Button>
             )}
           </div>
           <div className="mt-1 flex gap-1">
-            {verificationSent && !verified && (
-              <div>
-                <Label
-                  htmlFor={EMAIL_FORM_KEY}
-                  className="text-right text-lg font-normal"
-                >
-                  Verification Code:
-                </Label>
-                <Input
-                  name={VERIFICATION_CODE_KEY}
-                  ref={confirmationCodeRef}
-                  autoComplete="Verification Code"
-                  className={cn("col-span-8 text-xs font-light text-black", {
-                    "": verificationSent,
-                  })}
-                />
-                <Button
-                  variant="outline2"
-                  className="px-4"
-                  onClick={checkVerification}
-                >
-                  Submit Code?
-                </Button>
-              </div>
+            {verificationState == "sending" && (
+              <Label className="flex-grow rounded border  bg-gray-100 p-3 text-center font-normal">
+                Sending code...
+              </Label>
             )}
+          </div>
+
+          {verificationState == "sent" && (
+            <div className="flex justify-between gap-2">
+              <Input
+                name={VERIFICATION_CODE_KEY}
+                ref={confirmationCodeRef}
+                placeholder="Enter code"
+                className="col-span-8 w-max text-xs font-light text-black"
+              />
+              <Button
+                variant="mainblue"
+                className="flex-shrink-0 px-4"
+                onClick={checkVerification}
+              >
+                Verify
+              </Button>
+            </div>
+          )}
+          {verificationState == "verified" && (
+            <div className="mt-1 flex items-center gap-1 text-blue-primary">
+              <Check size={20} />
+              <p className="text-xs ">Code verification successful</p>
+            </div>
+          )}
+
+          <div className="mt-1 flex gap-1">
+            {invalidEmail && <WarningIcon />}
+            <p className="text-xs text-red-500">{invalidEmail}</p>
           </div>
         </div>
 
@@ -278,10 +293,10 @@ function EditProfileModal(props: EditProps) {
         </div>
       </div>
       <DialogFooter>
-        <div className="relative mt-10 w-full">
+        <div className="relative mt-10 flex w-full gap-4">
           <Button
             variant="outline2"
-            className="absolute bottom-0 left-0 px-4 text-lg"
+            className=" flex-grow px-4 text-lg"
             onClick={() => props.setProfileState("view")}
           >
             Cancel
@@ -290,10 +305,10 @@ function EditProfileModal(props: EditProps) {
           <Button
             type="submit"
             variant="mainblue"
-            className="absolute bottom-0 right-0 px-4 text-lg"
+            className=" flex-grow px-4 text-lg"
             onClick={() => props.setProfileState("edit")}
           >
-            Save Changes
+            Save
           </Button>
         </div>
       </DialogFooter>
