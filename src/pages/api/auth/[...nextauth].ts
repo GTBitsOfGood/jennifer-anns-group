@@ -86,8 +86,7 @@ export const authenticate = async (
   }
   if (methods.includes(req.method)) {
     const session = await getServerSession(req, res, authOptions);
-
-    if (session && (session.user.label == "administator" || !adminRequired)) {
+    if (session && (session.user.label == "administrator" || !adminRequired)) {
       return true;
     } else {
       return res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({

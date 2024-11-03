@@ -45,6 +45,9 @@ const config = {
         inter: ["Inter", "sans-serif"],
         rubik: ["Rubik", "Poppins", "sans-serif"],
       },
+      fontSize: {
+        "14pt": "14pt",
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
