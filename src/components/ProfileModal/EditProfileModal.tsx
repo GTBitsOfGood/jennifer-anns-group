@@ -153,11 +153,11 @@ function EditProfileModal(props: EditProps) {
 
   return (
     <form onSubmit={handleProfileFormSubmit}>
-      <div className="-my-2 grid grid-cols-8 gap-3 py-4">
+      <div className="grid grid-cols-8 gap-3">
         <div className="col-span-4 items-center">
           <Label
             htmlFor={FNAME_FORM_KEY}
-            className="text-right text-lg font-normal"
+            className="text-right text-base font-normal"
           >
             First Name
           </Label>
@@ -171,7 +171,7 @@ function EditProfileModal(props: EditProps) {
         <div className="col-span-4 items-center">
           <Label
             htmlFor={LNAME_FORM_KEY}
-            className="text-right text-lg font-normal"
+            className="text-right text-base font-normal"
           >
             Last Name
           </Label>
@@ -185,7 +185,7 @@ function EditProfileModal(props: EditProps) {
         <div className="col-span-8 items-center">
           <Label
             htmlFor={EMAIL_FORM_KEY}
-            className="text-right text-lg font-normal"
+            className="text-right text-base font-normal"
           >
             Email
           </Label>
@@ -253,7 +253,7 @@ function EditProfileModal(props: EditProps) {
         </div>
 
         <div className="col-span-8 items-center">
-          <Label className="text-right text-lg font-normal">Role</Label>
+          <Label className="text-right text-base font-normal">Role</Label>
           <p className="col-span-3 py-2 text-sm font-light text-blue-primary">
             {props.userData?.label
               ? props.userData?.label.charAt(0).toUpperCase() +
@@ -261,7 +261,14 @@ function EditProfileModal(props: EditProps) {
               : ""}
           </p>
         </div>
-
+        <div className="col-span-8 items-center">
+          <p
+            onClick={() => props.setProfileState("changePw")}
+            className="text-base font-semibold text-blue-primary hover:cursor-pointer"
+          >
+            Change Password
+          </p>
+        </div>
         <div className="col-span-8 items-center">
           <input
             name={TRACKING_FORM_KEY}
@@ -282,14 +289,6 @@ function EditProfileModal(props: EditProps) {
               privacy policy
             </span> */}
           </Label>
-        </div>
-        <div className="col-span-8 items-center">
-          <p
-            onClick={() => props.setProfileState("changePw")}
-            className="mb-6 mt-2 text-lg font-semibold text-blue-primary hover:cursor-pointer"
-          >
-            Change Password
-          </p>
         </div>
       </div>
       <DialogFooter>

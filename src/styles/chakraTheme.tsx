@@ -95,6 +95,9 @@ const Checkbox = checkboxHelper.defineMultiStyleConfig({
 });
 
 const chakraTheme = extendTheme({
+  fonts: {
+    body: "Poppins, sans-serif",
+  },
   styles: {
     global: {
       ":root": {
