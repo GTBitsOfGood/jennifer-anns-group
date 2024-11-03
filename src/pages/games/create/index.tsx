@@ -48,6 +48,24 @@ export const buildFileTypes = Object.freeze({
   code: "build.wasm",
 });
 
+async function markAsRemote(gameId: string): Promise<boolean> {
+  if (!gameId) return false;
+  try {
+    await axios.put(
+      `/api/games/${gameId}`,
+      JSON.stringify({ remoteUrl: true }),
+      {
+        headers: {
+          "Content-Type": "text",
+        },
+      },
+    );
+  } catch (e) {
+    throw e;
+  }
+  return true;
+}
+
 async function uploadBuildFiles(gameId: string, files: Map<string, File>) {
   if (files.size !== 4) {
     throw new Error("Invalid build files");
@@ -368,6 +386,7 @@ function CreateGame() {
           ...prevValidationErrors,
           builds: "Please add at least one Game Build.",
         }));
+        return false;
       }
     }
     return true;
@@ -434,6 +453,17 @@ function CreateGame() {
           if (uploadedWebGL) {
             const webGLSubmit = await handleWebGLSubmit(data._id);
             if (!webGLSubmit) return;
+          }
+          if (builds.some((build) => build.type == "remote")) {
+            try {
+              const remoteSubmit = await markAsRemote(data._id);
+              if (!remoteSubmit) return;
+            } catch (e) {
+              setValidationErrors((prevValidationErrors) => ({
+                ...prevValidationErrors,
+                builds: "An internal error occurred. Please try again.",
+              }));
+            }
           }
           router.replace(`/games/${data._id}/preview`);
         } else {

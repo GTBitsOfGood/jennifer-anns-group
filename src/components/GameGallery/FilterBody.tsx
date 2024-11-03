@@ -1,5 +1,5 @@
 import { UserLabel, tagSchema } from "@/utils/types";
-import { Tag, VStack } from "@chakra-ui/react";
+import { Tag } from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { z } from "zod";
 import { PageRequiredGameQuery } from "../Admin/ThemesTags/GamesSection";
@@ -50,10 +50,10 @@ export default function FilterBody({
   }, []);
 
   useEffect(() => {
-    filters.gameBuilds && setSelectedGameBuilds(filters.gameBuilds);
-    filters.accessibility && setSelectedAccessibility(filters.accessibility);
-    filters.tags && setSelectedTags(filters.tags);
-    filters.gameContent && setSelectedGameContent(filters.gameContent);
+    setSelectedGameBuilds(filters.gameBuilds || []);
+    setSelectedAccessibility(filters.accessibility || []);
+    setSelectedTags(filters.tags || []);
+    setSelectedGameContent(filters.gameContent || []);
   }, [filters]);
 
   async function getAllTags() {
@@ -90,6 +90,7 @@ export default function FilterBody({
     setSelectedGameContent([]);
     const { gameBuilds, accessibility, tags, gameContent, ...rest } = filters;
     setFilters(rest);
+    onClose();
   }
 
   return (
@@ -223,7 +224,7 @@ export default function FilterBody({
       <div className="flex flex-row gap-4">
         <button
           onClick={clearSelections}
-          className="w-full rounded-md border border-[#E1E4ED] px-3 py-4 font-sans font-medium text-blue-primary"
+          className="w-full rounded-md border border-border px-3 py-4 font-sans font-medium text-blue-primary"
         >
           Clear
         </button>

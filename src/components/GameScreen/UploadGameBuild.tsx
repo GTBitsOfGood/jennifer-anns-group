@@ -291,8 +291,16 @@ function UploadGameBuild(props: Props) {
                       >
                         Mac
                       </SelectItem>
+                      <SelectItem
+                        disabled={props.builds.some(
+                          (build) => build.type === "remote",
+                        )}
+                        value="remote"
+                      >
+                        Remote URL (iframe src)
+                      </SelectItem>
                       <SelectItem disabled={props.uploadedWebGL} value="webgl">
-                        WebGL
+                        WebGL (Unity)
                       </SelectItem>
                       <SelectItem
                         disabled={props.builds.some(
@@ -308,90 +316,139 @@ function UploadGameBuild(props: Props) {
               </span>
             </div>
             {selectedOption !== "" &&
-              (selectedOption === "webgl" ? (
-                <WebGLUpload
-                  cancel={cancelUpload}
-                  setLoaderFile={props.setLoaderFile}
-                  setDataFile={props.setDataFile}
-                  setCodeFile={props.setCodeFile}
-                  setFrameworkFile={props.setFrameworkFile}
-                  setUploadedWebGL={props.setUploadedWebGL}
-                  setUploadedFilenames={setUploadedFilenames}
-                  setShowUploadGameBuild={setShowUploadGameBuild}
-                  setShowUploadedBuild={setShowUploadedBuild}
-                />
-              ) : (
-                <>
-                  <div className="flex w-full flex-row items-center justify-between gap-4">
-                    <Label
-                      htmlFor={URL_FORM_KEY}
-                      className="text-md font-medium"
-                    >
-                      URL
-                      <span className="text-orange-primary">*</span>
-                    </Label>
-
-                    <span className="w-full">
-                      <div className="flex flex-col">
-                        <Input
-                          className={
-                            "w-full text-xs font-light" +
-                            (validationErrors.link
-                              ? " border-red-500 focus-visible:ring-red-500"
-                              : "")
-                          }
-                          value={url}
-                          onChange={handleUrlChange}
-                          type="url"
-                        />
-                      </div>
-                    </span>
-                  </div>
-
-                  <div className="flex w-full flex-col items-start gap-3 md:flex-row md:gap-8">
-                    <Label
-                      htmlFor={INSTR_FORM_KEY}
-                      className="text-md min-w-14 font-medium"
-                    >
-                      Instructions
-                    </Label>
-                    <span className="w-full">
-                      <TextArea
-                        name={INSTR_FORM_KEY}
-                        className="min-h-24 shrink text-xs font-light"
-                        value={instructions}
-                        onChange={handleInstructionsChange}
-                        style={{ whiteSpace: "pre-line" }}
+              (() => {
+                switch (selectedOption) {
+                  case "webgl":
+                    return (
+                      <WebGLUpload
+                        cancel={cancelUpload}
+                        setLoaderFile={props.setLoaderFile}
+                        setDataFile={props.setDataFile}
+                        setCodeFile={props.setCodeFile}
+                        setFrameworkFile={props.setFrameworkFile}
+                        setUploadedWebGL={props.setUploadedWebGL}
+                        setUploadedFilenames={setUploadedFilenames}
+                        setShowUploadGameBuild={setShowUploadGameBuild}
+                        setShowUploadedBuild={setShowUploadedBuild}
                       />
-                    </span>
-                  </div>
-                  {validationErrors.link && (
-                    <div className="mt-2 flex h-10 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
-                      <AlertTriangleIcon className="h-5 w-5" />
-                      <p>{validationErrors.link}</p>
-                    </div>
-                  )}
-                  <div className="flex-end mt-5 flex w-full justify-end gap-3">
-                    <Button
-                      variant="white"
-                      className="px-4 text-lg"
-                      type="button"
-                      onClick={cancelUpload}
-                    >
-                      Cancel
-                    </Button>
+                    );
 
-                    <Button
-                      type="button"
-                      onClick={handleSubmitNonWebGL}
-                      variant="mainblue"
-                      className="px-4 text-lg"
-                    >
-                      Done
-                    </Button>
-                  </div>
-                </>
-              ))}
+                  case "remote":
+                    return (
+                      <>
+                        <div className="flex w-full flex-row items-center justify-between gap-4">
+                          <Label
+                            htmlFor={URL_FORM_KEY}
+                            className="text-md font-medium"
+                          >
+                            Remote URL
+                            <span className="text-orange-primary">*</span>
+                          </Label>
+                          <span className="w-full">
+                            <Input
+                              className={
+                                "w-full text-xs font-light" +
+                                (validationErrors.link
+                                  ? " border-red-500 focus-visible:ring-red-500"
+                                  : "")
+                              }
+                              value={url}
+                              onChange={handleUrlChange}
+                              type="url"
+                            />
+                          </span>
+                        </div>
+                        <div className="flex-end mt-5 flex w-full justify-end gap-3">
+                          <Button
+                            variant="white"
+                            className="px-4 text-lg"
+                            type="button"
+                            onClick={cancelUpload}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={handleSubmitNonWebGL}
+                            variant="mainblue"
+                            className="px-4 text-lg"
+                          >
+                            Done
+                          </Button>
+                        </div>
+                      </>
+                    );
+                  default:
+                    return (
+                      <>
+                        <div className="flex w-full flex-row items-center justify-between gap-4">
+                          <Label
+                            htmlFor={URL_FORM_KEY}
+                            className="text-md font-medium"
+                          >
+                            URL
+                            <span className="text-orange-primary">*</span>
+                          </Label>
+                          <span className="w-full">
+                            <Input
+                              className={
+                                "w-full text-xs font-light" +
+                                (validationErrors.link
+                                  ? " border-red-500 focus-visible:ring-red-500"
+                                  : "")
+                              }
+                              value={url}
+                              onChange={handleUrlChange}
+                              type="url"
+                            />
+                          </span>
+                        </div>
+
+                        <div className="flex w-full flex-col items-start gap-3 md:flex-row md:gap-8">
+                          <Label
+                            htmlFor={INSTR_FORM_KEY}
+                            className="text-md min-w-14 font-medium"
+                          >
+                            Instructions
+                          </Label>
+                          <span className="w-full">
+                            <TextArea
+                              name={INSTR_FORM_KEY}
+                              className="min-h-24 shrink text-xs font-light"
+                              value={instructions}
+                              onChange={handleInstructionsChange}
+                              style={{ whiteSpace: "pre-line" }}
+                            />
+                          </span>
+                        </div>
+                        {validationErrors.link && (
+                          <div className="mt-2 flex h-10 w-full items-center gap-2 rounded-sm bg-red-100 px-4 py-6 text-sm text-red-500">
+                            <AlertTriangleIcon className="h-5 w-5" />
+                            <p>{validationErrors.link}</p>
+                          </div>
+                        )}
+                        <div className="flex-end mt-5 flex w-full justify-end gap-3">
+                          <Button
+                            variant="white"
+                            className="px-4 text-lg"
+                            type="button"
+                            onClick={cancelUpload}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={handleSubmitNonWebGL}
+                            variant="mainblue"
+                            className="px-4 text-lg"
+                          >
+                            Done
+                          </Button>
+                        </div>
+                      </>
+                    );
+                }
+              })()}
           </div>
         </div>
       )}

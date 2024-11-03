@@ -12,14 +12,16 @@ const GameBoy: React.FC<Props> = ({ imageUrl }) => {
         className="h-auto w-full"
         alt="Gameboy"
       />
-      <div className="absolute left-[50%] top-[28%] -translate-x-1/2 -translate-y-1/2 transform">
-        {imageUrl && (
-          <img
-            src={imageUrl}
-            className="h-auto w-full scale-[.95] transform rounded-3xl border-2 border-orange-primary md:border-4"
-            alt="Overlay Image"
-          />
-        )}
+      <div className="absolute left-[50%] top-[28%] h-[30%] w-[48%] -translate-x-1/2 -translate-y-1/2 transform overflow-hidden rounded-3xl border-2 border-orange-primary md:border-[3.5px]">
+        <div className="flex h-full w-full">
+          {imageUrl && (
+            <img
+              src={imageUrl}
+              className="h-full w-full object-cover"
+              alt="Overlay Image"
+            />
+          )}
+        </div>
       </div>
     </div>
   );

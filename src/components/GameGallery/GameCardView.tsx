@@ -81,8 +81,8 @@ export default function GameCardView({
             ))
           ) : (
             <div className="flex w-full flex-row justify-center">
-              <p className="mb-[50vh] mt-40 w-[360px] text-center font-sans text-[34px] font-medium text-blue-primary">
-                Oops! No games match this search
+              <p className="mt-30 w-96 text-center font-sans text-2halfxl font-medium text-blue-primary">
+                Oops! No games match your criteria
               </p>
             </div>
           )}

@@ -139,7 +139,9 @@ const GamePage = ({ mode, gameData }: Props) => {
       };
 
       const onunload = () => {
-        void handleCancel();
+        if (deleteOnRouteChange.current) {
+          void handleCancel();
+        }
       };
 
       window.addEventListener("beforeunload", beforeunload);

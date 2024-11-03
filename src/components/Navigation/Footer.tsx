@@ -1,7 +1,11 @@
 import Link from "next/link";
 import React from "react";
+import PrivacyPolicyModal from "../Registration/PrivacyPolicyModal";
+import { useState } from "react";
 
 export const Footer = () => {
+  const [isModalOpen, setModalOpen] = useState<boolean>(false);
+
   // replace with actual social links when nonprofit gets back
   const socialLinks = {
     Facebook: ["https://www.facebook.com", "11", "19"],
@@ -54,7 +58,7 @@ export const Footer = () => {
               )}
             </div>
           </div>
-          <div className="m-5 shrink lg:ml-[15vw] lg:mr-[5vw]">
+          <div className="m-5 shrink lg:ml-[5vw] lg:mr-[5vw] lg:max-w-xs">
             <div className="mb-10 font-dm-sans text-xl font-bold leading-snug text-indigo-950">
               Mission
             </div>
@@ -63,7 +67,7 @@ export const Footer = () => {
               advocacy.
             </div>
           </div>
-          <div className="m-5 flex shrink-0 flex-col gap-6">
+          <div className="m-5 flex shrink-0 flex-col gap-6 lg:max-w-xs">
             <div className="mb-[14px] font-dm-sans text-xl font-bold leading-snug text-indigo-950">
               Contact us
             </div>
@@ -87,6 +91,17 @@ export const Footer = () => {
                 877-786-7838 (877 STOP TDV)
               </div>
             </div>
+            <div className="text-slate-500">
+              For details about how we use your information, please see our{" "}
+              <span onClick={() => setModalOpen(true)} className="underline">
+                privacy policy
+              </span>
+              .
+            </div>
+            <PrivacyPolicyModal
+              isOpen={isModalOpen}
+              onClose={() => setModalOpen(false)}
+            />
           </div>
         </div>
       </div>
