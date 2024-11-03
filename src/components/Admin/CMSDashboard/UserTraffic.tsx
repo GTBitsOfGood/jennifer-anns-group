@@ -52,10 +52,12 @@ const UserTraffic = ({
             width={180}
             height={140}
           />
-          <h1 className="mt-4 font-inter text-2xl text-orange-primary">
+          <h1 className="mt-4 font-sans text-2xl font-medium text-orange-primary">
             Sorry, no {currentTab.toLowerCase()}!
           </h1>
-          <h2 className="text-sm text-gray-500">
+          {/* prettier-ignore */}
+
+          <h2 className="text-gray-table-head font-inter text-sm">
             No users viewed the site today.
           </h2>
         </div>
@@ -81,33 +83,36 @@ const UserTraffic = ({
 
   return (
     <div className="flex flex-col items-start gap-4 self-stretch rounded-2xl">
-      <h1 className="self-stretch text-2xl">User Traffic</h1>
+      {/* prettier-ignore */}
+      <h1 className="text-black-title self-stretch text-2xl font-medium">
+        User Traffic
+      </h1>
       <div className="flex space-x-4 self-stretch border-b-2 border-orange-primary">
         <button
-          className={`rounded-t-md px-3 py-2 text-xs ${
+          className={`rounded-t px-[16px] py-[12px] text-xs font-medium ${
             currentTab === "Major Sources"
               ? "bg-orange-primary text-white"
-              : "bg-gray-100 text-gray-500"
+              : "bg-gray-tab text-gray-text hover:bg-gray-tab-hover"
           }`}
           onClick={() => setCurrentTab("Major Sources")}
         >
           Major Sources
         </button>
         <button
-          className={`rounded-t-md px-4 py-2 text-xs ${
+          className={`rounded-t px-[16px] py-[12px] text-xs font-medium ${
             currentTab === "Links"
               ? "bg-orange-primary text-white"
-              : "bg-gray-100 text-gray-500"
+              : "bg-gray-tab text-gray-text hover:bg-gray-tab-hover"
           }`}
           onClick={() => setCurrentTab("Links")}
         >
           Links
         </button>
         <button
-          className={`rounded-t-md px-4 py-2 text-xs ${
+          className={`rounded-t px-[16px] py-[12px] text-xs font-medium transition-all ${
             currentTab === "User Groups"
               ? "bg-orange-primary text-white"
-              : "bg-gray-100 text-gray-500"
+              : "bg-gray-tab text-gray-text hover:bg-gray-tab-hover"
           }`}
           onClick={() => setCurrentTab("User Groups")}
         >

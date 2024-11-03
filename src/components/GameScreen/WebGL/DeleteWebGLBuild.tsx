@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { Button } from "../../ui/button";
-import { X } from "lucide-react";
+import { Trash } from "lucide-react";
 import {
   AlertDialog,
-  AlertDialogBody,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogContent,
@@ -38,19 +36,15 @@ function DeleteWebGLBuild(props: Props) {
   }
 
   return (
-    <div className="my-4">
+    <div className="-mb-8 mt-4">
       <ChakraProvider theme={chakraTheme}>
         <div>
-          <Button
-            type="button"
+          <button
+            className="flex items-center gap-1 rounded-md border border-delete-red px-4 py-3  font-sans text-lg font-medium text-delete-red hover:bg-dark-red-hover hover:text-white"
             onClick={onOpen}
-            className="rounded-xl border border-delete-red bg-white px-4 py-2 font-sans text-lg text-xl font-semibold text-delete-red hover:bg-delete-red hover:text-white"
           >
-            <div className="flex items-center gap-2">
-              <p>Delete WebGL Build</p>
-              <X />
-            </div>
-          </Button>
+            Delete WebGL <Trash size={18} />
+          </button>
           <AlertDialog
             motionPreset="slideInBottom"
             leastDestructiveRef={cancelRef}

@@ -10,7 +10,7 @@ function getBuildFileUrl(gameId: string, type: BuildFileType) {
     buildFileTypes[type as keyof typeof buildFileTypes]
   }`;
 
-  return `${CLOUDFLARE_URL}/webgl-builds/${fileName}`;
+  return `${CLOUDFLARE_URL}/webgl-builds${process.env.NODE_ENV == "production" ? "-prod" : ""}/${fileName}`;
 }
 
 interface RawEmbeddedGameProps {

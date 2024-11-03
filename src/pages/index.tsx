@@ -31,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     const pageData = JSON.parse(JSON.stringify(data));
     return {
       props: {
-        pageData,
+        pageDataProp: pageData,
       },
     };
   } catch (error) {
@@ -45,8 +45,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
 };
 
 const Home = ({
-  pageData,
+  pageDataProp,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const [pageData, setPageData] = useState<IHomePage>(pageDataProp);
   const { data: session } = useSession();
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
@@ -55,6 +56,7 @@ const Home = ({
   const [editDescription, setEditDescription] = useState("");
   const [editError, setEditError] = useState("");
   const [images, setImages] = useState<{ [key: string]: string | null }>({});
+  const [isPrivacyPolicyOpen, setPrivacyPolicyOpen] = useState<boolean>(false);
 
   const { refetch, isLoading } = useQuery({
     queryKey: ["homepage"],
@@ -64,6 +66,7 @@ const Home = ({
         throw new Error("Failed to fetch homepage");
       }
       const data = await response.json();
+      setPageData(data);
       return data as IHomePage;
     },
     retry: 3,
@@ -87,7 +90,7 @@ const Home = ({
       const fetchedImages: { [key: string]: string | null } = {};
 
       await Promise.all(
-        pageData.gameBoys.map(async (gameBoy: { gameId: string }) => {
+        pageData.gameBoys.map(async (gameBoy) => {
           if (gameBoy.gameId) {
             const image = await fetchImage(gameBoy.gameId);
             fetchedImages[gameBoy.gameId] = image;
@@ -151,7 +154,7 @@ const Home = ({
             Gaming against violence.
           </h2>
         </div>
-        <div className="flex w-full flex-col items-center bg-blue-bg py-16">
+        <div className="flex w-full flex-col items-center bg-blue-bg py-[72px]">
           {edit ? (
             <div className="flex w-4/5 max-w-7xl flex-col space-y-6">
               <div className="flex space-x-4">
@@ -224,14 +227,17 @@ const Home = ({
                   }}
                 />
               )}
-              <div className="flex w-4/5 flex-col items-center">
-                <h1 className="mb-12 text-center text-3xl font-medium">
-                  {pageData.mdTitle}
-                </h1>
-                <MarkdownRenderer
-                  markdown={pageData.mdDescription}
-                  parse={(markdown) => mdParser.render(markdown)}
-                />
+              <div className="flex items-center">
+                <img src={`/Union.svg`} alt="union" className="mr-14" />
+                <div className="flex flex-col items-start">
+                  <h1 className="mb-6 text-left text-[40px] font-medium text-[#2352A0]">
+                    {pageData.mdTitle}
+                  </h1>
+                  <MarkdownRenderer
+                    markdown={pageData.mdDescription}
+                    parse={(markdown) => mdParser.render(markdown)}
+                  />
+                </div>
               </div>
             </div>
           )}
@@ -244,19 +250,19 @@ const Home = ({
               refetchHomePage={refetch}
             />
           )}
-          <h1 className="mb-12 text-center text-5xl font-semibold text-orange-primary">
+          <h1 className="mb-12 text-center text-4xl font-bold text-orange-primary">
             {pageData.gameBoyTitle}
           </h1>
-          <div className="flex w-full max-w-7xl justify-center space-x-20 px-16">
+          <div className="flex w-full max-w-[96rem] justify-center space-x-14 px-16">
             {pageData.gameBoys.map((gameBoy: IGameBoy, index: number) => {
               if (!gameBoy.gameId) {
                 return <></>;
               }
 
               return (
-                <div key={index} className="max-w-xs flex-1">
+                <div key={index} className="max-w-l flex-1">
                   <GameBoy imageUrl={images[gameBoy.gameId] || null} />
-                  <p className="mt-12 text-center text-gray-500">
+                  <p className="text-s text-black-1000 mt-12 text-center leading-7">
                     {gameBoy.description}
                   </p>
                 </div>
@@ -286,7 +292,7 @@ const Home = ({
             </div>
           </div>
         </div>
-        <div className="flex w-full max-w-7xl flex-col px-32 py-32">
+        <div className="flex w-full flex-col px-[72px] py-32">
           <div className="flex flex-row content-start items-center">
             <img src={`/bog_logo_2.svg`} alt="Bits of Good Logo" />
             <div className="ml-12">
@@ -296,7 +302,7 @@ const Home = ({
               </p>
             </div>
           </div>
-          <div className="mt-16 flex flex-row justify-between">
+          <div className="mt-16 flex flex-row justify-between gap-5">
             <div className="w-2/5">
               <h1 className="mb-8 text-2xl font-medium">About Bits of Good</h1>
               <p className="text-lg">
@@ -305,25 +311,35 @@ const Home = ({
                 to make an impact with a technical background.
               </p>
             </div>
-            <div className="flex w-2/5 flex-col items-end">
+            <div className="flex flex-col items-end">
               <div>
                 <h1 className="mb-8 text-2xl font-medium">
                   Special thanks to:
                 </h1>
                 <div className="flex flex-row space-x-8 text-lg">
                   <ul>
-                    <li>Annie Vallamattam</li>
-                    <li>Helen Chen</li>
-                    <li>Liane Nguyen</li>
-                    <li>Xingyi Luo</li>
+                    <li>Uma Anand</li>
+                    <li>Hayden Carpenter</li>
+                    <li>Samarth Chandna</li>
+                    <li>Katsuki Chan</li>
                   </ul>
                   <ul>
-                    <li>Aakash Gupta</li>
-                    <li>Ankith Thalanki</li>
-                    <li>Katsuki Chan</li>
-                    <li>Lauren Ji</li>
+                    <li>Helen Chen</li>
+                    <li>Ansley Franks</li>
                     <li>Nathan Gong</li>
-                    <li>Uma Anand</li>
+                    <li>Aakash Gupta</li>
+                  </ul>
+                  <ul>
+                    <li>Lauren Ji</li>
+                    <li>Yolanda Li</li>
+                    <li>Xingyi Luo</li>
+                    <li>Liane Nguyen</li>
+                  </ul>
+                  <ul>
+                    <li>Ankith Thalanki</li>
+                    <li>Hannah Tsai</li>
+                    <li>Annie Vallamattam</li>
+                    <li>Natasha Valluri</li>
                   </ul>
                 </div>
               </div>

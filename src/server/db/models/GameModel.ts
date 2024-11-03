@@ -44,6 +44,7 @@ const GameSchema = new Schema<IGame>(
     },
     description: { type: String, required: true },
     webGLBuild: { type: Boolean, default: false },
+    remoteUrl: { type: Boolean, default: false },
     builds: { type: [BuildSchema], default: [] },
     lesson: { type: String },
     parentingGuide: { type: String },

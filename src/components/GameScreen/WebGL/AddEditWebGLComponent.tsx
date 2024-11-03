@@ -221,32 +221,28 @@ function AddEditWebGLComponent(props: Props) {
   };
 
   return (
-    <div className="h-[65vh] font-sans">
-      <div className="border-3 group flex h-full w-full items-center justify-center rounded-md border border-black bg-[#FAFBFC]">
+    <div className="">
+      <div className="border-3 group flex h-game w-full items-center justify-center rounded-md border border-black bg-[#FAFBFC]">
         <Dialog open={open} onOpenChange={handleOpenChange}>
           <DialogTrigger asChild>
-            <Button
-              type="button"
-              variant="mainblue"
-              className="flex hidden h-12 rounded-xl text-lg font-semibold text-white group-hover:block "
-            >
+            <button className="rounded-md bg-blue-primary px-8 py-4 font-sans text-4xl font-medium text-white hover:bg-blue-hover">
               <div className="flex items-center gap-2 font-sans">
-                <p>{addOrEdit} WebGL Game</p>
+                <p>{addOrEdit} Game</p>
                 {addOrEdit === "Add" ? <Plus /> : <Pencil />}
               </div>
-            </Button>
+            </button>
           </DialogTrigger>
 
-          <DialogContent className="border-4 border-solid border-blue-primary px-12 py-10 font-sans md:w-2/3">
+          <DialogContent className="items-center border-4 border-solid border-blue-primary p-12 font-sans">
             <DialogHeader>
-              <DialogTitle className="-mb-2 text-lg font-semibold text-blue-primary">
+              <DialogTitle className="mt-12 p-0 text-lg font-semibold text-blue-primary">
                 {addOrEdit} WebGL Game
               </DialogTitle>
             </DialogHeader>
 
             <div className="flex w-full flex-col gap-4 py-4 font-sans">
               <div className="flex w-full flex-row items-center justify-between gap-3">
-                <h1 className="text-md font-semibold">
+                <h1 className="text-md">
                   Loader<span className="text-orange-primary">*</span>
                 </h1>
 
@@ -280,7 +276,7 @@ function AddEditWebGLComponent(props: Props) {
               </div>
 
               <div className="flex w-full flex-row items-center justify-between gap-3">
-                <h1 className="text-md font-semibold">
+                <h1 className="text-md">
                   Data<span className="text-orange-primary">*</span>
                 </h1>
 
@@ -312,7 +308,7 @@ function AddEditWebGLComponent(props: Props) {
               </div>
 
               <div className="flex w-full flex-row items-center justify-between gap-3">
-                <h1 className="text-md font-semibold">
+                <h1 className="text-md">
                   Code<span className="text-orange-primary">*</span>
                 </h1>
                 <span className="w-2/3">
@@ -343,7 +339,7 @@ function AddEditWebGLComponent(props: Props) {
               </div>
 
               <div className="flex w-full flex-row items-center justify-between gap-3">
-                <h1 className="text-md font-semibold">
+                <h1 className="text-md">
                   Framework<span className="text-orange-primary">*</span>
                 </h1>
                 <span className="w-2/3">
@@ -378,25 +374,21 @@ function AddEditWebGLComponent(props: Props) {
                   <p className="">All files must be uploaded!</p>
                 </div>
               )}
-              <div className="flex-end mt-5 flex w-full justify-end gap-3">
-                <Button
-                  variant="white"
-                  className="px-4 text-lg"
-                  type="button"
+              <div className="mt-5 flex w-full gap-3">
+                <button
+                  className="w-full rounded-md border border-border px-4 py-3 font-sans text-xl font-medium hover:border-gray-tab hover:bg-gray-tab"
                   disabled={uploading}
                   onClick={cancelSubmit}
                 >
                   Cancel
-                </Button>
-                <Button
-                  type="button"
+                </button>
+                <button
                   onClick={handleSubmit}
-                  variant="mainblue"
-                  className="px-4 text-lg"
+                  className="w-full rounded-md bg-blue-primary px-4 py-3 font-sans text-xl font-medium text-white hover:bg-blue-hover"
                   disabled={uploading}
                 >
-                  {uploading ? "Uploading..." : "Done"}
-                </Button>
+                  {uploading ? "Uploading..." : "Save"}
+                </button>
               </div>
             </div>
           </DialogContent>

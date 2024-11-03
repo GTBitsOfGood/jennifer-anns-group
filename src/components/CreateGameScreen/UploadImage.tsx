@@ -45,7 +45,7 @@ const UploadImage = ({
           id={imageFormKey}
           name={imageFormKey}
           type="file"
-          accept=".jpg,.jpeg,.png"
+          accept=".jpg,.jpeg,.png,.webp"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             if (event.target.files === null || event.target.files.length === 0)
               return;

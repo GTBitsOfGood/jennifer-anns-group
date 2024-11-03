@@ -16,6 +16,14 @@ import { Spinner } from "@chakra-ui/react";
 import { Button } from "@/components/ui/button";
 import { ArrowDownToLine } from "lucide-react";
 import * as XLSX from "xlsx";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PieChartDataProps {
   id: string;
@@ -461,46 +469,105 @@ const CMSDashboardPage = () => {
   }
 
   return (
-    <AdminTabs page={Pages.CMSDASHBOARD}>
-      <div className="flex">
-        <button
-          className={
-            dataAge === "Day" ? "p-6 text-orange-primary" : "p-6 text-black"
-          }
-          onClick={() => setDataAge("Day")}
-        >
-          Day
-        </button>
-        <button
-          className={
-            dataAge === "Week" ? "p-6 text-orange-primary" : "p-6 text-black"
-          }
-          onClick={() => setDataAge("Week")}
-        >
-          Week
-        </button>
-        <button
-          className={
-            dataAge === "Month" ? "p-6 text-orange-primary" : "p-6 text-black"
-          }
-          onClick={() => setDataAge("Month")}
-        >
-          Month
-        </button>
+    <div>
+      <div className="relative mx-auto w-[calc(100%-4rem)] max-w-[90%]">
+        <div className="absolute right-0 flex gap-2">
+          <Select
+            defaultValue={dataAge}
+            onValueChange={(value) =>
+              setDataAge(value as "Day" | "Week" | "Month")
+            }
+          >
+            <SelectTrigger className="gap-2 text-black">
+              <SelectValue>{dataAge}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Day">Day</SelectItem>
+              <SelectItem value="Week">Week</SelectItem>
+              <SelectItem value="Month">Month</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button
+            variant="mainblue"
+            className="text-md gap-2"
+            disabled={loading}
+            onClick={downloadDataXLSX}
+          >
+            <ArrowDownToLine size={18} /> Download XLSX
+          </Button>
+        </div>
       </div>
-      <div className="my-6 flex flex-col items-stretch gap-6 rounded-2xl bg-orange-light-bg p-8">
-        <div className="flex">
-          <div className="flex w-3/5 flex-col gap-6">
-            <div className="rounded-2xl bg-white p-6 text-2xl text-black">
-              <UserTraffic
-                trafficSourceData={trafficSourceData}
-                trafficGroupsData={trafficGroupsData}
-                loading={loading}
-              />
+      <AdminTabs page={Pages.CMSDASHBOARD}>
+        <div className="my-6 flex flex-col items-stretch gap-6 rounded-2xl bg-orange-light-bg p-8">
+          <div className="flex">
+            <div className="flex w-3/5 flex-col gap-6">
+              <div className="rounded-2xl bg-white p-6 text-2xl text-black">
+                <UserTraffic
+                  trafficSourceData={trafficSourceData}
+                  trafficGroupsData={trafficGroupsData}
+                  loading={loading}
+                />
+              </div>
+              {/* prettier-ignore */}
+              <div className="text-black-title flex h-full flex-col rounded-2xl bg-white p-6 text-2xl font-medium">
+                <p>Game Info</p>
+                <div className="flex-grow overflow-auto">
+                  {loading ? (
+                    <div className="flex items-center justify-center py-10">
+                      <Spinner
+                        className="mb-5 h-10 w-10"
+                        thickness="4px"
+                        emptyColor="#98A2B3"
+                        color="#164C96"
+                      />
+                    </div>
+                  ) : (
+                    <PaginatedTable
+                      columns={GameInfoColumns}
+                      data={allGameData}
+                      itemsPerPage={itemsPerPage}
+                      setSelectedRow={setSelectedGameInfoRow}
+                      selectedRow={selectedGameInfoRow}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="flex h-full flex-col rounded-2xl bg-white p-6 text-2xl text-black">
-              <p>Game Info</p>
-              <div className="flex-grow overflow-auto">
+
+            <div className="relative h-64 w-6 bg-orange-light-bg">
+              {/* White triangle to indicate which game's detailed info is being displayed */}
+              <div
+                className="h-0 w-0 border-b-[15px] border-r-[25px] border-t-[15px] border-b-transparent border-r-white border-t-transparent"
+                style={{
+                  transform: `translateY(${(selectedGameInfoRow % itemsPerPage) * 53 + 510}px)`,
+                }}
+              ></div>
+            </div>
+            {/* prettier-ignore */}
+
+            <div className="text-black-title flex w-2/5 flex-col gap-6 truncate text-wrap rounded-2xl bg-white p-6 text-2xl font-medium">
+              {allGameData[selectedGameInfoRow]?.gameTitle ?? ""}
+              <div className="rounded-2xl border-[1px] border-orange-primary p-4 text-base text-black">
+                User Groups
+                {loading ? (
+                  <div className="flex items-center justify-center py-10">
+                    <Spinner
+                      className="mb-5 h-10 w-10"
+                      thickness="4px"
+                      emptyColor="#98A2B3"
+                      color="#164C96"
+                    />
+                  </div>
+                ) : (
+                  <UserGroupsByGame
+                    data={
+                      allGameData[selectedGameInfoRow]?.userGroupsData ?? []
+                    }
+                  />
+                )}
+              </div>
+              <div className="flex flex-grow flex-col rounded-2xl border-[1px] border-orange-primary p-4 text-base text-black">
+                <p>User Leaderboard</p>
                 {loading ? (
                   <div className="flex items-center justify-center py-10">
                     <Spinner
@@ -512,77 +579,17 @@ const CMSDashboardPage = () => {
                   </div>
                 ) : (
                   <PaginatedTable
-                    columns={GameInfoColumns}
-                    data={allGameData}
+                    columns={UserLeaderboardColumns}
+                    data={userLeaderboard[selectedGameInfoRow] ?? []}
                     itemsPerPage={itemsPerPage}
-                    setSelectedRow={setSelectedGameInfoRow}
-                    selectedRow={selectedGameInfoRow}
                   />
                 )}
               </div>
             </div>
           </div>
-
-          <div className="relative h-64 w-6 bg-orange-light-bg">
-            {/* White triangle to indicate which game's detailed info is being displayed */}
-            <div
-              className="h-0 w-0 border-b-[15px] border-r-[25px] border-t-[15px] border-b-transparent border-r-white border-t-transparent"
-              style={{
-                transform: `translateY(${(selectedGameInfoRow % itemsPerPage) * 53 + 500}px)`,
-              }}
-            ></div>
-          </div>
-          <div className="max-w-2/5 flex w-2/5 flex-col gap-6 truncate text-wrap rounded-2xl bg-white p-6 text-2xl text-black">
-            {allGameData[selectedGameInfoRow]?.gameTitle ?? ""}
-            <div className="rounded-2xl border-[1px] border-orange-primary p-4 text-base text-black">
-              User Groups
-              {loading ? (
-                <div className="flex items-center justify-center py-10">
-                  <Spinner
-                    className="mb-5 h-10 w-10"
-                    thickness="4px"
-                    emptyColor="#98A2B3"
-                    color="#164C96"
-                  />
-                </div>
-              ) : (
-                <UserGroupsByGame
-                  data={allGameData[selectedGameInfoRow]?.userGroupsData ?? []}
-                />
-              )}
-            </div>
-            <div className="flex flex-grow flex-col rounded-2xl border-[1px] border-orange-primary p-4 text-base text-black">
-              <p>User Leaderboard</p>
-              {loading ? (
-                <div className="flex items-center justify-center py-10">
-                  <Spinner
-                    className="mb-5 h-10 w-10"
-                    thickness="4px"
-                    emptyColor="#98A2B3"
-                    color="#164C96"
-                  />
-                </div>
-              ) : (
-                <PaginatedTable
-                  columns={UserLeaderboardColumns}
-                  data={userLeaderboard[selectedGameInfoRow] ?? []}
-                  itemsPerPage={itemsPerPage}
-                />
-              )}
-            </div>
-          </div>
         </div>
-        {!loading && (
-          <Button
-            variant="mainblue"
-            className="text-md gap-2"
-            onClick={downloadDataXLSX}
-          >
-            Download XLSX <ArrowDownToLine size={18} />
-          </Button>
-        )}
-      </div>
-    </AdminTabs>
+      </AdminTabs>
+    </div>
   );
 };
 

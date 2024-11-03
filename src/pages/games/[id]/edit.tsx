@@ -5,7 +5,6 @@ import TabsComponent from "@/components/Tabs/TabsComponent";
 import React from "react";
 import pageAccessHOC from "@/components/HOC/PageAccess";
 import AddEditWebGLComponent from "@/components/GameScreen/WebGL/AddEditWebGLComponent";
-import DeleteComponentModal from "@/components/DeleteComponentModal";
 import { useDisclosure } from "@chakra-ui/react";
 import DiscardChanges from "@/components/GameScreen/DiscardChanges";
 import { Button } from "@/components/ui/button";
@@ -163,11 +162,11 @@ const EditGamePage = ({
   };
 
   return (
-    <div>
-      <div className="mx-auto mt-32 flex w-[75vw] items-center justify-center gap-3">
+    <div className="mx-18 my-14 flex flex-col gap-14">
+      <div className="flex items-center justify-center gap-3">
         <div className="flex-1"></div>
         <input
-          className="flex-1 rounded-[20px] border border-solid border-grey bg-input-bg py-2.5 text-center font-sans text-[56px] font-semibold !outline-none"
+          className="flex-1 rounded-2xl border border-solid border-unselected bg-input-bg px-8 py-3 text-center font-sans text-5.5xl font-semibold text-font-1000 !outline-none"
           type="text"
           value={name}
           onChange={changeName}
@@ -180,25 +179,8 @@ const EditGamePage = ({
           />
         </div>
       </div>
-      {!curData.preview && (
-        <div className="mx-auto flex w-[75vw] justify-end">
-          <button
-            onClick={onOpen}
-            className="mt-1 rounded-md bg-delete-red px-[17px] py-2 font-sans text-xl font-semibold text-white"
-          >
-            Delete Page
-          </button>
-          <DeleteComponentModal
-            deleteType="game"
-            isOpen={isOpen}
-            onClose={onClose}
-            gameData={curData}
-            setGameData={setCurData}
-          />
-        </div>
-      )}
 
-      <div className="mx-auto my-8 h-[75vh] w-[75vw]">
+      <div>
         <AddEditWebGLComponent gameData={curData} />
       </div>
       <TabsComponent
@@ -216,7 +198,7 @@ const EditGamePage = ({
           admin={true}
         />
       ) : null}
-      <div className="mx-auto mb-40 mt-24 flex w-[80vw] justify-end">
+      <div className="mb-14 flex justify-end">
         <div className="absolute flex flex-row gap-10">
           <DiscardChanges gameID={gameID} preview={curData.preview} />
           <Button

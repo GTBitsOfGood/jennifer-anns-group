@@ -77,29 +77,25 @@ export default function AddEditVideoTrailer({ gameData, setGameData }: Props) {
     <ChakraProvider theme={chakraTheme}>
       <div>
         {addButton ? (
-          <Button
-            rightIcon={<Icon as={Image} src={"/link.svg"} boxSize="20px" />}
+          <button
             onClick={onOpen}
-            bg="white"
-            className="w-151 h-46 m-5 rounded-md border border-black px-[17px] py-2 font-sans text-xl font-semibold text-black"
+            className="flex items-center gap-1 rounded-md border border-font-1000 bg-white px-4 py-3 font-sans text-lg font-medium text-font-1000 hover:bg-gray-100"
           >
             Add Trailer
-          </Button>
+            <Icon as={Image} src={"/link.svg"} boxSize="20px" />
+          </button>
         ) : (
-          <Button
-            rightIcon={
-              <Icon
-                as={Image}
-                src={"/pencileditIconOutline.svg"}
-                boxSize="20px"
-              />
-            }
+          <button
             onClick={onOpen}
-            bg="white"
-            className="w-151 h-46 m-5 rounded-md border border-black px-[17px] py-2 font-sans text-xl font-semibold text-black"
+            className="flex items-center gap-1 rounded-md border border-font-1000 bg-white px-4 py-3 font-sans text-lg font-medium text-font-1000 hover:bg-gray-100"
           >
             Edit Trailer
-          </Button>
+            <Icon
+              as={Image}
+              src={"/pencileditIconOutline.svg"}
+              boxSize="20px"
+            />
+          </button>
         )}
         <AlertDialog
           motionPreset="slideInBottom"

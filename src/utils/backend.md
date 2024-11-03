@@ -19,6 +19,7 @@ This file contains the schema for the game model, including relationships with t
 - tags: Array of ObjectIds, ref: "Tag", default: []
 - description: String, required
 - webGLBuild: Boolean, default: false
+- remoteUrl: Boolean, default: false. flags if we're using a remote url from a game for the embed
 - builds: [BuildSchema]
   - points to all the builds for a game EXCEPT webGL
 - lesson: String

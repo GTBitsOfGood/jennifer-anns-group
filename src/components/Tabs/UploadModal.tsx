@@ -12,7 +12,6 @@ import { useEffect, useRef, useState } from "react";
 import { GameDataState } from "../GameScreen/GamePage";
 
 interface Props {
-  title: string;
   field: keyof GameDataState;
   fileField: keyof GameDataState;
   gameData: GameDataState;
@@ -20,7 +19,7 @@ interface Props {
 }
 
 function UploadModal(props: Props) {
-  const { title, setGameData, fileField, field, gameData } = props;
+  const { setGameData, fileField, field, gameData } = props;
   const fileRef = useRef(null);
   const [open, setOpen] = useState(false);
 
@@ -36,23 +35,18 @@ function UploadModal(props: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          type="button"
-          className="gap-1 border border-black bg-white font-sans text-black hover:bg-gray-100"
+        <button
+          className="flex items-center gap-1 rounded-md border border-font-1000 bg-white px-4 py-3 font-sans text-lg font-medium text-font-1000 hover:bg-gray-100"
           onClick={() => setOpen(false)}
         >
-          {fieldValue || fileFieldValue ? `Edit ${title}` : `Add ${title}`}
-          {fieldValue || fileFieldValue ? (
-            <Pencil size={18} />
-          ) : (
-            <Upload size={18} />
-          )}
-        </Button>
+          {fieldValue || fileFieldValue ? `Replace PDF` : `Add PDF`}
+          <Upload size={18} />
+        </button>
       </DialogTrigger>
-      <DialogContent className="border-4 border-blue-primary">
+      <DialogContent className="gap-6 border-4 border-blue-primary p-12">
         <DialogHeader>
           <DialogTitle className="font-sans text-xl font-semibold text-blue-primary">
-            Edit {title}
+            {fieldValue || fileFieldValue ? `Replace PDF` : `Add PDF`}
           </DialogTitle>
         </DialogHeader>
         <div className="flex w-full flex-row items-center gap-4">
@@ -62,7 +56,7 @@ function UploadModal(props: Props) {
           <div className="flex w-full flex-row items-center">
             {newFile ? (
               <div className="flex flex-row items-center gap-2">
-                <p className="font-sans text-sm">{newFile.name}</p>
+                <p className="font-sans">{newFile.name}</p>
                 <X
                   className="text-orange-primary hover:cursor-pointer"
                   size={18}
@@ -95,20 +89,18 @@ function UploadModal(props: Props) {
             )}
           </div>
         </div>
-        <DialogFooter className="flex w-full flex-row ">
-          <Button
-            variant="ghost"
-            className="w-18 h-10 font-sans text-blue-primary hover:text-blue-primary"
+        <DialogFooter className="flex w-full flex-row gap-4">
+          <button
+            className="w-full rounded-md border border-border px-4 py-3 font-sans text-xl font-medium hover:border-gray-tab hover:bg-gray-tab"
             onClick={() => {
               setOpen(false);
               setNewFile(fileFieldValue);
             }}
           >
             Cancel
-          </Button>
-          <Button
-            variant="primary"
-            className="h-10 w-20 font-sans"
+          </button>
+          <button
+            className="w-full rounded-md bg-blue-primary px-4 py-3 font-sans text-xl font-medium text-white hover:bg-blue-hover"
             type="submit"
             onClick={() => {
               setGameData({ ...gameData, [fileField]: newFile });
@@ -116,7 +108,7 @@ function UploadModal(props: Props) {
             }}
           >
             Done
-          </Button>
+          </button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
