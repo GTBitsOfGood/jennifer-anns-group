@@ -1,3 +1,5 @@
+"use client";
+
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import {
   AnalyticsLogger,
@@ -112,6 +114,7 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
 
 export const useAnalytics = () => {
   const context = useContext(AnalyticsContext);
+
   if (!context) {
     throw new Error("useAnalytics has to be used within an AnalyticsProvider");
   }
