@@ -10,7 +10,7 @@ services:
         MONGODB_URI: mongodb://mongo:27017/jennifer-anns?replicaSet=rs0
     volumes:
       - ./:/app
-      - /app/node_modules
+      - node_modules:/app/node_modules
       - ./app-init.sh:/app/app-init.sh
       - /app/.next
     ports:
@@ -46,3 +46,4 @@ networks:
 
 volumes:
   mongodb-data:
+  node_modules:

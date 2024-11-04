@@ -177,7 +177,7 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
   const cancelRef = useRef<HTMLButtonElement | null>(null);
 
   //Handle Download Analytics
-  const { analyticsLogger } = useAnalytics();
+  const { logCustomEvent } = useAnalytics();
   const [downloadedGames, setDownloadedGames] = useState(new Set());
   const downloadGame = (gameUrl: string, gameBuildName: string) => {
     if (!downloadedGames.has(gameBuildName)) {
@@ -196,7 +196,7 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
           resourceUrl: gameUrl,
           downloadSrc: window.location.href,
         };
-        analyticsLogger.logCustomEvent("Download", "game", properties);
+        logCustomEvent("Download", "game", properties);
       }
     }
   };

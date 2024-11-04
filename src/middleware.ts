@@ -5,7 +5,8 @@ import {
   getBrowserName,
   getLogger,
   logVisitEventServer,
-} from "./context/AnalyticsContext";
+} from "./lib/analytics";
+
 export async function middleware(request: NextRequest) {
   //Only takes in pages
   const secret = process.env.NEXTAUTH_SECRET;
@@ -14,9 +15,6 @@ export async function middleware(request: NextRequest) {
     const user_label = token.label;
     const current_date = Date();
     const logger = getLogger();
-    await logger.authenticate(
-      process.env.NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY as string,
-    );
     const referrer = request.headers.get("referer");
     let user_agent = request.headers.get("user-agent");
     if (user_agent == null) {

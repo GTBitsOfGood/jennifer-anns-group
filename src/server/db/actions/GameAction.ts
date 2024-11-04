@@ -15,7 +15,7 @@ import {
 import { ThemeNotFoundException } from "@/utils/exceptions/theme";
 import { TagNotFoundException } from "@/utils/exceptions/tag";
 import { SortType } from "@/utils/types";
-import { getViewer } from "@/context/AnalyticsContext";
+import { getViewer } from "@/lib/analytics";
 import connectB2 from "../b2";
 
 export const RESULTS_PER_PAGE = 6;
@@ -471,9 +471,6 @@ export async function updateGamesPopularity() {
 
   const popularityMap = new Map<string, number>();
   const viewer = getViewer();
-  await viewer.authenticate(
-    process.env.NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY as string,
-  );
 
   const gameVisits = await viewer.getAllCustomEvents(
     "Jennifer Ann's",

@@ -270,7 +270,7 @@ const CMSDashboardPage = () => {
   const [selectedGameInfoRow, setSelectedGameInfoRow] = useState<number>(2);
   const itemsPerPage = 8;
 
-  const { analyticsViewer } = useAnalytics();
+  const { getCustomEventsPaginated } = useAnalytics();
   const [loading, setLoading] = useState(true);
   const [trafficSourceData, setTrafficSourceData] = useState<
     PieChartDataProps[]
@@ -309,8 +309,7 @@ const CMSDashboardPage = () => {
         afterId: undefined,
         afterTime: afterTime.toString(),
       };
-      const visitEvents =
-        await analyticsViewer.getCustomEventsPaginated(visitQueryParams);
+      const visitEvents = await getCustomEventsPaginated(visitQueryParams);
 
       const { sourceData, groupsData } = formatUserTrafficData(
         visitEvents ? visitEvents.events : [],
@@ -324,8 +323,7 @@ const CMSDashboardPage = () => {
         limit: 2000,
         afterId: undefined,
       };
-      const gameEvents =
-        await analyticsViewer.getCustomEventsPaginated(downloadQueryParams);
+      const gameEvents = await getCustomEventsPaginated(downloadQueryParams);
 
       const pdfQueryParams = {
         projectName: "Jennifer Ann's",
@@ -335,8 +333,7 @@ const CMSDashboardPage = () => {
         limit: 2000,
         afterId: undefined,
       };
-      const pdfEvents =
-        await analyticsViewer.getCustomEventsPaginated(pdfQueryParams);
+      const pdfEvents = await getCustomEventsPaginated(pdfQueryParams);
 
       const { gameData, leaderboardData } = await formatGameEventsData(
         gameEvents?.events,
