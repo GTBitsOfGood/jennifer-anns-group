@@ -17,10 +17,8 @@ import UploadModal from "./UploadModal";
 import DeleteComponentModal from "../DeleteComponentModal";
 import { GameDataState } from "../GameScreen/GamePage";
 import { userDataSchema } from "../ProfileModal/ProfileModal";
-import { useContext } from "react";
 import { z } from "zod";
-import { authenticateLoggers, useAnalytics } from "@/context/AnalyticsContext";
-import { GameException } from "@/utils/exceptions/game";
+import { useAnalytics } from "@/context/AnalyticsContext";
 
 interface Props {
   mode: string;
@@ -64,7 +62,7 @@ export default function TabsComponent({
     }
   };
   //Handle Analytics
-  const { analyticsLogger } = useAnalytics();
+  const { logCustomEvent } = useAnalytics();
 
   const [visitedLessonPlan, setVisitedLessonPlan] = useState(false);
   const [visitedParentingGuide, setVisitedParentingGuide] = useState(false);
@@ -81,7 +79,7 @@ export default function TabsComponent({
         resourceUrl: resourceUrl,
         downloadSrc: window.location.href,
       };
-      analyticsLogger.logCustomEvent("View", "pdf", properties);
+      logCustomEvent("View", "pdf", properties);
     }
   };
   const onTabChange = (index: number) => {

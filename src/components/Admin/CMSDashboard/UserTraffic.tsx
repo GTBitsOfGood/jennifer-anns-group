@@ -22,14 +22,14 @@ const UserTraffic = () => {
   const [groupsData, setGroupsData] = useState<PieChartDataProps[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const { analyticsViewer } = useAnalytics();
+  const { getAllCustomEvents } = useAnalytics();
 
   const getData = async () => {
     try {
       setLoading(true);
       const today = new Date();
       today.setHours(0, 0, 0, 0); // beginning of the day today
-      const visitEvents = (await analyticsViewer.getAllCustomEvents(
+      const visitEvents = (await getAllCustomEvents(
         "Jennifer Ann's",
         "Visit",
         "Visit",

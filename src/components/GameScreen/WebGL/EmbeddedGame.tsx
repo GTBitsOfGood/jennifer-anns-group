@@ -20,7 +20,7 @@ export default function EmbeddedGame({
   const [height, setHeight] = useState("725px");
   const { data: session, status: sessionStatus } = useSession();
   const [iframeLoaded, setIframeLoaded] = useState(false);
-  const { analyticsLogger } = useAnalytics();
+  const { logCustomEvent } = useAnalytics();
   const updateHeight = () => {
     const iframe = ref.current;
     if (!iframe) return;
@@ -60,7 +60,7 @@ export default function EmbeddedGame({
         createdDate: Date(),
         gameName: gameName,
       };
-      analyticsLogger.logCustomEvent("Visit", "game", properties);
+      logCustomEvent("Visit", "game", properties);
     }
   }, [iframeLoaded, sessionStatus]);
 
