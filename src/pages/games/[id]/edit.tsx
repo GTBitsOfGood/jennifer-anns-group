@@ -3,10 +3,8 @@ import { ChangeEvent, useEffect, useState } from "react";
 import TagsComponent from "@/components/Tags/TagsComponent";
 import TabsComponent from "@/components/Tabs/TabsComponent";
 import React from "react";
-import { populatedGameWithId } from "@/server/db/models/GameModel";
 import pageAccessHOC from "@/components/HOC/PageAccess";
 import AddEditWebGLComponent from "@/components/GameScreen/WebGL/AddEditWebGLComponent";
-import DeleteComponentModal from "@/components/DeleteComponentModal";
 import { useDisclosure } from "@chakra-ui/react";
 import DiscardChanges from "@/components/GameScreen/DiscardChanges";
 import { Button } from "@/components/ui/button";
@@ -16,6 +14,7 @@ import { v4 as uuidv4 } from "uuid";
 import { GameDataState } from "@/components/GameScreen/GamePage";
 import { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { getGameById } from "@/server/db/actions/GameAction";
+import EditImage from "@/components/GameScreen/WebGL/EditImage";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
@@ -69,63 +68,63 @@ const EditGamePage = ({
 
   const saveChanges = async () => {
     const fieldInputs: Record<
-      "parentingGuide" | "answerKey" | "lesson",
+      "parentingGuide" | "answerKey" | "lesson" | "image",
       string | undefined
     > = {
       parentingGuide: curData?.parentingGuide,
       answerKey: curData?.answerKey,
       lesson: curData?.lesson,
+      image: curData?.image,
     };
-    const pdfInputs: Record<
-      "parentingGuide" | "answerKey" | "lesson",
+    const fileInputs: Record<
+      "parentingGuide" | "answerKey" | "lesson" | "image",
       File | undefined
     > = {
       parentingGuide: curData?.parentingGuideFile,
       answerKey: curData?.answerKeyFile,
       lesson: curData?.lessonFile,
+      image: curData?.imageFile,
     };
 
-    const pdfInputsKeys = Object.keys(pdfInputs);
+    const fileInputsKeys = Object.keys(fileInputs);
 
-    const nonNullPdfInputsKeys = pdfInputsKeys.filter(
-      (k) => pdfInputs[k as keyof typeof pdfInputs],
+    const nonNullFileInputsKeys = fileInputsKeys.filter(
+      (k) => fileInputs[k as keyof typeof fileInputs],
     );
 
     const directUploadUrls = await Promise.all(
-      nonNullPdfInputsKeys.map((k) =>
-        getDirectUpload(pdfInputs[k as keyof typeof pdfInputs] as File),
+      nonNullFileInputsKeys.map((k) =>
+        getDirectUpload(fileInputs[k as keyof typeof fileInputs] as File),
       ),
     );
 
     const fieldDirectUploadUrls: Record<
       string,
       { uploadUrl: string; uploadAuthToken: string }
-    > = nonNullPdfInputsKeys.reduce((acc, cur, i) => {
+    > = nonNullFileInputsKeys.reduce((acc, cur, i) => {
       return { ...acc, [cur]: directUploadUrls[i] };
     }, {});
 
     const storedUrls = await Promise.all(
-      nonNullPdfInputsKeys.map((key) =>
+      nonNullFileInputsKeys.map((key) =>
         uploadApplicationFile(
           fieldDirectUploadUrls[key].uploadUrl,
-          pdfInputs[key as keyof typeof pdfInputs] as File,
+          fileInputs[key as keyof typeof fileInputs] as File,
           fieldDirectUploadUrls[key].uploadAuthToken,
           uuidv4(),
         ),
       ),
     );
 
-    const fieldStoredUrls: Record<string, string> = nonNullPdfInputsKeys.reduce(
-      (acc, cur, i) => {
-        return { ...acc, [cur as keyof typeof pdfInputs]: storedUrls[i] };
-      },
-      {},
-    );
+    const fieldStoredUrls: Record<string, string> =
+      nonNullFileInputsKeys.reduce((acc, cur, i) => {
+        return { ...acc, [cur as keyof typeof fileInputs]: storedUrls[i] };
+      }, {});
 
-    const nullPdfInputsKeys = Object.keys(fieldInputs).filter(
+    const nullFileInputsKeys = Object.keys(fieldInputs).filter(
       (k) => !fieldInputs[k as keyof typeof fieldInputs],
     );
-    const nullPdfInputsNewValues = nullPdfInputsKeys.reduce((acc, cur) => {
+    const nullFileInputsNewValues = nullFileInputsKeys.reduce((acc, cur) => {
       return {
         ...acc,
         [cur]: "",
@@ -146,7 +145,7 @@ const EditGamePage = ({
       name: curData?.name,
       builds: curData?.builds,
       videoTrailer: curData?.videoTrailer,
-      ...nullPdfInputsNewValues,
+      ...nullFileInputsNewValues,
       ...fieldStoredUrls,
     };
 
@@ -163,34 +162,25 @@ const EditGamePage = ({
   };
 
   return (
-    <div>
-      <div className="flex justify-center">
+    <div className="mx-18 my-14 flex flex-col gap-14">
+      <div className="flex items-center justify-center gap-3">
+        <div className="flex-1"></div>
         <input
-          className="mt-[126px] rounded-[20px] border border-solid border-grey bg-input-bg py-2.5 text-center font-sans text-[56px] font-semibold !outline-none"
+          className="flex-1 rounded-2xl border border-solid border-unselected bg-input-bg px-8 py-3 text-center font-sans text-5.5xl font-semibold text-font-1000 !outline-none"
           type="text"
           value={name}
           onChange={changeName}
         />
-      </div>
-      {!curData.preview && (
-        <div className="mx-auto flex w-[75vw] justify-end">
-          <button
-            onClick={onOpen}
-            className="mt-1 rounded-md bg-delete-red px-[17px] py-2 font-sans text-xl font-semibold text-white"
-          >
-            Delete Page
-          </button>
-          <DeleteComponentModal
-            deleteType="game"
-            isOpen={isOpen}
-            onClose={onClose}
+        <div className="relative flex flex-1 justify-end">
+          <EditImage
+            imageURL={gameData.image}
             gameData={curData}
             setGameData={setCurData}
           />
         </div>
-      )}
+      </div>
 
-      <div className="mx-auto my-8 h-[75vh] w-[75vw]">
+      <div>
         <AddEditWebGLComponent gameData={curData} />
       </div>
       <TabsComponent
@@ -208,7 +198,7 @@ const EditGamePage = ({
           admin={true}
         />
       ) : null}
-      <div className="mx-auto mb-40 mt-24 flex w-[80vw] justify-end">
+      <div className="mb-14 flex justify-end">
         <div className="absolute flex flex-row gap-10">
           <DiscardChanges gameID={gameID} preview={curData.preview} />
           <Button

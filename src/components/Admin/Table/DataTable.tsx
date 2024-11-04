@@ -70,7 +70,7 @@ export function DataTable<TData, TValue>({
                       "overflow-hidden text-ellipsis whitespace-nowrap",
                       cell.column.columnDef.meta?.toString(),
                       selectedRow === (minRowIndex ?? 0) + row.index &&
-                        "bg-[#FFF5E6]",
+                        "bg-[#FFF4E5]",
                       setSelectedRow && "cursor-pointer",
                     )}
                     onClick={() => {

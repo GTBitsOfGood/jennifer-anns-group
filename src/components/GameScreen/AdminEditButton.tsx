@@ -1,4 +1,3 @@
-import Image from "next/image";
 import type { MutableRefObject } from "react";
 import { useRouter } from "next/router";
 
@@ -19,18 +18,11 @@ export default function AdminEditButton({
   };
 
   return (
-    <div className="mx-auto flex w-[80vw] justify-end">
-      <button
-        className="rounded-full bg-input-border"
-        onClick={handleEditClick}
-      >
-        <div className="flex flex-row py-2 pl-3.5 pr-4">
-          <Image width={24} height={24} src={`/editIcon.png`} alt="edit-icon" />
-          <p className="ml-1 font-sans text-base font-medium text-blue-primary">
-            Edit
-          </p>
-        </div>
-      </button>
-    </div>
+    <button
+      onClick={handleEditClick}
+      className="rounded-md bg-blue-primary px-4 py-3 font-sans text-xl font-medium text-white hover:bg-blue-hover"
+    >
+      Edit Game
+    </button>
   );
 }

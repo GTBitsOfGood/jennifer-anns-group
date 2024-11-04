@@ -28,19 +28,24 @@ export default function GameCard({ game }: Props) {
       height="380px"
     >
       <CardBody p="0px">
-        <Image
-          borderTopLeftRadius="8px"
-          borderTopRightRadius="8px"
-          height="200px"
-          width="100%"
-          fit="cover"
-          src="https://img.freepik.com/free-vector/hand-drawn-houseplant-collection_23-2148910610.jpg"
-        />
+        {game.image ? (
+          <Image
+            borderTopLeftRadius="8px"
+            borderTopRightRadius="8px"
+            height="200px"
+            width="100%"
+            fit="cover"
+            src={game.image}
+            alt="Game Image Preview"
+          />
+        ) : (
+          <div className="h-[200px] w-full rounded-t-lg bg-placeholder"></div>
+        )}
         <Stack mt="4" mr="5" ml="5" mb="5" spacing="2">
-          <p className="font-sans text-xl font-extrabold text-[#6D758F]">
+          <p className="font-sans text-xl font-semibold text-input-stroke">
             {game.name}
           </p>
-          <p className="line-clamp-4 font-inter text-[#6D758F]">
+          <p className="line-clamp-4 font-inter text-input-stroke">
             {game.description}
           </p>
         </Stack>

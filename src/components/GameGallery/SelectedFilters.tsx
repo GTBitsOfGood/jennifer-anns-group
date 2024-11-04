@@ -13,10 +13,10 @@ export default function SelectedFilters({ setFilters, filters }: Props) {
   const { gameBuilds, gameContent, accessibility, tags } = filters;
 
   return (
-    <div>
+    <div className="mb-6 flex h-9 flex-row flex-wrap items-center">
       {gameBuilds?.map((item) => {
         return (
-          <Tag key={item} height="36px" variant="filter_selected">
+          <Tag key={item} height="36px" variant="filter_selected_other">
             <div className="flex flex-row items-center gap-2">
               {gameBuildsMap[item]}
               <X
@@ -35,7 +35,7 @@ export default function SelectedFilters({ setFilters, filters }: Props) {
       })}
       {gameContent?.map((item) => {
         return (
-          <Tag key={item} height="36px" variant="filter_selected">
+          <Tag key={item} height="36px" variant="filter_selected_other">
             <div className="flex flex-row items-center gap-2">
               {gameContentsMap[item]}
               <X
@@ -54,7 +54,7 @@ export default function SelectedFilters({ setFilters, filters }: Props) {
       })}
       {accessibility?.map((item) => {
         return (
-          <Tag key={item} height="36px" variant="filter_selected">
+          <Tag key={item} height="36px" variant="filter_selected_accessibility">
             <div className="flex flex-row items-center gap-2">
               {item}
               <X
@@ -73,7 +73,7 @@ export default function SelectedFilters({ setFilters, filters }: Props) {
       })}
       {tags?.map((item) => {
         return (
-          <Tag key={item} height="36px" variant="filter_selected">
+          <Tag key={item} height="36px" variant="filter_selected_other">
             <div className="flex flex-row items-center gap-2">
               {item}
               <X
@@ -90,6 +90,17 @@ export default function SelectedFilters({ setFilters, filters }: Props) {
           </Tag>
         );
       })}
+      <button
+        className="mb-3 py-2 text-sm text-blue-primary"
+        onClick={() =>
+          setFilters(() => ({
+            page: 1,
+            theme: [],
+          }))
+        }
+      >
+        Clear filters
+      </button>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import {
   Tag,
   TagCloseButton,
-  TagRightIcon,
+  TagLeftIcon,
   ChakraProvider,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
@@ -9,7 +9,6 @@ import { AddIcon } from "@chakra-ui/icons";
 import { z } from "zod";
 import { Dispatch, useEffect, useState } from "react";
 import SearchTagsComponent from "./SearchTagsComponent";
-import { populatedGameWithId } from "@/server/db/models/GameModel";
 import { tagSchema, themeSchema } from "@/utils/types";
 import { GameDataState } from "../GameScreen/GamePage";
 import { gameBuildsMap } from "@/components/GameGallery/FilterBody";
@@ -94,7 +93,7 @@ export default function TagsComponent({
   return (
     <ChakraProvider theme={chakraTheme}>
       <div>
-        <div className="m-auto flex w-5/6 flex-row flex-wrap pb-3 pt-6 font-inter text-base">
+        <div className="flex flex-row flex-wrap font-inter text-base">
           {gameData.videoTrailer ? <Tag>Video Trailer</Tag> : null}
           {gameData.parentingGuide ? <Tag>Parenting Guide</Tag> : null}
           {gameData.lesson ? <Tag>Lesson Plan</Tag> : null}
@@ -137,22 +136,20 @@ export default function TagsComponent({
                 setSearch(true);
               }}
             >
+              <TagLeftIcon color="white" boxSize="12px" as={AddIcon} />
               Add
-              <TagRightIcon color="white" boxSize="12px" as={AddIcon} />
             </Tag>
           ) : null}
         </div>
         {mode === "edit" && search && themes && tags ? (
-          <div className="mb-32 ml-[10vw] mt-7 font-sans">
-            <div className="absolute">
-              <SearchTagsComponent
-                setSearch={setSearch}
-                currThemes={themes}
-                setCurrThemes={setThemes}
-                currTags={tags}
-                setCurrTags={setTags}
-              />
-            </div>
+          <div className="mt-10">
+            <SearchTagsComponent
+              setSearch={setSearch}
+              currThemes={themes}
+              setCurrThemes={setThemes}
+              currTags={tags}
+              setCurrTags={setTags}
+            />
           </div>
         ) : null}
       </div>

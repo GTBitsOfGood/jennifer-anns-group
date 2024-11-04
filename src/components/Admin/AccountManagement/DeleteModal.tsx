@@ -13,7 +13,6 @@ import { userSchema } from "@/utils/types";
 import { z } from "zod";
 import { signOut, useSession } from "next-auth/react";
 import router from "next/router";
-import { UserDoesNotExistException } from "@/utils/exceptions/user";
 
 const idSchema = z.string().length(24);
 

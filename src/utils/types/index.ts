@@ -49,6 +49,7 @@ export enum AllBuilds {
   mac = "mac",
   webgl = "webgl",
   windows = "windows",
+  remote = "remote",
 }
 
 export enum NonWebGLBuilds {
@@ -58,6 +59,7 @@ export enum NonWebGLBuilds {
   linux = "linux",
   mac = "mac",
   windows = "windows",
+  remote = "remote",
 }
 
 export enum GameContentEnum {
@@ -99,6 +101,7 @@ export const gameSchema = z.object({
   themes: z.array(z.string().refine(verifyObjectId)).optional(),
   tags: z.array(z.string().refine(verifyObjectId)).optional(),
   webGLBuild: z.boolean().optional(),
+  remoteUrl: z.boolean().optional(),
   builds: z.array(buildSchema).optional(),
   description: z.string().min(1, "Description is required"),
   lesson: z.string().url().optional(),
@@ -125,11 +128,13 @@ export const editGameSchema = z.object({
   multiClass: z.boolean().optional(),
   description: z.string().optional(),
   webGLBuild: z.boolean().optional(),
+  remoteUrl: z.boolean().optional(),
   builds: z.array(buildSchema).optional(),
   parentingGuide: z.literal("").or(z.string().url()).optional(),
   lesson: z.literal("").or(z.string().url()).optional(),
   answerKey: z.literal("").or(z.string().url()).optional(),
   videoTrailer: z.string().url().or(z.literal("")).optional(),
+  image: z.literal("").or(z.string().url()).optional(),
   preview: z.boolean().optional(),
 });
 
@@ -207,8 +212,8 @@ export interface CustomVisitEvent extends CustomEvent {
 }
 
 export enum SortType {
-  AtoZ = "A-Z",
   MostPopular = "Most Popular",
+  AtoZ = "A-Z",
   LastCreated = "Last Created",
   FirstCreated = "First Created",
 }

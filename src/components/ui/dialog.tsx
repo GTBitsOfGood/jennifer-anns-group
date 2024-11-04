@@ -63,7 +63,7 @@ const DialogContent = React.forwardRef<
             showClose ? "block" : "hidden",
           )}
         >
-          <X className="h-6 w-6 text-blue-primary" />
+          <X className="mr-8 mt-8 h-6 w-6 text-blue-primary" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
