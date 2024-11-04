@@ -14,6 +14,7 @@ import {
   PaginationPrevious,
 } from "../../ui/pagination";
 import FilterPopover from "./FilterPopover";
+import { Filter } from "lucide-react";
 
 export type PageRequiredGameQuery = GameQuery &
   Required<Pick<GameQuery, "page">>;

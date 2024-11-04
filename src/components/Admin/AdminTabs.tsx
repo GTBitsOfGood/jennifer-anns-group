@@ -10,7 +10,7 @@ interface Props {
 const AdminTabs = ({ page, children }: Props) => {
   const tabs: Partial<Record<Pages, string>> = {
     [Pages.CMSDASHBOARD]: "CMS Dashboard",
-    [Pages.THEMES]: "Themes and Tags",
+    [Pages.THEMES]: "Filter Management",
     [Pages.ACCOUNTMANAGEMENT]: "Account Management",
   };
   return (

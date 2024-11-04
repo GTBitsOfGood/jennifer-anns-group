@@ -10,6 +10,7 @@ import { HTTP_STATUS_CODE } from "@/utils/consts";
 import cookie from "cookie";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
+import { UserLabel } from "@/utils/types";
 import {
   UserDoesNotExistException,
   UserException,
@@ -90,7 +91,26 @@ async function editUserHandler(req: NextApiRequest, res: NextApiResponse) {
 async function editProfileHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const session = await getServerSession(req, res, authOptions);
-    const emailModified = req.body.email !== session?.user.email;
+    //The session of the user calling this API endpoint is not necessarily the same as the one using it,
+    //either the admin or the sameUser.
+
+    const user = await getUser(req.body._id);
+    const emailModified = req.body.email !== user.email;
+    const changeToAdmin =
+      req.body.label == "administrator" &&
+      session?.user.label !== "administrator";
+    if (changeToAdmin) {
+      //Non-admin cannot make others admin
+      throw new GenericUserErrorException(
+        "Non-admin cannot change a user to admin",
+      );
+    }
+    //Ensure label is one of the four allowed value
+    if (!Object.values(UserLabel).includes(req.body.label as UserLabel)) {
+      throw new GenericUserErrorException(
+        `Label must be one of ${Object.values(UserLabel)}`,
+      );
+    }
     if (emailModified) {
       //Email is being changed, verify cookie exists. if it does, delete it.
       if (!req.cookies.emailVerificationJwt) {

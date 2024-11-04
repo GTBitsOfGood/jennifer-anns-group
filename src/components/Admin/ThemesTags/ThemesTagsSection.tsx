@@ -60,8 +60,8 @@ function ThemesTagsSection() {
             asChild
           >
             <div>
+              <p>New</p>
               <Plus size={16} />
-              <p>New theme</p>
             </div>
           </Button>
         </div>
@@ -105,8 +105,8 @@ function ThemesTagsSection() {
             asChild
           >
             <div>
+              <p>New</p>
               <Plus size={16} />
-              <p>New accessibility</p>
             </div>
           </Button>
         </div>
@@ -150,8 +150,8 @@ function ThemesTagsSection() {
             asChild
           >
             <div>
+              <p>New</p>
               <Plus size={16} />
-              <p>New tag</p>
             </div>
           </Button>
         </div>

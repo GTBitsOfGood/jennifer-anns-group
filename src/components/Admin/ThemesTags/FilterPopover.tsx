@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { PageRequiredGameQuery } from "./GamesSection";
 import { ExtendId } from "@/utils/types";
+import { Filter } from "lucide-react";
 
 const FORM_THEMES_KEY = "themes";
 const FORM_TAGS_ACCESSIBILITY_KEY = "accessibility";
@@ -71,7 +72,11 @@ function FilterPopover(props: Props) {
     <div className="flex flex-row">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline2">Filter</Button>
+          <Button variant="outline2" className="rounded-lg">
+            <div className="flex flex-row items-center gap-2">
+              Filter <Filter size={15}></Filter>
+            </div>
+          </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[40em]" align="start">
           <form className="m-4 flex flex-col gap-4" onSubmit={handleSubmit}>
