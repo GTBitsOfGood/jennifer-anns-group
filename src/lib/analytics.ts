@@ -84,6 +84,7 @@ export async function logVisitEventServer(
 }
 
 export function getBrowserName(userAgent: string) {
+  if (!userAgent) return "unknown";
   if (userAgent.includes("Firefox")) return "Mozilla Firefox";
   if (userAgent.includes("SamsungBrowser")) return "Samsung Internet";
   if (userAgent.includes("Opera") || userAgent.includes("OPR")) return "Opera";
