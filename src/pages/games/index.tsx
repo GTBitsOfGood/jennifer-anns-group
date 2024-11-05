@@ -20,7 +20,7 @@ import { Search2Icon } from "@chakra-ui/icons";
 import { Input } from "@chakra-ui/react";
 import FilterBody from "@/components/GameGallery/FilterBody";
 import chakraTheme from "@/styles/chakraTheme";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import ThemeSidebar from "@/components/GameGallery/ThemeSidebar";
 import SelectedFilters from "@/components/GameGallery/SelectedFilters";
 import GameCardView from "@/components/GameGallery/GameCardView";

@@ -11,7 +11,7 @@ import {
   ChakraProvider,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 import { useRef } from "react";
 import axios from "axios";
 
@@ -20,8 +20,8 @@ interface Props {
 }
 
 function DeleteWebGLBuild(props: Props) {
-  const router = useRouter();
-  const gameId = router.query.id;
+  const searchParams = useSearchParams();
+  const gameId = searchParams.get("id");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement | null>(null);
 

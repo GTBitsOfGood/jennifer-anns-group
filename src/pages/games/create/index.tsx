@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { TextArea } from "@/components/ui/textarea";
 import { AlertTriangleIcon, MoveLeft, Plus, Upload, X } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import ThemeSelect from "@/components/Themes/ThemeSelect";
 import TagSelect from "@/components/Tags/TagSelect";
 import { ITheme } from "@/server/db/models/ThemeModel";

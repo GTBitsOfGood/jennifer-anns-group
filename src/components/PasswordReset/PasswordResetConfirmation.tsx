@@ -1,5 +1,5 @@
 import { Button } from "../ui/button";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function PasswordResetUpdate() {
   const router = useRouter();

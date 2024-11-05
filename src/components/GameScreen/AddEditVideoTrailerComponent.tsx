@@ -16,7 +16,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState, useEffect, Dispatch } from "react";
 import { GameDataState } from "./GamePage";
 export const youtubeREGEX =
@@ -30,7 +30,8 @@ interface Props {
 
 export default function AddEditVideoTrailer({ gameData, setGameData }: Props) {
   const router = useRouter();
-  const gameID = router.query.id;
+  const searchParams = useSearchParams();
+  const gameID = searchParams.get("id");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement | null>(null);
   const [url, setUrl] = useState(gameData.videoTrailer ?? "");

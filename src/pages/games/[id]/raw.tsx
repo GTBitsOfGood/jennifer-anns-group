@@ -1,24 +1,38 @@
-import { useRouter } from "next/router";
+// pages/games/[id]/raw.tsx
+
 import { useEffect } from "react";
 import RawEmbeddedGame from "@/components/GameScreen/WebGL/RawEmbeddedGame";
+import { GetServerSideProps } from "next";
 
-const GamePage = () => {
-  const gameId = useRouter().query.id;
+interface GamePageProps {
+  gameId: string;
+}
 
+const GamePage: React.FC<GamePageProps> = ({ gameId }) => {
   useEffect(() => {
     const body = document.querySelector("body");
-    if (body === null) {
-      return;
+    if (body) {
+      body.classList.add("overflow-hidden");
     }
-
-    body.classList.add("overflow-hidden");
   }, []);
 
-  if (!gameId || typeof window === "undefined") {
-    return <></>;
+  return <RawEmbeddedGame gameId={gameId} />;
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { id } = context.params as any;
+
+  if (!id || Array.isArray(id)) {
+    return {
+      notFound: true,
+    };
   }
 
-  return <RawEmbeddedGame gameId={gameId as string} />;
+  return {
+    props: {
+      gameId: id,
+    },
+  };
 };
 
 export default GamePage;

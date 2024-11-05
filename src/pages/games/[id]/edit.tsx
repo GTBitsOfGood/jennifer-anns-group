@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 import TagsComponent from "@/components/Tags/TagsComponent";
 import TabsComponent from "@/components/Tabs/TabsComponent";
@@ -40,7 +40,8 @@ const EditGamePage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
-  const gameID = router.query.id;
+  const searchParams = useSearchParams();
+  const gameID = searchParams.get("id");
   const [curData, setCurData] = useState<GameDataState>(gameData);
   const [name, setName] = useState(gameData.name);
 
@@ -200,7 +201,10 @@ const EditGamePage = ({
       ) : null}
       <div className="mb-14 flex justify-end">
         <div className="absolute flex flex-row gap-10">
-          <DiscardChanges gameID={gameID} preview={curData.preview} />
+          <DiscardChanges
+            gameID={gameID as string | undefined}
+            preview={curData.preview}
+          />
           <Button
             onClick={saveChanges}
             variant="mainblue"

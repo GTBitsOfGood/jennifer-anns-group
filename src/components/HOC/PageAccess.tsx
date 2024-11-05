@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Pages } from "@/utils/consts";
 
@@ -56,6 +56,7 @@ const pageRequiredLabels: Record<Pages, Array<Label>> = {
 const pageAccessHOC = <P extends object>(Component: React.FC<P>) => {
   const WrappedComponent = (props: P) => {
     const router = useRouter();
+    const pathname = usePathname();
     const { status, data } = useSession();
     const [label, setLabel] = useState<Label>(Label.LOADING);
 
@@ -77,8 +78,8 @@ const pageAccessHOC = <P extends object>(Component: React.FC<P>) => {
       if (
         status !== "loading" &&
         label !== "loading" &&
-        (!pageRequiredLabels[router.pathname as Pages].includes(label) ||
-          pageRequiredAuthentication[router.pathname as Pages] !== status)
+        (!pageRequiredLabels[pathname as Pages].includes(label) ||
+          pageRequiredAuthentication[pathname as Pages] !== status)
       ) {
         router.replace("/");
       }
@@ -108,8 +109,8 @@ const pageAccessHOC = <P extends object>(Component: React.FC<P>) => {
       );
     }
     if (
-      pageRequiredAuthentication[router.pathname as Pages] === status &&
-      pageRequiredLabels[router.pathname as Pages].includes(label)
+      pageRequiredAuthentication[pathname as Pages] === status &&
+      pageRequiredLabels[pathname as Pages].includes(label)
     ) {
       return <Component {...props} />;
     }

@@ -1,6 +1,5 @@
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import React, { useEffect } from "react";
-import { Button } from "../../ui/button";
 import {
   Dialog,
   DialogContent,
@@ -14,7 +13,7 @@ import { AlertTriangleIcon, Pencil, Plus, X } from "lucide-react";
 import { useState } from "react";
 
 import axios from "axios";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import DeleteWebGLBuild from "./DeleteWebGLBuild";
 
 // there's probably a better place to put these
@@ -122,6 +121,8 @@ function AddEditWebGLComponent(props: Props) {
   const [dataFile, setDataFile] = useState<null | File>(null);
   const [codeFile, setCodeFile] = useState<null | File>(null);
   const [frameworkFile, setFrameworkFile] = useState<null | File>(null);
+  const searchParams = useSearchParams();
+  const gameId = searchParams.get("id");
 
   const [open, setOpen] = useState(false);
 
@@ -173,7 +174,6 @@ function AddEditWebGLComponent(props: Props) {
     ]);
 
     try {
-      const gameId = router.query.id;
       if (gameId) {
         setUploading(true);
         await uploadBuildFiles(gameId.toString(), addOrEdit, files);

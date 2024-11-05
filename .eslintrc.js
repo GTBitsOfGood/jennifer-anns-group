@@ -6,6 +6,15 @@ module.exports = {
     "prettier",
   ],
   rules: {
-    "prettier/prettier": ["error", { endOfLine: "auto" }],
+    'tailwindcss/classnames-order': 'off',  // Disables sorting rules for class names
+    'prettier/prettier': [
+      'error',
+      {
+        tailwindConfig: './tailwind.config.ts',
+        htmlWhitespaceSensitivity: 'ignore',
+        endOfLine: "auto"
+      },
+    ],
   },
+  plugins: ['tailwindcss']
 };

@@ -1,5 +1,5 @@
 import type { MutableRefObject } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface AdminEditButtonProps {
   gameId: String;

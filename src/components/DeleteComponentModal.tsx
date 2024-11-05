@@ -9,7 +9,7 @@ import {
   ChakraProvider,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, Dispatch } from "react";
 import { GameDataState } from "./GameScreen/GamePage";
 
@@ -23,7 +23,8 @@ interface Props {
 
 export default function DeleteComponentModal(props: Props) {
   const router = useRouter();
-  const gameID = router.query.id;
+  const searchParams = useSearchParams();
+  const gameID = searchParams.get("id");
   const cancelRef = useRef<HTMLButtonElement | null>(null);
 
   const deleteType = props.deleteType;

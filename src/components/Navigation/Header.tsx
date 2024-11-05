@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
+import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { ProfileModal, userDataSchema } from "../ProfileModal/ProfileModal";
 import { Button } from "../ui/button";
 import { z } from "zod";
 import { UserLabel } from "@/utils/types";
 import Select from "react-select";
-import { log } from "util";
 
 type TabName = "Home" | "Game Gallery" | "Donate" | "Admin";
 
@@ -39,6 +38,7 @@ const tabData: Record<UserType, TabName[]> = {
 
 const Header = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: session, status, update } = useSession();
   const currentUser = session?.user;
   const [userData, setUserData] = useState<z.infer<typeof userDataSchema>>();
@@ -55,13 +55,13 @@ const Header = () => {
     } else {
       setLoaded(true);
     }
-    const pathname = router.pathname;
+
     const tabNames = Object.keys(tabLinks) as TabName[];
     const index = tabNames.findIndex((name) =>
       tabLinks[name].includes(pathname),
     ); // this might need to be changed later on, pathname could be dynamic
     setSelectedTab(index !== -1 ? index : 1); // set default to game gallery (for game screen, create game, edit game)
-  }, [status, router.pathname]);
+  }, [status, pathname]);
 
   function getUserData() {
     setUserData(currentUser);

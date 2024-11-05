@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import TabsComponent from "../Tabs/TabsComponent";
 import TagsComponent from "../Tags/TagsComponent";
@@ -40,6 +40,8 @@ interface Props {
 
 const GamePage = ({ mode, gameData }: Props) => {
   const router = useRouter();
+  const pathname = usePathname();
+  const initialPathname = useRef(pathname);
   const [curData, setCurData] = useState<GameDataState>(gameData);
   const [error, setError] = useState("");
   const [visibleAnswer, setVisibleAnswer] = useState(false);
@@ -130,11 +132,6 @@ const GamePage = ({ mode, gameData }: Props) => {
 
   useEffect(() => {
     if (mode === "preview") {
-      const routeChangeStart = (url: string) => {
-        if (deleteOnRouteChange.current) handleCancel();
-        router.events.off("routeChangeStart", routeChangeStart);
-      };
-
       const beforeunload = (e: BeforeUnloadEvent) => {
         e.preventDefault();
       };
@@ -148,15 +145,25 @@ const GamePage = ({ mode, gameData }: Props) => {
       window.addEventListener("beforeunload", beforeunload);
       window.addEventListener("unload", onunload);
 
-      router.events.on("routeChangeStart", routeChangeStart);
-
       return () => {
+        if (deleteOnRouteChange.current) {
+          void handleCancel();
+        }
         window.removeEventListener("beforeunload", beforeunload);
-        window.addEventListener("unload", onunload);
-        router.events.off("routeChangeStart", routeChangeStart);
+        window.removeEventListener("unload", onunload);
       };
     }
-  }, []);
+  }, [mode]);
+
+  useEffect(() => {
+    if (mode === "preview") {
+      if (pathname !== initialPathname.current) {
+        if (deleteOnRouteChange.current) {
+          void handleCancel();
+        }
+      }
+    }
+  }, [pathname, mode]);
 
   const loaded = userData && userId;
 
@@ -165,7 +172,7 @@ const GamePage = ({ mode, gameData }: Props) => {
       deleteOnRouteChange.current = false;
       router.replace("/");
     }
-    if (!gameData.preview && mode == "preview") {
+    if (!gameData.preview && mode === "preview") {
       deleteOnRouteChange.current = false;
       router.replace(`/games/${gameData._id}`);
     } else {
