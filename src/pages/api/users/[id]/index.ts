@@ -111,7 +111,7 @@ async function editProfileHandler(req: NextApiRequest, res: NextApiResponse) {
       Student: "student",
       Parent: "parent",
       Administrator: "administrator",
-    }
+    };
     if (!Object.values(userLabels).includes(req.body.label as UserLabel)) {
       throw new GenericUserErrorException(
         `Label must be one of ${Object.values(userLabels)}`,
