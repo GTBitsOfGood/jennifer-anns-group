@@ -26,9 +26,9 @@ export default function DiscardChanges({ gameID, preview }: Props) {
 
   const discard = () => {
     if (preview) {
-      router.push(`/games/${gameID}/preview`);
+      router?.push(`/games/${gameID}/preview`);
     } else {
-      router.push(`/games/${gameID}`);
+      router?.push(`/games/${gameID}`);
     }
   };
 

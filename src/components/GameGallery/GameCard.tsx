@@ -16,7 +16,7 @@ export default function GameCard({ game }: Props) {
   const router = useRouter();
 
   const goToGame = () => {
-    router.push(`/games/${game._id}`);
+    router?.push(`/games/${game._id}`);
   };
 
   return (

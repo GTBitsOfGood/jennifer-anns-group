@@ -97,7 +97,7 @@ const GamePage = ({ mode, gameData }: Props) => {
         setError("Failed to publish game.");
       } else {
         deleteOnRouteChange.current = false;
-        router.replace(`/games/${gameData._id}`);
+        router?.replace(`/games/${gameData._id}`);
       }
     } catch (error) {
       console.error("Error publishing game:", error);
@@ -125,14 +125,14 @@ const GamePage = ({ mode, gameData }: Props) => {
     if (mode === "preview") {
       deleteOnRouteChange.current = true;
     }
-    router.push("/games");
+    router?.push("/games");
   };
 
   useEffect(() => {
     if (mode === "preview") {
       const routeChangeStart = (url: string) => {
         if (deleteOnRouteChange.current) handleCancel();
-        router.events.off("routeChangeStart", routeChangeStart);
+        router?.events.off("routeChangeStart", routeChangeStart);
       };
 
       const beforeunload = (e: BeforeUnloadEvent) => {
@@ -148,12 +148,12 @@ const GamePage = ({ mode, gameData }: Props) => {
       window.addEventListener("beforeunload", beforeunload);
       window.addEventListener("unload", onunload);
 
-      router.events.on("routeChangeStart", routeChangeStart);
+      router?.events.on("routeChangeStart", routeChangeStart);
 
       return () => {
         window.removeEventListener("beforeunload", beforeunload);
         window.addEventListener("unload", onunload);
-        router.events.off("routeChangeStart", routeChangeStart);
+        router?.events.off("routeChangeStart", routeChangeStart);
       };
     }
   }, []);
@@ -163,11 +163,11 @@ const GamePage = ({ mode, gameData }: Props) => {
   useEffect(() => {
     if (!gameData) {
       deleteOnRouteChange.current = false;
-      router.replace("/");
+      router?.replace("/");
     }
     if (!gameData.preview && mode == "preview") {
       deleteOnRouteChange.current = false;
-      router.replace(`/games/${gameData._id}`);
+      router?.replace(`/games/${gameData._id}`);
     } else {
       setCurData(gameData);
     }
@@ -308,7 +308,7 @@ const GamePage = ({ mode, gameData }: Props) => {
                   <AlertDialogFooter p="0" justifyContent="center">
                     <div className="mt-4 flex flex-row items-center gap-4">
                       <button
-                        onClick={() => router.replace("/games")}
+                        onClick={() => router?.replace("/games")}
                         className="rounded-xl bg-delete-red px-6 py-3 font-sans font-semibold text-white"
                       >
                         Yes, cancel

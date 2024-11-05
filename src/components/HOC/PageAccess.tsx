@@ -77,10 +77,10 @@ const pageAccessHOC = <P extends object>(Component: React.FC<P>) => {
       if (
         status !== "loading" &&
         label !== "loading" &&
-        (!pageRequiredLabels[router.pathname as Pages].includes(label) ||
-          pageRequiredAuthentication[router.pathname as Pages] !== status)
+        (!pageRequiredLabels[router?.pathname as Pages].includes(label) ||
+          pageRequiredAuthentication[router?.pathname as Pages] !== status)
       ) {
-        router.replace("/");
+        router?.replace("/");
       }
     }, [label]);
 
@@ -108,8 +108,8 @@ const pageAccessHOC = <P extends object>(Component: React.FC<P>) => {
       );
     }
     if (
-      pageRequiredAuthentication[router.pathname as Pages] === status &&
-      pageRequiredLabels[router.pathname as Pages].includes(label)
+      pageRequiredAuthentication[router?.pathname as Pages] === status &&
+      pageRequiredLabels[router?.pathname as Pages].includes(label)
     ) {
       return <Component {...props} />;
     }

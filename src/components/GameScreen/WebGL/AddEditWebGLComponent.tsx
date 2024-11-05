@@ -173,7 +173,7 @@ function AddEditWebGLComponent(props: Props) {
     ]);
 
     try {
-      const gameId = router.query.id;
+      const gameId = router?.query.id;
       if (gameId) {
         setUploading(true);
         await uploadBuildFiles(gameId.toString(), addOrEdit, files);

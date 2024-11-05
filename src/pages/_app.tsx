@@ -17,10 +17,10 @@ export default function App({
 }: AppProps) {
   const router = useRouter();
   const showHeaderAndFooter =
-    !router.pathname.includes("/login") &&
-    !router.pathname.includes("/signup") &&
-    !router.pathname.includes("/password-reset") &&
-    !router.pathname.includes("/raw");
+    !router?.pathname.includes("/login") &&
+    !router?.pathname.includes("/signup") &&
+    !router?.pathname.includes("/password-reset") &&
+    !router?.pathname.includes("/raw");
 
   return (
     <SessionProvider session={session}>

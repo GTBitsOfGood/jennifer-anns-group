@@ -40,7 +40,7 @@ const EditGamePage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
-  const gameID = router.query.id;
+  const gameID = router?.query.id;
   const [curData, setCurData] = useState<GameDataState>(gameData);
   const [name, setName] = useState(gameData.name);
 
@@ -50,7 +50,7 @@ const EditGamePage = ({
 
   useEffect(() => {
     if (!gameData) {
-      router.replace("/");
+      router?.replace("/");
     }
     setCurData(gameData);
   }, [gameData]);
@@ -155,9 +155,9 @@ const EditGamePage = ({
     });
 
     if (curData?.preview) {
-      router.push(`/games/${gameID}/preview`);
+      router?.push(`/games/${gameID}/preview`);
     } else {
-      router.push(`/games/${gameID}`);
+      router?.push(`/games/${gameID}`);
     }
   };
 

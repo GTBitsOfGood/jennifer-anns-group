@@ -465,7 +465,7 @@ function CreateGame() {
               }));
             }
           }
-          router.replace(`/games/${data._id}/preview`);
+          router?.replace(`/games/${data._id}/preview`);
         } else {
           setSubmitting(false);
         }
@@ -529,7 +529,7 @@ function CreateGame() {
         <div className="col-span-1 rounded-sm opacity-100 ring-offset-white transition-opacity hover:cursor-pointer focus:outline-none focus:ring-2">
           <MoveLeft
             onClick={() => {
-              router.replace("/games");
+              router?.replace("/games");
             }}
             className="h-12 w-12 text-blue-primary"
           />

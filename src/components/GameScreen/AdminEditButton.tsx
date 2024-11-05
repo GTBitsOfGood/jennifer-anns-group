@@ -14,7 +14,7 @@ export default function AdminEditButton({
 
   const handleEditClick = () => {
     deleteOnRouteChange.current = false;
-    router.push(`/games/${gameId}/edit`);
+    router?.push(`/games/${gameId}/edit`);
   };
 
   return (

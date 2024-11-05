@@ -101,7 +101,7 @@ export default function Games() {
             {userData?.label === "administrator" ? (
               <button
                 onClick={() => {
-                  router.push("/games/create");
+                  router?.push("/games/create");
                 }}
                 className="rounded-md bg-blue-primary px-4 py-3 font-sans text-lg text-white hover:bg-[#4F75B3]"
               >

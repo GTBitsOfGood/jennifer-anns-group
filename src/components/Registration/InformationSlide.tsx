@@ -151,7 +151,7 @@ function InformationSlide({
       password: combinedAccountData.password,
       redirect: false,
     });
-    router.replace("/");
+    router?.replace("/");
   }
 
   return (

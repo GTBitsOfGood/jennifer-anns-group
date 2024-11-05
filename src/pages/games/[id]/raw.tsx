@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import RawEmbeddedGame from "@/components/GameScreen/WebGL/RawEmbeddedGame";
 
 const GamePage = () => {
-  const gameId = useRouter().query.id;
+  const gameId = useRouter()?.query.id;
 
   useEffect(() => {
     const body = document.querySelector("body");

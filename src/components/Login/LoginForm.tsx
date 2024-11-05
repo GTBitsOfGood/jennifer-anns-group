@@ -59,7 +59,7 @@ function LoginForm() {
       email: undefined,
       password: undefined,
     });
-    router.replace("/");
+    router?.replace("/");
   }
 
   return (

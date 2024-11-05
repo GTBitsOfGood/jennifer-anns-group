@@ -15,7 +15,7 @@ export default function PasswordResetUpdate() {
         type="submit"
         variant="default"
         size="lg"
-        onClick={() => router.push("/login")}
+        onClick={() => router?.push("/login")}
       >
         Back to Login
       </Button>

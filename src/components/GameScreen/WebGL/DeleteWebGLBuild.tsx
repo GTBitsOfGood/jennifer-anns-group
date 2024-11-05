@@ -21,7 +21,7 @@ interface Props {
 
 function DeleteWebGLBuild(props: Props) {
   const router = useRouter();
-  const gameId = router.query.id;
+  const gameId = router?.query.id;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement | null>(null);
 

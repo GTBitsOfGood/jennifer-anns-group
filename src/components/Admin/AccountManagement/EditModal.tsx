@@ -70,7 +70,7 @@ function EditModal({ open, setOpen, admin }: Props) {
       }
       setOpen(false);
       if (currUser) {
-        router.push("/");
+        router?.push("/");
       }
     } catch (error) {
       console.error("Error updating role:", error);
