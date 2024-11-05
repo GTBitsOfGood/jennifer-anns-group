@@ -7,7 +7,7 @@ services:
       dockerfile: ./Dockerfile.dev
       args:
         BW_PASSWORD: ${BW_PASSWORD}
-        MONGODB_URI: mongodb://mongo:27017/jennifer-anns?replicaSet=rs0
+        MONGODB_URI: mongodb+srv://itsgivingdrb:L6hn_nVCW9Gw@devdb.ivnpj.mongodb.net/jennifer-anns
     volumes:
       - ./:/app
       - node_modules:/app/node_modules

@@ -208,7 +208,7 @@ function AddEditWebGLComponent(props: Props) {
   const [addOrEdit, setAddOrEdit] = useState<"Add" | "Edit">("Add");
 
   useEffect(() => {
-    if (props.gameData.webGLBuild) {
+    if (props.gameData?.webGLBuild) {
       setAddOrEdit("Edit");
     } else {
       setAddOrEdit("Add");

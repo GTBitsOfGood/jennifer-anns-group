@@ -133,7 +133,7 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
         ...input,
       };
 
-      const buildsArray = gameData.builds || [];
+      const buildsArray = gameData?.builds || [];
       const updatedBuilds = [...buildsArray, newBuild];
 
       setGameData({
@@ -191,7 +191,7 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
           userId: userData._id,
           userGroup: userData.label,
           createdDate: Date(),
-          gameName: gameData.name,
+          gameName: gameData?.name,
           resourceName: gameBuildName,
           resourceUrl: gameUrl,
           downloadSrc: window.location.href,
@@ -202,8 +202,8 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
   };
   return (
     <div>
-      {gameData.builds &&
-        gameData.builds.map(
+      {gameData?.builds &&
+        gameData?.builds.map(
           (data: z.infer<typeof buildSchema>, index: number) => (
             <div key={index} className="mb-4">
               <div className="flex flex-row items-center justify-between">
@@ -478,8 +478,8 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
                       <DialogContent className="border-4 border-solid border-blue-primary p-14 sm:max-w-[500px]">
                         <div className="mx-auto flex w-full flex-col items-center">
                           <div className="mt-12 w-80 p-0 text-center font-sans text-lg font-semibold text-blue-primary">
-                            Are you sure you want to delete this {gameData.name}{" "}
-                            {data.type.toUpperCase()} build?
+                            Are you sure you want to delete this{" "}
+                            {gameData?.name} {data.type.toUpperCase()} build?
                           </div>
                         </div>
                         <div className="mt-6 text-center font-sans text-base">
@@ -519,7 +519,7 @@ function GameBuildList({ gameData, editing, setGameData, userData }: Props) {
             </div>
           ),
         )}
-      {editing && !(gameData.builds && gameData.builds.length >= 6) && (
+      {editing && !(gameData?.builds && gameData?.builds.length >= 6) && (
         <div className="mt-12">
           <button
             onClick={() => setAddDialogOpen(true)}

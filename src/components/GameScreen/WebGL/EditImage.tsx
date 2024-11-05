@@ -13,17 +13,17 @@ const EditImage = ({ imageURL, gameData, setGameData }: Props) => {
   const [previewURL, setPreviewURL] = useState<string | null>(imageURL);
 
   useEffect(() => {
-    if (!gameData.imageFile) {
+    if (!gameData?.imageFile) {
       return;
     }
-    setPreviewURL(URL.createObjectURL(gameData.imageFile));
+    setPreviewURL(URL.createObjectURL(gameData?.imageFile));
 
     return () => {
       if (previewURL) {
         URL.revokeObjectURL(previewURL);
       }
     };
-  }, [gameData.imageFile]);
+  }, [gameData?.imageFile]);
 
   const updateImage = async (e: ChangeEvent<HTMLInputElement>) => {
     const image = e.target.files ? e.target.files[0] : undefined;

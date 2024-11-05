@@ -49,7 +49,7 @@ export default function TabsComponent({
     onOpen: onDeleteAnswerKeyOpen,
     onClose: onDeleteAnswerKeyClose,
   } = useDisclosure();
-  const [description, setDescription] = useState(gameData.description);
+  const [description, setDescription] = useState(gameData?.description);
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
     setDescription(newValue);
@@ -73,7 +73,7 @@ export default function TabsComponent({
         userId: userData._id,
         userGroup: userData.label,
         createdDate: Date(),
-        gameName: gameData.name,
+        gameName: gameData?.name,
         resourceName: resourceName,
         resourceUrl: resourceUrl,
         downloadSrc: window.location.href,
@@ -84,13 +84,13 @@ export default function TabsComponent({
   const onTabChange = (index: number) => {
     if (!visitedLessonPlan && index == 1) {
       setVisitedLessonPlan(true);
-      loadedFile(gameData.lesson ?? "No Url", "Lesson Plan");
+      loadedFile(gameData?.lesson ?? "No Url", "Lesson Plan");
     } else if (!visitedParentingGuide && index == 2) {
       setVisitedParentingGuide(true);
-      loadedFile(gameData.parentingGuide ?? "No Url", "Parenting Guide");
+      loadedFile(gameData?.parentingGuide ?? "No Url", "Parenting Guide");
     } else if (!visitedAnswerKey && index == 3) {
       setVisitedAnswerKey(true);
-      loadedFile(gameData.answerKey ?? "No Url", "Answer Key");
+      loadedFile(gameData?.answerKey ?? "No Url", "Answer Key");
     }
   };
   return (
@@ -102,19 +102,18 @@ export default function TabsComponent({
               <>
                 {/** tabs in view mode only visible if value exists */}
                 <Tab>Description</Tab>
-                {gameData.videoTrailer && gameData.videoTrailer !== "" && (
+                {gameData?.videoTrailer && gameData?.videoTrailer !== "" && (
                   <Tab>Trailer</Tab>
                 )}
-                {gameData.lesson && gameData.lesson !== "" && (
+                {gameData?.lesson && gameData?.lesson !== "" && (
                   <Tab>Lesson Plan</Tab>
                 )}
-                {gameData.parentingGuide && gameData.parentingGuide !== "" && (
-                  <Tab>Parenting Guide</Tab>
-                )}
-                {gameData.answerKey &&
-                  gameData.answerKey !== "" &&
+                {gameData?.parentingGuide &&
+                  gameData?.parentingGuide !== "" && <Tab>Parenting Guide</Tab>}
+                {gameData?.answerKey &&
+                  gameData?.answerKey !== "" &&
                   authorized && <Tab>Answer Key</Tab>}
-                {gameData?.builds && gameData.builds.length > 0 && (
+                {gameData?.builds && gameData?.builds.length > 0 && (
                   <Tab>Game Builds</Tab>
                 )}
               </>
@@ -141,12 +140,12 @@ export default function TabsComponent({
                 />
               ) : (
                 <p className="font-sans text-input-stroke">
-                  {gameData.description}
+                  {gameData?.description}
                 </p>
               )}
             </TabPanel>
             {/** other tabs render if field exists or in edit mode */}
-            {((gameData.videoTrailer && gameData.videoTrailer !== "") ||
+            {((gameData?.videoTrailer && gameData?.videoTrailer !== "") ||
               mode === "edit") && (
               <TabPanel className="p-0">
                 <VideoComponent
@@ -156,18 +155,18 @@ export default function TabsComponent({
                 />
               </TabPanel>
             )}
-            {((gameData.lesson && gameData.lesson !== "") ||
+            {((gameData?.lesson && gameData?.lesson !== "") ||
               mode === "edit") && (
               <TabPanel className="p-0" display="flex" flexDir="column" gap={8}>
-                {((gameData.lesson && gameData.lesson !== "") ||
-                  gameData.lessonFile) && (
+                {((gameData?.lesson && gameData?.lesson !== "") ||
+                  gameData?.lessonFile) && (
                   <iframe
                     className="w-full"
                     height="600"
                     src={
-                      gameData.lessonFile
-                        ? URL.createObjectURL(gameData.lessonFile as File)
-                        : gameData.lesson
+                      gameData?.lessonFile
+                        ? URL.createObjectURL(gameData?.lessonFile as File)
+                        : gameData?.lesson
                     }
                   />
                 )}
@@ -179,8 +178,8 @@ export default function TabsComponent({
                       gameData={gameData}
                       setGameData={setGameData}
                     />
-                    {((gameData.lesson && gameData.lesson !== "") ||
-                      gameData.lessonFile) && (
+                    {((gameData?.lesson && gameData?.lesson !== "") ||
+                      gameData?.lessonFile) && (
                       <button
                         className="flex items-center gap-1 rounded-md border border-delete-red px-4 py-3  font-sans text-lg font-medium text-delete-red hover:bg-dark-red-hover hover:text-white"
                         onClick={onDeleteLessonOpen}
@@ -199,20 +198,21 @@ export default function TabsComponent({
                 )}
               </TabPanel>
             )}
-            {((gameData.parentingGuide && gameData.parentingGuide !== "") ||
+            {((gameData?.parentingGuide && gameData?.parentingGuide !== "") ||
               mode === "edit") && (
               <TabPanel className="p-0" display="flex" flexDir="column" gap={8}>
-                {((gameData.parentingGuide && gameData.parentingGuide !== "") ||
-                  gameData.parentingGuideFile) && (
+                {((gameData?.parentingGuide &&
+                  gameData?.parentingGuide !== "") ||
+                  gameData?.parentingGuideFile) && (
                   <iframe
                     className="w-full"
                     height="600"
                     src={
-                      gameData.parentingGuideFile
+                      gameData?.parentingGuideFile
                         ? URL.createObjectURL(
-                            gameData.parentingGuideFile as File,
+                            gameData?.parentingGuideFile as File,
                           )
-                        : gameData.parentingGuide
+                        : gameData?.parentingGuide
                     }
                   />
                 )}
@@ -225,9 +225,9 @@ export default function TabsComponent({
                       gameData={gameData}
                       setGameData={setGameData}
                     />
-                    {((gameData.parentingGuide &&
-                      gameData.parentingGuide !== "") ||
-                      gameData.parentingGuideFile) && (
+                    {((gameData?.parentingGuide &&
+                      gameData?.parentingGuide !== "") ||
+                      gameData?.parentingGuideFile) && (
                       <button
                         className="flex items-center gap-1 rounded-md border border-delete-red px-4 py-3  font-sans text-lg font-medium text-delete-red hover:bg-dark-red-hover hover:text-white"
                         onClick={onDeleteParentingGuideOpen}
@@ -246,18 +246,20 @@ export default function TabsComponent({
                 )}
               </TabPanel>
             )}
-            {((gameData.answerKey && gameData.answerKey !== "" && authorized) ||
+            {((gameData?.answerKey &&
+              gameData?.answerKey !== "" &&
+              authorized) ||
               mode === "edit") && (
               <TabPanel className="p-0" display="flex" flexDir="column" gap={8}>
-                {((gameData.answerKey && gameData.answerKey !== "") ||
-                  gameData.answerKeyFile) && (
+                {((gameData?.answerKey && gameData?.answerKey !== "") ||
+                  gameData?.answerKeyFile) && (
                   <iframe
                     className="w-full"
                     height="600"
                     src={
-                      gameData.answerKeyFile
-                        ? URL.createObjectURL(gameData.answerKeyFile as File)
-                        : gameData.answerKey
+                      gameData?.answerKeyFile
+                        ? URL.createObjectURL(gameData?.answerKeyFile as File)
+                        : gameData?.answerKey
                     }
                   />
                 )}
@@ -269,8 +271,8 @@ export default function TabsComponent({
                       gameData={gameData}
                       setGameData={setGameData}
                     />
-                    {((gameData.answerKey && gameData.answerKey !== "") ||
-                      gameData.answerKeyFile) && (
+                    {((gameData?.answerKey && gameData?.answerKey !== "") ||
+                      gameData?.answerKeyFile) && (
                       <button
                         className="flex items-center gap-1 rounded-md border border-delete-red px-4 py-3  font-sans text-lg font-medium text-delete-red hover:bg-dark-red-hover hover:text-white"
                         onClick={onDeleteAnswerKeyOpen}
@@ -289,7 +291,7 @@ export default function TabsComponent({
                 )}
               </TabPanel>
             )}
-            {((gameData?.builds && gameData.builds.length > 0) ||
+            {((gameData?.builds && gameData?.builds.length > 0) ||
               mode === "edit") && (
               <TabPanel className="p-0">
                 <GameBuildList

@@ -57,13 +57,13 @@ function createViewer(environment: EventEnvironment) {
 }
 
 export function getLogger() {
-  return process.env.NODE_ENV === "production"
+  return process.env.NEXT_PUBLIC_ENV === "production"
     ? createLogger(EventEnvironment.PRODUCTION)
     : createLogger(EventEnvironment.DEVELOPMENT);
 }
 
 export function getViewer() {
-  return process.env.NODE_ENV === "production"
+  return process.env.NEXT_PUBLIC_ENV === "production"
     ? createViewer(EventEnvironment.PRODUCTION)
     : createViewer(EventEnvironment.DEVELOPMENT);
 }

@@ -33,11 +33,11 @@ export default function AddEditVideoTrailer({ gameData, setGameData }: Props) {
   const gameID = router?.query.id;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement | null>(null);
-  const [url, setUrl] = useState(gameData.videoTrailer ?? "");
+  const [url, setUrl] = useState(gameData?.videoTrailer ?? "");
   const [issue, setIssue] = useState("");
   const [addButton, setAddButton] = useState(true);
   useEffect(() => {
-    if (gameData.videoTrailer === undefined || gameData.videoTrailer === "") {
+    if (gameData?.videoTrailer === undefined || gameData?.videoTrailer === "") {
       setAddButton(true);
     } else {
       setAddButton(false);

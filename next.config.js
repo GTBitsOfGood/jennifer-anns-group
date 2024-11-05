@@ -4,6 +4,7 @@ const nextConfig = {
   images: {
     domains: ["cloudflare-b2.bogjenniferanns.workers.dev"],
   },
+  productionBrowserSourceMaps: process.env.NEXT_PUBLIC_ENV !== "production"
 };
 
 module.exports = nextConfig;

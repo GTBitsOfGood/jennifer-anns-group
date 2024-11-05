@@ -42,7 +42,7 @@ const EditGamePage = ({
   const router = useRouter();
   const gameID = router?.query.id;
   const [curData, setCurData] = useState<GameDataState>(gameData);
-  const [name, setName] = useState(gameData.name);
+  const [name, setName] = useState(gameData?.name);
 
   const { mutateAsync: getDirectUpload } = useMutation({
     mutationFn: (file: File) => fetch("/api/file").then((res) => res.json()),
@@ -173,7 +173,7 @@ const EditGamePage = ({
         />
         <div className="relative flex flex-1 justify-end">
           <EditImage
-            imageURL={gameData.image}
+            imageURL={gameData?.image}
             gameData={curData}
             setGameData={setCurData}
           />

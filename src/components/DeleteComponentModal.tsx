@@ -29,7 +29,7 @@ export default function DeleteComponentModal(props: Props) {
   const deleteType = props.deleteType;
 
   const title: Record<string, string> = {
-    game: props.gameData.name ? props.gameData.name : "",
+    game: props.gameData?.name ? props.gameData?.name : "",
     answerKey: "this answer key",
     parentingGuide: "this parenting guide",
     lessonPlan: "this lesson plan",
