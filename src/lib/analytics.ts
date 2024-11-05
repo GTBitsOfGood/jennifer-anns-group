@@ -12,6 +12,8 @@ const BASE_URL = "https://data.bitsofgood.org";
 
 function createLogger(environment: EventEnvironment) {
   const clientApiKey = process.env.NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY;
+  if (!clientApiKey)
+    throw new Error("Missing NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY");
   if (environment === EventEnvironment.DEVELOPMENT) {
     if (!devLoggerInstance) {
       devLoggerInstance = new AnalyticsLogger({
@@ -35,6 +37,8 @@ function createLogger(environment: EventEnvironment) {
 
 function createViewer(environment: EventEnvironment) {
   const serverApiKey = process.env.BOG_BOG_ANALYTICS_SERVER_API_KEY;
+  if (!serverApiKey)
+    throw new Error("Missing BOG_BOG_ANALYTICS_SERVER_API_KEY");
   if (environment === EventEnvironment.DEVELOPMENT) {
     if (!devViewerInstance) {
       devViewerInstance = new AnalyticsViewer({

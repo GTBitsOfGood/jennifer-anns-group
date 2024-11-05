@@ -10,6 +10,7 @@ import {
 export async function middleware(request: NextRequest) {
   //Only takes in pages
   const secret = process.env.NEXTAUTH_SECRET;
+  if (!secret) throw new Error("Missing NEXTAUTH_SECRET");
   const token = await getToken({ req: request, secret });
   if (token && token.tracked) {
     const user_label = token.label;
