@@ -1,5 +1,5 @@
 import { Button } from "../ui/button";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 
 export default function PasswordResetUpdate() {
   const router = useRouter();
@@ -15,7 +15,7 @@ export default function PasswordResetUpdate() {
         type="submit"
         variant="default"
         size="lg"
-        onClick={() => router.push("/login")}
+        onClick={() => router?.push("/login")}
       >
         Back to Login
       </Button>

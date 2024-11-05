@@ -14,23 +14,23 @@ type ViewProps = {
 function ViewProfileModal(props: ViewProps) {
   return (
     <>
-      <div className="-my-2 grid grid-cols-8 gap-3 py-4 font-sans">
+      <div className="grid grid-cols-8 gap-3 font-sans">
         <div className="col-span-4 items-center">
-          <Label className="text-right text-lg font-normal">First Name</Label>
+          <Label className="text-right text-base font-normal">First Name</Label>
 
           <p className="col-span-3 py-2 text-sm font-light text-blue-primary">
             {props.userData?.firstName}
           </p>
         </div>
         <div className="col-span-4 items-center">
-          <Label className="text-right text-lg font-normal">Last Name</Label>
+          <Label className="text-right text-base font-normal">Last Name</Label>
 
           <p className="col-span-3 py-2 text-sm font-light text-blue-primary">
             {props.userData?.lastName}
           </p>
         </div>
         <div className="col-span-8 items-center">
-          <Label className="text-right text-lg font-normal">Email</Label>
+          <Label className="text-right text-base font-normal">Email</Label>
 
           <p className="col-span-3 py-2 text-sm font-light text-blue-primary">
             {props.userData?.email}
@@ -38,7 +38,7 @@ function ViewProfileModal(props: ViewProps) {
         </div>
 
         <div className="col-span-8 items-center">
-          <Label className="text-right text-lg font-normal">Role</Label>
+          <Label className="text-right text-base font-normal">Role</Label>
 
           <p className="col-span-3 py-2 text-sm font-light text-blue-primary">
             {props.userData?.label
@@ -48,14 +48,14 @@ function ViewProfileModal(props: ViewProps) {
           </p>
         </div>
         <div className="col-span-8 items-center">
-          <Label className="text-right text-lg font-normal">Password</Label>
+          <Label className="text-right text-base font-normal">Password</Label>
           <p className="col-span-3 py-2 text-sm font-light text-blue-primary">
             ********
           </p>
         </div>
 
         <div className="col-span-8 items-center">
-          <Label className="text-right text-lg font-normal">
+          <Label className="text-right text-base font-normal">
             Optional Data Collection
           </Label>
 

@@ -40,3 +40,5 @@ next-env.d.ts
 settings.json
 # Local Netlify folder
 .netlify
+
+.env.old

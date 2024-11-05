@@ -10,7 +10,7 @@ import {
   ChakraProvider,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -26,9 +26,9 @@ export default function DiscardChanges({ gameID, preview }: Props) {
 
   const discard = () => {
     if (preview) {
-      router.push(`/games/${gameID}/preview`);
+      router?.push(`/games/${gameID}/preview`);
     } else {
-      router.push(`/games/${gameID}`);
+      router?.push(`/games/${gameID}`);
     }
   };
 

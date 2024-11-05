@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { TextArea } from "@/components/ui/textarea";
 import { AlertTriangleIcon, MoveLeft, Plus, Upload, X } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import ThemeSelect from "@/components/Themes/ThemeSelect";
 import TagSelect from "@/components/Tags/TagSelect";
 import { ITheme } from "@/server/db/models/ThemeModel";
@@ -47,6 +47,24 @@ export const buildFileTypes = Object.freeze({
   loader: "build.loader.js",
   code: "build.wasm",
 });
+
+async function markAsRemote(gameId: string): Promise<boolean> {
+  if (!gameId) return false;
+  try {
+    await axios.put(
+      `/api/games/${gameId}`,
+      JSON.stringify({ remoteUrl: true }),
+      {
+        headers: {
+          "Content-Type": "text",
+        },
+      },
+    );
+  } catch (e) {
+    throw e;
+  }
+  return true;
+}
 
 async function uploadBuildFiles(gameId: string, files: Map<string, File>) {
   if (files.size !== 4) {
@@ -368,6 +386,7 @@ function CreateGame() {
           ...prevValidationErrors,
           builds: "Please add at least one Game Build.",
         }));
+        return false;
       }
     }
     return true;
@@ -435,7 +454,18 @@ function CreateGame() {
             const webGLSubmit = await handleWebGLSubmit(data._id);
             if (!webGLSubmit) return;
           }
-          router.replace(`/games/${data._id}/preview`);
+          if (builds.some((build) => build.type == "remote")) {
+            try {
+              const remoteSubmit = await markAsRemote(data._id);
+              if (!remoteSubmit) return;
+            } catch (e) {
+              setValidationErrors((prevValidationErrors) => ({
+                ...prevValidationErrors,
+                builds: "An internal error occurred. Please try again.",
+              }));
+            }
+          }
+          router?.replace(`/games/${data._id}/preview`);
         } else {
           setSubmitting(false);
         }
@@ -499,7 +529,7 @@ function CreateGame() {
         <div className="col-span-1 rounded-sm opacity-100 ring-offset-white transition-opacity hover:cursor-pointer focus:outline-none focus:ring-2">
           <MoveLeft
             onClick={() => {
-              router.replace("/games");
+              router?.replace("/games");
             }}
             className="h-12 w-12 text-blue-primary"
           />

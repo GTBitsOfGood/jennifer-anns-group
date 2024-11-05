@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { PageRequiredGameQuery } from "./GamesSection";
 import { ExtendId } from "@/utils/types";
+import { Filter } from "lucide-react";
 
 const FORM_THEMES_KEY = "themes";
 const FORM_TAGS_ACCESSIBILITY_KEY = "accessibility";
@@ -71,13 +72,19 @@ function FilterPopover(props: Props) {
     <div className="flex flex-row">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline2">Filter</Button>
+          <Button variant="outline2" className="rounded-lg">
+            <div className="flex flex-row items-center gap-2">
+              Filter <Filter size={15}></Filter>
+            </div>
+          </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[40em]" align="start">
           <form className="m-4 flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <p className="mb-2 mt-2 font-semibold text-[#6D758F]">Themes</p>
+                <p className="mb-2 mt-2 font-semibold text-input-stroke">
+                  Themes
+                </p>
                 <div className="flex flex-row flex-wrap gap-2">
                   {themes?.map((theme) => {
                     return (
@@ -102,7 +109,7 @@ function FilterPopover(props: Props) {
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <p className="mb-2 mt-2 font-semibold text-[#6D758F]">
+                <p className="mb-2 mt-2 font-semibold text-input-stroke">
                   Accessibility
                 </p>
                 <div className="flex flex-row flex-wrap gap-2">
@@ -131,7 +138,9 @@ function FilterPopover(props: Props) {
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <p className="mb-2 mt-2 font-semibold text-[#6D758F]">Tags</p>
+                <p className="mb-2 mt-2 font-semibold text-input-stroke">
+                  Tags
+                </p>
                 <div className="flex flex-row flex-wrap gap-2">
                   {tags?.custom.map((tag) => {
                     return (

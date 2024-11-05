@@ -22,7 +22,7 @@ export default function EmbeddedGame({
   const [height, setHeight] = useState("725px");
   const { data: session, status: sessionStatus } = useSession();
   const [iframeLoaded, setIframeLoaded] = useState(false);
-  const { analyticsLogger } = useAnalytics();
+  const { logCustomEvent } = useAnalytics();
   const updateHeight = () => {
     const iframe = ref.current;
     if (!iframe) return;
@@ -60,9 +60,9 @@ export default function EmbeddedGame({
         userId: userData?._id ?? "Unauthenticated",
         userGroup: userData?.label ?? "None",
         createdDate: Date(),
-        gameName: gameData.name,
+        gameName: gameData?.name,
       };
-      analyticsLogger.logCustomEvent("Visit", "game", properties);
+      logCustomEvent("Visit", "game", properties);
     }
   }, [iframeLoaded, sessionStatus]);
 
@@ -73,6 +73,7 @@ export default function EmbeddedGame({
   }, [iframeLoaded]);
 
   useEffect(() => {
+    if (gameData?.remoteUrl) return;
     const iframeWidth = ref.current?.offsetWidth;
     if (iframeWidth) {
       setHeight(`${iframeWidth / 2}px`);
@@ -83,25 +84,55 @@ export default function EmbeddedGame({
     };
   }, []);
 
-  return gameData.webGLBuild ? (
-    <iframe
-      ref={ref}
-      onLoad={handleLoad}
-      height={height}
-      src={`/games/${gameId}/raw`}
-      className={cn("m-auto my-6 w-10/12", {
-        "border-2 border-solid border-black": height !== "0px",
-      })}
-    />
-  ) : (
-    <div className="m-auto my-6 flex h-[600px] w-10/12 flex-col items-center justify-center border-2 border-solid border-black">
-      <Image src={`/orange_heart.svg`} alt="No data" width={90} height={70} />
-      <div className="mt-4 text-center text-2xl font-semibold text-orange-primary">
-        This game is not playable from the browser.
-      </div>
-      <div className="text-center text-gray-text">
-        Find download files in the <b>Game Builds</b> tab below.
-      </div>
-    </div>
-  );
+  const renderContent = () => {
+    switch (true) {
+      case gameData?.webGLBuild:
+        return (
+          <iframe
+            ref={ref}
+            onLoad={handleLoad}
+            height={height}
+            src={`/games/${gameId}/raw`}
+            className={cn("", {
+              "border-2 border-solid border-black": height !== "0px",
+            })}
+          />
+        );
+
+      case gameData?.remoteUrl:
+        return (
+          <iframe
+            ref={ref}
+            // onLoad={handleLoad}
+            height={height}
+            src={
+              gameData?.builds?.find((build) => build.type == "remote")?.link
+            }
+            className={cn("", {
+              "border-2 border-solid border-black": height !== "0px",
+            })}
+          />
+        );
+
+      default:
+        return (
+          <div className="flex h-game flex-col items-center justify-center border-2 border-solid border-black">
+            <Image
+              src={`/orange_heart.svg`}
+              alt="No data"
+              width={90}
+              height={70}
+            />
+            <div className="mt-4 text-center text-2xl font-semibold text-orange-primary">
+              This game is not playable from the browser.
+            </div>
+            <div className="text-center text-gray-text">
+              Find download files in the <b>Game Builds</b> tab below.
+            </div>
+          </div>
+        );
+    }
+  };
+
+  return renderContent();
 }

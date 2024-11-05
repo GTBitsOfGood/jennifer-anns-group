@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { signOut } from "next-auth/react";
 import { ProfileModal, userDataSchema } from "../ProfileModal/ProfileModal";
 import { Button } from "../ui/button";
@@ -55,13 +55,13 @@ const Header = () => {
     } else {
       setLoaded(true);
     }
-    const pathname = router.pathname;
+    const pathname = router?.pathname;
     const tabNames = Object.keys(tabLinks) as TabName[];
     const index = tabNames.findIndex((name) =>
-      tabLinks[name].includes(pathname),
+      tabLinks[name].includes(pathname as string),
     ); // this might need to be changed later on, pathname could be dynamic
     setSelectedTab(index !== -1 ? index : 1); // set default to game gallery (for game screen, create game, edit game)
-  }, [status, router.pathname]);
+  }, [status, router?.pathname]);
 
   function getUserData() {
     setUserData(currentUser);
@@ -72,7 +72,7 @@ const Header = () => {
     if (userType !== UserType.Public) {
       signOut({ callbackUrl: "/" });
     } else {
-      router.push("/signup");
+      router?.push("/signup");
     }
   }
 
@@ -81,7 +81,7 @@ const Header = () => {
     const tabLink = tabLinks[tabData[userType][i]];
     if (tabName !== "Donate") {
       setSelectedTab(i);
-      router.push(tabLink[0]);
+      router?.push(tabLink[0]);
     } else {
       window.open(tabLink[0], "_blank");
     }
@@ -150,7 +150,7 @@ const Header = () => {
           variant="mainorange"
           className="text-lg"
           onClick={() => {
-            router.push("/login");
+            router?.push("/login");
           }}
         >
           Log in
@@ -174,7 +174,7 @@ const Header = () => {
       <div
         className="flex items-center hover:cursor-pointer"
         onClick={() => {
-          router.push("/");
+          router?.push("/");
         }}
       >
         <img className="w-50 h-auto" src="/logo_gray.svg" alt="Logo" />

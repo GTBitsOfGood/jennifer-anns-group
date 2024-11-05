@@ -121,27 +121,29 @@ export default function SearchTagsComponent({
 
   return (
     <ThemeProvider theme={muiTheme}>
-      <div>
-        <Autocomplete
-          disablePortal
-          id="combo-box-demo"
-          options={options}
-          getOptionLabel={(t) => t.name}
-          className="sans-serif"
-          onChange={handleSelection}
-          PaperComponent={CustomPaper}
-          sx={{
-            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-              {
-                border: "1px solid black",
-              },
-            width: 560,
-          }}
-          renderInput={(params) => (
-            <TextField {...params} placeholder="Search themes/tags" />
-          )}
-        />
-      </div>
+      <Autocomplete
+        disablePortal
+        id="combo-box-demo"
+        options={options}
+        getOptionLabel={(t) => t.name}
+        className="font-sans"
+        onChange={handleSelection}
+        PaperComponent={CustomPaper}
+        sx={{
+          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+            {
+              border: "1px solid black",
+            },
+          width: 560,
+        }}
+        renderInput={(params) => (
+          <TextField
+            className=""
+            {...params}
+            placeholder="Search themes/tags"
+          />
+        )}
+      />
     </ThemeProvider>
   );
 }

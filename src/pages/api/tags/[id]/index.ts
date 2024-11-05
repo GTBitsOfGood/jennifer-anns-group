@@ -7,11 +7,17 @@ import {
   TagException,
 } from "@/utils/exceptions/tag";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
-
+import { authenticate } from "../../auth/[...nextauth]";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
+  //Authentication
+  //Authentication
+  const authenticated = await authenticate(req, res, ["DELETE"], true);
+  if (authenticated !== true) {
+    return authenticated;
+  }
   switch (req.method) {
     case "DELETE":
       return deleteTagHandler(req, res);

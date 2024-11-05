@@ -10,11 +10,17 @@ import {
 } from "@/utils/exceptions/admin";
 import { adminSchema } from "@/utils/types";
 import { NextApiRequest, NextApiResponse } from "next";
-
+import { authenticate } from "../auth/[...nextauth]";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
+  //Authentication
+  const authenticated = await authenticate(req, res, ["POST", "GET"], true);
+  if (authenticated !== true) {
+    return authenticated;
+  }
+
   switch (req.method) {
     case "POST":
       return postAdminHandler(req, res);

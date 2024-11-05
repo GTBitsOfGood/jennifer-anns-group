@@ -17,6 +17,7 @@ function createRandomGame(): GamesFilterOutput[number] {
     lowercaseName: name.toLowerCase(),
     description: faker.lorem.paragraph(),
     webGLBuild: faker.datatype.boolean(),
+    remoteUrl: faker.datatype.boolean(),
     lesson: faker.internet.url(),
     parentingGuide: faker.internet.url(),
     answerKey: faker.internet.url(),

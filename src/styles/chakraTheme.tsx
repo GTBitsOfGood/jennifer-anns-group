@@ -8,13 +8,12 @@ const Tabs = tabsHelper.defineMultiStyleConfig({
   baseStyle: {
     tab: {
       borderBottom: "4px solid",
-      color: "#98A2B3",
+      color: "#A3AED0",
       borderColor: "#EAECF0",
       mb: "-4px",
       fontWeight: "400",
       _selected: {
         color: "#164C96",
-        fontWeight: "600",
         borderColor: "#164C96",
         borderBottomWidth: "4px",
         mb: "-4px",
@@ -32,23 +31,40 @@ const Tag = tagHelper.defineMultiStyleConfig({
   baseStyle: {
     container: {
       mr: "12px",
-      px: "18px",
+      px: "16px",
       py: "8px",
       mb: "12px",
       borderRadius: "full",
+      fontSize: "14px",
+      fontFamily: "Inter",
+      fontWeight: "normal",
+      color: "#38414B",
     },
   },
   variants: {
     filter: {
       container: {
-        color: "#535353",
-        bg: "#F6F6F6",
+        bg: "#F1F3F7",
       },
     },
-    filter_selected: {
+    filter_selected_theme: {
       container: {
-        color: "#535353",
-        bg: "#B0CAE8",
+        bg: "#E2EFFF",
+      },
+    },
+    filter_selected_accessibility: {
+      container: {
+        bg: "#FEE9CC",
+      },
+    },
+    filter_selected_other: {
+      container: {
+        bg: "#E2DED5",
+      },
+    },
+    filter_selected_game: {
+      container: {
+        bg: "#E1E4ED",
       },
     },
   },
@@ -79,6 +95,16 @@ const Checkbox = checkboxHelper.defineMultiStyleConfig({
 });
 
 const chakraTheme = extendTheme({
+  fonts: {
+    body: "Poppins, sans-serif",
+  },
+  styles: {
+    global: {
+      ":root": {
+        "--tabs-color": "#A3AED0",
+      },
+    },
+  },
   colors: {
     brand: {
       300: "#FDD299",

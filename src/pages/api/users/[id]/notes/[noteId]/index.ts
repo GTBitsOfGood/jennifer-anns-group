@@ -3,11 +3,19 @@ import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { UserDoesNotExistException } from "@/utils/exceptions/user";
 import { noteSchema } from "@/utils/types";
 import { NextApiRequest, NextApiResponse } from "next";
-
+import { authenticateAdminOrSameUser } from "@/pages/api/auth/[...nextauth]";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
+  const authenticated = await authenticateAdminOrSameUser(
+    req,
+    res,
+    req.query.id as string,
+  );
+  if (authenticated !== true) {
+    return authenticated;
+  }
   switch (req.method) {
     case "PUT":
       return editNoteHandler(req, res);

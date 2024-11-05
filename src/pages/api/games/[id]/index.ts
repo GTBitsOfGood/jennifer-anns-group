@@ -13,11 +13,16 @@ import {
 } from "@/utils/exceptions/game";
 import mongoose from "mongoose";
 import { z } from "zod";
-
+import { authenticate } from "../../auth/[...nextauth]";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
+  //Authentication
+  const authenticated = await authenticate(req, res, ["PUT", "DELETE"], true);
+  if (authenticated !== true) {
+    return authenticated;
+  }
   switch (req.method) {
     case "GET":
       return getGameByIdHandler(req, res);

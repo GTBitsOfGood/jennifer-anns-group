@@ -139,15 +139,15 @@ export async function editUser(
   userInfo: z.infer<typeof userSchema> & { _id: z.infer<typeof idSchema> },
 ) {
   await connectMongoDB();
-
+  if (!userInfo.notes) {
+    userInfo.notes = [];
+  }
   const existingUser = await UserModel.findOne({ email: userInfo.email });
 
   if (existingUser && existingUser.toObject()._id.toString() != userInfo._id) {
     if (existingUser.markedToDelete) {
       // Transfer notes info and delete old user
-      if (!userInfo.notes) {
-        userInfo.notes = [];
-      }
+
       userInfo.notes = [...userInfo.notes, ...existingUser.notes];
       await UserModel.findByIdAndDelete(existingUser.id);
     } else {
@@ -156,6 +156,7 @@ export async function editUser(
   }
   // Ensures new notes don't overide old ones
   const { notes, ...newUserInfo } = userInfo;
+  console.log(notes);
   const result = await UserModel.findByIdAndUpdate(
     userInfo._id,
     { $set: newUserInfo, $push: { notes: { $each: notes } } },

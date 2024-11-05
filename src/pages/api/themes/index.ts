@@ -7,15 +7,21 @@ import {
 } from "@/server/db/actions/ThemeAction";
 import { z } from "zod";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
+
+import { authenticate } from "../auth/[...nextauth]";
 import {
   ThemeException,
   ThemeInvalidInputException,
 } from "@/utils/exceptions/theme";
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
+  //Authentication
+  const authenticated = await authenticate(req, res, ["POST", "DELETE"], true);
+  if (authenticated !== true) {
+    return authenticated;
+  }
   switch (req.method) {
     case "GET":
       return getThemeHandler(req, res);

@@ -101,6 +101,17 @@ export const Footer = () => {
                 onClose={() => setModalOpen(false)}
               />
             </div>
+            <div className="text-slate-500">
+              For details about how we use your information, please see our{" "}
+              <span onClick={() => setModalOpen(true)} className="underline">
+                privacy policy
+              </span>
+              .
+            </div>
+            <PrivacyPolicyModal
+              isOpen={isModalOpen}
+              onClose={() => setModalOpen(false)}
+            />
           </div>
         </div>
       </div>

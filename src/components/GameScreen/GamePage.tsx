@@ -1,13 +1,12 @@
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useEffect, useState, useRef } from "react";
 import TabsComponent from "../Tabs/TabsComponent";
 import TagsComponent from "../Tags/TagsComponent";
-import ContactComponent from "../Tabs/ContactComponent";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { userSchema } from "@/utils/types";
 import EmbeddedGame from "@/components/GameScreen/WebGL/EmbeddedGame";
-import NotesComponent from "@/components/Tabs/NotesComponent";
+import NotesContactComponent from "@/components/Tabs/NotesContactComponent";
 import AdminEditButton from "@/components/GameScreen/AdminEditButton";
 import { populatedGameWithId } from "@/server/db/models/GameModel";
 import {
@@ -22,6 +21,8 @@ import {
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
 import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
+import DeleteComponentModal from "@/components/DeleteComponentModal";
 
 export type GameDataState = populatedGameWithId & {
   parentingGuideFile: File | undefined;
@@ -87,7 +88,7 @@ const GamePage = ({ mode, gameData }: Props) => {
         preview: false,
       };
 
-      const response = await fetch(`/api/games/${gameData._id}`, {
+      const response = await fetch(`/api/games/${gameData?._id}`, {
         method: "PUT",
         body: JSON.stringify(putData),
       });
@@ -96,7 +97,7 @@ const GamePage = ({ mode, gameData }: Props) => {
         setError("Failed to publish game.");
       } else {
         deleteOnRouteChange.current = false;
-        router.replace(`/games/${gameData._id}`);
+        router?.replace(`/games/${gameData?._id}`);
       }
     } catch (error) {
       console.error("Error publishing game:", error);
@@ -105,7 +106,7 @@ const GamePage = ({ mode, gameData }: Props) => {
 
   const handleCancel = async () => {
     try {
-      const response = await fetch(`/api/games/${gameData._id}`, {
+      const response = await fetch(`/api/games/${gameData?._id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -120,11 +121,18 @@ const GamePage = ({ mode, gameData }: Props) => {
     }
   };
 
+  const returnToGallery = () => {
+    if (mode === "preview") {
+      deleteOnRouteChange.current = true;
+    }
+    router?.push("/games");
+  };
+
   useEffect(() => {
     if (mode === "preview") {
       const routeChangeStart = (url: string) => {
         if (deleteOnRouteChange.current) handleCancel();
-        router.events.off("routeChangeStart", routeChangeStart);
+        router?.events.off("routeChangeStart", routeChangeStart);
       };
 
       const beforeunload = (e: BeforeUnloadEvent) => {
@@ -132,18 +140,20 @@ const GamePage = ({ mode, gameData }: Props) => {
       };
 
       const onunload = () => {
-        void handleCancel();
+        if (deleteOnRouteChange.current) {
+          void handleCancel();
+        }
       };
 
       window.addEventListener("beforeunload", beforeunload);
       window.addEventListener("unload", onunload);
 
-      router.events.on("routeChangeStart", routeChangeStart);
+      router?.events.on("routeChangeStart", routeChangeStart);
 
       return () => {
         window.removeEventListener("beforeunload", beforeunload);
         window.addEventListener("unload", onunload);
-        router.events.off("routeChangeStart", routeChangeStart);
+        router?.events.off("routeChangeStart", routeChangeStart);
       };
     }
   }, []);
@@ -153,11 +163,11 @@ const GamePage = ({ mode, gameData }: Props) => {
   useEffect(() => {
     if (!gameData) {
       deleteOnRouteChange.current = false;
-      router.replace("/");
+      router?.replace("/");
     }
-    if (!gameData.preview && mode == "preview") {
+    if (!gameData?.preview && mode == "preview") {
       deleteOnRouteChange.current = false;
-      router.replace(`/games/${gameData._id}`);
+      router?.replace(`/games/${gameData?._id}`);
     } else {
       setCurData(gameData);
     }
@@ -169,29 +179,62 @@ const GamePage = ({ mode, gameData }: Props) => {
 
   return (
     <ChakraProvider theme={chakraTheme}>
-      <div>
+      <div className="mx-18 my-14 flex flex-col gap-14">
         {mode === "preview" && (
           <div className="flex h-fit w-full flex-col items-center justify-center bg-blue-bg py-2 font-sans">
             <p className="font-bold">🔍 You are in preview mode.</p>
             <p>Note: Leaving this page will discard your progress.</p>
           </div>
         )}
-        <h1 className="mt-[32px] text-center font-sans text-[56px] font-semibold">
-          {curData.name}
-        </h1>
-        {loaded && (
-          <>
-            {userData.label === "administrator" && (
-              <AdminEditButton
-                gameId={gameData._id}
-                deleteOnRouteChange={deleteOnRouteChange}
-              />
-            )}
-          </>
-        )}
+        <div className="flex items-center justify-between">
+          <button
+            className="group flex flex-row items-center"
+            onClick={returnToGallery}
+          >
+            <ChevronLeft className="text-font-600 group-hover:text-font-900" />
+            <p className="ml-2 w-max font-sans text-2xl text-font-600 group-hover:text-font-900">
+              Game Gallery
+            </p>
+          </button>
+
+          <h1 className="w-full text-center font-sans text-5.5xl font-semibold text-font-1000">
+            {curData?.name}
+          </h1>
+          {loaded && (
+            <>
+              {userData.label === "administrator" ? (
+                <div className="flex justify-end gap-4">
+                  {!curData?.preview && (
+                    <>
+                      <button
+                        onClick={onOpen}
+                        className="rounded-md px-4 py-3 font-sans text-xl font-medium text-delete-red hover:bg-light-red-hover"
+                      >
+                        Delete Game
+                      </button>
+                      <DeleteComponentModal
+                        deleteType="game"
+                        isOpen={isOpen}
+                        onClose={onClose}
+                        gameData={curData}
+                        setGameData={setCurData}
+                      />
+                    </>
+                  )}
+                  <AdminEditButton
+                    gameId={gameData?._id}
+                    deleteOnRouteChange={deleteOnRouteChange}
+                  />
+                </div>
+              ) : (
+                <div className="w-48"></div>
+              )}
+            </>
+          )}
+        </div>
         {sessionStatus !== "loading" && (
           <EmbeddedGame
-            gameId={gameData._id as string}
+            gameId={gameData?._id as string}
             userData={currentUser}
             gameData={curData}
           />
@@ -204,12 +247,10 @@ const GamePage = ({ mode, gameData }: Props) => {
           userData={currentUser}
         />
         {loaded && userData.label !== "administrator" && (
-          <NotesComponent gameId={gameData._id} userId={userId} />
-        )}
-        {loaded && userData.label !== "administrator" && (
-          <ContactComponent
-            gameName={curData.name}
+          <NotesContactComponent
+            gameId={gameData?._id}
             userId={userId}
+            gameName={curData?.name}
             firstName={userData.firstName}
           />
         )}
@@ -263,11 +304,10 @@ const GamePage = ({ mode, gameData }: Props) => {
                       </div>
                     </div>
                   </AlertDialogHeader>
-
                   <AlertDialogFooter p="0" justifyContent="center">
                     <div className="mt-4 flex flex-row items-center gap-4">
                       <button
-                        onClick={() => router.replace("/games")}
+                        onClick={() => router?.replace("/games")}
                         className="rounded-xl bg-delete-red px-6 py-3 font-sans font-semibold text-white"
                       >
                         Yes, cancel

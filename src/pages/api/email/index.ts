@@ -4,10 +4,16 @@ import { EmailInvalidInputException } from "@/utils/exceptions/email";
 import { contactSchema } from "@/utils/types";
 import { sendContactEmail } from "@/server/db/actions/EmailAction";
 import z from "zod";
+import { authenticate } from "../auth/[...nextauth]";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
+  //Authentication
+  const authenticated = await authenticate(req, res, ["POST"], false);
+  if (authenticated !== true) {
+    return authenticated;
+  }
   switch (req.method) {
     case "POST":
       return sendEmailHandler(req, res);

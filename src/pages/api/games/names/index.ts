@@ -1,12 +1,17 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { fetchGameNames } from "@/server/db/actions/GameAction";
-
+import { authenticate } from "../../auth/[...nextauth]";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method Not Allowed" });
+  }
+  //Authentication
+  const authenticated = await authenticate(req, res, ["POST"], true);
+  if (authenticated !== true) {
+    return authenticated;
   }
 
   const { gameIds } = req.body;

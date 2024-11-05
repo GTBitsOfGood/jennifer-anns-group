@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import z from "zod";
-
+import cookie from "cookie";
+import jwt from "jsonwebtoken";
 import { HTTP_STATUS_CODE } from "@/utils/consts";
 import { verifyEmailVerificationLog } from "@/server/db/actions/VerificationLogAction";
 
@@ -42,9 +43,22 @@ async function verifyEmailVerificationHandler(
         .status(HTTP_STATUS_CODE.NOT_FOUND)
         .send({ error: "Invalid email verification token provided" });
     }
-
+    //Create JWT token indicating it's verified
+    const serializedCookie = cookie.serialize(
+      "emailVerificationJwt",
+      jwt.sign({ email }, process.env.NEXTAUTH_SECRET),
+      {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 60 * 15, // 15 minutes
+        path: "/",
+      },
+    );
+    console.log("Cookie has been created and signed");
     return res
       .status(HTTP_STATUS_CODE.OK)
+      .setHeader("Set-Cookie", serializedCookie)
       .send({ message: "Succesfully verified token" });
   } catch (e: any) {
     console.error(e);

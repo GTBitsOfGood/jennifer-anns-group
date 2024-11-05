@@ -1,4 +1,5 @@
 import pageAccessHOC from "@/components/HOC/PageAccess";
+import EditModal from "@/components/Admin/AccountManagement/EditModal";
 import DeleteModal from "@/components/Admin/AccountManagement/DeleteModal";
 import { Button } from "@/components/ui/button";
 import CrossIcon from "@/components/ui/icons/crossicon";
@@ -10,6 +11,7 @@ import { UNDELETABLE_EMAILS } from "@/utils/consts";
 import { Box, Tooltip } from "@chakra-ui/react";
 import { ObjectId } from "mongodb";
 import { useEffect, useState } from "react";
+import { Pencil, Trash } from "lucide-react";
 
 export type Admin = IAdmin & { _id: ObjectId };
 
@@ -17,10 +19,9 @@ const AccountManagementPage = () => {
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [newEmail, setNewEmail] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
+  const [editModalDisclosure, setEditModalDisclosure] = useState(false);
   const [deleteModalDisclosure, setDeleteModalDisclosure] = useState(false);
-  const [selectedDeleteAdmin, setSelectedDeleteAdmin] = useState<Admin | null>(
-    null,
-  );
+  const [chosenAdmin, setChosenAdmin] = useState<Admin | null>(null);
 
   const fetchData = async () => {
     try {
@@ -37,7 +38,7 @@ const AccountManagementPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, [deleteModalDisclosure]);
+  }, [editModalDisclosure, deleteModalDisclosure]);
 
   const handleAddAccount = async () => {
     try {
@@ -70,13 +71,13 @@ const AccountManagementPage = () => {
 
   return (
     <AdminTabs page={Pages.ACCOUNTMANAGEMENT}>
-      <div className="my-6 flex flex-col px-28">
-        <div className="text-2xl font-semibold text-black">
+      <div className="px-18 my-6 flex flex-col">
+        <div className="font-['Poppins'] text-[24pt] font-semibold text-[#1A222B]">
           Add New Admin Account
         </div>
-        <div className="mt-5 flex flex-row flex-wrap justify-between gap-5">
+        <div className="mt-6 flex flex-row flex-wrap gap-4">
           <input
-            className={`h-16 w-full max-w-[57rem] rounded-xl border bg-gray-50 px-7 text-lg ${
+            className={`h-12 flex-grow  rounded-xl border bg-gray-50 px-7 text-lg ${
               emailError ? "border-red-600" : "border-stone-500"
             }`}
             placeholder="Email"
@@ -87,7 +88,7 @@ const AccountManagementPage = () => {
           />
           <Button
             variant="primary"
-            className="h-14 w-60 rounded-xl text-3xl"
+            className="flex h-12 items-center justify-center space-x-2 rounded-[6px] bg-[#2352A0] px-[16px] font-['Poppins'] text-[18px] font-medium text-[#FFFFFF] hover:bg-[#4F75B3]"
             onClick={handleAddAccount}
           >
             Add Account
@@ -99,60 +100,85 @@ const AccountManagementPage = () => {
           {emailError && <WarningIcon />}
           <div className="text-sm font-normal text-red-600">{emailError}</div>
         </div>
-        <div className="mt-14 text-2xl font-semibold text-black">
+        <div className="mb-6 mt-12 font-['Poppins'] text-[24pt] font-semibold text-[#1A222B]">
           Manage Admin Accounts
         </div>
-        <div className="font-['DM Sans'] mx-1 mt-14 flex flex-row justify-between text-base font-medium leading-7 text-slate-400">
-          <div>Email</div>
-          <div>Delete</div>
-        </div>
-        <div className="mt-1.5 border border-violet-100"></div>
-        {[...UNDELETABLE_EMAILS, ...admins.map((admin) => admin.email)].map(
-          (email, index) => {
-            const isUndeletable = index < UNDELETABLE_EMAILS.length;
-            return (
-              <div className="mt-9 flex flex-row justify-between" key={index}>
-                <div className="break-all font-inter text-xl text-slate-800">
-                  {email}
-                </div>
-                <div className="pr-4">
+        <div className="rounded-[8px] border border-[#E2EFFF]">
+          <div className="font-['DM Sans'] mx-1 flex flex-row items-center justify-between text-base font-medium leading-7 text-slate-400 ">
+            <div className="flex items-center py-3 pl-6 font-inter text-14pt font-medium text-[#7A8086]">
+              Email
+            </div>
+            <div className="flex items-center py-3 pr-6 font-inter text-14pt font-medium text-[#7A8086]">
+              Edit & Delete
+            </div>
+          </div>
+          <div className=" border border-[#E2EFFF]"></div>
+          {[...UNDELETABLE_EMAILS, ...admins.map((admin) => admin.email)].map(
+            (email, index) => {
+              const isUndeletable = index < UNDELETABLE_EMAILS.length;
+              return (
+                <div
+                  className="flex flex-row justify-between border-b border-[#E2EFFF] p-6"
+                  key={index}
+                >
+                  <div className="text-md break-all font-inter text-[#384414B]">
+                    {email}
+                  </div>
                   {isUndeletable ? (
-                    <Tooltip
-                      className="rounded-lg bg-white p-3 text-xs shadow-md"
-                      label="This email cannot be removed"
-                      placement="bottom"
-                      hasArrow
-                      arrowSize={16}
-                    >
-                      <Box as="span" cursor="pointer">
-                        <CrossIcon color="#7d7e82" />
-                      </Box>
-                    </Tooltip>
+                    <div className="flex gap-4 pr-4">
+                      <Pencil color="#A3AED0" />
+
+                      <Tooltip
+                        className="rounded-lg bg-white p-3  text-xs shadow-md"
+                        label="This email cannot be removed"
+                        placement="bottom"
+                        hasArrow
+                        arrowSize={16}
+                      >
+                        <Trash color="#A3AED0" />
+                      </Tooltip>
+                    </div>
                   ) : (
-                    <CrossIcon
-                      color="#8b0000"
-                      onClick={() => {
-                        const selectedAdmin = admins.find(
-                          (admin) => admin.email === email,
-                        );
-                        setSelectedDeleteAdmin(
-                          selectedAdmin ? selectedAdmin : null,
-                        );
-                        setDeleteModalDisclosure(true);
-                      }}
-                      className="cursor-pointer"
-                    />
+                    <div className="flex gap-4 pr-4">
+                      <Pencil
+                        className="cursor-pointer text-blue-primary"
+                        onClick={() => {
+                          const selectedAdmin = admins.find(
+                            (admin) => admin.email === email,
+                          );
+                          setChosenAdmin(selectedAdmin ? selectedAdmin : null);
+                          setEditModalDisclosure(true);
+                        }}
+                      />
+                      <Trash
+                        color="#8b0000"
+                        className="cursor-pointer"
+                        onClick={() => {
+                          const selectedAdmin = admins.find(
+                            (admin) => admin.email === email,
+                          );
+                          setChosenAdmin(selectedAdmin ? selectedAdmin : null);
+                          setDeleteModalDisclosure(true);
+                        }}
+                      />
+                    </div>
                   )}
                 </div>
-              </div>
-            );
-          },
-        )}
+              );
+            },
+          )}
+        </div>
       </div>
+      <EditModal
+        open={editModalDisclosure}
+        setOpen={setEditModalDisclosure}
+        admin={chosenAdmin}
+        fetchData={fetchData}
+      />
       <DeleteModal
         open={deleteModalDisclosure}
         setOpen={setDeleteModalDisclosure}
-        admin={selectedDeleteAdmin}
+        admin={chosenAdmin}
         fetchData={fetchData}
       />
     </AdminTabs>

@@ -28,8 +28,16 @@ async function sendEmailVerificationEmailHandler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
+  let email;
   try {
-    const { email } = emailObject.parse(JSON.parse(req.body));
+    const parsedResult = emailObject.safeParse(JSON.parse(req.body));
+    if (parsedResult.success) {
+      email = parsedResult.data.email;
+    } else {
+      return res
+        .status(HTTP_STATUS_CODE.BAD_REQUEST)
+        .send({ message: "Invalid Email" });
+    }
     const emailVerificationLog = await createEmailVerificationLog(email);
     await sendEmailVerificationEmail(email, emailVerificationLog.token);
 
