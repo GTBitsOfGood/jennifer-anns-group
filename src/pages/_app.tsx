@@ -16,11 +16,14 @@ export default function App({
   pageProps: { session, ...pageProps },
 }: AppProps) {
   const pathname = usePathname();
-  const showHeaderAndFooter =
-    !pathname.includes("/login") &&
-    !pathname.includes("/signup") &&
-    !pathname.includes("/password-reset") &&
-    !pathname.includes("/raw");
+  let showHeaderAndFooter = false;
+  if (pathname) {
+    showHeaderAndFooter =
+      !pathname.includes("/login") &&
+      !pathname.includes("/signup") &&
+      !pathname.includes("/password-reset") &&
+      !pathname.includes("/raw");
+  }
 
   return (
     <SessionProvider session={session}>
