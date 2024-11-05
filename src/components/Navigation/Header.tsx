@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { signOut } from "next-auth/react";
 import { ProfileModal, userDataSchema } from "../ProfileModal/ProfileModal";
 import { Button } from "../ui/button";

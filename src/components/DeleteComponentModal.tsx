@@ -9,7 +9,7 @@ import {
   ChakraProvider,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useRef, Dispatch } from "react";
 import { GameDataState } from "./GameScreen/GamePage";
 

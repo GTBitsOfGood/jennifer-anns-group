@@ -14,7 +14,7 @@ import { AlertTriangleIcon, Pencil, Plus, X } from "lucide-react";
 import { useState } from "react";
 
 import axios from "axios";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import DeleteWebGLBuild from "./DeleteWebGLBuild";
 
 // there's probably a better place to put these

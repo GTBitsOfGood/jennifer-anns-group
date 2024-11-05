@@ -5,7 +5,7 @@ import { Admin } from "@/pages/admin/account-management";
 import { userSchema } from "@/utils/types";
 import { z } from "zod";
 import { signOut, useSession } from "next-auth/react";
-import router from "next/router";
+import router from "next/compat/router";
 
 const idSchema = z.string().length(24);
 

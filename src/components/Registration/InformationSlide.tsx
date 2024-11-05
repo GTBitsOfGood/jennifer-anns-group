@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { z } from "zod";
 import { AlertKeys, accountSchema } from "@/pages/signup";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { signIn } from "next-auth/react";
 import PrivacyPolicyModal from "./PrivacyPolicyModal";
 

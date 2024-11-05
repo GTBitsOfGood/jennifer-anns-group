@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useEffect, useState, useRef } from "react";
 import TabsComponent from "../Tabs/TabsComponent";
 import TagsComponent from "../Tags/TagsComponent";
