@@ -454,7 +454,7 @@ const CMSDashboardPage = () => {
       }));
 
       let ws = XLSX.utils.json_to_sheet(entryInfo);
-      let gameName = gameInfo[i]["Game Title"];
+      let gameName = gameInfo[i]["Game Title"].replace(/[\/\\\?\*\:\[\]]/g, "");
       if (gameName.length > 15) {
         gameName = gameName.substring(0, 11) + "...";
       }
@@ -462,7 +462,7 @@ const CMSDashboardPage = () => {
 
       XLSX.utils.book_append_sheet(wb, ws, name);
     });
-    XLSX.writeFile(wb, `Dashboard Analytics (1 ${dataAge}).xlsx`);
+    XLSX.writeFile(wb, `Analytics Dashboard (1 ${dataAge}).xlsx`);
   }
 
   return (
