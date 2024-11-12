@@ -70,6 +70,7 @@ export function getViewer() {
 
 export interface visitProperties {
   referrer: string;
+  pageUrl: string;
   userId: string;
   createdDate: string;
   userGroup: string;

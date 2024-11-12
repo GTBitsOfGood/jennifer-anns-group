@@ -204,6 +204,7 @@ export const changePWSchema = z.object({
 export interface CustomVisitEvent extends CustomEvent {
   properties: {
     referrer: string;
+    pageUrl: string;
     createdDate: string;
     userGroup: string; // TODO, use enum
     userId: string;
