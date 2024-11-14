@@ -118,7 +118,7 @@ export default function DeleteComponentModal(props: Props) {
               <AlertDialogCloseButton className="mr-11 mt-11 text-sm text-blue-primary" />
             </div>
             <AlertDialogHeader className="mt-12 w-80 p-0 text-center font-sans text-lg font-semibold text-blue-primary">
-              Are you sure you want to delete &quot;{title[deleteType]}&quot;?
+              Are you sure you want to delete {title[deleteType]}?
             </AlertDialogHeader>
             <AlertDialogBody p="0">
               <div className="mt-6 text-center font-sans text-base">

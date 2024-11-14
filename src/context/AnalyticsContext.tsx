@@ -42,7 +42,6 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
     properties: any,
   ) => {
     if (!session?.user?.tracked) return;
-    console.log("hmm");
     try {
       const response = await fetch("/api/events/log", {
         method: "POST",

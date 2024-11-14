@@ -256,7 +256,7 @@ const Home = ({
           <div className="flex w-full max-w-[96rem] justify-center space-x-14 px-16">
             {pageData.gameBoys.map((gameBoy: IGameBoy, index: number) => {
               if (!gameBoy.gameId) {
-                return <></>;
+                return null;
               }
 
               return (

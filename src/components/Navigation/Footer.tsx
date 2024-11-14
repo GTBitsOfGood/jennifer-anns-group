@@ -93,7 +93,10 @@ export const Footer = () => {
             </div>
             <div className="text-slate-500">
               For details about how we use your information, please see our{" "}
-              <span onClick={() => setModalOpen(true)} className="underline">
+              <span
+                onClick={() => setModalOpen(true)}
+                className="cursor-pointer underline"
+              >
                 privacy policy
               </span>
               .

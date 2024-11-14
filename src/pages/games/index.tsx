@@ -235,10 +235,8 @@ export default function Games() {
             >
               <GameCardView
                 filters={filters}
-                setCurrPage={setCurrPage}
                 setNumPages={setNumPages}
                 numPages={numPages}
-                currPage={currPage}
               />
             </Suspense>
           </div>
