@@ -1,0 +1,35 @@
+name: Reusable Workflow for Updating Game Popularity for Specific Environment
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+jobs:
+  run-game-popularity-updater:
+    name: Update Game Popularity for ${{ inputs.environment }}
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: API Request to Update Game Popularity Endpoint
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+          CRON_KEY: ${{ secrets.GAME_POPULARITY_CRON_KEY }}
+          URL: ${{ secrets.DEPLOYMENT_BASE_URL }}
+        run: |
+          echo "Updating game popularity"
+          RESPONSE=$(curl -X POST -H "x-api-key: $CRON_KEY" -w "\n%{http_code}\n" "$URL/api/games/popularity")
+          STATUS=$(echo "$RESPONSE" | sed -n '2p')
+          echo "Response: $RESPONSE"
+          if [[ $STATUS == 200 ]]; then
+           echo "Game popularities updated successfully."
+          else
+            echo "Failed to update game popularities."
+            exit 1 # Set a non-zero exit code to indicate failure
+          fi

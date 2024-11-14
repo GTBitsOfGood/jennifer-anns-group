@@ -54,7 +54,7 @@ export const uploadApplicationFile = async (
 
     if (uploadResp.status === 200) {
       const data = await uploadResp.json();
-      return `${CLOUDFLARE_URL}/application-files${process.env.NODE_ENV == "production" ? "-prod" : ""}/${fileName}`;
+      return `${CLOUDFLARE_URL}/application-files${process.env.NEXT_PUBLIC_ENV == "production" ? "-prod" : ""}/${fileName}`;
     }
 
     if (++count === maxTries) {

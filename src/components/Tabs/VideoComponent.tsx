@@ -22,13 +22,13 @@ export default function VideoComponent({ gameData, edit, setGameData }: Props) {
 
   return (
     <div className="flex flex-col justify-center">
-      {isClient && gameData.videoTrailer && gameData.videoTrailer !== "" ? (
+      {isClient && gameData?.videoTrailer && gameData?.videoTrailer !== "" ? (
         <div
           className="mb-6"
           style={{ paddingTop: "56.25%", position: "relative" }}
         >
           <ReactPlayer
-            url={gameData.videoTrailer}
+            url={gameData?.videoTrailer}
             controls={true}
             width="100%"
             height="100%"
@@ -44,7 +44,7 @@ export default function VideoComponent({ gameData, edit, setGameData }: Props) {
       {edit && setGameData && (
         <Flex className="flex flex-row gap-4">
           <AddEditVideoTrailer gameData={gameData} setGameData={setGameData} />
-          {gameData.videoTrailer && gameData.videoTrailer !== "" ? (
+          {gameData?.videoTrailer && gameData?.videoTrailer !== "" ? (
             <div>
               <button
                 onClick={onOpen}

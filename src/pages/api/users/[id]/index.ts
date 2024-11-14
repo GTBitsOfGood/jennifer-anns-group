@@ -106,9 +106,15 @@ async function editProfileHandler(req: NextApiRequest, res: NextApiResponse) {
       );
     }
     //Ensure label is one of the four allowed value
-    if (!Object.values(UserLabel).includes(req.body.label as UserLabel)) {
+    const userLabels = {
+      Educator: "educator",
+      Student: "student",
+      Parent: "parent",
+      Administrator: "administrator",
+    };
+    if (!Object.values(userLabels).includes(req.body.label as UserLabel)) {
       throw new GenericUserErrorException(
-        `Label must be one of ${Object.values(UserLabel)}`,
+        `Label must be one of ${Object.values(userLabels)}`,
       );
     }
     if (emailModified) {

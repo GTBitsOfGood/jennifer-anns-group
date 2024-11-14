@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "../../ui/button";
 import { Dialog, DialogClose, DialogContent } from "../../ui/dialog";
 import { Admin } from "@/pages/admin/account-management";
-import { userSchema } from "@/utils/types";
 import { z } from "zod";
 import { signOut, useSession } from "next-auth/react";
-import router from "next/router";
 
 const idSchema = z.string().length(24);
 

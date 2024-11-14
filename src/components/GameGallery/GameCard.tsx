@@ -1,6 +1,6 @@
 import { Card, Image, CardBody, Stack } from "@chakra-ui/react";
 import z from "zod";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { gameSchema } from "@/utils/types";
 
 const idSchema = z.string().length(24);
@@ -16,7 +16,7 @@ export default function GameCard({ game }: Props) {
   const router = useRouter();
 
   const goToGame = () => {
-    router.push(`/games/${game._id}`);
+    router?.push(`/games/${game._id}`);
   };
 
   return (

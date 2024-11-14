@@ -20,7 +20,7 @@ import { Search2Icon } from "@chakra-ui/icons";
 import { Input } from "@chakra-ui/react";
 import FilterBody from "@/components/GameGallery/FilterBody";
 import chakraTheme from "@/styles/chakraTheme";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import ThemeSidebar from "@/components/GameGallery/ThemeSidebar";
 import SelectedFilters from "@/components/GameGallery/SelectedFilters";
 import GameCardView from "@/components/GameGallery/GameCardView";
@@ -101,7 +101,7 @@ export default function Games() {
             {userData?.label === "administrator" ? (
               <button
                 onClick={() => {
-                  router.push("/games/create");
+                  router?.push("/games/create");
                 }}
                 className="rounded-md bg-blue-primary px-4 py-3 font-sans text-lg text-white hover:bg-[#4F75B3]"
               >

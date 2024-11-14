@@ -1,5 +1,5 @@
 import type { MutableRefObject } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 
 interface AdminEditButtonProps {
   gameId: String;
@@ -14,7 +14,7 @@ export default function AdminEditButton({
 
   const handleEditClick = () => {
     deleteOnRouteChange.current = false;
-    router.push(`/games/${gameId}/edit`);
+    router?.push(`/games/${gameId}/edit`);
   };
 
   return (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useSession } from "next-auth/react";
 import { Pages } from "@/utils/consts";
 
@@ -77,10 +77,10 @@ const pageAccessHOC = <P extends object>(Component: React.FC<P>) => {
       if (
         status !== "loading" &&
         label !== "loading" &&
-        (!pageRequiredLabels[router.pathname as Pages].includes(label) ||
-          pageRequiredAuthentication[router.pathname as Pages] !== status)
+        (!pageRequiredLabels[router?.pathname as Pages].includes(label) ||
+          pageRequiredAuthentication[router?.pathname as Pages] !== status)
       ) {
-        router.replace("/");
+        router?.replace("/");
       }
     }, [label]);
 
@@ -108,8 +108,8 @@ const pageAccessHOC = <P extends object>(Component: React.FC<P>) => {
       );
     }
     if (
-      pageRequiredAuthentication[router.pathname as Pages] === status &&
-      pageRequiredLabels[router.pathname as Pages].includes(label)
+      pageRequiredAuthentication[router?.pathname as Pages] === status &&
+      pageRequiredLabels[router?.pathname as Pages].includes(label)
     ) {
       return <Component {...props} />;
     }

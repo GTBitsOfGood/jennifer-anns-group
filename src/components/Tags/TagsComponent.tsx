@@ -48,10 +48,10 @@ export default function TagsComponent({
 }: Props) {
   const [search, setSearch] = useState(false);
   const [themes, setThemes] = useState<z.infer<typeof themeDataSchema>[]>(
-    gameData.themes,
+    gameData?.themes,
   );
   const [tags, setTags] = useState<z.infer<typeof tagDataSchema>[]>(
-    gameData.tags,
+    gameData?.tags,
   );
 
   useEffect(() => {
@@ -94,13 +94,13 @@ export default function TagsComponent({
     <ChakraProvider theme={chakraTheme}>
       <div>
         <div className="flex flex-row flex-wrap font-inter text-base">
-          {gameData.videoTrailer ? <Tag>Video Trailer</Tag> : null}
-          {gameData.parentingGuide ? <Tag>Parenting Guide</Tag> : null}
-          {gameData.lesson ? <Tag>Lesson Plan</Tag> : null}
-          {gameData.answerKey && admin ? <Tag>Answer Key</Tag> : null}
-          {gameData.webGLBuild ? <Tag>WebGL</Tag> : null}
-          {gameData.builds
-            ? gameData.builds.map((build) => (
+          {gameData?.videoTrailer ? <Tag>Video Trailer</Tag> : null}
+          {gameData?.parentingGuide ? <Tag>Parenting Guide</Tag> : null}
+          {gameData?.lesson ? <Tag>Lesson Plan</Tag> : null}
+          {gameData?.answerKey && admin ? <Tag>Answer Key</Tag> : null}
+          {gameData?.webGLBuild ? <Tag>WebGL</Tag> : null}
+          {gameData?.builds
+            ? gameData?.builds.map((build) => (
                 <Tag key={build.type}>{gameBuildsMap[build.type]}</Tag>
               ))
             : null}

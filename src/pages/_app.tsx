@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "../components/ui/toaster";
 import Header from "@/components/Navigation/Header";
 import { Footer } from "@/components/Navigation/Footer";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { AnalyticsProvider } from "@/context/AnalyticsContext";
 
 const queryClient = new QueryClient();
@@ -17,10 +17,10 @@ export default function App({
 }: AppProps) {
   const router = useRouter();
   const showHeaderAndFooter =
-    !router.pathname.includes("/login") &&
-    !router.pathname.includes("/signup") &&
-    !router.pathname.includes("/password-reset") &&
-    !router.pathname.includes("/raw");
+    !router?.pathname.includes("/login") &&
+    !router?.pathname.includes("/signup") &&
+    !router?.pathname.includes("/password-reset") &&
+    !router?.pathname.includes("/raw");
 
   return (
     <SessionProvider session={session}>

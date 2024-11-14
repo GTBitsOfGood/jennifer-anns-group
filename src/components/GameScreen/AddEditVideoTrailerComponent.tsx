@@ -16,7 +16,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import chakraTheme from "@/styles/chakraTheme";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useRef, useState, useEffect, Dispatch } from "react";
 import { GameDataState } from "./GamePage";
 export const youtubeREGEX =
@@ -30,14 +30,14 @@ interface Props {
 
 export default function AddEditVideoTrailer({ gameData, setGameData }: Props) {
   const router = useRouter();
-  const gameID = router.query.id;
+  const gameID = router?.query.id;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement | null>(null);
-  const [url, setUrl] = useState(gameData.videoTrailer ?? "");
+  const [url, setUrl] = useState(gameData?.videoTrailer ?? "");
   const [issue, setIssue] = useState("");
   const [addButton, setAddButton] = useState(true);
   useEffect(() => {
-    if (gameData.videoTrailer === undefined || gameData.videoTrailer === "") {
+    if (gameData?.videoTrailer === undefined || gameData?.videoTrailer === "") {
       setAddButton(true);
     } else {
       setAddButton(false);
@@ -67,7 +67,7 @@ export default function AddEditVideoTrailer({ gameData, setGameData }: Props) {
     if (youtubeREGEX.test(url) || vimeoREGEX.test(url)) {
       gameData.videoTrailer = url;
       onClose();
-      router.push(`/games/${gameID}/edit`);
+      router?.push(`/games/${gameID}/edit`);
     } else {
       setIssue("Invalid URL (Only Youtube and Vimeo videos supported)");
     }

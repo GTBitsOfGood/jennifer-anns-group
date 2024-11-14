@@ -14,7 +14,7 @@ import { AlertTriangleIcon, Pencil, Plus, X } from "lucide-react";
 import { useState } from "react";
 
 import axios from "axios";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import DeleteWebGLBuild from "./DeleteWebGLBuild";
 
 // there's probably a better place to put these
@@ -173,7 +173,7 @@ function AddEditWebGLComponent(props: Props) {
     ]);
 
     try {
-      const gameId = router.query.id;
+      const gameId = router?.query.id;
       if (gameId) {
         setUploading(true);
         await uploadBuildFiles(gameId.toString(), addOrEdit, files);
@@ -208,7 +208,7 @@ function AddEditWebGLComponent(props: Props) {
   const [addOrEdit, setAddOrEdit] = useState<"Add" | "Edit">("Add");
 
   useEffect(() => {
-    if (props.gameData.webGLBuild) {
+    if (props.gameData?.webGLBuild) {
       setAddOrEdit("Edit");
     } else {
       setAddOrEdit("Add");

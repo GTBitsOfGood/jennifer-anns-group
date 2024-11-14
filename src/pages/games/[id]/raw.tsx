@@ -1,9 +1,9 @@
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useEffect } from "react";
 import RawEmbeddedGame from "@/components/GameScreen/WebGL/RawEmbeddedGame";
 
 const GamePage = () => {
-  const gameId = useRouter().query.id;
+  const gameId = useRouter()?.query.id;
 
   useEffect(() => {
     const body = document.querySelector("body");

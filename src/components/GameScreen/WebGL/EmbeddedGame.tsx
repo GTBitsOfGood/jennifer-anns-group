@@ -60,7 +60,7 @@ export default function EmbeddedGame({
         userId: userData?._id ?? "Unauthenticated",
         userGroup: userData?.label ?? "None",
         createdDate: Date(),
-        gameName: gameData.name,
+        gameName: gameData?.name,
       };
       logCustomEvent("Visit", "game", properties);
     }
@@ -73,7 +73,7 @@ export default function EmbeddedGame({
   }, [iframeLoaded]);
 
   useEffect(() => {
-    if (gameData.remoteUrl) return;
+    if (gameData?.remoteUrl) return;
     const iframeWidth = ref.current?.offsetWidth;
     if (iframeWidth) {
       setHeight(`${iframeWidth / 2}px`);
@@ -86,7 +86,7 @@ export default function EmbeddedGame({
 
   const renderContent = () => {
     switch (true) {
-      case gameData.webGLBuild:
+      case gameData?.webGLBuild:
         return (
           <iframe
             ref={ref}
@@ -99,13 +99,15 @@ export default function EmbeddedGame({
           />
         );
 
-      case gameData.remoteUrl:
+      case gameData?.remoteUrl:
         return (
           <iframe
             ref={ref}
             // onLoad={handleLoad}
             height={height}
-            src={gameData.builds?.find((build) => build.type == "remote")?.link}
+            src={
+              gameData?.builds?.find((build) => build.type == "remote")?.link
+            }
             className={cn("", {
               "border-2 border-solid border-black": height !== "0px",
             })}
