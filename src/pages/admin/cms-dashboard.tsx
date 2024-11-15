@@ -170,8 +170,8 @@ const formatGameEventsData = async (
 
   if (visitEvents) {
     visitEvents.forEach((event) => {
-      const referrer = event.properties.referrer;
-      const match = referrer && referrer.match(/\/games\/([a-zA-Z0-9]{24})/);
+      const pageUrl = event.properties.pageUrl;
+      const match = pageUrl && pageUrl.match(/\/games\/([a-zA-Z0-9]{24})/);
       if (match) {
         const gameId = match[1];
         gamePageHitsMap[gameId] = (gamePageHitsMap[gameId] || 0) + 1;
