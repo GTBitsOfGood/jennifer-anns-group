@@ -200,36 +200,32 @@ const GamePage = ({ mode, gameData }: Props) => {
           <h1 className="w-full text-center font-sans text-5.5xl font-semibold text-font-1000">
             {curData?.name}
           </h1>
-          {loaded && (
-            <>
-              {userData.label === "administrator" ? (
-                <div className="flex justify-end gap-4">
-                  {!curData?.preview && (
-                    <>
-                      <button
-                        onClick={onOpen}
-                        className="rounded-md px-4 py-3 font-sans text-xl font-medium text-delete-red hover:bg-light-red-hover"
-                      >
-                        Delete Game
-                      </button>
-                      <DeleteComponentModal
-                        deleteType="game"
-                        isOpen={isOpen}
-                        onClose={onClose}
-                        gameData={curData}
-                        setGameData={setCurData}
-                      />
-                    </>
-                  )}
-                  <AdminEditButton
-                    gameId={gameData?._id}
-                    deleteOnRouteChange={deleteOnRouteChange}
+          {loaded && userData.label === "administrator" ? (
+            <div className="flex justify-end gap-4">
+              {!curData?.preview && (
+                <>
+                  <button
+                    onClick={onOpen}
+                    className="text-nowrap rounded-md px-4 py-3 font-sans text-xl font-medium text-delete-red hover:bg-light-red-hover"
+                  >
+                    Delete Game
+                  </button>
+                  <DeleteComponentModal
+                    deleteType="game"
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    gameData={curData}
+                    setGameData={setCurData}
                   />
-                </div>
-              ) : (
-                <div className="w-48"></div>
+                </>
               )}
-            </>
+              <AdminEditButton
+                gameId={gameData?._id}
+                deleteOnRouteChange={deleteOnRouteChange}
+              />
+            </div>
+          ) : (
+            <div className="w-48"></div>
           )}
         </div>
         {sessionStatus !== "loading" && (
