@@ -2,6 +2,14 @@ import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import WarningIcon from "@/components/ui/icons/warningicon";
 import { userSchema } from "@/utils/types";
 import cn from "classnames";
@@ -33,6 +41,7 @@ function EditProfileModal(props: EditProps) {
   const FNAME_FORM_KEY = "firstName";
   const LNAME_FORM_KEY = "lastName";
   const EMAIL_FORM_KEY = "email";
+  const LABEL_FORM_KEY = "label";
   const TRACKING_FORM_KEY = "tracking";
   const VERIFICATION_CODE_KEY = "verification_code";
 
@@ -46,6 +55,31 @@ function EditProfileModal(props: EditProps) {
   const [trackedChecked, setTrackedChecked] = useState<boolean>(
     props.userData?.tracked ?? false,
   );
+
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      try {
+        const response = await fetch(
+          `/api/admin?email=${props.userData?.email}`,
+        );
+        if (response.ok) {
+          const admin_data = await response.json();
+          if (Object.keys(admin_data).length == 0) {
+            setIsAdmin(false);
+          } else {
+            setIsAdmin(true); // valid admin email
+          }
+        } else {
+          setIsAdmin(false);
+        }
+      } catch (error) {
+        console.error("Error checking admin status:", error);
+      }
+    };
+    checkAdminStatus();
+  }, []);
 
   useEffect(() => {
     setTrackedChecked(props.userData?.tracked ?? false);
@@ -112,7 +146,7 @@ function EditProfileModal(props: EditProps) {
       firstName: formData.get(FNAME_FORM_KEY),
       lastName: formData.get(LNAME_FORM_KEY),
       email: email,
-      label: props.userData?.label,
+      label: isAdmin ? formData.get(LABEL_FORM_KEY) : props.userData?.label,
       tracked: formData.get(TRACKING_FORM_KEY) === "on",
     };
     const parse = formUserSchema.safeParse(input);
@@ -253,13 +287,37 @@ function EditProfileModal(props: EditProps) {
         </div>
 
         <div className="col-span-8 items-center">
-          <Label className="text-right text-base font-normal">Role</Label>
-          <p className="col-span-3 py-2 text-sm font-light text-blue-primary">
-            {props.userData?.label
-              ? props.userData?.label.charAt(0).toUpperCase() +
-                props.userData?.label.slice(1)
-              : ""}
-          </p>
+          <Label
+            htmlFor={LABEL_FORM_KEY}
+            className="text-right text-base font-normal"
+          >
+            Role
+          </Label>
+          {isAdmin ? (
+            <Select name={LABEL_FORM_KEY} defaultValue={props.userData?.label}>
+              <SelectTrigger className="col-span-8 text-xs font-light">
+                <SelectValue
+                  placeholder={props.userData?.label}
+                  className="text-red-500"
+                />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="student">Student</SelectItem>
+                  <SelectItem value="parent">Parent</SelectItem>
+                  <SelectItem value="educator">Educator</SelectItem>
+                  <SelectItem value="administrator">Administrator</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          ) : (
+            <p className="col-span-3 py-2 text-sm font-light text-blue-primary">
+              {props.userData?.label
+                ? props.userData?.label.charAt(0).toUpperCase() +
+                  props.userData?.label.slice(1)
+                : ""}
+            </p>
+          )}
         </div>
         <div className="col-span-8 items-center">
           <p

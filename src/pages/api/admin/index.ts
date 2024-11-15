@@ -16,7 +16,12 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   //Authentication
-  const authenticated = await authenticate(req, res, ["POST", "GET"], true);
+  const authenticated = await authenticate(
+    req,
+    res,
+    ["POST", "GET"],
+    req.method === "GET" ? false : true,
+  );
   if (authenticated !== true) {
     return authenticated;
   }
