@@ -25,14 +25,7 @@ import { getHomePage } from "@/server/db/actions/HomePageAction";
 // const mdPlugins = ["font-bold", "font-italic", "font-underline"];
 const mdParser = new MarkdownIt().use(insert);
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { id } = ctx.query;
-
-  if (!id || id === "create") {
-    return {
-      notFound: true,
-    };
-  }
+export const getServerSideProps: GetServerSideProps = async () => {
   try {
     const data = await getHomePage();
     const pageData = JSON.parse(JSON.stringify(data));
