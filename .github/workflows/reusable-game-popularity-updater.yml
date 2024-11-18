@@ -32,3 +32,4 @@ jobs:
           CRON_KEY: ${{ secrets.GAME_POPULARITY_CRON_KEY }}
           URL: ${{ secrets.DEPLOYMENT_BASE_URL }}
         run: npx tsx scripts/updateGamePopularity.ts
+        timeout-minutes: 5

@@ -19,25 +19,36 @@ async function updateGamePopularity() {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-      data: JSON.stringify({}),
+      timeout: 30000,
+      data: {},
+      validateStatus: (status) => {
+        return status === 200;
+      },
+      responseType: "json",
     });
 
-    console.log("Response status:", response.status);
-    console.log("Response headers:", response.headers);
-    console.log("Response data:", response.data);
-
-    if (response.status === 200) {
-      console.log("Game popularities updated successfully.");
-      process.exit(0);
-    } else {
-      throw new Error(`Unexpected status code: ${response.status}`);
+    if (!response.data || typeof response.data !== "object") {
+      throw new Error("Invalid response format");
     }
+
+    console.log("Game popularities updated successfully.");
+    process.exit(0);
   } catch (error) {
     console.error("Error updating game popularities:");
     if (axios.isAxiosError(error)) {
       console.error("Status:", error.response?.status);
-      console.error("Response:", error.response?.data);
-      console.error("Headers:", error.response?.headers);
+      if (error.response?.data) {
+        console.error(
+          "Response data:",
+          typeof error.response.data === "string"
+            ? error.response.data.substring(0, 200)
+            : error.response.data,
+        );
+      }
+      console.error("Request URL:", error.config?.url);
+      if (error.code === "ECONNABORTED") {
+        console.error("Request timed out");
+      }
     } else {
       console.error(error);
     }
