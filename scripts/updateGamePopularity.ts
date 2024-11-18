@@ -16,10 +16,7 @@ async function updateGamePopularity() {
       url: `${url}/api/games/popularity`,
       headers: {
         "x-api-key": cronKey,
-        "Content-Type": "application/json",
-        Accept: "application/json",
       },
-      data: {},
     });
 
     console.log("Response status:", response.status);
