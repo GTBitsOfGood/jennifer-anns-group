@@ -10,6 +10,8 @@ async function updateGamePopularity() {
 
   try {
     console.log(`Making request to ${url}/api/games/popularity`);
+    console.log(url.length);
+    console.log(cronKey.length);
 
     const response = await axios({
       method: "POST",
