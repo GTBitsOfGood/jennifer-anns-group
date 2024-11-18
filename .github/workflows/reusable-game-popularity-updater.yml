@@ -24,25 +24,41 @@ jobs:
           URL: ${{ secrets.DEPLOYMENT_BASE_URL }}
         run: |
           echo "Updating game popularity"
-          echo "x-api-key: $CRON_KEY"
-          echo "$URL/api/games/popularity"
-          # Add -v flag for verbose output and --fail flag to fail on HTTP errors
-          RESPONSE=$(curl -v --fail -X POST \
+          echo "URL: $URL/api/games/popularity"
+          
+          # Store response headers and body separately
+          RESPONSE_HEADERS=$(mktemp)
+          RESPONSE_BODY=$(mktemp)
+          
+          HTTP_CODE=$(curl -v --fail \
             -H "x-api-key: $CRON_KEY" \
             -H "Content-Type: application/json" \
             -H "Accept: application/json" \
             -d "{}" \
-            "$URL/api/games/popularity" 2>&1)
+            -w "%{http_code}" \
+            -D "$RESPONSE_HEADERS" \
+            "$URL/api/games/popularity" > "$RESPONSE_BODY" 2>&1)
           
           # Capture the exit status of curl
           CURL_EXIT_CODE=$?
           
-          echo "Full Response: $RESPONSE"
+          echo "HTTP Status Code: $HTTP_CODE"
+          echo "Response Headers:"
+          cat "$RESPONSE_HEADERS"
+          echo "Response Body:"
+          cat "$RESPONSE_BODY"
           
-          if [[ $CURL_EXIT_CODE -eq 0 ]]; then
+          if [[ $CURL_EXIT_CODE -eq 0 && $HTTP_CODE -eq 200 ]]; then
             echo "Game popularities updated successfully."
           else
-            echo "Failed to update game popularities. Curl exit code: $CURL_EXIT_CODE"
-            echo "Error details: $RESPONSE"
+            echo "Failed to update game popularities."
+            echo "Curl exit code: $CURL_EXIT_CODE"
+            echo "HTTP status code: $HTTP_CODE"
+            if [[ $HTTP_CODE -eq 502 ]]; then
+              echo "Received 502 Bad Gateway error. The server might be temporarily unavailable or timing out."
+            fi
             exit 1
           fi
+          
+          # Clean up temporary files
+          rm -f "$RESPONSE_HEADERS" "$RESPONSE_BODY"
