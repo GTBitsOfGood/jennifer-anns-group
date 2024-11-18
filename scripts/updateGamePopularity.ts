@@ -1,7 +1,7 @@
 import { updateGamesPopularity } from "@/server/db/actions/GameAction";
 
 async function updateGamePopularityHandler() {
-  console.log("Updating game popularity");
+  console.log("Starting handler");
   try {
     if (
       !process.env.MONGODB_URI ||
