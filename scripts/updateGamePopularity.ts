@@ -1,4 +1,6 @@
-async function updateGamePopularity() {
+import { updateGamesPopularity } from "@/server/db/actions/GameAction";
+
+async function updateGamePopularityHandler() {
   console.log("Updating game popularity");
   try {
     if (
@@ -11,7 +13,7 @@ async function updateGamePopularity() {
     }
 
     console.log("Updating game popularity");
-    updateGamePopularity();
+    updateGamesPopularity();
     console.log("Finished updating game popularity");
     process.exit(0);
   } catch (e: any) {
@@ -20,4 +22,4 @@ async function updateGamePopularity() {
   }
 }
 
-updateGamePopularity();
+updateGamePopularityHandler();
