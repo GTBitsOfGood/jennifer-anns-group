@@ -31,5 +31,7 @@ jobs:
           ENVIRONMENT: ${{ inputs.environment }}
           CRON_KEY: ${{ secrets.GAME_POPULARITY_CRON_KEY }}
           URL: ${{ secrets.DEPLOYMENT_BASE_URL }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY: ${{ secrets.NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY }}
         run: npx tsx scripts/updateGamePopularity.ts
         timeout-minutes: 5
