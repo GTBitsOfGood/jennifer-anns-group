@@ -35,4 +35,3 @@ jobs:
           NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY: ${{ secrets.NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY }}
           NEXT_PUBLIC_ENV: ${{ inputs.environment == 'Production' && 'production' || 'development' }}
         run: npx tsx scripts/updateGamePopularity.ts
-        timeout-minutes: 5

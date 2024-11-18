@@ -1,5 +1,0 @@
-[functions]
-  node_bundler = "esbuild"
-  external_node_modules = ["axios"]
-  included_files = []
-  timeout = 30 
