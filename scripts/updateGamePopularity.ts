@@ -14,6 +14,7 @@ async function updateGamePopularity() {
         ["x-api-key", process.env.CRON_KEY ?? ""],
         ["Accept", "application/json"],
       ],
+      body: JSON.stringify({ test: "test" }),
     });
     console.log("Response from updating game popularity: ", res);
 
