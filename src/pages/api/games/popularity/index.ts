@@ -10,7 +10,7 @@ export default async function handler(
     case "POST":
       return updatePopularityHandler(req, res);
     default:
-      return res.status(HTTP_STATUS_CODE.METHOD_NOT_ALLOWED).send({
+      return res.status(HTTP_STATUS_CODE.METHOD_NOT_ALLOWED).json({
         error: `Request method ${req.method} is not allowed`,
       });
   }
@@ -25,15 +25,16 @@ async function updatePopularityHandler(
     if (requestKey !== process.env.GAME_POPULARITY_CRON_KEY) {
       return res
         .status(HTTP_STATUS_CODE.UNAUTHORIZED)
-        .send({ error: "Invalid secret provided." });
+        .json({ error: "Invalid secret provided." });
     }
 
     await updateGamesPopularity();
 
-    return res.status(HTTP_STATUS_CODE.OK).send({ message: "Success" });
+    return res.status(HTTP_STATUS_CODE.OK).json({ message: "Success" });
   } catch (e: any) {
+    console.error("Error updating game popularity:", e);
     return res
       .status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR)
-      .send({ error: e.message });
+      .json({ error: e.message });
   }
 }
