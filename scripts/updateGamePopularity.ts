@@ -1,59 +1,29 @@
-import axios from "axios";
-
 async function updateGamePopularity() {
-  const url = process.env.URL;
-  const cronKey = process.env.CRON_KEY;
-
-  if (!url || !cronKey) {
-    throw new Error("Missing required environment variables (URL or CRON_KEY)");
-  }
-
+  console.log("Updating game popularity");
   try {
-    console.log(`Making request to ${url}/api/games/popularity`);
-    console.log(url.length);
-    console.log(cronKey.length);
+    if (!process.env.URL || !process.env.CRON_KEY) {
+      throw new Error(
+        "Missing required environment variables (URL or CRON_KEY)",
+      );
+    }
 
-    const response = await axios({
+    console.log("Making request to update game popularity");
+    const res = await fetch(`${process.env.URL}/api/games/popularity`, {
       method: "POST",
-      url: `${url}/api/games/popularity`,
-      headers: {
-        "x-api-key": cronKey,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      timeout: 30000,
-      data: {},
-      validateStatus: (status) => {
-        return status === 200;
-      },
-      responseType: "json",
+      headers: [["x-api-key", process.env.CRON_KEY ?? ""]],
     });
+    console.log("Response from updating game popularity: ", res);
 
-    if (!response.data || typeof response.data !== "object") {
-      throw new Error("Invalid response format");
+    if (!res.ok) {
+      const { error } = await res.json();
+      console.error("Failed to update game popularity: ", error);
+      process.exit(1);
     }
 
-    console.log("Game popularities updated successfully.");
+    console.log("Successfully updated game popularity");
     process.exit(0);
-  } catch (error) {
-    console.error("Error updating game popularities:");
-    if (axios.isAxiosError(error)) {
-      console.error("Status:", error.response?.status);
-      if (error.response?.data) {
-        console.error(
-          "Response data:",
-          typeof error.response.data === "string"
-            ? error.response.data.substring(0, 200)
-            : error.response.data,
-        );
-      }
-      console.error("Request URL:", error.config?.url);
-      if (error.code === "ECONNABORTED") {
-        console.error("Request timed out");
-      }
-    } else {
-      console.error(error);
-    }
+  } catch (e: any) {
+    console.error("Failed to update game popularity: ", e.message);
     process.exit(1);
   }
 }
