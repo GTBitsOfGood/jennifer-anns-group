@@ -10,11 +10,15 @@ async function updateGamePopularity() {
     console.log("Making request to update game popularity");
     const res = await fetch(`${process.env.URL}/api/games/popularity`, {
       method: "POST",
-      headers: [["x-api-key", process.env.CRON_KEY ?? ""]],
+      headers: [
+        ["x-api-key", process.env.CRON_KEY ?? ""],
+        ["Accept", "application/json"],
+      ],
     });
     console.log("Response from updating game popularity: ", res);
 
     if (!res.ok) {
+      console.log("Error here");
       const { error } = await res.json();
       console.error("Failed to update game popularity: ", error);
       process.exit(1);
