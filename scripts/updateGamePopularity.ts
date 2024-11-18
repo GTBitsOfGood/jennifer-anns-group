@@ -13,7 +13,7 @@ async function updateGamePopularityHandler() {
     }
 
     console.log("Updating game popularity");
-    updateGamesPopularity();
+    await updateGamesPopularity();
     console.log("Finished updating game popularity");
     process.exit(0);
   } catch (e: any) {
