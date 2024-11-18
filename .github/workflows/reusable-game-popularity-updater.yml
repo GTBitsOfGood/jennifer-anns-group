@@ -24,6 +24,8 @@ jobs:
           URL: ${{ secrets.DEPLOYMENT_BASE_URL }}
         run: |
           echo "Updating game popularity"
+          echo "x-api-key: $CRON_KEY"
+          echo "$URL/api/games/popularity"
           RESPONSE=$(curl -X POST -H "x-api-key: $CRON_KEY" -w "\n%{http_code}\n" "$URL/api/games/popularity")
           STATUS=$(echo "$RESPONSE" | sed -n '2p')
           echo "Response: $RESPONSE"
