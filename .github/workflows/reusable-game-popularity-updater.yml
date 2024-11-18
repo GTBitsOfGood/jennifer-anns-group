@@ -17,48 +17,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: API Request to Update Game Popularity Endpoint
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Game Popularity Update Script
         env:
           ENVIRONMENT: ${{ inputs.environment }}
           CRON_KEY: ${{ secrets.GAME_POPULARITY_CRON_KEY }}
           URL: ${{ secrets.DEPLOYMENT_BASE_URL }}
-        run: |
-          echo "Updating game popularity"
-          echo "URL: $URL/api/games/popularity"
-          
-          # Store response headers and body separately
-          RESPONSE_HEADERS=$(mktemp)
-          RESPONSE_BODY=$(mktemp)
-          
-          HTTP_CODE=$(curl -v --fail \
-            -H "x-api-key: $CRON_KEY" \
-            -H "Content-Type: application/json" \
-            -H "Accept: application/json" \
-            -d "{}" \
-            -w "%{http_code}" \
-            -D "$RESPONSE_HEADERS" \
-            "$URL/api/games/popularity" > "$RESPONSE_BODY" 2>&1)
-          
-          # Capture the exit status of curl
-          CURL_EXIT_CODE=$?
-          
-          echo "HTTP Status Code: $HTTP_CODE"
-          echo "Response Headers:"
-          cat "$RESPONSE_HEADERS"
-          echo "Response Body:"
-          cat "$RESPONSE_BODY"
-          
-          if [[ $CURL_EXIT_CODE -eq 0 && $HTTP_CODE -eq 200 ]]; then
-            echo "Game popularities updated successfully."
-          else
-            echo "Failed to update game popularities."
-            echo "Curl exit code: $CURL_EXIT_CODE"
-            echo "HTTP status code: $HTTP_CODE"
-            if [[ $HTTP_CODE -eq 502 ]]; then
-              echo "Received 502 Bad Gateway error. The server might be temporarily unavailable or timing out."
-            fi
-            exit 1
-          fi
-          
-          # Clean up temporary files
-          rm -f "$RESPONSE_HEADERS" "$RESPONSE_BODY"
+        run: npx tsx scripts/updateGamePopularity.ts
