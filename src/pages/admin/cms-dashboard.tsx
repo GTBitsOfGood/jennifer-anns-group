@@ -302,7 +302,10 @@ const CMSDashboardPage = () => {
 
       const visitQueryParams = {
         projectName: "Jennifer Ann's",
-        environment: EventEnvironment.DEVELOPMENT,
+        environment:
+          process.env.NEXT_PUBLIC_ENV === "production"
+            ? EventEnvironment.PRODUCTION
+            : EventEnvironment.DEVELOPMENT,
         category: "Visit",
         subcategory: "Visit",
         limit: 50000,
@@ -317,7 +320,10 @@ const CMSDashboardPage = () => {
 
       const downloadQueryParams = {
         projectName: "Jennifer Ann's",
-        environment: EventEnvironment.DEVELOPMENT,
+        environment:
+          process.env.NEXT_PUBLIC_ENV === "production"
+            ? EventEnvironment.PRODUCTION
+            : EventEnvironment.DEVELOPMENT,
         category: "Download",
         subcategory: "game",
         limit: 2000,
@@ -327,7 +333,10 @@ const CMSDashboardPage = () => {
 
       const pdfQueryParams = {
         projectName: "Jennifer Ann's",
-        environment: EventEnvironment.DEVELOPMENT,
+        environment:
+          process.env.NEXT_PUBLIC_ENV === "production"
+            ? EventEnvironment.PRODUCTION
+            : EventEnvironment.DEVELOPMENT,
         category: "View",
         subcategory: "pdf",
         limit: 2000,
