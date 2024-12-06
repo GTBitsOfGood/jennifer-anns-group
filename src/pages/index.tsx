@@ -154,7 +154,7 @@ const Home = ({
             Jennifer Ann&apos;s
           </h1>
           <h2 className="text-center text-2xl font-medium italic text-orange-primary md:text-5xl">
-            Gaming against violence.
+            Gaming Against Violence.
           </h2>
         </div>
         <div className="flex w-full flex-col items-center bg-blue-bg py-[72px]">
@@ -267,7 +267,10 @@ const Home = ({
               }
 
               return (
-                <div key={index} className="md:max-w-l max-w-48 flex-1">
+                <div
+                  key={index}
+                  className="md:max-w-l max-w-48 flex-1 lg:max-w-[340px]"
+                >
                   <GameBoy imageUrl={images[gameBoy.gameId] || null} />
                   <p className="text-s text-black-1000 mt-4 text-center leading-7 md:mt-12">
                     {gameBoy.description}
@@ -339,30 +342,30 @@ const Home = ({
               </p>
             </div>
             <div className="flex flex-row items-end md:flex-col">
-              <div>
+              <div className="w-full">
                 <h1 className="mb-4 text-2xl font-medium md:mb-8">
                   Special thanks to:
                 </h1>
-                <div className="grid grid-cols-2 gap-8 md:grid-cols-4 md:text-lg">
+                <div className="grid w-full grid-cols-2  justify-between gap-8 md:grid-cols-4 md:text-lg">
                   <ul>
                     <li>Uma Anand</li>
                     <li>Hayden Carpenter</li>
                     <li>Samarth Chandna</li>
                     <li>Katsuki Chan</li>
                   </ul>
-                  <ul>
+                  <ul className="text-right md:text-left">
                     <li>Helen Chen</li>
                     <li>Ansley Franks</li>
                     <li>Nathan Gong</li>
                     <li>Aakash Gupta</li>
                   </ul>
-                  <ul>
+                  <ul className="">
                     <li>Lauren Ji</li>
                     <li>Yolanda Li</li>
                     <li>Xingyi Luo</li>
                     <li>Liane Nguyen</li>
                   </ul>
-                  <ul>
+                  <ul className="text-right md:text-left">
                     <li>Ankith Thalanki</li>
                     <li>Hannah Tsai</li>
                     <li>Annie Vallamattam</li>
