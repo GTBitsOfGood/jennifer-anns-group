@@ -263,7 +263,7 @@ const Home = ({
           <div className="flex w-full max-w-[96rem] flex-col items-center justify-center gap-4 px-16 md:flex-row md:gap-0 md:space-x-14">
             {pageData.gameBoys.map((gameBoy: IGameBoy, index: number) => {
               if (!gameBoy.gameId) {
-                return <></>;
+                return null;
               }
 
               return (

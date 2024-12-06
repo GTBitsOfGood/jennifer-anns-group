@@ -16,6 +16,7 @@ export async function middleware(request: NextRequest) {
     const current_date = Date();
     const logger = getLogger();
     const referrer = request.headers.get("referer");
+    const pageUrl = request.nextUrl.href;
     let user_agent = request.headers.get("user-agent");
     if (user_agent == null) {
       user_agent = "";
@@ -23,6 +24,7 @@ export async function middleware(request: NextRequest) {
     const browser_agent = getBrowserName(user_agent);
     logVisitEventServer(logger, {
       referrer: referrer ?? "None",
+      pageUrl,
       userId: (token?._id as string) ?? "Unauthenticated",
       createdDate: current_date,
       browserAgent: browser_agent,

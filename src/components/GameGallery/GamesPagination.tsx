@@ -50,9 +50,9 @@ export default function GamesPagination({
       if (numPages === undefined) return;
       if (targetPage <= 0) return;
       if (targetPage > numPages) return;
-      setFilters({ ...filters, page: targetPage });
+      setFilters((filters) => ({ ...filters, page: targetPage }));
     },
-    [filters.page, numPages],
+    [filters, numPages],
   );
 
   useEffect(() => {

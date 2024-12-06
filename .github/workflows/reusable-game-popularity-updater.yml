@@ -1,0 +1,37 @@
+name: Reusable Workflow for Updating Game Popularity for Specific Environment
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+jobs:
+  run-game-popularity-updater:
+    name: Update Game Popularity for ${{ inputs.environment }}
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Game Popularity Update Script
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+          CRON_KEY: ${{ secrets.GAME_POPULARITY_CRON_KEY }}
+          URL: ${{ secrets.DEPLOYMENT_BASE_URL }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY: ${{ secrets.NEXT_PUBLIC_BOG_ANALYTICS_CLIENT_API_KEY }}
+          NEXT_PUBLIC_ENV: ${{ inputs.environment == 'Production' && 'production' || 'development' }}
+        run: npx tsx scripts/updateGamePopularity.ts

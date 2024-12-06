@@ -13,7 +13,7 @@ export default function SelectedFilters({ setFilters, filters }: Props) {
   const { gameBuilds, gameContent, accessibility, tags } = filters;
 
   return (
-    <div className="mb-6 flex h-9 flex-row flex-wrap items-center">
+    <div className="mb-4 flex h-auto flex-row flex-wrap items-center">
       {gameBuilds?.map((item) => {
         return (
           <Tag key={item} height="36px" variant="filter_selected_other">

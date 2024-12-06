@@ -59,7 +59,6 @@ function LoginForm() {
       email: undefined,
       password: undefined,
     });
-    router?.replace("/");
   }
 
   return (

@@ -170,8 +170,8 @@ const formatGameEventsData = async (
 
   if (visitEvents) {
     visitEvents.forEach((event) => {
-      const referrer = event.properties.referrer;
-      const match = referrer && referrer.match(/\/games\/([a-zA-Z0-9]{24})/);
+      const pageUrl = event.properties.pageUrl;
+      const match = pageUrl && pageUrl.match(/\/games\/([a-zA-Z0-9]{24})/);
       if (match) {
         const gameId = match[1];
         gamePageHitsMap[gameId] = (gamePageHitsMap[gameId] || 0) + 1;
@@ -302,7 +302,10 @@ const CMSDashboardPage = () => {
 
       const visitQueryParams = {
         projectName: "Jennifer Ann's",
-        environment: EventEnvironment.DEVELOPMENT,
+        environment:
+          process.env.NEXT_PUBLIC_ENV === "production"
+            ? EventEnvironment.PRODUCTION
+            : EventEnvironment.DEVELOPMENT,
         category: "Visit",
         subcategory: "Visit",
         limit: 50000,
@@ -317,7 +320,10 @@ const CMSDashboardPage = () => {
 
       const downloadQueryParams = {
         projectName: "Jennifer Ann's",
-        environment: EventEnvironment.DEVELOPMENT,
+        environment:
+          process.env.NEXT_PUBLIC_ENV === "production"
+            ? EventEnvironment.PRODUCTION
+            : EventEnvironment.DEVELOPMENT,
         category: "Download",
         subcategory: "game",
         limit: 2000,
@@ -327,7 +333,10 @@ const CMSDashboardPage = () => {
 
       const pdfQueryParams = {
         projectName: "Jennifer Ann's",
-        environment: EventEnvironment.DEVELOPMENT,
+        environment:
+          process.env.NEXT_PUBLIC_ENV === "production"
+            ? EventEnvironment.PRODUCTION
+            : EventEnvironment.DEVELOPMENT,
         category: "View",
         subcategory: "pdf",
         limit: 2000,
@@ -454,7 +463,7 @@ const CMSDashboardPage = () => {
       }));
 
       let ws = XLSX.utils.json_to_sheet(entryInfo);
-      let gameName = gameInfo[i]["Game Title"];
+      let gameName = gameInfo[i]["Game Title"].replace(/[\/\\\?\*\:\[\]]/g, "");
       if (gameName.length > 15) {
         gameName = gameName.substring(0, 11) + "...";
       }
@@ -462,7 +471,7 @@ const CMSDashboardPage = () => {
 
       XLSX.utils.book_append_sheet(wb, ws, name);
     });
-    XLSX.writeFile(wb, `Dashboard Analytics (1 ${dataAge}).xlsx`);
+    XLSX.writeFile(wb, `Analytics Dashboard (1 ${dataAge}).xlsx`);
   }
 
   return (

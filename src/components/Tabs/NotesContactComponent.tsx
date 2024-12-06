@@ -193,7 +193,11 @@ export default function NotesContactComponent({
             </div>
             <div className="flex flex-col items-stretch">
               {notes?.data
-                ?.map((note: INote & { _id: string; date: string }) =>
+                ?.filter(
+                  (note: INote & { _id: string; date: string }) =>
+                    note.gameId == gameId,
+                )
+                .map((note: INote & { _id: string; date: string }) =>
                   editId !== note._id ? (
                     <div key={note._id} className="mb-4 flex flex-row">
                       <div className="mr-8 mt-0.5 whitespace-nowrap text-blue-primary">

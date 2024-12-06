@@ -23,7 +23,7 @@ export const gameBuildsMap: Record<string, string> = {
 };
 export const gameContentsMap: Record<string, string> = {
   parentingGuide: "Parenting Guide",
-  lessonPlan: "Lesson Plan",
+  lesson: "Lesson Plan", //Maybe check back
   answerKey: "Answer Key",
   videoTrailer: "Video Trailer",
 };

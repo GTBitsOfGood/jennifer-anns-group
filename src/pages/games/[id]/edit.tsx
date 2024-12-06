@@ -17,6 +17,13 @@ import { getGameById } from "@/server/db/actions/GameAction";
 import EditImage from "@/components/GameScreen/WebGL/EditImage";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { id } = ctx.query;
+
+  if (!id || id === "create") {
+    return {
+      notFound: true,
+    };
+  }
   try {
     const data = await getGameById(ctx.query.id as string);
     const gameData = JSON.parse(JSON.stringify(data));

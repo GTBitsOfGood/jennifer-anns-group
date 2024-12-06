@@ -7,7 +7,6 @@ import { Button } from "../ui/button";
 import { z } from "zod";
 import { UserLabel } from "@/utils/types";
 import Select from "react-select";
-import { log } from "util";
 
 type TabName = "Home" | "Game Gallery" | "Donate" | "Admin";
 
