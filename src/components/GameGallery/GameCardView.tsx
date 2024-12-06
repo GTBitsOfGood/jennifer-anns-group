@@ -59,10 +59,10 @@ export default function GameCardView({
   return (
     <>
       {data ? (
-        <div className="ml-6 flex w-full flex-row flex-wrap">
+        <div className="flex w-full flex-row flex-wrap items-center justify-center gap-6 md:justify-normal">
           {data.games?.length > 0 ? (
             data.games.map((game: z.infer<typeof gameDataSchema>) => (
-              <div key={game.name} className="mb-6 ml-6">
+              <div key={game.name} className="">
                 <GameCard game={game} />
               </div>
             ))

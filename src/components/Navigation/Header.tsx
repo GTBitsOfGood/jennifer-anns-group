@@ -95,7 +95,7 @@ const Header = () => {
         {tabData[userType].map((tabName, index) => (
           <div
             key={index}
-            className={`ml-8 cursor-pointer text-nowrap text-center font-sans text-lg ${
+            className={`ml-8 cursor-pointer text-nowrap text-center font-sans text-base ${
               selectedTab === index
                 ? "relative font-bold text-orange-primary"
                 : "font-normal text-stone-900 opacity-50"
@@ -113,14 +113,14 @@ const Header = () => {
       </div>
       {/* for smaller screens */}
       <Select
-        className={`relative m-2 ${userType === UserType.Admin ? "2xl:hidden" : "lg:hidden"}`}
+        className={`relative md:m-2 ${userType === UserType.Admin ? "2xl:hidden" : "lg:hidden"}`}
         classNames={{
           control: () =>
             `${userType === UserType.Admin ? "w-56" : "w-40"} cursor-pointer rounded-md outline-none ring-0 text-nowrap font-sans font-semibold text-lg bg-orange-bg border-none`,
           singleValue: () => "text-neutral-600",
           menu: () => `cursor-pointer rounded-md bg-input-bg m-0 ring-0`,
           option: () =>
-            "cursor-pointer text-nowrap font-sans text-lg bg-input-bg text-neutral-600",
+            "cursor-pointer text-nowrap font-sans text-base bg-input-bg text-neutral-600",
           indicatorSeparator: () => "hidden",
           dropdownIndicator: () => "text-neutral-600",
         }}
@@ -143,11 +143,11 @@ const Header = () => {
   );
 
   const ProfileButtons = (
-    <div className="mx-2 my-2 flex items-center gap-4">
+    <div className="flex items-center gap-2">
       {userType === UserType.Public ? (
         <Button
           variant="mainorange"
-          className="text-lg"
+          className="text-base"
           onClick={() => {
             router?.push("/login");
           }}
@@ -162,31 +162,33 @@ const Header = () => {
           sessionData={session}
         />
       )}
-      <Button variant="gray" className="text-lg" onClick={handleSignUpLogOut}>
+      <Button variant="gray" className="text-base" onClick={handleSignUpLogOut}>
         {userType === UserType.Public ? "Sign up" : "Log out"}
       </Button>
     </div>
   );
 
   return (
-    <div className="mx-auto my-6 flex w-[calc(100%-4rem)] max-w-[90%] flex-wrap items-center justify-between">
-      <div
-        className="flex items-center hover:cursor-pointer"
-        onClick={() => {
-          router?.push("/");
-        }}
-      >
-        <img className="w-50 h-auto" src="/logo_gray.svg" alt="Logo" />
-        <div className="ml-4 text-nowrap font-open-sans text-xl font-semibold text-stone-900 opacity-70">
-          Jennifer Ann&apos;s Group
+    <div className="mx-2 my-4 sm:mx-8 sm:my-8 md:mx-16 md:my-6">
+      <div className="flex flex-wrap items-center justify-center sm:justify-between">
+        <div
+          className=" hidden items-center hover:cursor-pointer sm:flex"
+          onClick={() => {
+            router?.push("/");
+          }}
+        >
+          <img className="w-50 h-auto" src="/logo_gray.svg" alt="Logo" />
+          <div className="ml-4 hidden text-nowrap font-open-sans text-xl font-semibold text-stone-900 opacity-70 md:block">
+            Jennifer Ann&apos;s Group
+          </div>
         </div>
+        {loaded && (
+          <div className="flex flex-wrap items-center gap-2">
+            {TabLinkOptions}
+            {ProfileButtons}
+          </div>
+        )}
       </div>
-      {loaded && (
-        <div className="flex flex-wrap items-center">
-          {TabLinkOptions}
-          {ProfileButtons}
-        </div>
-      )}
     </div>
   );
 };

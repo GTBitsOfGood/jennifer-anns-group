@@ -7,18 +7,10 @@ import {
   Divider,
   InputGroup,
   InputLeftElement,
-  Popover,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
   useDisclosure,
-  Text,
-  Button,
-  PopoverCloseButton,
 } from "@chakra-ui/react";
 import { Search2Icon } from "@chakra-ui/icons";
 import { Input } from "@chakra-ui/react";
-import FilterBody from "@/components/GameGallery/FilterBody";
 import chakraTheme from "@/styles/chakraTheme";
 import { useRouter } from "next/compat/router";
 import ThemeSidebar from "@/components/GameGallery/ThemeSidebar";
@@ -26,9 +18,9 @@ import SelectedFilters from "@/components/GameGallery/SelectedFilters";
 import GameCardView from "@/components/GameGallery/GameCardView";
 import GamesPagination from "@/components/GameGallery/GamesPagination";
 import { PageRequiredGameQuery } from "@/components/Admin/ThemesTags/GamesSection";
-import { Filter, ChevronsUpDown, Check } from "lucide-react";
-import cx from "classnames";
 import { SortType } from "@/utils/types";
+import FilterButtonPopover from "@/components/GameGallery/FilterButtonPopover";
+import SortButtonPopover from "@/components/GameGallery/SortButtonPopover";
 
 export default function Games() {
   const { data: session } = useSession();
@@ -90,11 +82,11 @@ export default function Games() {
     (filters.gameBuilds?.length ?? 0) > 0;
 
   return (
-    <div className="m-[72px]">
+    <div className="m-[32px] md:m-[72px]">
       <ChakraProvider theme={chakraTheme} resetCSS={false}>
         <div className="flex items-center justify-center">
           <div className="flex-1"></div>
-          <h1 className="mb-16 mt-10 text-center font-sans text-6xl font-semibold">
+          <h1 className="mb-2 text-center font-sans text-[32px] font-semibold md:mb-16 md:mt-10 md:text-6xl">
             Game Gallery
           </h1>
           <div className="relative flex flex-1 justify-end">
@@ -110,9 +102,9 @@ export default function Games() {
             ) : null}
           </div>
         </div>
-        <div className="mb-6 flex flex-row items-center justify-between">
-          <div className="flex flex-row items-center gap-6">
-            <InputGroup className="w-[400px]">
+        <div className="flex flex-row items-center justify-between md:mb-6">
+          <div className="flex w-full flex-col items-center justify-center gap-2 md:flex-row md:justify-normal md:gap-6">
+            <InputGroup className="w-full md:w-[400px]">
               <InputLeftElement pointerEvents="none">
                 <Search2Icon className="text-input-stroke" />
               </InputLeftElement>
@@ -123,109 +115,41 @@ export default function Games() {
                 placeholder="Search games"
               />
             </InputGroup>
-            {/* sort button and popover */}
-            <Popover
-              placement="bottom-start"
-              onOpen={onOpenSortModal}
-              onClose={onCloseSortModal}
-              isOpen={isOpenSortModal}
-            >
-              <PopoverTrigger>
-                <Button className="flex h-9 items-center justify-center rounded-full bg-white p-0">
-                  <Text className="select-none pr-1 font-inter">Sort by:</Text>
-                  <Text className="select-none font-inter font-bold text-blue-primary">
-                    {selectedSort}
-                  </Text>
-                  <ChevronsUpDown className="h-4 text-blue-primary" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-fit p-0">
-                <PopoverBody className="my-2 p-0">
-                  <div className="flex w-52 flex-col">
-                    {Object.values(SortType).map((item, index) => {
-                      return (
-                        <button
-                          key={index}
-                          className={cx(
-                            "flex flex-row justify-between px-4 py-2 text-left font-inter text-sm text-black hover:bg-menu-item-hover",
-                            {
-                              "text-blue-primary": selectedSort === item,
-                            },
-                          )}
-                          onClick={() => {
-                            setFilters({ ...filters, sort: item as SortType });
-                            setSelectedSort(item as SortType);
-                            onCloseSortModal();
-                          }}
-                        >
-                          {item}
-                          <Check className="flex justify-end" size="16" />
-                        </button>
-                      );
-                    })}
-                  </div>
-                </PopoverBody>
-              </PopoverContent>
-            </Popover>
-          </div>
-          {/* filter button and popover */}
-          <Popover
-            placement="bottom-end"
-            onOpen={onOpenFilterModal}
-            onClose={onCloseFilterModal}
-            isOpen={isOpenFilterModal}
-          >
-            <PopoverTrigger>
-              <Button
-                className={cx(
-                  "mx-5 my-2.5 flex items-center justify-center rounded-full border",
-                  {
-                    "bg-brand-800 border-blue-bg": hasFilters,
-                    "border-gray-300 bg-white hover:bg-light-gray": !hasFilters,
-                  },
-                )}
-              >
-                <Text
-                  className={cx("select-none font-inter font-bold text-black", {
-                    "text-blue-primary": hasFilters,
-                  })}
-                >
-                  Filters
-                </Text>
-                <Filter
-                  className={cx("ml-1 h-4 text-black", {
-                    "text-blue-primary": hasFilters,
-                  })}
-                />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="min-h-[500px] w-[730px] rounded-lg">
-              <PopoverCloseButton
-                className="mr-11 mt-11 h-6 w-6 p-0 font-semibold text-blue-primary"
-                size="md"
+            <div className="flex w-full flex-row items-center justify-between gap-6">
+              <SortButtonPopover
+                filters={filters}
+                setFilters={setFilters}
+                selectedSort={selectedSort}
+                setSelectedSort={setSelectedSort}
+                isOpenSortModal={isOpenSortModal}
+                onOpenSortModal={onOpenSortModal}
+                onCloseSortModal={onCloseSortModal}
               />
-              <PopoverBody className="m-12 p-0">
-                <FilterBody
-                  setFilters={setFilters}
-                  filters={filters}
-                  userLabel={userData?.label}
-                  onClose={onCloseFilterModal}
-                />
-              </PopoverBody>
-            </PopoverContent>
-          </Popover>
+              <FilterButtonPopover
+                filters={filters}
+                setFilters={setFilters}
+                hasFilters={hasFilters}
+                isOpenFilterModal={isOpenFilterModal}
+                onOpenFilterModal={onOpenFilterModal}
+                onCloseFilterModal={onCloseFilterModal}
+                userData={userData}
+              />
+            </div>
+          </div>
         </div>
         {hasFilters && (
           <SelectedFilters setFilters={setFilters} filters={filters} />
         )}
 
-        <div>
+        <div className="">
           <Divider className="border border-border" />
         </div>
 
         <div className="mt-12">
           <div className="justify-left flex flex-row">
-            <ThemeSidebar filters={filters} setFilters={setFilters} />
+            <span className="mr-6 hidden md:block">
+              <ThemeSidebar filters={filters} setFilters={setFilters} />
+            </span>
             <Suspense
               fallback={
                 <div className="flex h-96 w-full items-center justify-center">

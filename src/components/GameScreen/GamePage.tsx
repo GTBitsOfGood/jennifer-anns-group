@@ -23,6 +23,8 @@ import chakraTheme from "@/styles/chakraTheme";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import DeleteComponentModal from "@/components/DeleteComponentModal";
+import Link from "next/link";
+import Image from "next/image";
 
 export type GameDataState = populatedGameWithId & {
   parentingGuideFile: File | undefined;
@@ -179,157 +181,179 @@ const GamePage = ({ mode, gameData }: Props) => {
 
   return (
     <ChakraProvider theme={chakraTheme}>
-      <div className="mx-18 my-14 flex flex-col gap-14">
-        {mode === "preview" && (
-          <div className="flex h-fit w-full flex-col items-center justify-center bg-blue-bg py-2 font-sans">
-            <p className="font-bold">🔍 You are in preview mode.</p>
-            <p>Note: Leaving this page will discard your progress.</p>
-          </div>
-        )}
-        <div className="flex items-center justify-between">
-          <button
-            className="group flex flex-row items-center"
-            onClick={returnToGallery}
-          >
-            <ChevronLeft className="text-font-600 group-hover:text-font-900" />
-            <p className="ml-2 w-max font-sans text-2xl text-font-600 group-hover:text-font-900">
-              Game Gallery
-            </p>
-          </button>
-
-          <h1 className="w-full text-center font-sans text-5.5xl font-semibold text-font-1000">
-            {curData?.name}
-          </h1>
-          {loaded && userData.label === "administrator" ? (
-            <div className="flex justify-end gap-4">
-              {!curData?.preview && (
-                <>
-                  <button
-                    onClick={onOpen}
-                    className="text-nowrap rounded-md px-4 py-3 font-sans text-xl font-medium text-delete-red hover:bg-light-red-hover"
-                  >
-                    Delete Game
-                  </button>
-                  <DeleteComponentModal
-                    deleteType="game"
-                    isOpen={isOpen}
-                    onClose={onClose}
-                    gameData={curData}
-                    setGameData={setCurData}
-                  />
-                </>
-              )}
-              <AdminEditButton
-                gameId={gameData?._id}
-                deleteOnRouteChange={deleteOnRouteChange}
-              />
+      <div className="hidden md:block">
+        <div className="mx-18 my-14 flex flex-col gap-14">
+          {mode === "preview" && (
+            <div className="flex h-fit w-full flex-col items-center justify-center bg-blue-bg py-2 font-sans">
+              <p className="font-bold">🔍 You are in preview mode.</p>
+              <p>Note: Leaving this page will discard your progress.</p>
             </div>
-          ) : (
-            <div className="w-48"></div>
           )}
-        </div>
-        {sessionStatus !== "loading" && (
-          <EmbeddedGame
-            gameId={gameData?._id as string}
-            userData={currentUser}
+          <div className="flex items-center justify-between">
+            <button
+              className="group flex flex-row items-center"
+              onClick={returnToGallery}
+            >
+              <ChevronLeft className="text-font-600 group-hover:text-font-900" />
+              <p className="ml-2 w-max font-sans text-2xl text-font-600 group-hover:text-font-900">
+                Game Gallery
+              </p>
+            </button>
+
+            <h1 className="w-full text-center font-sans text-5.5xl font-semibold text-font-1000">
+              {curData?.name}
+            </h1>
+            {loaded && userData.label === "administrator" ? (
+              <div className="flex justify-end gap-4">
+                {!curData?.preview && (
+                  <>
+                    <button
+                      onClick={onOpen}
+                      className="text-nowrap rounded-md px-4 py-3 font-sans text-xl font-medium text-delete-red hover:bg-light-red-hover"
+                    >
+                      Delete Game
+                    </button>
+                    <DeleteComponentModal
+                      deleteType="game"
+                      isOpen={isOpen}
+                      onClose={onClose}
+                      gameData={curData}
+                      setGameData={setCurData}
+                    />
+                  </>
+                )}
+                <AdminEditButton
+                  gameId={gameData?._id}
+                  deleteOnRouteChange={deleteOnRouteChange}
+                />
+              </div>
+            ) : (
+              <div className="w-48"></div>
+            )}
+          </div>
+          {sessionStatus !== "loading" && (
+            <EmbeddedGame
+              gameId={gameData?._id as string}
+              userData={currentUser}
+              gameData={curData}
+            />
+          )}
+          <TabsComponent
+            mode="view"
             gameData={curData}
+            setGameData={setCurData}
+            authorized={visibleAnswer}
+            userData={currentUser}
           />
-        )}
-        <TabsComponent
-          mode="view"
-          gameData={curData}
-          setGameData={setCurData}
-          authorized={visibleAnswer}
-          userData={currentUser}
-        />
-        {loaded && userData.label !== "administrator" && (
-          <NotesContactComponent
-            gameId={gameData?._id}
-            userId={userId}
-            gameName={curData?.name}
-            firstName={userData.firstName}
+          {loaded && userData.label !== "administrator" && (
+            <NotesContactComponent
+              gameId={gameData?._id}
+              userId={userId}
+              gameName={curData?.name}
+              firstName={userData.firstName}
+            />
+          )}
+          <TagsComponent
+            mode="view"
+            gameData={curData}
+            setGameData={setCurData}
+            admin={visibleAnswer}
           />
-        )}
-        <TagsComponent
-          mode="view"
-          gameData={curData}
-          setGameData={setCurData}
-          admin={visibleAnswer}
-        />
-        {loaded && mode === "preview" && (
-          <div className="relative my-10 flex w-11/12 justify-end gap-6 font-sans">
-            <div>
+          {loaded && mode === "preview" && (
+            <div className="relative my-10 flex w-11/12 justify-end gap-6 font-sans">
+              <div>
+                <Button
+                  type="button"
+                  onClick={onOpen}
+                  variant="outline2"
+                  className="px-6 py-6 text-2xl font-semibold"
+                >
+                  Cancel
+                </Button>
+                <AlertDialog
+                  motionPreset="slideInBottom"
+                  leastDestructiveRef={cancelRef}
+                  onClose={onClose}
+                  isOpen={isOpen}
+                  isCentered
+                >
+                  <AlertDialogOverlay />
+
+                  <AlertDialogContent
+                    border="4px"
+                    borderColor="brand.600"
+                    height="350"
+                    width="450"
+                  >
+                    <div>
+                      <AlertDialogCloseButton
+                        mr="12px"
+                        mt="12px"
+                        color="brand.600"
+                      />
+                    </div>
+                    <AlertDialogHeader p="0">
+                      <div className="mx-auto flex w-4/5 flex-col items-center">
+                        <div className="mt-16 text-center font-sans text-[26px] font-bold leading-tight text-blue-primary">
+                          Are you sure you want to cancel?{" "}
+                        </div>
+                        <div className="mb-6 mt-6 text-center font-sans text-sm font-normal">
+                          If you cancel, your uploaded information will be lost.
+                          You can edit the page by clicking the edit button.{" "}
+                        </div>
+                      </div>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter p="0" justifyContent="center">
+                      <div className="mt-4 flex flex-row items-center gap-4">
+                        <button
+                          onClick={() => router?.replace("/games")}
+                          className="rounded-xl bg-delete-red px-6 py-3 font-sans font-semibold text-white"
+                        >
+                          Yes, cancel
+                        </button>
+                        <button
+                          ref={cancelRef}
+                          onClick={onClose}
+                          className="rounded-xl border-[1px] border-solid border-black px-6 py-3 font-sans font-semibold"
+                        >
+                          No, return
+                        </button>
+                      </div>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
               <Button
                 type="button"
-                onClick={onOpen}
-                variant="outline2"
+                variant="mainblue"
                 className="px-6 py-6 text-2xl font-semibold"
+                onClick={publishGame}
               >
-                Cancel
+                Publish
               </Button>
-              <AlertDialog
-                motionPreset="slideInBottom"
-                leastDestructiveRef={cancelRef}
-                onClose={onClose}
-                isOpen={isOpen}
-                isCentered
-              >
-                <AlertDialogOverlay />
-
-                <AlertDialogContent
-                  border="4px"
-                  borderColor="brand.600"
-                  height="350"
-                  width="450"
-                >
-                  <div>
-                    <AlertDialogCloseButton
-                      mr="12px"
-                      mt="12px"
-                      color="brand.600"
-                    />
-                  </div>
-                  <AlertDialogHeader p="0">
-                    <div className="mx-auto flex w-4/5 flex-col items-center">
-                      <div className="mt-16 text-center font-sans text-[26px] font-bold leading-tight text-blue-primary">
-                        Are you sure you want to cancel?{" "}
-                      </div>
-                      <div className="mb-6 mt-6 text-center font-sans text-sm font-normal">
-                        If you cancel, your uploaded information will be lost.
-                        You can edit the page by clicking the edit button.{" "}
-                      </div>
-                    </div>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter p="0" justifyContent="center">
-                    <div className="mt-4 flex flex-row items-center gap-4">
-                      <button
-                        onClick={() => router?.replace("/games")}
-                        className="rounded-xl bg-delete-red px-6 py-3 font-sans font-semibold text-white"
-                      >
-                        Yes, cancel
-                      </button>
-                      <button
-                        ref={cancelRef}
-                        onClick={onClose}
-                        className="rounded-xl border-[1px] border-solid border-black px-6 py-3 font-sans font-semibold"
-                      >
-                        No, return
-                      </button>
-                    </div>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
             </div>
-            <Button
-              type="button"
-              variant="mainblue"
-              className="px-6 py-6 text-2xl font-semibold"
-              onClick={publishGame}
-            >
-              Publish
-            </Button>
-          </div>
-        )}
+          )}
+        </div>
+      </div>
+      <div className="m-8 flex h-[80vh] flex-col items-center text-gray-600 md:hidden">
+        <Image
+          src={`/orange_heart.svg`}
+          alt="Jennifer Ann's Heart"
+          width={120}
+          height={80}
+          className="mb-4 mt-16"
+        />
+        <p className="text-2xl font-medium text-orange-primary">Sorry!</p>
+        <p className="text-center">
+          You can’t view a game at this screen size. Please move to a larger
+          screen.
+        </p>
+        <Link
+          href="/games"
+          className="mt-8 rounded-md bg-blue-primary px-4 py-3 text-white"
+        >
+          Back to Game Gallery
+        </Link>
       </div>
     </ChakraProvider>
   );
