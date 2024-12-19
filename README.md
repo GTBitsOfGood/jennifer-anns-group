@@ -32,6 +32,7 @@ Jennifer Ann's Group is a nonprofit organization dedicated to preventing teen da
   If you are unable to use the commands to retrieve the `.env` file, you can download or visit [Bitwarden](https://bitwarden.com/) and login using `product@bitsofgood.org` and the master password. The `.env` file will be available within the vault.
 
 - To setup the db with example data, run:
+
   ```sh
   npm run add-initial-data
   ```
@@ -80,7 +81,7 @@ I’m pretty sure
 ￼
 ￼
 ￼Hayden Carpenter
-Hayden Carpenter  5:47 PMstions/40452508/docker-error-on-an-entrypoint-script-no-such-file-or-directory) to fix it.
+Hayden Carpenter 5:47 PMstions/40452508/docker-error-on-an-entrypoint-script-no-such-file-or-directory) to fix it.
 
 ## Major Technologies
 
@@ -89,11 +90,14 @@ Hayden Carpenter  5:47 PMstions/40452508/docker-error-on-an-entrypoint-script-no
 - [Tailwind CSS](https://tailwindcss.com)
 
 ## Documentation
+
 ### Secrets
+
 - Production secrets: `.env` in Bitwarden.
-- Local secrets: `.env.local` in Bitwarden. Used when setting up local container with the Bitwarden CLI. 
+- Local secrets: `.env.local` in Bitwarden. Used when setting up local container with the Bitwarden CLI.
 
 ### Databases
+
 Production Database: We're planning to spin up Mongo in Azure, but we've had issues with Azure giving us permission to. The NP is aware of this problem and we're trying to sort it out, but we have been unable to do so before DRB. We have temporarily spinned up a cluster on Atlas using the DRB test email.
 
 Local Database: MongoDB on Atlas on the Jennifer Ann's Mongo Account (Sign in with our Gmail located in Bitwarden).
@@ -103,11 +107,13 @@ Local Database: MongoDB on Atlas on the Jennifer Ann's Mongo Account (Sign in wi
 We use mongoose for our schemas. Updating database objects requires updating those schemas in `server/db/models` and altering the actions in the `server/db/actions` directory accordingly. The connection strings are in the environment files store in Bitwarden. There should be no problem creating a new Mongo database, updating the connection string, and running `npm run add-initial-data` if you want to re-create the database.
 
 ### File Storage
+
 For accessing both `application-files` (images, pdfs, etc) and `webgl-builds`, we use Backblaze B2 for hosting and Cloudflare as a bridge to connect to it. Cloudflare allows us to reduce the costs on data transfer.
 
-There is only __one__ Cloudflare account and only __one__ Backblaze account. The same Cloudflare worker is used for both production and development, as all it really does is mitigate our costs and isn't responsible for any data storage. There are __two__ versions of the buckets on the Backblaze account. One is for dev and one is for prod, and those buckets are selected at runtime based on the `NODE_ENV` variable. The `B2_BUCKET_ID_BUILD` and `B2_BUCKET_ID_APPLICATION` env variables have to be updated accordingly as well, corresponding to the production/development bucket they are using. Each set of buckets are only used for their respective environments.
+There is only **one** Cloudflare account and only **one** Backblaze account. The same Cloudflare worker is used for both production and development, as all it really does is mitigate our costs and isn't responsible for any data storage. There are **two** versions of the buckets on the Backblaze account. One is for dev and one is for prod, and those buckets are selected at runtime based on the `NODE_ENV` variable. The `B2_BUCKET_ID_BUILD` and `B2_BUCKET_ID_APPLICATION` env variables have to be updated accordingly as well, corresponding to the production/development bucket they are using. Each set of buckets are only used for their respective environments.
 
 #### Reconfiguring
+
 Any data can be put in the Backblaze buckets. The `cloudflare-b2` package inside of this repository can be used to update the configuration of the Cloudflare worker. Simply update the `src/index.js` file and run `npm run deploy`. To update the CORS policy for Backblaze, you have to use the [B2 CLI tool](https://www.backblaze.com/docs/cloud-storage-command-line-tools). Our CORS policy is kept traack of in the `b2-cors.json` file and then we update the actual policy with `b2-tools`.
 
 ### Juno
@@ -116,11 +122,12 @@ We use [Juno](https://github.com/GTBitsOfGood/juno) for email services. Juno cur
 
 ### Analytics
 
-We use [bog-analytics](https://github.com/GTBitsOfGood/bog-analytics) for analytics. This will always be hosted on BoG infrastructure and we have no plans to move it. The actual data API is only used from the server, and we use internal `api/events/log` and `api/events/view` routes to access it. There is an useAnalytics hook that calls this API with the same syntax as the npm package. 
+We use [bog-analytics](https://github.com/GTBitsOfGood/bog-analytics) for analytics. This will always be hosted on BoG infrastructure and we have no plans to move it. The actual data API is only used from the server, and we use internal `api/events/log` and `api/events/view` routes to access it. There is an useAnalytics hook that calls this API with the same syntax as the npm package.
 
 ### Cron Jobs
 
 We have a few cron jobs that run periodically for updating data.
+
 - Every day, we check if data should be deleted following GDPR (user data should be deleted 30 days after deleting an account).
 - Every day, we recalculate 'popularity' values for games to decide rankings.
 

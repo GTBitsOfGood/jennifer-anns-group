@@ -338,14 +338,14 @@ function EditProfileModal(props: EditProps) {
             htmlFor={TRACKING_FORM_KEY}
             className={`ml-3 text-right text-sm font-normal`}
           >
-            I would like my data to help improve this site (Optional).
-            {/* Learn more about Jennifer Ann&apos;s{" "}
+            I would like my data to help improve this site (Optional). Learn
+            more about Jennifer Ann&apos;s{" "}
             <span
-              onClick={() => props.setPrivacyPolicyModalOpen(true)}
+              onClick={() => window.open("/privacy-policy", "_blank")}
               className={`text-blue-primary underline`}
             >
               privacy policy
-            </span> */}
+            </span>
           </Label>
         </div>
       </div>

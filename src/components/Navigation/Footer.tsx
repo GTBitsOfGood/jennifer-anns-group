@@ -6,15 +6,14 @@ import { useState } from "react";
 export const Footer = () => {
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
-  // replace with actual social links when nonprofit gets back
   const socialLinks = {
-    Facebook: ["https://www.facebook.com", "11", "19"],
-    Twitter: ["https://www.x.com", "19", "15"],
-    Instagram: ["https://www.instagram.com", "19", "19"],
-    LinkedIn: ["https://www.linkedin.com", "19", "18"],
-    YouTube: ["https://www.youtube.com", "21", "15"],
+    Facebook: ["https://www.facebook.com/jenniferannsgroup/", "11", "19"],
+    Twitter: ["https://x.com/stoptdv?lang=en", "19", "15"],
+    Instagram: ["https://www.instagram.com/stopTDV/", "19", "19"],
+    // LinkedIn: ["https://www.linkedin.com", "19", "18"],
+    YouTube: ["https://www.youtube.com/c/JenniferannOrg", "21", "15"],
     // Mastodon: ["https://joinmastodon.org/", "19", "15"],
-    // Pinterest: ["https://www.pinterest.com", "19", "19"],
+    Pinterest: ["https://www.pinterest.com/stoptdv/", "19", "19"],
   };
 
   return (

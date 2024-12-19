@@ -295,7 +295,11 @@ const Home = ({
               </h2>
               <p className="text-base italic text-blue-primary md:text-2xl">
                 Join our{" "}
-                <Link className="underline" href="" target="_blank">
+                <Link
+                  className="underline"
+                  href="https://discord.gg/g4bzMdF5"
+                  target="_blank"
+                >
                   Jennifer Ann&apos;s Group&apos;s discord!
                 </Link>
               </p>

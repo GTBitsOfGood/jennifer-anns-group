@@ -21,11 +21,10 @@ jobs:
     with:
       environment: "Development"
     secrets: inherit
-      
+
   run-prod-game-popularity-updater:
     name: Update Game Popularity for Production Environment
     uses: ./.github/workflows/reusable-game-popularity-updater.yml
     with:
       environment: "Production"
     secrets: inherit
-    
