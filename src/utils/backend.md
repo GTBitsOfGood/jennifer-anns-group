@@ -1,6 +1,6 @@
 # Backend
 
-So sorry for how many changes and refactorings we've done to the backend guys!! Hopefully this guide helps a little. 
+So sorry for how many changes and refactorings we've done to the backend guys!! Hopefully this guide helps a little.
 
 ## Models
 

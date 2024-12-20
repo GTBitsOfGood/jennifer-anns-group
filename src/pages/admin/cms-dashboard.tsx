@@ -81,8 +81,15 @@ const formatUserTrafficData = (
       ratio: ((count / visitEvents.length) * 100).toFixed(2),
     }),
   );
-  referrerChartData = referrerChartData.filter((data) => data.label != "None");
-  // We'll have to implement proper filtering later to remove local urls, but they're useful for testing
+
+  const hostingDomain = process.env.NEXT_PUBLIC_HOSTING_URL || "selgames.org";
+  // Filter out local URLs and the hosting domain
+  referrerChartData = referrerChartData.filter(
+    (data) =>
+      data.label !== "None" &&
+      !/^https?:\/\/(localhost|127\.0\.0\.1|.*\.local).*$/i.test(data.label) &&
+      !data.label.includes(hostingDomain),
+  );
 
   const sourceData = referrerChartData;
 

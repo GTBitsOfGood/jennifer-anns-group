@@ -32,7 +32,7 @@ const addGameboyData = async () => {
   const gameBoy = {
     mdTitle: "Title",
     mdDescription: "**Description**",
-    gameBoyTitle: "Gameboys",
+    gameBoyTitle: "Check out what's new!",
     gameBoys: [
       {
         description: "Description of Game 1",

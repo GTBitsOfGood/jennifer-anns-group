@@ -26,7 +26,7 @@ export default function ThemeSidebar({ setFilters, filters }: Props) {
   }
 
   return (
-    <div className="flex h-[365px] w-[268px] flex-col overflow-y-scroll">
+    <div className="flex w-max flex-col">
       <p
         onClick={() => {
           setFilters({ ...filters, theme: [], page: 1 });

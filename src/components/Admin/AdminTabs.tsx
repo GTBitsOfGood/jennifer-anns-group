@@ -19,6 +19,7 @@ const AdminTabs = ({ page, children }: Props) => {
         {Object.entries(tabs).map(([key, tab]) => (
           <li key={key} className="me-2">
             <Link
+              prefetch={false}
               href={key}
               className={cx(
                 "inline-block rounded-t px-[16px] py-[12px] text-base transition-all",

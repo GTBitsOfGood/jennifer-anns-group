@@ -146,12 +146,15 @@ const Home = ({
   return (
     <div>
       <div className="flex flex-col items-center">
-        <div className="flex flex-col items-center py-32">
-          <h1 className="mb-12 text-center font-rubik text-7xl font-extrabold text-stone-primary">
+        <div className="flex flex-col items-center py-16 md:py-32">
+          <h1 className="mb-12 hidden text-center font-rubik text-7xl font-extrabold text-stone-primary md:block">
             Jennifer Ann&apos;s Group
           </h1>
-          <h2 className="text-center text-5xl font-medium italic text-orange-primary">
-            Gaming against violence.
+          <h1 className="mb-2 block text-center font-rubik text-4xl font-extrabold text-stone-primary md:hidden">
+            Jennifer Ann&apos;s
+          </h1>
+          <h2 className="text-center text-2xl font-medium italic text-orange-primary md:text-5xl">
+            Gaming Against Violence.
           </h2>
         </div>
         <div className="flex w-full flex-col items-center bg-blue-bg py-[72px]">
@@ -227,10 +230,14 @@ const Home = ({
                   }}
                 />
               )}
-              <div className="flex items-center">
-                <img src={`/Union.svg`} alt="union" className="mr-14" />
+              <div className="mx-8 flex flex-col items-center text-center md:mx-16 md:flex-row md:text-left">
+                <img
+                  src={`/Union.svg`}
+                  alt="union"
+                  className="w-16 md:mr-14 md:w-auto"
+                />
                 <div className="flex flex-col items-start">
-                  <h1 className="mb-6 text-left text-[40px] font-medium text-[#2352A0]">
+                  <h1 className="my-4 w-full text-2xl font-medium text-[#2352A0] md:my-0 md:mb-6 md:text-[40px]">
                     {pageData.mdTitle}
                   </h1>
                   <MarkdownRenderer
@@ -242,7 +249,7 @@ const Home = ({
             </div>
           )}
         </div>
-        <div className="relative flex w-full flex-col items-center py-16">
+        <div className="relative flex w-full flex-col items-center py-8 md:py-16">
           {userData?.label === "administrator" && !edit && (
             <EditGameBoyModal
               gameBoyTitle={pageData.gameBoyTitle}
@@ -250,19 +257,22 @@ const Home = ({
               refetchHomePage={refetch}
             />
           )}
-          <h1 className="mb-12 text-center text-4xl font-bold text-orange-primary">
+          <h1 className="mx-4 mb-6 text-center text-2xl font-bold text-orange-primary md:mx-0 md:mb-12 md:text-4xl">
             {pageData.gameBoyTitle}
           </h1>
-          <div className="flex w-full max-w-[96rem] justify-center space-x-14 px-16">
+          <div className="flex w-full max-w-[96rem] flex-col items-center justify-center gap-4 px-16 md:flex-row md:gap-0 md:space-x-14">
             {pageData.gameBoys.map((gameBoy: IGameBoy, index: number) => {
               if (!gameBoy.gameId) {
-                return <></>;
+                return null;
               }
 
               return (
-                <div key={index} className="max-w-l flex-1">
+                <div
+                  key={index}
+                  className="md:max-w-l max-w-48 flex-1 lg:max-w-[340px]"
+                >
                   <GameBoy imageUrl={images[gameBoy.gameId] || null} />
-                  <p className="text-s text-black-1000 mt-12 text-center leading-7">
+                  <p className="text-s text-black-1000 mt-4 text-center leading-7 md:mt-12">
                     {gameBoy.description}
                   </p>
                 </div>
@@ -270,72 +280,96 @@ const Home = ({
             })}
           </div>
         </div>
-        <div className="flex w-full flex-col items-center bg-blue-bg px-32 py-16">
-          <div className="flex flex-row items-center">
+        <div className="flex w-full flex-col items-center bg-blue-bg px-8 py-16 text-center md:px-32 md:text-start">
+          <div className="flex flex-col items-center gap-8 md:flex-row md:gap-0">
             <Image
               src={`/footer/social/Discord.svg`}
-              className="mr-16 -rotate-6 fill-blue-primary"
+              className="w-24 fill-blue-primary md:mr-16 md:w-[120px] md:-rotate-6"
               width={120}
               height={120}
               alt="Discord Icon"
             />
             <div>
-              <h2 className="mb-4 text-3xl font-semibold text-blue-primary">
+              <h2 className="mb-4 text-2xl font-semibold text-blue-primary md:text-4xl">
                 Want to learn more about Gaming Against Violence?
               </h2>
-              <p className="text-3xl italic text-blue-primary">
+              <p className="text-base italic text-blue-primary md:text-2xl">
                 Join our{" "}
-                <Link className="underline" href="" target="_blank">
+                <Link
+                  className="underline"
+                  href="https://discord.gg/g4bzMdF5"
+                  target="_blank"
+                >
                   Jennifer Ann&apos;s Group&apos;s discord!
                 </Link>
               </p>
             </div>
           </div>
         </div>
-        <div className="flex w-full flex-col px-[72px] py-32">
-          <div className="flex flex-row content-start items-center">
+        <div className="flex w-full flex-col px-8  py-16 md:px-16 md:py-32">
+          <div className="hidden flex-col content-start items-center gap-8 md:flex md:flex-row md:gap-0">
             <img src={`/bog_logo_2.svg`} alt="Bits of Good Logo" />
-            <div className="ml-12">
+            <div className="flex flex-col gap-4 md:ml-12 md:block">
               <img src={`/bog_logo_1.svg`} alt="Bits of Good Logo" />
-              <p className="mt-3 text-2xl font-semibold text-orange-primary">
+              <p className="mt-3 text-2xl font-semibold text-orange-primary md:text-3xl">
                 Thanks to Bits of Good for helping create our site!
               </p>
             </div>
           </div>
-          <div className="mt-16 flex flex-row justify-between gap-5">
-            <div className="w-2/5">
-              <h1 className="mb-8 text-2xl font-medium">About Bits of Good</h1>
-              <p className="text-lg">
+          <div className="flex flex-col content-start items-center gap-8 md:hidden md:flex-row md:gap-0">
+            <div className="flex w-full flex-col items-center justify-center gap-8 xs:flex-row">
+              <img
+                src={`/bog_logo_2.svg`}
+                alt="Bits of Good Logo"
+                className="h-auto w-1/4 max-w-16"
+              />
+              <img
+                src={`/bog_logo_1.svg`}
+                alt="Bits of Good Logo"
+                className="h-auto w-3/4 max-w-64"
+              />
+            </div>
+
+            <p className="text-center text-2xl font-semibold text-orange-primary xs:mt-3 xs:text-left">
+              Thanks to Bits of Good for helping create our site!
+            </p>
+          </div>
+          <div className="mt-16 flex flex-col justify-between gap-8 md:flex-row md:gap-5">
+            <div className="md:w-2/5">
+              <h1 className="mb-4 text-2xl font-medium md:mb-8">
+                About Bits of Good
+              </h1>
+              <p className="md:text-lg">
                 Georgia Tech Bits of Good connects students with local
                 nonprofits by building powerful web apps, redefining social good
                 to make an impact with a technical background.
               </p>
             </div>
-            <div className="flex flex-col items-end">
-              <div>
-                <h1 className="mb-8 text-2xl font-medium">
+            <div className="flex flex-row items-end md:flex-col">
+              <div className="w-full">
+                <h1 className="mb-4 text-2xl font-medium md:mb-8">
                   Special thanks to:
                 </h1>
-                <div className="flex flex-row space-x-8 text-lg">
+                <div className="grid w-full grid-cols-2  justify-between gap-8 md:grid-cols-4 md:text-lg">
                   <ul>
                     <li>Uma Anand</li>
                     <li>Hayden Carpenter</li>
                     <li>Samarth Chandna</li>
                     <li>Katsuki Chan</li>
                   </ul>
-                  <ul>
+                  <ul className="text-right md:text-left">
                     <li>Helen Chen</li>
                     <li>Ansley Franks</li>
                     <li>Nathan Gong</li>
                     <li>Aakash Gupta</li>
                   </ul>
-                  <ul>
+                  <ul className="">
                     <li>Lauren Ji</li>
                     <li>Yolanda Li</li>
                     <li>Xingyi Luo</li>
                     <li>Liane Nguyen</li>
                   </ul>
-                  <ul>
+                  <ul className="text-right md:text-left">
                     <li>Ankith Thalanki</li>
                     <li>Hannah Tsai</li>
                     <li>Annie Vallamattam</li>

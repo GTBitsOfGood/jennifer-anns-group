@@ -20,7 +20,7 @@ export default function AdminEditButton({
   return (
     <button
       onClick={handleEditClick}
-      className="rounded-md bg-blue-primary px-4 py-3 font-sans text-xl font-medium text-white hover:bg-blue-hover"
+      className="text-nowrap rounded-md bg-blue-primary px-4 py-3 font-sans text-xl font-medium text-white hover:bg-blue-hover"
     >
       Edit Game
     </button>
