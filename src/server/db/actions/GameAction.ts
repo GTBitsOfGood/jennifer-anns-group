@@ -347,6 +347,8 @@ const QUERY_FIELD_HANDLER_MAP: QueryFieldHandlers<GameQuery> = {
         "i",
       );
       filterFieldsAnd.name = { $regex: reg_string };
+      console.log("Filter Fields:", filterFieldsAnd);
+      console.log("Regex Used:", reg_string);
     }
     return { filterFieldsAnd: filterFieldsAnd, filterFieldsOr: filterFieldsOr };
   },

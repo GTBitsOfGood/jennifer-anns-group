@@ -325,6 +325,17 @@ const CMSDashboardPage = () => {
         visitEvents ? visitEvents.events : [],
       );
 
+      const viewQueryParams = {
+        projectName: "Jennifer Ann's",
+        environment:
+          process.env.NEXT_PUBLIC_ENV === "production"
+            ? EventEnvironment.PRODUCTION
+            : EventEnvironment.DEVELOPMENT,
+        category: "Visit",
+        subcategory: "game",
+        limit: 2000,
+        afterId: undefined,
+      };
       const downloadQueryParams = {
         projectName: "Jennifer Ann's",
         environment:
@@ -336,7 +347,12 @@ const CMSDashboardPage = () => {
         limit: 2000,
         afterId: undefined,
       };
-      const gameEvents = await getCustomEventsPaginated(downloadQueryParams);
+      const downloadGameEvents =
+        await getCustomEventsPaginated(downloadQueryParams);
+      const viewGameEvents = await getCustomEventsPaginated(viewQueryParams);
+      const gameEvents = {
+        events: [...downloadGameEvents?.events, ...viewGameEvents?.events],
+      };
 
       const pdfQueryParams = {
         projectName: "Jennifer Ann's",
@@ -356,13 +372,14 @@ const CMSDashboardPage = () => {
         pdfEvents?.events,
         visitEvents?.events,
       );
-
       setTrafficSourceData(sourceData);
       setTrafficGroupsData(groupsData);
       setAllGameData(gameData);
       setUserLeaderboard(leaderboardData);
     } catch (e) {
       console.error("Error fetching data:", e);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -399,7 +416,6 @@ const CMSDashboardPage = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userIds: allUserIds }),
         });
-
         if (!response.ok) return;
 
         const data = await response.json();
@@ -420,7 +436,6 @@ const CMSDashboardPage = () => {
         setLoading(false);
       }
     };
-
     fetchAllUserNames();
   }, [userLeaderboard]);
 
