@@ -87,8 +87,7 @@ async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
       "Cache-Control",
       "public, s-maxage=60, stale-while-revalidate=30",
     );
-
-    res.setHeader("Netlify-Vary", "query=*");
+    res.setHeader("Netlify-Vary", "query");
 
     return res.status(HTTP_STATUS_CODE.OK).send({
       games: tagSeparatedGames,
