@@ -83,6 +83,11 @@ async function getGamesHandler(req: NextApiRequest, res: NextApiResponse) {
       game.custom?.sort((a, b) => a.name.localeCompare(b.name));
     });
 
+    res.setHeader(
+      "Cache-Control",
+      "public, s-maxage=60, stale-while-revalidate=30",
+    );
+
     return res.status(HTTP_STATUS_CODE.OK).send({
       games: tagSeparatedGames,
       numPages,
