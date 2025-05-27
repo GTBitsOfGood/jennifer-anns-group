@@ -1,18 +1,34 @@
 import React from "react";
+import { useRouter } from "next/router";
 
 interface Props {
   imageUrl: string | null;
+  gameId?: string;
 }
 
-const GameBoy: React.FC<Props> = ({ imageUrl }) => {
+const GameBoy: React.FC<Props> = ({ imageUrl, gameId }) => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    if (gameId) {
+      router.push(`/games/${gameId}`);
+    }
+  };
+
   return (
-    <div className="relative">
+    <div 
+      className="relative" 
+      onClick={handleClick}
+      style={{ cursor: gameId ? "pointer" : "default" }}
+    >
       <img
         src="/gameboy-template.png"
         className="h-auto w-full"
         alt="Gameboy"
       />
-      <div className="absolute left-[50%] top-[28%] h-[30%] w-[48%] -translate-x-1/2 -translate-y-1/2 transform overflow-hidden rounded-3xl border-2 border-orange-primary md:border-[3.5px]">
+      <div 
+        className="absolute left-[50%] top-[28%] h-[30%] w-[48%] -translate-x-1/2 -translate-y-1/2 transform overflow-hidden rounded-3xl border-2 border-orange-primary md:border-[3.5px]"
+      >
         <div className="flex h-full w-full">
           {imageUrl && (
             <img

@@ -142,7 +142,7 @@ export default function WebGLUpload({
               </Label>
             ) : (
               <Label className="relative inline-block w-full rounded-md border border-black bg-[#D9D9D9] px-4 py-3 text-center hover:cursor-pointer">
-                Choose File
+                Choose File (build.loader.js)
                 <input
                   className="absolute opacity-0 hover:cursor-pointer"
                   type="file"
@@ -176,7 +176,7 @@ export default function WebGLUpload({
               </Label>
             ) : (
               <Label className="relative inline-block w-full rounded-md border border-black bg-[#D9D9D9] px-4 py-3 text-center hover:cursor-pointer">
-                Choose File
+                Choose File (build.data)
                 <input
                   className="absolute opacity-0 hover:cursor-pointer"
                   type="file"
@@ -209,7 +209,7 @@ export default function WebGLUpload({
               </Label>
             ) : (
               <Label className="relative inline-block w-full rounded-md border border-black bg-[#D9D9D9] px-4 py-3 text-center hover:cursor-pointer">
-                Choose File
+                Choose File (build.wasm)
                 <input
                   className="absolute opacity-0 hover:cursor-pointer"
                   type="file"
@@ -242,7 +242,7 @@ export default function WebGLUpload({
               </Label>
             ) : (
               <Label className="relative inline-block w-full rounded-md border border-black bg-[#D9D9D9] px-4 py-3 text-center hover:cursor-pointer">
-                Choose File
+                Choose File (build.framework.js)
                 <input
                   className="absolute opacity-0 hover:cursor-pointer"
                   type="file"

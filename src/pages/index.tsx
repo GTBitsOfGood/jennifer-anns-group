@@ -271,7 +271,7 @@ const Home = ({
                   key={index}
                   className="md:max-w-l max-w-48 flex-1 lg:max-w-[340px]"
                 >
-                  <GameBoy imageUrl={images[gameBoy.gameId] || null} />
+                  <GameBoy imageUrl={images[gameBoy.gameId] || null} gameId={gameBoy.gameId} />
                   <p className="text-s text-black-1000 mt-4 text-center leading-7 md:mt-12">
                     {gameBoy.description}
                   </p>
