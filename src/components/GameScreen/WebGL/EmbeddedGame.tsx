@@ -22,6 +22,7 @@ export default function EmbeddedGame({
   const [height, setHeight] = useState("725px");
   const { data: session, status: sessionStatus } = useSession();
   const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [showGame, setShowGame] = useState(false);
   const { logCustomEvent } = useAnalytics();
   const updateHeight = () => {
     const iframe = ref.current;
@@ -53,9 +54,22 @@ export default function EmbeddedGame({
     };
   };
 
+  const handlePlayClick = () => {
+    setShowGame(true);
+    
+    if (sessionStatus === "authenticated" && userData?.tracked) {
+      const properties = {
+        userId: userData?._id ?? "Unauthenticated",
+        userGroup: userData?.label ?? "None",
+        createdDate: Date(),
+        gameName: gameData?.name,
+      };
+      logCustomEvent("Gameplay", "game", properties);
+    }
+  };
+
   useEffect(() => {
-    if (iframeLoaded && sessionStatus == "authenticated" && userData?.tracked) {
-      // Analytics stuff
+    if (iframeLoaded && sessionStatus == "authenticated" && userData?.tracked && !showGame) {
       const properties = {
         userId: userData?._id ?? "Unauthenticated",
         userGroup: userData?.label ?? "None",
@@ -84,7 +98,27 @@ export default function EmbeddedGame({
     };
   }, []);
 
-  const renderContent = () => {
+  const renderPlayButton = () => (
+    <div className="flex h-game flex-col items-center justify-center border-2 border-solid border-black">
+      <Image
+        src={`/orange_heart.svg`}
+        alt="Play game"
+        width={90}
+        height={70}
+      />
+      <div className="mt-4 text-center text-2xl font-semibold text-orange-primary">
+        {gameData?.name || "Play Game"}
+      </div>
+      <button
+        onClick={handlePlayClick}
+        className="mt-4 px-8 py-3 bg-orange-primary hover:bg-orange-600 text-white rounded-md font-semibold transition-colors"
+      >
+        Play Now
+      </button>
+    </div>
+  );
+
+  const renderGameContent = () => {
     switch (true) {
       case gameData?.webGLBuild:
         return (
@@ -131,6 +165,14 @@ export default function EmbeddedGame({
             </div>
           </div>
         );
+    }
+  };
+
+  const renderContent = () => {
+    if ((gameData?.webGLBuild || gameData?.remoteUrl) && !showGame) {
+      return renderPlayButton();
+    } else {
+      return renderGameContent();
     }
   };
 

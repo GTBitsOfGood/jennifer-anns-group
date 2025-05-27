@@ -34,7 +34,7 @@ export default function GameCard({ game }: Props) {
             borderTopRightRadius="8px"
             height="200px"
             width="100%"
-            fit="cover"
+            fit="contain"
             src={game.image}
             alt="Game Image Preview"
           />
